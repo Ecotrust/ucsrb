@@ -175,13 +175,13 @@ INSTALLED_APPS = [
     'core',
     'compressor',
     ### BEGIN INSERTED INSTALLED APPS ###
-    'ucsrb',
-    'features',
-    'manipulators',
-    'accounts',
-    'data_manager',
-    'visualize',
-    'nursery',
+    'features', 
+    'manipulators', 
+    'accounts', 
+    'data_manager', 
+    'visualize', 
+    'nursery', 
+    'ucsrb', 
     ### END INSERTED INSTALLED APPS ###
 ]
 

@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 setup(
     name='ucsrb',
     version='0.0.1',
-    packages=find_packages(),
+    packages=['ucsrb'],
     include_package_data=True,
     license='TBD',
     description='Core Django Module for UCSRB Tool',
