@@ -1,0 +1,43 @@
+<!-- {\% load static portal menu %} -->
+{% load static %}
+<!-- Brand and toggle get grouped for better mobile display -->
+<div class="navbar-header">
+  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="navbar-brand" href="/">
+    <!-- <img src="{% static 'brand_logo.svg' %}"> -->
+  </a>
+</div>
+
+<!-- Collect the nav links, forms, and other content for toggling -->
+<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+  <ul class="nav navbar-nav navbar-right">
+    <li><a href="{% url 'visualize' %}"><span class="icon-marco oversized"></span>MAPS</a></li>
+    <!-- {\% menus %} -->
+    <li>
+      {% if user.is_authenticated %}
+          <a href="{% url 'account:index' %}">{{ user.first_name }} <span class="fa fa-user"></span></a>
+      {% else %}
+          <a href="{% url 'account:index' %}?next={{ request.path }}">LOG IN <span class="fa fa-user"></span></a>
+      {% endif %}
+    </li>
+    {% if not SEARCH_DISABLED %}
+      <li class="dropdown search-dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fa fa-search"></span></a>
+        <ul class="dropdown-menu" role="menu">
+          <li>
+            <form action="/search/" method="get" class="form-inline search">
+              <input type="text" name="q"{% if query_string %} value="{{ query_string }}"{% endif %} class="form-control search-input">
+              <button class="btn btn-primary" type="submit">Search</button>
+            </form>
+          </li>
+        </ul>
+      </li>
+    {% endif %}
+
+  </ul>
+</div><!-- /.navbar-collapse -->
