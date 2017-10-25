@@ -19,7 +19,8 @@ $('#bbox-test-link').click(function() {
     url: "/api/get_segment_by_bbox",
     data: {
       // bbox_coords: [minX, minY, -maxX, maxY]
-      bbox_coords: [-120.4322147, 47.6283221, -120.4079246, 47.6430126]
+      // bbox_coords: [-120.4322147, 47.6283221, -120.4079246, 47.6430126] (4326 is not allowed)
+      bbox_coords: [-13406452.813644003, 6045242.123841717, -13403748.852081062, 6047669.009725289]
     },
     type: 'GET',
     dataType: 'json',
