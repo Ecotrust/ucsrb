@@ -9,6 +9,9 @@
   <li>
     <b><a id='bbox-test-link'>/api/get_segment_by_bbox</a></b> - for use on click - calculate bbox from an x-pixel buffer from clicked pixel.
   </li>
+  <li>
+    <b><a id='segment-id-test-link'>/api/get_segment_by_id</a></b> - given a segment id (from return or state), get segment details.
+  </li>
 </ul>
 
 
@@ -32,6 +35,24 @@ $('#bbox-test-link').click(function() {
       console.log(data);
     }
   });
-
 });
+$('#segment-id-test-link').click(function() {
+  console.log('segment-id-test-link clicked');
+  $.ajax({
+    url: "/api/get_segment_by_id",
+    data: {
+      'id': 1
+    },
+    type: 'GET',
+    dataType: 'json',
+    success: function(data){
+      window.alert(JSON.stringify(data));
+    },
+    error: function(data){
+      window.alert('Error returning get_segment_by_id api call');
+      console.log(data);
+    }
+  });
+});
+
 </script>
