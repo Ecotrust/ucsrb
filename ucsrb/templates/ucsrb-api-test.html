@@ -1,0 +1,36 @@
+{% block extra_head %}
+<script
+  src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
+  crossorigin="anonymous"></script>
+{% endblock %} <!-- extra_head -->
+
+<ul>
+  <li>
+    <b><a id='bbox-test-link'>/api/get_segment_by_bbox</a></b> - for use on click - calculate bbox from an x-pixel buffer from clicked pixel.
+  </li>
+</ul>
+
+
+<script>
+$('#bbox-test-link').click(function() {
+  console.log('bbox-test-link clicked');
+  $.ajax({
+    url: "/api/get_segment_by_bbox",
+    data: {
+      // bbox_coords: [minX, minY, -maxX, maxY]
+      bbox_coords: [-120.4322147, 47.6283221, -120.4079246, 47.6430126]
+    },
+    type: 'GET',
+    dataType: 'json',
+    success: function(data){
+      window.alert(JSON.stringify(data));
+    },
+    error: function(data){
+      window.alert('Error returning get_segment_by_bbox api call');
+      console.log(data);
+    }
+  });
+
+});
+</script>

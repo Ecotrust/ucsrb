@@ -175,13 +175,15 @@ INSTALLED_APPS = [
     'core',
     'compressor',
     ### BEGIN INSERTED INSTALLED APPS ###
-    'features', 
-    'manipulators', 
-    'accounts', 
-    'data_manager', 
-    'visualize', 
-    'nursery', 
-    'ucsrb', 
+    'features',
+    'manipulators',
+    'accounts',
+    'data_manager',
+    'visualize',
+    'nursery',
+    'ucsrb',
+    'drawing',
+    'rpc4django',
     ### END INSERTED INSTALLED APPS ###
 ]
 
@@ -190,6 +192,7 @@ try:
     from features.settings import *
     from accounts.settings import *
     from data_manager.settings import *
+    from drawing.settings import *
     ### END MODULE SETTINGS IMPORT ###
 except ImportError:
     pass
