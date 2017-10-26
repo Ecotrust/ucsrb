@@ -31,7 +31,7 @@ urlpatterns = [
     url(r'^ucsrb/', include('ucsrb.urls')),
     url(r'^drawing/', include('drawing.urls')),
     url(r'^api/', include('ucsrb.urls')),
-    url(r'^$', include('ucsrb.urls')),
+    url(r'', include('ucsrb.urls')),
     ### END PROJECT URL INCLUDES ###
     # url(r'^visualize/', include('visualize.urls')),
     # url(r'^account/auth/', include('social.apps.django_app.urls', namespace='social')),

@@ -11,13 +11,16 @@
 
 <ul>
   <li>
+    <b><a id='bbox-veg-test-link'>/api/get_veg_unit_by_bbox</a></b> - for use on click - calculate bbox from an x-pixel buffer from clicked pixel.
+  </li>
+  <li>
     <b><a id='bbox-test-link'>/api/get_segment_by_bbox</a></b> - for use on click - calculate bbox from an x-pixel buffer from clicked pixel.
   </li>
   <li>
-    <b><a id='segment-id-test-link'>/api/get_segment_by_id</a></b> - given a segment id (from return or state), get segment details.
+    <b><a id='segment-id-test-link'>/segment/1</a></b> - given a segment id (from return or state), get segment details.
   </li>
   <li>
-    <b><a id='pp-id-test-link'>/api/get_pourpoint_by_id</a></b> - given a pour point id (from return or state), get pour point details.
+    <b><a id='pp-id-test-link'>/pourpoint/1</a></b> - given a pour point id (from return or state), get pour point details.
   </li>
   <li>
     <b><a id='filter-test-link'>/api/filter_results</a></b> - given a list of contraints, get matching planning units (and count).
@@ -32,6 +35,27 @@
 
 
 <script>
+$('#bbox-veg-test-link').click(function() {
+  console.log('bbox-veg-test-link clicked');
+  $.ajax({
+    url: "/api/get_veg_unit_by_bbox",
+    data: {
+      // bbox_coords: [minX, minY, -maxX, maxY]
+      // bbox_coords: [-120.4322147, 47.6283221, -120.4079246, 47.6430126] (4326 is not allowed)
+      bbox_coords: [-13406452.813644003, 6045242.123841717, -13403748.852081062, 6047669.009725289]
+    },
+    type: 'GET',
+    dataType: 'json',
+    success: function(data){
+      window.alert(JSON.stringify(data));
+    },
+    error: function(data){
+      window.alert('Error returning get_segment_by_bbox api call');
+      console.log(data);
+    }
+  });
+});
+
 $('#bbox-test-link').click(function() {
   console.log('bbox-test-link clicked');
   $.ajax({
@@ -55,12 +79,8 @@ $('#bbox-test-link').click(function() {
 $('#segment-id-test-link').click(function() {
   console.log('segment-id-test-link clicked');
   $.ajax({
-    url: "/api/get_segment_by_id",
-    data: {
-      'id': 1
-    },
+    url: "/segment/1",
     type: 'GET',
-    dataType: 'json',
     success: function(data){
       window.alert(JSON.stringify(data));
     },
@@ -73,12 +93,8 @@ $('#segment-id-test-link').click(function() {
 $('#pp-id-test-link').click(function() {
   console.log('pp-id-test-link clicked');
   $.ajax({
-    url: "/api/get_pourpoint_by_id",
-    data: {
-      'id': 1
-    },
+    url: "/pourpoint/1",
     type: 'GET',
-    dataType: 'json',
     success: function(data){
       window.alert(JSON.stringify(data));
     },

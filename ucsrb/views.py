@@ -18,8 +18,24 @@ def index(request):
 ###########################################################
 ###             API Calls                                 #
 ###########################################################
+def get_veg_unit_by_bbox(request):
+    [minX, minY, maxX, maxY] = [float(x) for x in request.GET.getlist('bbox_coords[]')]
+    # TODO: Get all veg units that intersect bbox (planning units)
+    # TODO: Select first returned veg unit (handle 0)
+    # TODO: build context and return.
+    return_json = {
+        'id': 1,
+        'veg_unit_attrs': [
+            ['int_attr', 100],
+            ['float_attr', 99.999],
+            ['str_attr', 'one hundred'],
+            ['bool_attr', True],
+            ['list_attr', [1,2,3,4]]
+        ]
+    }
+    return JsonResponse(return_json)
+
 def get_segment_by_bbox(request):
-    # Get bbox [minX, minY, maxX, maxY] from request
     [minX, minY, maxX, maxY] = [float(x) for x in request.GET.getlist('bbox_coords[]')]
     # TODO: Get all stream segments that intersect bbox
     # TODO: Select first returned stream segment (handle 0)
@@ -152,8 +168,8 @@ def get_segment_by_bbox(request):
     }
     return JsonResponse(return_json)
 
-def get_segment_by_id(request):
-    segment_id = request.GET.get('id')
+def get_segment_by_id(request, id):
+    print('Segment ID: %s' % str(id))
     # TODO: query for stream segment with given ID
     # TODO: get list of Pourpoints associated with stream segment
     # TODO: build context and return.
@@ -283,8 +299,8 @@ def get_segment_by_id(request):
     }
     return JsonResponse(return_json)
 
-def get_pourpoint_by_id(request):
-    pourpoint_id = request.GET.get('id')
+def get_pourpoint_by_id(request, id):
+    print('Pour Point ID: %s' % str(id))
     # TODO: query for pour point with given ID
     # TODO: query for pour point basin polygon with given ID
     # TODO: calculate area (on PPBasin model? On Madrona PolygonFeature model?)
