@@ -1,8 +1,12 @@
 {% block extra_head %}
+<!-- jQuery for the Ajax testing -->
 <script
   src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
   integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
   crossorigin="anonymous"></script>
+<!-- Openlayers 4 in case it helps for testing/debugging -->
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/ol3/4.4.2/ol.css"></script>
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/ol3/4.4.2/ol.js"></script>
 {% endblock %} <!-- extra_head -->
 
 <ul>
@@ -11,6 +15,18 @@
   </li>
   <li>
     <b><a id='segment-id-test-link'>/api/get_segment_by_id</a></b> - given a segment id (from return or state), get segment details.
+  </li>
+  <li>
+    <b><a id='pp-id-test-link'>/api/get_pourpoint_by_id</a></b> - given a pour point id (from return or state), get pour point details.
+  </li>
+  <li>
+    <b><a id='filter-test-link'>/api/filter_results</a></b> - given a list of contraints, get matching planning units (and count).
+  </li>
+  <li>
+    <b><a id='scenario-results-test-link'>/api/get_results_by_scenario_id</a></b> - given a scenario id, get report: JSON, .csv, or .pdf.
+  </li>
+  <li>
+    <b><a id='state-results-test-link'>/api/get_results_by_state</a></b> - given the current scenario state, get report: JSON, .csv, or .pdf.
   </li>
 </ul>
 
@@ -50,6 +66,89 @@ $('#segment-id-test-link').click(function() {
     },
     error: function(data){
       window.alert('Error returning get_segment_by_id api call');
+      console.log(data);
+    }
+  });
+});
+$('#pp-id-test-link').click(function() {
+  console.log('pp-id-test-link clicked');
+  $.ajax({
+    url: "/api/get_pourpoint_by_id",
+    data: {
+      'id': 1
+    },
+    type: 'GET',
+    dataType: 'json',
+    success: function(data){
+      window.alert(JSON.stringify(data));
+    },
+    error: function(data){
+      window.alert('Error returning get_pourpoint_by_id api call');
+      console.log(data);
+    }
+  });
+});
+$('#filter-test-link').click(function() {
+  console.log('filter-test-link clicked');
+  $.ajax({
+    url: "/api/filter_results",
+    data: {
+      'ppid': 1,        // pour point id for stream segment scenarios (else null)
+      'muid': null,     // management unit id for forest management scenarios (else null)
+      'filters': {
+        'rd_dist': 2,         // current guess at name for 'distance to road' field
+        'stp_slope': false,   // current guess as to whether to filter out steep slopes
+        'str_filter': 'foo'   // I have no idea if anything will be filtered by string
+      }
+    },
+    type: 'GET',
+    dataType: 'json',
+    success: function(data){
+      window.alert('COUNT: ' + data.count + '\nFEATURES: ' + JSON.stringify(data.features));
+    },
+    error: function(data){
+      window.alert('Error returning filter_results api call');
+      console.log(data);
+    }
+  });
+});
+$('#scenario-results-test-link').click(function() {
+  console.log('scenario-results-test-link clicked');
+  $.ajax({
+    url: "/api/get_results_by_scenario_id",
+    data: {
+      'id': 1,
+      'export': null
+    },
+    type: 'GET',
+    dataType: 'json',
+    success: function(data){
+      window.alert(JSON.stringify(data));
+      console.log(data);
+    },
+    error: function(data){
+      window.alert('Error returning get_results_by_scenario_id api call');
+      console.log(data);
+    }
+  });
+});
+var state = {};         //This will have to get more defined - maybe build with a function?
+$('#state-results-test-link').click(function() {
+  console.log('state-results-test-link clicked');
+  $.ajax({
+    url: "/api/get_results_by_state",
+    data: {
+      'state': state,
+      'export': null
+    },
+    type: 'GET',
+    dataType: 'json',
+    success: function(data){
+      window.alert(JSON.stringify(data));
+      console.log(data);
+    },
+    error: function(data){
+      window.alert('Error returning get_results_by_state api call');
       console.log(data);
     }
   });
