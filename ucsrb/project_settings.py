@@ -185,6 +185,7 @@ INSTALLED_APPS = [
     'ucsrb',
     'drawing',
     'rpc4django',
+    'filter',
     ### END INSERTED INSTALLED APPS ###
 ]
 

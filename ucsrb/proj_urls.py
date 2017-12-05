@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^account/', include('accounts.urls', namespace="account")),
     url(r'^data_manager/', include('data_manager.urls')),
     url(r'^visualize/', include('visualize.urls')),
+    url(r'^filter/', include('filter.urls')),
     url(r'^ucsrb/', include('ucsrb.urls')),
     url(r'^drawing/', include('drawing.urls')),
     url(r'^api/', include('ucsrb.urls')),
