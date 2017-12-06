@@ -31,9 +31,11 @@ echo "setting up virtualenvs"
     $PIP install -e $PROJECT_DIR/apps/madrona-manipulators && \
     $PIP install -e $PROJECT_DIR/apps/mp-accounts && \
     $PIP install -e $PROJECT_DIR/apps/mp-data-manager && \
-    $PIP install -e $PROJECT_DIR/apps/mp-filter && \ 
     $PIP install -e $PROJECT_DIR/apps/mp-visualize && \
     $PIP install -e $PROJECT_DIR/apps/p97-nursery && \
+    $PIP install -e $PROJECT_DIR/apps/madrona-analysistools && \
+    $PIP install -e $PROJECT_DIR/apps/madrona-scenarios && \
+    # $PIP install -e $PROJECT_DIR/apps/mp-filter && \
     $PIP install -e $PROJECT_DIR/apps/ucsrb && \
     ### END PROJECT PROVISION FILES ###
 
