@@ -15,6 +15,20 @@ def index(request):
     }
     return HttpResponse(template.render(context, request))
 
+def home(request):
+    template = loader.get_template('ucsrb/home.html')
+    context = {
+        'title': 'UCSRB',
+        'self': {
+            'title': 'UCSRB'
+        }
+    }
+    return HttpResponse(template.render(context, request))
+
+def app(request):
+    template = loader.get_template('ucsrb/index.html')
+    return HttpResponse(template.render(context, request))
+
 ###########################################################
 ###             API Calls                                 #
 ###########################################################

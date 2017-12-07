@@ -4,6 +4,8 @@ from . import views
 
 urlpatterns = [
     ### API urls
+    url(r'^home/?', views.home),
+    url(r'^app/?', views.app, name="app"),
     url(r'^get_veg_unit_by_bbox', views.get_veg_unit_by_bbox),
     url(r'^get_segment_by_bbox', views.get_segment_by_bbox),
     # url(r'^get_segment_by_id', views.get_segment_by_id),

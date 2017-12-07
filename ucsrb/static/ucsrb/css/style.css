@@ -1,3 +1,18 @@
 body {
   background: pink;
 }
+
+a:hover,
+button:hover {
+    cursor: pointer;
+}
+
+button {
+    background: transparent;
+    border: 2px solid #fff;
+    border-radius: 0;
+    color: #fff;
+    font-size: 1.5em;
+    line-height: 1.3125;
+    padding: 4px 20px;
+}
