@@ -8,7 +8,7 @@ html {
 }
 
 body {
-  background: rgba(255,20,20,.5);
+  background: rgba(255,200,200,.5);
   margin: 0;
   padding: 0;
 }
@@ -28,7 +28,21 @@ a.btn {
     text-decoration: none;
 }
 
+.nav-wrap {
+    border-bottom: 3px solid #fff;
+    overflow: hidden;
+    position: relative;
+}
+
 nav {
-    background: rgba(55,250,250,.5);
+    background: rgba(25,255,250,.5);
     line-height: 3;
+}
+
+#scenario-nav {
+    float: left;
+}
+
+#file-nav {
+    float:right;
 }

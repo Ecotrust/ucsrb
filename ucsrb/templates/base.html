@@ -20,7 +20,6 @@
     {% endblock %}
 
     {% block site_style %}
-        <link rel="stylesheet" href="{% static 'ucsrb/css/ol.css' %}" media="screen,projection"/>
         <link rel="stylesheet" href="{% static 'ucsrb/css/style.css' %}" media="screen,projection"/>
     {% endblock site_style %}
 
@@ -49,9 +48,7 @@
         {% endblock %}
     </footer>
 
-    {% block extra_js %}
-        <script src="{% static 'ucsrb/js/ol.js' %}"></script>
-    {% endblock %}
+    {% block extra_js %}{% endblock %}
 
     {% block top-level %}{% endblock %}
 </body>

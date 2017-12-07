@@ -1,6 +1,19 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block site_style %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'ucsrb/css/ol.css' %}" media="screen,projection"/>
+{% endblock site_style %}
+
 {% block content %}
-  <h1>Forest Viewer Title</h1>
+    <div id="map"></div>
 {% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'ucsrb/js/ol.js' %}"></script>
+    <script src="{% static 'ucsrb/js/map.js' %}"></script>
+    <script src="{% static 'ucsrb/js/scenario-type.js' %}"></script>
+    <script src="{% static 'ucsrb/js/main.js' %}"></script>
+{% endblock extra_js %}
