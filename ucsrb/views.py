@@ -6,7 +6,7 @@ from django.template import loader
 import json
 
 def index(request):
-    template = loader.get_template('index.html')
+    template = loader.get_template('ucsrb/index.html')
     context = {
         'title': 'UCSRB FSTAT',
         'self': {

@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}{% if self.seo_title %}{{ self.seo_title }}{% else %}{{ self.title }}{% endif %}{% endblock %}{% block title_suffix %}{% endblock %}</title>
+
+    {% block extra_head %}
+        <meta name="description" content="upper columbia">
+        <meta name="robots" content="index,follow"><!-- All Search Engines -->
+        <meta name="googlebot" content="index,follow"><!-- Google Specific -->
+        <meta name="referrer" content="same-origin">
+
+        {# <link rel="icon" type="image/png" sizes="16x16" href="{% static 'hnfp/img/favicon16x16.png' %}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'hnfp/img/favicon32x32.png' %}">
+        <link rel="icon" type="image/png" sizes="96x96" href="{% static 'hnfp/img/favicon.png' %}"> #}
+    {% endblock %}
+
+    {% block site_style %}
+        <link rel="stylesheet" href="{% static 'ucsrb/css/ol.css' %}" media="screen,projection"/>
+        <link rel="stylesheet" href="{% static 'ucsrb/css/style.css' %}" media="screen,projection"/>
+    {% endblock site_style %}
+
+    {% block extra_css %}{% endblock extra_css %}
+
+    {% block jquery %}
+        <script src="{% static 'ucsrb/js/jquery-3.2.1.min.js' %}"></script>
+    {% endblock jquery %}
+</head>
+
+<body class="{% block body_class %}classless-page{% endblock %} {% block layout %}base{% endblock %}-layout">
+    <header>
+        {% block header %}
+            {% include 'ucsrb/navbar.html' %}
+        {% endblock header %}
+    </header>
+
+    {% block content %}{% endblock content %}
+
+    {% block outer_content %}{% endblock outer_content %}
+
+    <footer>
+        {% block footer %}
+            {% include 'ucsrb/footer.html' %}
+        {% endblock %}
+    </footer>
+
+    {% block extra_js %}
+        <script src="{% static 'ucsrb/js/ol.js' %}"></script>
+    {% endblock %}
+
+    {% block top-level %}{% endblock %}
+</body>
+</html>

@@ -124,6 +124,7 @@ STATICFILES_DIRS = (
 COMPRESS_ENABLED = True
 COMPRESS_URL = STATIC_URL
 COMPRESS_ROOT = STATIC_ROOT
+COMPRESS_URL_PLACEHOLDER = '_'
 COMPRESS_OUTPUT_DIR = 'CACHE'
 COMPRESS_STORAGE = 'compressor.storage.CompressorFileStorage'
 COMPRESS_VERBOSE = False
@@ -180,9 +181,9 @@ INSTALLED_APPS = [
     'manipulators',
     'accounts',
     'data_manager',
+    'ucsrb',
     'visualize',
     'nursery',
-    'ucsrb',
     'drawing',
     'rpc4django',
     'analysistools',
