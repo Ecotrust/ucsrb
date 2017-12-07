@@ -1,13 +1,23 @@
-body {
-  background: pink;
+* {
+    box-sizing: border-box;
 }
 
-a:hover,
-button:hover {
+html {
+    font-weight: normal;
+    font-size: 1em;
+}
+
+body {
+  background: rgba(255,20,20,.5);
+  margin: 0;
+  padding: 0;
+}
+
+a:hover {
     cursor: pointer;
 }
 
-button {
+a.btn {
     background: transparent;
     border: 2px solid #fff;
     border-radius: 0;
@@ -15,4 +25,10 @@ button {
     font-size: 1.5em;
     line-height: 1.3125;
     padding: 4px 20px;
+    text-decoration: none;
+}
+
+nav {
+    background: rgba(55,250,250,.5);
+    line-height: 3;
 }
