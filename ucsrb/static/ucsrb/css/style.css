@@ -46,3 +46,11 @@ nav {
 #file-nav {
     float:right;
 }
+
+#right-panel div {
+    visibility: hidden;
+}
+
+#right-panel div.show {
+    visibility: visible;
+}

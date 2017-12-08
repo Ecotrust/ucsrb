@@ -5,8 +5,8 @@ var scenarioType = {
     'filter',
     'draw'
   ],
-  get function() {
-    return this.currentScenarioType
+  get current() {
+    return this.currentScenarioType;
   },
   set current(scenarioType) {
     this.currentScenarioType = scenarioType;
