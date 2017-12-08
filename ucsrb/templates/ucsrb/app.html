@@ -4,15 +4,26 @@
 {% block site_style %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'ucsrb/css/ol.css' %}" media="screen,projection"/>
+    <link rel="stylesheet" href="{% static 'ucsrb/css/app.css' %}"/>
+    <link rel="stylesheet" href="{% static 'ucsrb/css/_40-app.css' %}"/>
+    <link rel="stylesheet" href="{% static 'ucsrb/css/_64-app.css' %}"/>
+    <link rel="stylesheet" href="{% static 'ucsrb/css/_90-app.css' %}"/>
 {% endblock site_style %}
 
 {% block content %}
-    <div id="map"></div>
+<section class="map-wrap">
+    <div id="map">Map</div>
     <div id="right-panel">
-        <div class="step1">Step 1</div>
-        <div class="step2">Step 2</div>
-        <div class="step3">Step 3</div>
+        <section class="content"></section>
+        <div class="step1" data-step="1">Step 1</div>
+        <div class="step2" data-step="2">Step 2</div>
+        <div class="step3" data-step="3">Step 3</div>
+        <section class="step-controls">
+            <div id="prev-step"><a href="" data-step="prev">Prev</a></div>
+            <div id="next-step"><a href="" data-step="next">Next</a></div>
+        </section>
     </div>
+</section>
 {% endblock %}
 
 {% block extra_js %}
@@ -21,4 +32,5 @@
     <script src="{% static 'ucsrb/js/map.js' %}"></script>
     <script src="{% static 'ucsrb/js/scenario-type.js' %}"></script>
     <script src="{% static 'ucsrb/js/main.js' %}"></script>
+    <script src="{% static 'ucsrb/js/results.js' %}"></script>
 {% endblock extra_js %}

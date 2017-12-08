@@ -39,18 +39,6 @@ nav {
     line-height: 3;
 }
 
-#scenario-nav {
-    float: left;
-}
+footer {
 
-#file-nav {
-    float:right;
-}
-
-#right-panel div {
-    visibility: hidden;
-}
-
-#right-panel div.show {
-    visibility: visible;
 }
