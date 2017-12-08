@@ -874,3 +874,26 @@ def get_results_by_state(request):
         'response': 'TODO :('
     }
     return JsonResponse(return_json)
+
+def get_planningunits(request):
+    from ucsrb.models import VegPlanningUnit
+    from json import dumps
+    json = []
+    # planningunits = PlanningUnit.objects.filter(avg_depth__lt=0.0, min_wind_speed_rev__isnull=False)
+    planningunits = VegPlanningUnit.objects.all()
+    for p_unit in planningunits:
+        json.append({
+            'id': p_unit.id,
+            'wkt': p_unit.geometry.wkt,
+            'has_roads': p_unit.has_roads,
+            'has_endangered_habitat': p_unit.has_endangered_habitat,
+            'is_private': p_unit.is_private,
+            'has_high_fire_risk': p_unit.has_high_fire_risk,
+            'miles_from_road_access': p_unit.miles_from_road_access,
+            'vegetation_type': p_unit.vegetation_type,
+            'forest_height': p_unit.forest_height,
+            'forest_class': p_unit.forest_class,
+            'slope': p_unit.slope,
+            'canopy_coverage': p_unit.canopy_coverage,
+        })
+    return HttpResponse(dumps(json))
