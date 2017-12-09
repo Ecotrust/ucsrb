@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 import json
+from ucsrb.models import TreatmentScenario
 
 def index(request):
     template = loader.get_template('index.html')
@@ -897,3 +898,20 @@ def get_planningunits(request):
             'canopy_coverage': p_unit.canopy_coverage,
         })
     return HttpResponse(dumps(json))
+
+from scenarios.views import get_scenarios as scenarios_get_scenarios
+def get_scenarios(request, scenario_model=TreatmentScenario):
+    return scenarios_get_scenarios(request, scenario_model)
+
+def demo(request, template='scenarios/demo.html'):
+    try:
+        from ucsrb import project_settings as settings
+        context = {
+            'GET_SCENARIOS_URL': settings.GET_SCENARIOS_URL,
+            'SCENARIO_FORM_URL': settings.SCENARIO_FORM_URL,
+            'SCENARIO_LINK_BASE': settings.SCENARIO_LINK_BASE
+        }
+    except:
+        context = {}
+
+    return render(request, template, context)

@@ -191,6 +191,10 @@ INSTALLED_APPS = [
     ### END INSERTED INSTALLED APPS ###
 ]
 
+GET_SCENARIOS_URL = '/get_scenarios'
+SCENARIO_FORM_URL = '/features/treatmentscenario/form/'
+SCENARIO_LINK_BASE = '/features/treatmentscenario/ucsrb_treatmentscenario'
+
 try:
     ### START MODULE SETTINGS IMPORT ###
     from features.settings import *

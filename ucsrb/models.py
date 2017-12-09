@@ -1,12 +1,19 @@
 from django.db import models
-
+from features.registry import register
 from scenarios.models import Scenario, PlanningUnit
 
-# class TreatmentScenario(Scenario):
+@register
+class TreatmentScenario(Scenario):
     # input_max_distance_to_shore = models.FloatField(verbose_name='Maximum Distance to Shore', null=True, blank=True)
     #
     # input_parameter_substrate = models.BooleanField(verbose_name='Substrate Parameter', default=False)
     # input_substrate = models.ManyToManyField('Substrate', null=True, blank=True)
+    class Options:
+        verbose_name = 'Treatment'
+        # icon_url = 'marco/img/multi.png'
+        form = 'ucsrb.forms.TreatmentScenarioForm'
+        form_template = 'ucsrb_scenarios/form.html'
+        show_template = 'scenarios/show.html'
 
 class VegPlanningUnit(PlanningUnit):
     # max_wind_speed = models.FloatField()

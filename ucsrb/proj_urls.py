@@ -18,6 +18,7 @@ from django.contrib import admin
 ### INSERT ADDITIONAL IMPORTS HERE ###
 import accounts.urls
 ### END PROJECT URL IMPORTS ###
+from ucsrb.views import demo
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -28,6 +29,7 @@ urlpatterns = [
     url(r'^account/', include('accounts.urls', namespace="account")),
     url(r'^data_manager/', include('data_manager.urls')),
     url(r'^visualize/', include('visualize.urls')),
+    url(r'^scenario/demo$', demo),
     url(r'^scenario/', include('scenarios.urls')),
     # url(r'^filter/', include('filter.urls')),
     url(r'^ucsrb/', include('ucsrb.urls')),
