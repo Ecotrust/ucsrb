@@ -15,7 +15,9 @@ urlpatterns = [
     url(r'^get_results_by_scenario_id', views.get_results_by_scenario_id),
     url(r'^get_results_by_state', views.get_results_by_state),
 
-
+    ### Filter/Scenarios Work
+    url(r'get_scenarios$', views.get_scenarios),
+    url(r'get_planningunits$', views.get_planningunits),
 
     ### end API urls
     url(r'^', views.index, name='index'),
