@@ -14,6 +14,54 @@ var scenarioType = {
   }
 };
 
+var selectSegment = {
+  currentSegement: {}
+}
+
+var scenarioTypeCall = {
+  /**
+   * Request stream segement by id
+   * @param {number|int} id
+   * Returns stream segement Object
+   * @returns {Object} segment
+   * @property {string} name
+   * @property {int} id
+   * @property {geojson} geometery
+   * @property {Array} pourpoints
+       * @property {Object|id,geometry,name} list of objects
+   */
+  get_segment_by_id: function(id) {
+    let request = 'segment/' + id;
+    return $.ajax(request)
+      .done(function(response) {
+        selectSegment.currentSegement = response;
+        console.log(response);
+        return response;
+      })
+      .fail(function(response) {
+        console.log('fail: ' + response);
+      });
+  },
+  /**
+   * Request pourpoint by id
+   * @param {number|int} id
+   * Returns pourpoint Object
+   * @returns {Object} pourpoint
+   * @property {string} name
+   * @property {number} id
+   * @property {number} acres
+   * @property {Object} point_geometry
+   * @property {Object} area_geometry
+   */
+  get_pourpoint_by_id: function(id) {
+    let request = 'pourpoint/' + id;
+    return $.ajax(request)
+      .done(function(response) {
+          console.log(response);
+      });
+  }
+}
+
 var scenarioTypePanel = {
   currentStep: 0,
   panelPosition: '',

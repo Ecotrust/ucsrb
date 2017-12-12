@@ -10,6 +10,11 @@ $(document).ready(function() {
     setScenarioType.then(function() {
       $('#map').css('background-color', '#aaa');
       $('#map').html(scenarioType.current);
+      if (scenarioType.current === 'select') {
+        $('#map').click(function() {
+          scenarioTypeCall.get_segment_by_id(1)
+        });
+      }
       scenarioTypePanel.step = 1;
       scenarioTypePanel.setPanel('right', '50%', scenarioType.current);
       scenarioTypePanel.updatePanel();

@@ -48,7 +48,11 @@
         {% endblock %}
     </footer>
 
-    {% block extra_js %}{% endblock %}
+    {% block extra_js %}
+        <!-- Automatically provides/replaces `Promise` if missing or broken. -->
+        <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js"></script> 
+    {% endblock %}
 
     {% block top-level %}{% endblock %}
 </body>
