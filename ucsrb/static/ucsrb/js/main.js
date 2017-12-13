@@ -2,22 +2,29 @@ $(document).ready(function() {
 
   $('#scenario-nav a').click(function(event) {
     event.preventDefault();
+    var type = event.target.dataset.scenarioType;
     var setScenarioType = new Promise((resolve,reject) => {
-      scenarioType.current = event.target.dataset.scenarioType;
+      appState.setScenarioType = type;
       // add error check
       resolve();
     });
     setScenarioType.then(function() {
       $('#map').css('background-color', '#aaa');
-      $('#map').html(scenarioType.current);
-      if (scenarioType.current === 'select') {
+      $('#map').html(appState.scenarioType);
+      if (appState.scenarioType === 'select') {
         $('#map').click(function() {
-          scenarioTypeCall.get_segment_by_id(1)
+          fetch(scenarioTypeCall.get_segment_by_id(1))
+            .then(function(data) {
+              $('#map').html(data.pourpoints);
+            })
+            .then(function(data) {
+              scenarioTypePanel.setPanel(data, 'right', '50%');
+            })
+            .then(function(data) {
+              scenarioTypePanel.updatePanel();
+            });
         });
       }
-      scenarioTypePanel.step = 1;
-      scenarioTypePanel.setPanel('right', '50%', scenarioType.current);
-      scenarioTypePanel.updatePanel();
     });
   })
 
