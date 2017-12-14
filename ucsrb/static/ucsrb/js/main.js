@@ -13,7 +13,7 @@ $(document).ready(function() {
       $('#map').html(appState.scenarioType);
       if (appState.scenarioType === 'select') {
         $('#map').click(function() {
-          fetch(scenarioTypeCall.get_segment_by_id(1))
+          fetch(scenarioTypeRequest.get_segment_by_id(1))
             .then(function(data) {
               $('#map').html(data.pourpoints);
             })

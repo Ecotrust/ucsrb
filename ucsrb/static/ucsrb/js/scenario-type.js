@@ -6,11 +6,33 @@ var appState = {
     panelHeight: '',
     step: 0
   },
+  /**
+   * init scenario type
+   * invoked by getter `scenario_type` for appState
+   * @param {Object} self should be the appState object
+   * @param {string} type set in data-attr on element
+   */
+  initScenario: function(self, type) {
+    self.scenarioType = type;
+    switch (type) {
+      case 'select':
+        scenarioType.initStreamSelectScenario();
+        break;
+      case 'filter':
+        break;
+      default:
+        break;
+    }
+  },
   get scenario_type() {
     return this.scenarioType;
   },
+  /**
+   * setter for scenario type
+   * @param {string} type set in data-attr on element
+   */
   set setScenarioType(type) {
-    this.scenarioType = type;
+    this.initScenario(this,type);
   },
   get get_scenarioPanel() {
     return this.scenarioPanel;
@@ -27,6 +49,13 @@ var appState = {
 }
 
 var scenarioType = {
+  initStreamSelectScenario: function() {
+    // TODO get bbox from map window and assign to var
+    var bbox = [0,1,2,3];
+    var streams = scenarioTypeRequest.get_segment_by_bbox(bbox);
+    // TODO add to map streams
+    $('#map').html(JSON.stringify(streams));
+  },
   showPourPoints: function(data) {
 
   }
@@ -78,7 +107,26 @@ var scenarioTypePanel = {
   }
 };
 
-var scenarioTypeCall = {
+var scenarioTypeRequest = {
+  /**
+   * get stream segments by bounding box
+   * @param {Array} bbox coords from map view
+   */
+  get_segment_by_bbox: function(bbox) {
+    // TODO get real bbox param
+    $.ajax({
+      url: `get_segment_by_bbox`,
+      data: {
+        'bbox_coords': bbox
+      }
+    })
+      .done(function(response) {
+        console.log(response);
+      })
+      .fail(function(response) {
+        console.log('fail: ' + response);
+      });
+  },
   /**
    * Request stream segement by id
    * @param {number|int} id
