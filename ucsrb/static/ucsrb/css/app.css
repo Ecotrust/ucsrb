@@ -1,0 +1,21 @@
+.map-wrap {
+    height: 65vh;
+    position: relative;
+}
+
+#map {
+    background: #eee;
+    height: 100%;
+}
+
+#right-panel {
+    background: rgba(100,255,235,0.75);
+}
+
+#right-panel div {
+    visibility: hidden;
+}
+
+#right-panel div.show {
+    visibility: visible;
+}

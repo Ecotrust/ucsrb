@@ -1,0 +1,44 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-weight: normal;
+    font-size: 1em;
+}
+
+body {
+  background: rgba(255,200,200,.5);
+  margin: 0;
+  padding: 0;
+}
+
+a:hover {
+    cursor: pointer;
+}
+
+a.btn {
+    background: transparent;
+    border: 2px solid #fff;
+    border-radius: 0;
+    color: #fff;
+    font-size: 1.5em;
+    line-height: 1.3125;
+    padding: 4px 20px;
+    text-decoration: none;
+}
+
+.nav-wrap {
+    border-bottom: 3px solid #fff;
+    overflow: hidden;
+    position: relative;
+}
+
+nav {
+    background: rgba(25,255,250,.5);
+    line-height: 3;
+}
+
+footer {
+
+}

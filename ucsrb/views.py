@@ -7,13 +7,28 @@ import json
 from ucsrb.models import TreatmentScenario
 
 def index(request):
-    template = loader.get_template('index.html')
+    template = loader.get_template('ucsrb/index.html')
     context = {
         'title': 'UCSRB FSTAT',
         'self': {
             'title': 'UCSRB Snowpack Treatment'
         }
     }
+    return HttpResponse(template.render(context, request))
+
+def home(request):
+    template = loader.get_template('ucsrb/home.html')
+    context = {
+        'title': 'UCSRB',
+        'self': {
+            'title': 'UCSRB'
+        }
+    }
+    return HttpResponse(template.render(context, request))
+
+def app(request):
+    template = loader.get_template('ucsrb/app.html')
+    context = {}
     return HttpResponse(template.render(context, request))
 
 ###########################################################
