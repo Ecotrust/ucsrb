@@ -10,7 +10,7 @@
     #map,
     #right-panel {
         display: inline-block;
-        margin: 0 -2px;
+        margin: 0 -2px 0 -3px;
         vertical-align: middle;
     }
 

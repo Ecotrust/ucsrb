@@ -8,9 +8,20 @@ html {
 }
 
 body {
-  background: rgba(255,200,200,.5);
+  background: rgba(220,250,215,.75);
+  font-family: 'Andale Mono';
   margin: 0;
   padding: 0;
+}
+
+button {
+    background: lemonchiffon;
+    display: inline-block;
+    margin: 5px;
+    padding: 5px;
+}
+a {
+    margin: 10px;
 }
 
 a:hover {

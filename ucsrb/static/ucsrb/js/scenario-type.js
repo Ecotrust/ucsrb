@@ -51,10 +51,14 @@ var appState = {
 var scenarioType = {
   initStreamSelectScenario: function() {
     // TODO get bbox from map window and assign to var
-    var bbox = [0,1,2,3];
-    var streams = scenarioTypeRequest.get_segment_by_bbox(bbox);
+    var bbox = [-13406452.813644003, 6045242.123841717, -13403748.852081062, 6047669.009725289];
+    var getStreamSegments = new Promise((resolve,reject) => {
+      scenarioTypeRequest.get_segment_by_bbox(bbox);
+    });
+    getStreamSegments.then(function(data) {
+      $('#map').append(data);
+    });
     // TODO add to map streams
-    $('#map').html(JSON.stringify(streams));
   },
   showPourPoints: function(data) {
 
@@ -104,6 +108,9 @@ var scenarioTypePanel = {
     scenarioTypePanel.setHeight();
     scenarioTypePanel.setPosition();
     scenarioTypePanel.setContent();
+  },
+  beginEvaluation: function() {
+    
   }
 };
 
@@ -115,13 +122,14 @@ var scenarioTypeRequest = {
   get_segment_by_bbox: function(bbox) {
     // TODO get real bbox param
     $.ajax({
-      url: `get_segment_by_bbox`,
+      url: `/api/get_segment_by_bbox`,
       data: {
-        'bbox_coords': bbox
-      }
+        bbox_coords: bbox
+      },
+      dataType: 'json'
     })
       .done(function(response) {
-        console.log(response);
+        return response;
       })
       .fail(function(response) {
         console.log('fail: ' + response);
@@ -139,10 +147,8 @@ var scenarioTypeRequest = {
        * @property {Object|id,geometry,name} list of objects
    */
   get_segment_by_id: function(id) {
-    let request = 'segment/' + id;
-    return $.ajax(request)
+    return $.ajax(`/segment/${id}`)
       .done(function(response) {
-        console.log(response);
         return response;
       })
       .fail(function(response) {
@@ -161,10 +167,20 @@ var scenarioTypeRequest = {
    * @property {Object} area_geometry
    */
   get_pourpoint_by_id: function(id) {
-    let request = 'pourpoint/' + id;
-    return $.ajax(request)
+    return $.ajax(`pourpoint/${id}`)
       .done(function(response) {
-          console.log(response);
+          return response;
+      })
+      .fail(function(response) {
+        console.log('fail: ' + response);
       });
+  },
+  filter_results: function(pourpoint) {
+    $.ajax({
+       url: "/api/filter_results",
+       data: {
+         ppid: pourpoint
+       }
+     })
   }
 }

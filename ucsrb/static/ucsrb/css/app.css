@@ -4,12 +4,23 @@
 }
 
 #map {
-    background: #eee;
+    background: #dccd40;
+    padding: 40px;
     height: 100%;
 }
 
+#map div {
+    left: 10px;
+    top: 20px;
+    font-size: 1.25em;
+    text-shadow: 2 2 2px #333;
+    position: absolute;
+    display: block;
+}
+
 #right-panel {
-    background: rgba(100,255,235,0.75);
+    background: rgba(0,105,85,0.9);
+    color: #fff;
 }
 
 #right-panel div {
