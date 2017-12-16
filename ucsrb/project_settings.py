@@ -173,6 +173,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.contenttypes',
+    'django.contrib.gis',
     'marineplanner',
     'core',
     'compressor',
