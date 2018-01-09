@@ -53,21 +53,19 @@
     position: relative;
 }
 
-.home-intro:before {
-    background: #fff;
-    border-radius: 100%;
-    content: '';
-    height: 160px;
-    left: -3%;
-    position: absolute;
-    top: -80px;
-    width: 106%;
-    z-index: -1;
-}
+    .home-intro:before {
+        background: #fff;
+        border-radius: 100%;
+        content: '';
+        height: 164px;
+        left: -4%;
+        position: absolute;
+        top: -82px;
+        width: 108%;
+        z-index: -1;
+    }
 
 .home-intro .icon {
     display: block;
-    height: auto;
-    margin-bottom: 1em;
-    width: 50px;
+    margin: 0 auto 1em;
 }
