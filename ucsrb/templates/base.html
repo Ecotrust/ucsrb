@@ -20,6 +20,7 @@
     {% endblock %}
 
     {% block site_style %}
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
         <link rel="stylesheet" href="{% static 'ucsrb/css/base.css' %}" />
     {% endblock site_style %}
 
@@ -48,11 +49,13 @@
         {% endblock %}
     </footer>
 
-    {% block extra_js %}
+    {% block js %}
         <!-- Automatically provides/replaces `Promise` if missing or broken. -->
         <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js"></script> 
-    {% endblock %}
+        <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js"></script>
+    {% endblock js %}
+
+    {% block extra_js %}{% endblock %}
 
     {% block top-level %}{% endblock %}
 </body>

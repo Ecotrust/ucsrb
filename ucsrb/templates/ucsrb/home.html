@@ -1,12 +1,49 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block site_style %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'ucsrb/css/landing-layout.css' %}"/>
+{% endblock site_style %}
+
+{% block body_class %}home{% endblock body_class %}
+{% block layout %}landing{% endblock layout %}
+
 {% block header %}{% endblock header %}
 
 {% block content %}
-  <h1>Home</h1>
+
+    <div class="jumbotron">
+        <div class="hero-bg">
+            <img src="{% static 'ucsrb/img/methow.jpg' %}" alt="methow river" />
+            <cite>I, <a href="/w/index.php?title=User:Murderbike&amp;action=edit&amp;redlink=1" class="new" title="User:Murderbike (page does not exist)">Murderbike</a> [<a href="http://www.gnu.org/copyleft/fdl.html">GFDL</a> or <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA-3.0</a>], <a href="https://commons.wikimedia.org/wiki/File%3AMethow_River.JPG">via Wikimedia Commons</a></cite>
+        </div>
+        <h1>Forest Viewer Title</h1>
+        <a href="/app" id="launch" class="btn btn-outline-light btn-lg">Launch App</a>
+    </div>
+
+    <section class="home-intro">
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col col-lg-3"></div>
+                <div class="col-md-auto">
+                    <img src="{% static 'ucsrb/img/i_evergreens.svg' %}" class="icon" alt="evergreens icons" />
+                </div>
+                <div class="col col-lg-3"></div>
+            </div>
+            <div class="row justify-content-md-center">
+                <div class="col col-lg-2"></div>
+                <div class="col-md-auto">
+                    <h2>Lorem ipsum</h2>
+                    <p>Sed do eiusmode tempor</p>
+                </div>
+                <div class="col col-lg-2"></div>
+            </div>
+        </div>
+    </section>
+
 {% endblock %}
 
 {% block outer_content %}
-    <a href="/app" id="launch" class="btn">Launch App</a>
+
 {% endblock outer_content %}

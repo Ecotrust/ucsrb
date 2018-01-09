@@ -29,14 +29,12 @@ a:hover {
 }
 
 a.btn {
-    background: transparent;
-    border: 2px solid #fff;
+    border-width: 2px;
     border-radius: 0;
-    color: #fff;
+}
+
+.jumbotron a.btn {
     font-size: 1.5em;
-    line-height: 1.3125;
-    padding: 4px 20px;
-    text-decoration: none;
 }
 
 .nav-wrap {
