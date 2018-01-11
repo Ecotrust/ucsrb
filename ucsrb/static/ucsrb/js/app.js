@@ -1,41 +1,12 @@
-var appState = {
-  scenarioType: 0,
-  scenarioPanel: {
-    content: '',
-    position: '',
-    panelHeight: '',
-    step: 0
-  },
+var app = {
   /**
-   * init scenario type
-   * invoked by getter `scenario_type` for appState
-   * @param {Object} self should be the appState object
-   * @param {string} type set in data-attr on element
+   * set app state for scenario type
+   * init a scenario type
+   * @param {string} type value from data-attr on html element
    */
-  initScenario: function(self, type) {
-    self.scenarioType = type;
-    switch (type) {
-      case 'select':
-        scenarioType.initStreamSelectScenario();
-        break;
-      case 'filter':
-        break;
-      default:
-        break;
-    }
-  },
-  get scenario_type() {
-    return this.scenarioType;
-  },
-  /**
-   * setter for scenario type
-   * @param {string} type set in data-attr on element
-   */
-  set setScenarioType(type) {
-    this.initScenario(this,type);
-  },
-  get get_scenarioPanel() {
-    return this.scenarioPanel;
+  setState: function(type) {
+    app.state.scenarioType = type;
+    app.init[type]();
   },
   set scenarioPanelContent(content) {
     this.scenarioPanel.content = content;
@@ -48,21 +19,25 @@ var appState = {
   }
 }
 
-var scenarioType = {
-  initStreamSelectScenario: function() {
+app.init = {
+  'select': function() {
+    console.log('select init');
     // TODO get bbox from map window and assign to var
     var bbox = [-13406452.813644003, 6045242.123841717, -13403748.852081062, 6047669.009725289];
-    var getStreamSegments = new Promise((resolve,reject) => {
-      scenarioTypeRequest.get_segment_by_bbox(bbox);
-    });
-    getStreamSegments.then(function(data) {
+    return new Promise((resolve,reject) => {
+      // TODO finish promise
+      resolve(app.request.get_segment_by_bbox(bbox));
+    }).then(function(data) {
+      console.log('double');
       $('#map').append(data);
     });
-    // TODO add to map streams
   },
-  showPourPoints: function(data) {
+  'filter': function() {
 
-  }
+  },
+  'draw': function() {
+
+  },
 }
 
 var scenarioTypePanel = {
@@ -110,11 +85,11 @@ var scenarioTypePanel = {
     scenarioTypePanel.setContent();
   },
   beginEvaluation: function() {
-    
+
   }
 };
 
-var scenarioTypeRequest = {
+app.request = {
   /**
    * get stream segments by bounding box
    * @param {Array} bbox coords from map view
@@ -133,6 +108,7 @@ var scenarioTypeRequest = {
       })
       .fail(function(response) {
         console.log('fail: ' + response);
+        return false;
       });
   },
   /**
