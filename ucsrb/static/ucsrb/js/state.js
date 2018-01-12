@@ -6,10 +6,10 @@ app.state = {
     panelHeight: '',
     step: 0
   },
-  get scenarioType() {
+  get type() {
     return this.scenarioType;
   },
-  get scenarioPanel() {
+  get panel() {
     return this.scenarioPanel;
   },
 }

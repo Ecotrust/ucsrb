@@ -12,17 +12,13 @@
 
 {% block content %}
 <section class="map-wrap">
-    <div id="map">Map</div>
+    <div id="map"></div>
+    <div id="popup" class="ol-popup">
+      <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+      <div id="popup-content"></div>
+    </div>
     <div id="right-panel">
-        <section class="content"></section>
-        <div class="step1" data-step="1">Step 1</div>
-        <div class="step2" data-step="2">Step 2</div>
-        <div class="step3" data-step="3">Step 3</div>
-        <section class="step-controls">
-            <div id="prev-step"><a href="" data-step="prev">Prev</a></div>
-            <div id="next-step"><a href="" data-step="next">Next</a></div>
-        </section>
-        <div><a href="" id="begin-evaluation" class="btn">Begin Evaluation</a></div>
+        {% include 'ucsrb_scenarios/form.html' %}
     </div>
 </section>
 {% endblock %}

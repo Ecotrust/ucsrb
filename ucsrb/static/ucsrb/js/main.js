@@ -10,14 +10,7 @@ $(document).ready(function() {
 // ------
 
 app.selectOption = function(scenario) {
-  var setScenarioType = new Promise((resolve,reject) => {
-    appState.setScenarioType = scenario;
-    // TODO add error check
-    resolve();
-  });
   setScenarioType.then(function() {
-    $('#map').css('background-color', '#6addaa');
-    $('#map').html(appState.scenarioType);
     $('#map').append('<button class="segment">A stream segment</button><h2>Open in Dev tools</h2>')
       .find('button')
       .click(function(event) {

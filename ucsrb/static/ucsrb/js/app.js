@@ -24,13 +24,19 @@ app.init = {
     console.log('select init');
     // TODO get bbox from map window and assign to var
     var bbox = [-13406452.813644003, 6045242.123841717, -13403748.852081062, 6047669.009725289];
-    return new Promise((resolve,reject) => {
-      // TODO finish promise
-      resolve(app.request.get_segment_by_bbox(bbox));
-    }).then(function(data) {
-      console.log('double');
-      $('#map').append(data);
-    });
+    app.request.get_segment_by_bbox(bbox)
+      .then(function(data) {
+        app.map.layer.streams.init(data);
+      })
+      .then(function() {
+        app.map.interaction.add('select');
+      })
+      .then(function() {
+        app.map.layer.streams.selectListener();
+      })
+      .catch(function(data) {
+        alert('failed to add map layer');
+      });
   },
   'filter': function() {
 
@@ -54,19 +60,19 @@ var scenarioTypePanel = {
     $('#prev-step').removeClass('show');
   },
   setHeight: function() {
-    $('#right-panel').css('height', appState.scenarioPanel.height);
+    $('#right-panel').css('height', appState.panel.height);
   },
   setPosition: function() {
-    if (appState.scenarioPanel.position == 'left') {
+    if (appState.panel.position == 'left') {
       $('#right-panel').css('right', 'auto');
       $('#right-panel').css('left', '0');
-    } else if (appState.scenarioPanel.position == 'right') {
+    } else if (appState.panel.position == 'right') {
       $('#right-panel').css('left', 'auto');
       $('#right-panel').css('right', '0');
     }
   },
   setContent: function() {
-    $('.content').html(appState.scenarioPanel.content);
+    $('.content').html(appState.panel.content);
   },
   setPanel: function(content, position, height) {
     appState.scenarioPanelContent   = content;
@@ -75,7 +81,7 @@ var scenarioTypePanel = {
   },
   updatePanel: function() {
     scenarioTypePanel.showNextBtn();
-    if (appState.scenarioPanel.step > 1) {
+    if (appState.panel.step > 1) {
       scenarioTypePanel.showPrevBtn();
     } else {
       scenarioTypePanel.hidePrevBtn();
@@ -96,14 +102,15 @@ app.request = {
    */
   get_segment_by_bbox: function(bbox) {
     // TODO get real bbox param
-    $.ajax({
-      url: `/api/get_segment_by_bbox`,
+    return $.ajax({
+      url: `/get_segment_by_bbox`,
       data: {
         bbox_coords: bbox
       },
       dataType: 'json'
     })
       .done(function(response) {
+        console.log('success');
         return response;
       })
       .fail(function(response) {
