@@ -193,9 +193,11 @@ INSTALLED_APPS = [
     ### END INSERTED INSTALLED APPS ###
 ]
 
-GET_SCENARIOS_URL = '/get_scenarios'
+GET_SCENARIOS_URL = '/ucsrb/get_scenarios/'
 SCENARIO_FORM_URL = '/features/treatmentscenario/form/'
 SCENARIO_LINK_BASE = '/features/treatmentscenario/ucsrb_treatmentscenario'
+
+MAP_TECH = 'ol4'
 
 try:
     ### START MODULE SETTINGS IMPORT ###

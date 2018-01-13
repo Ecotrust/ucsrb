@@ -5,6 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 import json
 from ucsrb.models import TreatmentScenario
+from django.conf import settings
 
 def index(request):
     template = loader.get_template('ucsrb/index.html')
@@ -899,34 +900,45 @@ def get_planningunits(request):
     planningunits = VegPlanningUnit.objects.all()
     for p_unit in planningunits:
         json.append({
-            'id': p_unit.id,
+            'id': p_unit.pk,
             'wkt': p_unit.geometry.wkt,
-            'has_roads': p_unit.has_roads,
-            'has_endangered_habitat': p_unit.has_endangered_habitat,
-            'is_private': p_unit.is_private,
-            'has_high_fire_risk': p_unit.has_high_fire_risk,
-            'miles_from_road_access': p_unit.miles_from_road_access,
-            'vegetation_type': p_unit.vegetation_type,
-            'forest_height': p_unit.forest_height,
-            'forest_class': p_unit.forest_class,
+            'acres': p_unit.acres,
+            'huc_2_id': p_unit.huc_2_id,
+            'huc_4_id': p_unit.huc_4_id,
+            'huc_6_id': p_unit.huc_6_id,
+            'huc_8_id': p_unit.huc_8_id,
+            'huc_10_id': p_unit.huc_10_id,
+            'huc_12_id': p_unit.huc_12_id,
+            'pub_priv_own': p_unit.pub_priv_own,
+            'lsr_percent': p_unit.lsr_percent,
+            'has_critical_habitat': p_unit.has_critical_habitat,
+            'percent_critical_habitat': p_unit.percent_critical_habitat,
+            'percent_roadless': p_unit.percent_roadless,
+            'percent_wetland': p_unit.percent_wetland,
+            'percent_riparian': p_unit.percent_riparian,
             'slope': p_unit.slope,
-            'canopy_coverage': p_unit.canopy_coverage,
+            'road_distance': p_unit.road_distance,
+            'percent_fractional_coverage': p_unit.percent_fractional_coverage,
+            'percent_high_fire_risk_area': p_unit.percent_high_fire_risk_area,
         })
     return HttpResponse(dumps(json))
 
 from scenarios.views import get_scenarios as scenarios_get_scenarios
-def get_scenarios(request, scenario_model=TreatmentScenario):
-    return scenarios_get_scenarios(request, scenario_model)
+def get_scenarios(request, scenario_model='treatmentscenario'):
+    return scenarios_get_scenarios(request, scenario_model, 'ucsrb')
 
 def demo(request, template='scenarios/demo.html'):
     try:
-        from ucsrb import project_settings as settings
         context = {
             'GET_SCENARIOS_URL': settings.GET_SCENARIOS_URL,
             'SCENARIO_FORM_URL': settings.SCENARIO_FORM_URL,
-            'SCENARIO_LINK_BASE': settings.SCENARIO_LINK_BASE
+            'SCENARIO_LINK_BASE': settings.SCENARIO_LINK_BASE,
         }
     except:
         context = {}
+    try:
+        context['MAP_TECH'] = settings.MAP_TECH
+    except:
+        context['MAP_TECH'] = 'ol4'
 
     return render(request, template, context)

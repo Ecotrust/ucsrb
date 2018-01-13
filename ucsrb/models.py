@@ -8,6 +8,19 @@ class TreatmentScenario(Scenario):
     #
     # input_parameter_substrate = models.BooleanField(verbose_name='Substrate Parameter', default=False)
     # input_substrate = models.ManyToManyField('Substrate', null=True, blank=True)
+
+    ###
+    # RDH 1/12/2018:
+    # We need to track:
+    # * ID
+    # * Type (select, filter, or draw)
+    # *
+    #
+    # We must be able to:
+    # * Query by type
+    # *
+    #
+    ####
     class Options:
         verbose_name = 'Treatment'
         # icon_url = 'marco/img/multi.png'
@@ -45,8 +58,8 @@ class VegPlanningUnit(PlanningUnit):
     def has_roads(self):
         return self.percent_roadless < 100
 
-    def has_critical_habitat(self):
-        return self.percent_critical_habitat > 0
+    # def has_critical_habitat(self):
+    #     return self.percent_critical_habitat > 0
 
     def has_high_fire_risk(self):
         return self.percent_high_fire_risk_area > 0
@@ -63,5 +76,3 @@ class VegPlanningUnit(PlanningUnit):
     # is_private = models.BooleanField(default=False)
     # miles_from_road_access = models.IntegerField()
     # slope = models.IntegerField()
-
-# Create your models here.
