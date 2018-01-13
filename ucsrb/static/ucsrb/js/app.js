@@ -6,6 +6,7 @@ var app = {
    */
   setState: function(type) {
     app.state.scenarioType = type;
+    console.log(type);
     app.init[type]();
   },
   set scenarioPanelContent(content) {

@@ -1,20 +1,27 @@
 {% load static %}
-<div class="nav-wrap">
-    <nav id="men">
-        <a href="">Terms Defined</a>
-        <a href="">Tutorial</a>
-        <a href="">Log in</a>
+<div class="nav-wrap top-nav-wrap">
+    <nav class="navbar navbar-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <h1>Forest Viewer Title</h1>
+        <div class="collapse navbar-collapse" id="menu">
+            <a href="" class="nav-item">Terms Defined</a>
+            <a href="" class="nav-item">Tutorial</a>
+            <a href="" class="nav-item">Log in</a>
+        </div>
     </nav>
-    <h1>Forest Viewer Title</h1>
 </div>
 
-<div class="nav-wrap">
-    <nav id="scenario-nav">
-        <button class="" data-scenario-type="select">Select stream segment</button>
-        <button data-scenario-type="filter">Filter forest regions</button>
-        <button data-scenario-type="draw">Draw treatment areas</button>
-    </nav>
-    <nav id="file-nav">
-        <a href="">load saved</a>
-    </nav>
+<div class="nav-wrap container">
+    <div class="row align-items-center">
+        <nav id="scenario-nav" class="col-9 nav justify-content-center">
+            <button class="nav-item" data-scenario-type="select"><img src="{% static 'ucsrb/img/icon/i_select.svg' %}" alt="select stream segment" /></button>
+            <button class="nav-item" data-scenario-type="filter"><img src="{% static 'ucsrb/img/icon/i_filter.svg' %}" alt="filter forest region" /></button>
+            <button class="nav-item" data-scenario-type="draw"><img src="{% static 'ucsrb/img/icon/i_draw.svg' %}" alt="draw treatment area" /></button>
+        </nav>
+        <nav id="file-nav" class="col-3 nav justify-content-center">
+            <a class="nav-item" href="">load saved</a>
+        </nav>
+    </div>
 </div>

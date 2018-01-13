@@ -1,3 +1,31 @@
+.top-nav-wrap {
+    background: #58595B;
+    color: #fff;
+}
+
+.top-nav-wrap .navbar {
+    justify-content: flex-start;
+    padding: 1em;
+}
+
+.top-nav-wrap .navbar h1 {
+    line-height: 2;
+    margin: 0 1em;
+}
+
+#scenario-nav button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    margin: 2em;
+}
+
+#scenario-nav button img {
+    height: 200px;
+    pointer-events: none;
+    width: auto;
+}
+
 .map-wrap {
     height: 65vh;
     position: relative;
@@ -8,8 +36,11 @@
 }
 
 #right-panel {
-    background: rgba(0,105,85,0.9);
-    color: #fff;
+    background: rgba(0,105,85,0.2);
+    position: absolute;
+    right: 1em;
+    top: 1em;
+    width: 90%;
 }
 
 #right-panel div {

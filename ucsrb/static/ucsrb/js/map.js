@@ -7,7 +7,7 @@ app.map = new ol.Map({
   ],
   view: new ol.View({
     center: [-13405984.640957793,6046804.319313334],
-    zoom: 6
+    zoom: 8
   })
 });
 
@@ -42,7 +42,7 @@ app.map.styles = {
   }),
   'LineString': new ol.style.Style({
     stroke: new ol.style.Stroke({
-      color: '#99dddd',
+      color: '#3399dd',
       width: 10
     })
   }),

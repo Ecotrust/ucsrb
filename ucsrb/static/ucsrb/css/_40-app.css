@@ -1,24 +1,5 @@
 @media all and (min-width: 40em) {
-    #scenario-nav {
-        float: left;
-    }
-
-    #file-nav {
-        float:right;
-    }
-
-    #map,
     #right-panel {
-        display: inline-block;
-        margin: 0 -2px;
-        vertical-align: middle;
-    }
-
-    #right-panel {
-        width: 34%;
-    }
-
-    #map {
-        width: 66%;
+        width: 50%;
     }
 }

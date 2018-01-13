@@ -1,6 +1,7 @@
 $(document).ready(function() {
   $('#scenario-nav button').click(function(event) {
-    app.setState(event.target.dataset.scenarioType)
+    console.log(event.currentTarget);
+    app.setState(event.currentTarget.dataset.scenarioType)
   });
   $('.step-controls a').click(function(event) {
     app.setStep(event.target.dataset.step);
