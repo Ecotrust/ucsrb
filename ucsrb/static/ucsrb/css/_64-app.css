@@ -1,9 +1,5 @@
 @media all and (min-width: 64em) {
     #right-panel {
-        width: 30%;
-    }
-
-    #map {
-        width: 70%;
+        width: 35%;
     }
 }

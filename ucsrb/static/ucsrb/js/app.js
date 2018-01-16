@@ -1,41 +1,13 @@
-var appState = {
-  scenarioType: 0,
-  scenarioPanel: {
-    content: '',
-    position: '',
-    panelHeight: '',
-    step: 0
-  },
+var app = {
   /**
-   * init scenario type
-   * invoked by getter `scenario_type` for appState
-   * @param {Object} self should be the appState object
-   * @param {string} type set in data-attr on element
+   * set app state for scenario type
+   * init a scenario type
+   * @param {string} type value from data-attr on html element
    */
-  initScenario: function(self, type) {
-    self.scenarioType = type;
-    switch (type) {
-      case 'select':
-        scenarioType.initStreamSelectScenario();
-        break;
-      case 'filter':
-        break;
-      default:
-        break;
-    }
-  },
-  get scenario_type() {
-    return this.scenarioType;
-  },
-  /**
-   * setter for scenario type
-   * @param {string} type set in data-attr on element
-   */
-  set setScenarioType(type) {
-    this.initScenario(this,type);
-  },
-  get get_scenarioPanel() {
-    return this.scenarioPanel;
+  setState: function(type) {
+    app.state.scenarioType = type;
+    console.log(type);
+    app.init[type]();
   },
   set scenarioPanelContent(content) {
     this.scenarioPanel.content = content;
@@ -48,21 +20,31 @@ var appState = {
   }
 }
 
-var scenarioType = {
-  initStreamSelectScenario: function() {
+app.init = {
+  'select': function() {
+    console.log('select init');
     // TODO get bbox from map window and assign to var
     var bbox = [-13406452.813644003, 6045242.123841717, -13403748.852081062, 6047669.009725289];
-    var getStreamSegments = new Promise((resolve,reject) => {
-      scenarioTypeRequest.get_segment_by_bbox(bbox);
-    });
-    getStreamSegments.then(function(data) {
-      $('#map').append(data);
-    });
-    // TODO add to map streams
+    app.request.get_segment_by_bbox(bbox)
+      .then(function(data) {
+        app.map.layer.streams.init(data);
+      })
+      .then(function() {
+        app.map.interaction.add('select');
+      })
+      .then(function() {
+        app.map.layer.streams.selectListener();
+      })
+      .catch(function(data) {
+        alert('failed to add map layer');
+      });
   },
-  showPourPoints: function(data) {
+  'filter': function() {
 
-  }
+  },
+  'draw': function() {
+
+  },
 }
 
 var scenarioTypePanel = {
@@ -79,19 +61,19 @@ var scenarioTypePanel = {
     $('#prev-step').removeClass('show');
   },
   setHeight: function() {
-    $('#right-panel').css('height', appState.scenarioPanel.height);
+    $('#right-panel').css('height', appState.panel.height);
   },
   setPosition: function() {
-    if (appState.scenarioPanel.position == 'left') {
+    if (appState.panel.position == 'left') {
       $('#right-panel').css('right', 'auto');
       $('#right-panel').css('left', '0');
-    } else if (appState.scenarioPanel.position == 'right') {
+    } else if (appState.panel.position == 'right') {
       $('#right-panel').css('left', 'auto');
       $('#right-panel').css('right', '0');
     }
   },
   setContent: function() {
-    $('.content').html(appState.scenarioPanel.content);
+    $('.content').html(appState.panel.content);
   },
   setPanel: function(content, position, height) {
     appState.scenarioPanelContent   = content;
@@ -100,7 +82,7 @@ var scenarioTypePanel = {
   },
   updatePanel: function() {
     scenarioTypePanel.showNextBtn();
-    if (appState.scenarioPanel.step > 1) {
+    if (appState.panel.step > 1) {
       scenarioTypePanel.showPrevBtn();
     } else {
       scenarioTypePanel.hidePrevBtn();
@@ -110,29 +92,31 @@ var scenarioTypePanel = {
     scenarioTypePanel.setContent();
   },
   beginEvaluation: function() {
-    
+
   }
 };
 
-var scenarioTypeRequest = {
+app.request = {
   /**
    * get stream segments by bounding box
    * @param {Array} bbox coords from map view
    */
   get_segment_by_bbox: function(bbox) {
     // TODO get real bbox param
-    $.ajax({
-      url: `/api/get_segment_by_bbox`,
+    return $.ajax({
+      url: `/get_segment_by_bbox`,
       data: {
         bbox_coords: bbox
       },
       dataType: 'json'
     })
       .done(function(response) {
+        console.log('success');
         return response;
       })
       .fail(function(response) {
         console.log('fail: ' + response);
+        return false;
       });
   },
   /**
