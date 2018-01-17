@@ -1,3 +1,14 @@
+@supports(--var: 'value') {
+    /**
+     * Setting some variables mainly for reference because
+     * no support for css vars in IE  (╯°□°)╯
+     */
+    :root {
+        --link: #67b8c6;
+        --hover: #3a5675;
+    }
+}
+
 * {
     box-sizing: border-box;
 }
@@ -16,7 +27,12 @@ img {
     max-width: 100%;
 }
 
+a {
+    color: #67b8c6;
+}
+
 a:hover {
+    color: #3a5675;
     cursor: pointer;
 }
 

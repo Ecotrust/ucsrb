@@ -8,7 +8,8 @@ $(document).ready(function() {
   });
 });
 
-// ------
+// ------ TODO update or delete below
+// currently saving below for reference
 
 app.selectOption = function(scenario) {
   setScenarioType.then(function() {
