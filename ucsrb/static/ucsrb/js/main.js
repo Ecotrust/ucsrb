@@ -11,45 +11,6 @@ $(document).ready(function() {
 // ------ TODO update or delete below
 // currently saving below for reference
 
-app.selectOption = function(scenario) {
-  setScenarioType.then(function() {
-    $('#map').append('<button class="segment">A stream segment</button><h2>Open in Dev tools</h2>')
-      .find('button')
-      .click(function(event) {
-        $(event.target).remove();
-        var getSegment = new Promise((resolve,reject) => {
-          var segment = scenarioTypeRequest.get_segment_by_id(1);
-          // add error check
-          resolve(segment);
-        });
-        getSegment.then(function(segment) {
-          for (let i = 0; i < segment.pourpoints.length; i++) {
-            var $btn = $(`<button class="pourpoint" data-id="${segment.pourpoints[i].id}">${segment.pourpoints[i].name}</button>`);
-            $btn.data('id', segment.pourpoints[i].id)
-            $btn.bind('click', function(event) {
-              var getPourPoint = new Promise((resolve,reject) => {
-                var pourpoint = scenarioTypeRequest.get_pourpoint_by_id(event.target.dataset.id)
-                resolve(pourpoint);
-              });
-              getPourPoint.then(function(pourpoint) {
-                $('#map').html('<div style="background: darkslateblue; color:#fff; height: 200px; width: 200px; position: relative;">Basin</div>');
-                var panelContent = '<h1>Filters</h1><button id="filter">Filter</button>';
-                scenarioTypePanel.setPanel(panelContent, 'right', '50%');
-                scenarioTypePanel.updatePanel();
-                app.listenBeginEval();
-              });
-            });
-            $('#map').append($btn)
-          }
-          scenarioTypePanel.setPanel(segment.name, 'right', '50%');
-          scenarioTypePanel.updatePanel();
-        })
-      });
-  });
-}
-
-
-
 app.listenBeginEval = function() {
   $('#right-panel div:last-of-type').addClass('show');
   $('#right-panel').find('button').click(function() {

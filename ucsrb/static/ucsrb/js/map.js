@@ -98,41 +98,41 @@ app.map.layer = {
     },
     segment: {
       data: {},
-      pourpoints: {
-        data: {},
-        source: new ol.source.Vector({
-            format: new ol.format.GeoJSON()
-        }),
-        layer: new ol.layer.Vector({
-          style: app.map.styles['LineString']
-        }),
-        show: function() {
-          app.map.layer.streams.segment.pourpoints.data.forEach(function(pp,i,a) {
-            var feature = new ol.Feature({
-              geometry: new ol.geom.Point(pp.geometry),
-              name: pp.name,
-              properties: {
-                id: pp.id
-              }
-            });
-            app.map.layer.streams.segment.pourpoints.source.addFeature(feature);
-            app.map.layer.streams.segment.pourpoints.layer.setSource(app.map.layer.streams.segment.pourpoints.source);
-            app.map.addLayer(app.map.layer.streams.segment.pourpoints.layer);
-          });
-        }
-      },
-      set: function(data) {
+      init: function(data) {
         var selected = data.selected[0].getProperties();
         app.map.layer.streams.segment.data = selected;
-        app.map.layer.streams.segment.pourpoints.data = selected.properties.pourpoints;
-        app.map.layer.streams.segment.pourpoints.show();
+        app.map.layer.pourpoints.data = selected.properties.pourpoints;
+        app.map.layer.pourpoints.init();
       },
       select: function() {
         var select = app.map.interaction.select;
         return select.on('select', function(event) {
-          app.map.layer.streams.segment.set(event);
+          app.map.layer.streams.segment.init(event);
         });
       },
     },
+  },
+  pourpoints: {
+    data: {},
+    source: new ol.source.Vector({
+        format: new ol.format.GeoJSON()
+    }),
+    layer: new ol.layer.Vector({
+      style: app.map.styles['Point']
+    }),
+    init: function() {
+      app.map.layer.streams.segment.pourpoints.data.forEach(function(pp,i,a) {
+        var feature = new ol.Feature({
+          geometry: new ol.geom.Point(pp.geometry),
+          name: pp.name,
+          properties: {
+            id: pp.id
+          }
+        });
+        app.map.layer.streams.segment.pourpoints.source.addFeature(feature);
+        app.map.layer.streams.segment.pourpoints.layer.setSource(app.map.layer.streams.segment.pourpoints.source);
+        app.map.addLayer(app.map.layer.streams.segment.pourpoints.layer);
+      });
+    }
   },
 }
