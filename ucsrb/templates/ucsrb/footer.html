@@ -1,18 +1,26 @@
-{% extends "footer.html" %}
 {% load static %}
 
 {% block footer-brand %}
-<!-- <img src="{% static 'brand/logo.svg' %}"></img> -->
-<!-- <p>footer brand</p> -->
+    <div class="container-fluid">
+        <div class="row justify-content-between">
+            <div class="col-3 align-self-center pad-left">
+                <hr />
+                <p><a href="mailto:info@forestviewer.com">info@forestviewer.com</a></p>
+                <p><a href="tel:+15555555555">555.555.5555</a></p>
+            </div>
+            <div class="col"></div>
+            <div class="col-3 align-self-center">
+                <img src="{% static 'ucsrb/img/logo/logo-ridgetop.svg' %}" class="footer-logo" />
+            </div>
+            <div class="col-3 align-self-start">
+                <img src="{% static 'ucsrb/img/logo/logo-ucsrb.svg' %}" class="footer-logo" />
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
-{% block footer-blurb %}
-<p class="about-text">Welcome to the <a href="{% url 'planner' %}">UCSRB Snowpack Treatment Assessment</a>, an Interactive mapping tool.</p>
-{% endblock %}
+{% block footer-blurb %}{% endblock %}
 
-{% block social-links %}
-{% endblock %}
+{% block social-links %}{% endblock %}
 
-{% block contact %}
-<a class="email" href="mailto:ksdev@ecotrust.org">ksdev@ecotrust.org</a>
-{% endblock %}
+{% block contact %}{% endblock %}

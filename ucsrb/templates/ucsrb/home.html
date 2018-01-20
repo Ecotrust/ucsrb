@@ -4,6 +4,7 @@
 {% block site_style %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'ucsrb/css/landing-layout.css' %}"/>
+    <link rel="stylesheet" href="{% static 'ucsrb/css/landing-mq.css' %}"/>
 {% endblock site_style %}
 
 {% block body_class %}home{% endblock body_class %}
@@ -13,13 +14,15 @@
 
 {% block content %}
 
+<div class="home-wrap">
     <div class="jumbotron">
         <div class="hero-bg">
-            <img src="{% static 'ucsrb/img/methow.jpg' %}" alt="methow river" />
             <cite>I, <a href="/w/index.php?title=User:Murderbike&amp;action=edit&amp;redlink=1" class="new" title="User:Murderbike (page does not exist)">Murderbike</a> [<a href="http://www.gnu.org/copyleft/fdl.html">GFDL</a> or <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA-3.0</a>], <a href="https://commons.wikimedia.org/wiki/File%3AMethow_River.JPG">via Wikimedia Commons</a></cite>
         </div>
-        <h1>Forest Viewer Title</h1>
-        <a href="/app" id="launch" class="btn btn-outline-light btn-lg">Launch App</a>
+        <div class="container">
+            <h1 class="display-1">Snowpack Catch Title</h1>
+            <a href="/app" id="launch" class="btn btn-outline-light btn-lg">Delineate</a>
+        </div>
     </div>
 
     <section class="home-intro">
@@ -36,6 +39,7 @@
                 <div class="col-sm-auto">
                     <h2>Lorem ipsum</h2>
                     <p>Sed do eiusmode tempor</p>
+                    <hr />
                 </div>
                 <div class="col col-md-3"></div>
             </div>
@@ -44,15 +48,16 @@
 
     <section class="home-about">
         <div class="row">
-            <div class="col col-sm">
-                <img src="{% static 'ucsrb/img/watershed_illustration.jpg' %}" alt="watershed illustration" />
+            <div class="col col-sm align-self-start">
+                <img src="{% static 'ucsrb/img/watershed.png' %}" alt="watershed illustration" />
             </div>
-            <div class="col col-sm align-self-center">
+            <div class="col col-sm align-self-end">
                 <h2>About the App</h2>
-                <p>Lorem ipsum and all that</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
             </div>
         </div>
     </section>
+</div>
 
 {% endblock %}
 

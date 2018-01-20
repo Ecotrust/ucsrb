@@ -33,7 +33,7 @@ app.init = {
         app.map.interaction.add('select');
       })
       .then(function() {
-        app.map.layer.streams.segment.select();
+        app.map.interaction.selectSegment();
       })
       .then(function() {
         console.log('%clistening for stream segement selection...', 'color: orange;');

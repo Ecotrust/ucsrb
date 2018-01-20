@@ -14,12 +14,14 @@ app.map = new ol.Map({
 app.map.styles = {
   'Point': new ol.style.Style({
     image: new ol.style.Circle({
-      radius: 5,
-      fill: null,
+      radius: 10,
+      fill:  new ol.style.Fill({
+        color: '#ffffff'
+      }),
       stroke: new ol.style.Stroke({
-        color: 'red',
-        width: 1,
-      })
+        color: '#aaffff',
+        width: 5,
+      }),
     })
   }),
   'LineString': new ol.style.Style({
@@ -51,17 +53,33 @@ app.map.styles = {
 };
 
 app.map.interaction = {
-  select: new ol.interaction.Select({
-    style: app.map.styles['LineStringSelected'],
-    hitTolerance: 1
-  }),
+  select: {
+    segment: function() {
+      var select = new ol.interaction.Select({
+        style: app.map.styles['LineStringSelected'],
+        hitTolerance: 1
+      });
+      return select.on('select', function(event) {
+        app.map.layer.streams.segment.init(event);
+      });
+    },
+    pourpoint: function() {
+      var select = new ol.interaction.Select({
+        style: app.map.styles['Point'],
+        hitTolerance: 1,
+      });
+      return select.on('select', function(event) {
+        console.log('yes');
+      });
+    },
+  },
   /**
    * add an interaction to the map
    * @param {Object|string} type kind of interaction or the interaction object
    */
   add: function(type) {
-    if (type === 'select' || type == app.map.interaction.select) {
-      app.map.addInteraction(app.map.interaction.select);
+    if (type === 'select' || type == app.map.interaction.select.segment) {
+      app.map.addInteraction(app.map.interaction.select.segment);
     } else {
       console.log('no interaction type given');
     }
@@ -73,9 +91,13 @@ app.map.interaction = {
 
 app.map.popup = {}
 
+/**
+ * Map - Layers, Sources, Features
+ */
 app.map.layer = {
   streams: {
     data: {},
+    counter: 0,
     source: new ol.source.Vector({
         format: new ol.format.GeoJSON()
     }),
@@ -94,45 +116,60 @@ app.map.layer = {
       });
       app.map.layer.streams.source.addFeature(app.map.layer.streams.features);
       app.map.layer.streams.layer.setSource(app.map.layer.streams.source);
-      app.map.addLayer(app.map.layer.streams.layer);
+      /**
+       * check if streams layer has already been added
+       */
+      if (app.map.layer.streams.counter < 1) {
+        app.map.addLayer(app.map.layer.streams.layer);
+      } else {
+        app.map.layer.streams.counter++;
+      }
     },
     segment: {
       data: {},
       init: function(data) {
-        var selected = data.selected[0].getProperties();
-        app.map.layer.streams.segment.data = selected;
-        app.map.layer.pourpoints.data = selected.properties.pourpoints;
-        app.map.layer.pourpoints.init();
-      },
-      select: function() {
-        var select = app.map.interaction.select;
-        return select.on('select', function(event) {
-          app.map.layer.streams.segment.init(event);
-        });
+        if (data.selected.length > 0) {
+          var selected = data.selected[0].getProperties();
+          app.map.layer.streams.segment.data = selected;
+          app.map.layer.pourpoints.data = selected.properties.pourpoints;
+          app.map.layer.pourpoints.init();
+        }
       },
     },
   },
   pourpoints: {
     data: {},
+    counter: 0,
     source: new ol.source.Vector({
-        format: new ol.format.GeoJSON()
+      format: new ol.format.GeoJSON()
     }),
     layer: new ol.layer.Vector({
-      style: app.map.styles['Point']
+      style: function(feature) {
+        return app.map.styles['Point'];
+      },
+      zIndex: 1,
     }),
     init: function() {
-      app.map.layer.streams.segment.pourpoints.data.forEach(function(pp,i,a) {
+      app.map.layer.pourpoints.data.forEach(function(pp,i,a) {
         var feature = new ol.Feature({
-          geometry: new ol.geom.Point(pp.geometry),
+          geometry: new ol.geom.Point(pp.geometry.geometry.coordinates),
           name: pp.name,
           properties: {
             id: pp.id
           }
         });
-        app.map.layer.streams.segment.pourpoints.source.addFeature(feature);
-        app.map.layer.streams.segment.pourpoints.layer.setSource(app.map.layer.streams.segment.pourpoints.source);
-        app.map.addLayer(app.map.layer.streams.segment.pourpoints.layer);
+        
+        app.map.layer.pourpoints.source.addFeature(feature);
       });
+      app.map.layer.pourpoints.layer.setSource(app.map.layer.pourpoints.source);
+      /**
+       * check if pourpoints layer has already been added
+       */
+      if (app.map.layer.pourpoints.counter < 1) {
+        app.map.addLayer(app.map.layer.pourpoints.layer);
+      } else {
+        app.map.layer.pourpoints.counter++;
+      }
     }
   },
 }

@@ -1,6 +1,15 @@
-.landing-layout {
-
+/**
+ * home page styles
+ */
+.home-wrap {
+    overflow: hidden;
+    width: 100%;
 }
+
+/**
+ * Hero image area (top of screen)
+ * @css
+ */
 
 .jumbotron {
     background: transparent;
@@ -9,18 +18,21 @@
     margin-bottom: 0;
 }
 
-.jumbotron:before {
-    background: rgba(0,0,0,0.4);
-    bottom: 0;
-    content: '';
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    z-index: -1;
-}
+    .jumbotron:before {
+        background: rgba(0,0,0,0.4);
+        bottom: 0;
+        content: '';
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: -1;
+    }
 
 .hero-bg {
+    background: url('/static/ucsrb/img/methow.jpg');
+    background-size: cover;
+    background-position: center;
     bottom: 0;
     left: 0;
     right: 0;
@@ -30,42 +42,77 @@
     pointer-events: none;
     z-index: -2;
 }
-    .hero-bg img {
-        position: absolute;
-        left: 0;
-        height: auto;
-        top: 50%;
-        transform: translate(0,-50%);
-        max-width: 100%;
-        z-index: -1;
-    }
+
+.jumbotron cite {
+    visibility: hidden;
+}
 
 .jumbotron h1 {
-    margin: 1em 0;
+    color: #f1f1f1;
+    font-size: 3.75em;
+    font-weight: 700;
+    margin: 3rem 0;
 }
 
-.jumbotron .btn {
-    margin: 0 0 5em;
+.jumbotron a.btn {
+    border: 5px solid #fff;
+    color: #fff;
+    letter-spacing: .05em;
+    font-size: 1.6375em;
+    font-weight: 700;
+    margin: 0 0 10rem;
 }
+
+/**
+ * home page content under hero image
+ * @css
+ */
 
 .home-intro {
     background: #fff;
+    color: #58595B;
     position: relative;
+    text-align: center;
+    width: 100%;
 }
 
     .home-intro:before {
         background: #fff;
         border-radius: 100%;
         content: '';
-        height: 164px;
-        left: -4%;
+        height: 492px;
+        left: -15%;
         position: absolute;
-        top: -82px;
-        width: 108%;
+        top: -100px;
+        width: 130%;
         z-index: -1;
     }
 
 .home-intro .icon {
     display: block;
     margin: 0 auto 1em;
+}
+
+.home-intro h2,
+.home-about h2 {
+    font-size: 2.125em;
+    font-weight: 900;
+}
+
+.home-intro p,
+.home-about p {
+    font-size: 1.3125em;
+    font-weight: 700;
+}
+
+.home-about {
+    text-align: left;
+}
+
+.home-about p {
+    font-weight: 400;
+}
+
+.home-about .align-self-end p {
+    padding-right: 10%;
 }

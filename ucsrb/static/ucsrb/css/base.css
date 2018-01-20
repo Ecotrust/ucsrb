@@ -4,8 +4,14 @@
      * no support for css vars in IE  (╯°□°)╯
      */
     :root {
-        --link: #67b8c6;
-        --hover: #3a5675;
+        --primary: #3a5675;
+            --hover: #3a5675;
+        --secondary: #67b8c6;
+            --link: #67b8c6;
+        --accent: #e2e05e;
+        --text: #58595b;
+
+        --margin-bottom: 1.5rem;
     }
 }
 
@@ -14,17 +20,30 @@
 }
 
 html {
-    font-weight: normal;
     font-size: 1em;
 }
 
 body {
+    color: #58595b;
     font-family: 'Libre Franklin', sans-serif;
+    font-weight: normal;
 }
 
 img {
     height: auto;
     max-width: 100%;
+}
+
+hr {
+    background: #e2e05e;
+    border: none;
+    height: 10px;
+    margin: 1.5rem 0;
+}
+
+p {
+    font-size: 1em;
+    margin: 0 0 1.5rem;
 }
 
 a {
@@ -41,10 +60,6 @@ a.btn {
     border-radius: 0;
 }
 
-.jumbotron a.btn {
-    font-size: 1.5em;
-}
-
 .nav-wrap {
     border-bottom: 3px solid #fff;
     overflow: hidden;
@@ -55,5 +70,22 @@ nav {
 }
 
 footer {
+    padding-bottom: 3rem;
+}
 
+footer p {
+    font-size: 1em;
+    margin-bottom: .5rem;
+}
+
+footer hr {
+    margin-top: 2.5rem;
+}
+
+footer .pad-left {
+    padding-left: 3rem;
+}
+
+footer .footer-logo {
+    max-width: 84%;
 }
