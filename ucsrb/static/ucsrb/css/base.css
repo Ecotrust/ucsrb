@@ -34,6 +34,15 @@ img {
     max-width: 100%;
 }
 
+i {
+    display: inline-block;
+    height: 1rem;
+    line-height: 1rem;
+    margin: 0 .5rem .25rem 0;
+    vertical-align: middle;
+    width: 1rem;
+}
+
 hr {
     background: #e2e05e;
     border: none;
@@ -60,13 +69,8 @@ a.btn {
     border-radius: 0;
 }
 
-.nav-wrap {
-    border-bottom: 3px solid #fff;
-    overflow: hidden;
-    position: relative;
-}
-
-nav {
+h1 {
+    font-weight: 900;
 }
 
 footer {
