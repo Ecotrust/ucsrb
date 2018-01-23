@@ -22,7 +22,7 @@ var app = {
 
 app.init = {
   'select': function() {
-    console.log('select init');
+    console.log('%cinit stream segment selection scenario type', 'font-weight: bold;');
     // TODO get bbox from map window and assign to var
     var bbox = [-13406452.813644003, 6045242.123841717, -13403748.852081062, 6047669.009725289];
     app.request.get_segment_by_bbox(bbox)
@@ -33,10 +33,13 @@ app.init = {
         app.map.interaction.add('select');
       })
       .then(function() {
-        app.map.layer.streams.selectListener();
+        app.map.interaction.selectSegment();
+      })
+      .then(function() {
+        console.log('%clistening for stream segement selection...', 'color: orange;');
       })
       .catch(function(data) {
-        alert('failed to add map layer');
+        console.warn('failed to add map layer');
       });
   },
   'filter': function() {
@@ -47,6 +50,7 @@ app.init = {
   },
 }
 
+// TODO rewrite panel object
 var scenarioTypePanel = {
   showNextBtn: function() {
     $('#next-step').addClass('show');
@@ -111,7 +115,7 @@ app.request = {
       dataType: 'json'
     })
       .done(function(response) {
-        console.log('success');
+        console.log('%csuccessfully returned segments by bbox', 'color: green');
         return response;
       })
       .fail(function(response) {

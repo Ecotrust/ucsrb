@@ -1,3 +1,27 @@
+/**
+ * navbar styles
+ */
+
+nav .navbar-toggler {
+    background: #67b8c6;
+    border-radius: 50%;
+    border: none;
+    height: 3.3125rem;
+    line-height: 3.3125rem;
+    text-align: center;
+    padding: 0;
+    width: 3.3125rem;
+}
+
+nav .navbar-toggler .navbar-toggler-icon {
+    background-image: url('/static/ucsrb/img/navicon.svg');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: block;
+    margin: 0 auto;
+}
+
 .top-nav-wrap {
     background: #58595B;
     color: #fff;
@@ -13,21 +37,61 @@
     margin: 0 1em;
 }
 
+#scenario-nav li {
+    margin: 0;
+    padding: 1.25rem 3rem;
+    position: relative;
+}
+
+    #scenario-nav li:after {
+        content: '';
+        border-right: 10px solid #e6e7e8;
+        height: 70%;
+        position: absolute;
+        top: 15%;
+        right: -5px;
+    }
+
+    #scenario-nav li:last-of-type:after {
+        border-right: none;
+    }
+
 #scenario-nav button {
     border: none;
     background: transparent;
     cursor: pointer;
-    margin: 2em;
+    text-align: center;
+    padding: 0;
 }
 
 #scenario-nav button img {
-    height: 200px;
+    height: 9rem;
     pointer-events: none;
-    width: auto;
 }
 
+#file-nav {
+    background: #e6e7e8;
+    font-size: 1.06125em;
+    font-weight: 600;
+    padding: 2rem 2rem 0 2rem;
+}
+
+#file-nav li {
+    display: block;
+    margin: 0 0 .5rem;
+}
+
+#file-nav a {
+    display: inline-block;
+    text-decoration: none;
+}
+
+/**
+ * map styles
+ */
+
 .map-wrap {
-    height: 65vh;
+    height: 60vh;
     position: relative;
 }
 
@@ -35,6 +99,9 @@
     height: 100%;
 }
 
+/**
+ * panel styles
+ */
 #right-panel {
     background: rgba(0,105,85,0.2);
     position: absolute;

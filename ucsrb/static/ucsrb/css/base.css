@@ -1,14 +1,32 @@
+@supports(--var: 'value') {
+    /**
+     * Setting some variables mainly for reference because
+     * no support for css vars in IE  (╯°□°)╯
+     */
+    :root {
+        --primary: #3a5675;
+            --hover: #3a5675;
+        --secondary: #67b8c6;
+            --link: #67b8c6;
+        --accent: #e2e05e;
+        --text: #58595b;
+
+        --margin-bottom: 1.5rem;
+    }
+}
+
 * {
     box-sizing: border-box;
 }
 
 html {
-    font-weight: normal;
     font-size: 1em;
 }
 
 body {
-  font-family: 'Andale Mono';
+    color: #58595b;
+    font-family: 'Libre Franklin', sans-serif;
+    font-weight: normal;
 }
 
 img {
@@ -16,7 +34,33 @@ img {
     max-width: 100%;
 }
 
+i {
+    display: inline-block;
+    height: 1rem;
+    line-height: 1rem;
+    margin: 0 .5rem .25rem 0;
+    vertical-align: middle;
+    width: 1rem;
+}
+
+hr {
+    background: #e2e05e;
+    border: none;
+    height: 10px;
+    margin: 1.5rem 0;
+}
+
+p {
+    font-size: 1em;
+    margin: 0 0 1.5rem;
+}
+
+a {
+    color: #67b8c6;
+}
+
 a:hover {
+    color: #3a5675;
     cursor: pointer;
 }
 
@@ -25,19 +69,27 @@ a.btn {
     border-radius: 0;
 }
 
-.jumbotron a.btn {
-    font-size: 1.5em;
-}
-
-.nav-wrap {
-    border-bottom: 3px solid #fff;
-    overflow: hidden;
-    position: relative;
-}
-
-nav {
+h1 {
+    font-weight: 900;
 }
 
 footer {
+    padding-bottom: 3rem;
+}
 
+footer p {
+    font-size: 1em;
+    margin-bottom: .5rem;
+}
+
+footer hr {
+    margin-top: 2.5rem;
+}
+
+footer .pad-left {
+    padding-left: 3rem;
+}
+
+footer .footer-logo {
+    max-width: 84%;
 }
