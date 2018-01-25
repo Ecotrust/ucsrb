@@ -58,7 +58,7 @@ class TreatmentScenarioForm(ScenarioForm):
     )
     area_min = forms.FloatField(
         required=False,
-        initial=3500000000,
+        initial=100000000,
         widget=forms.TextInput(
             attrs={
                 'class': 'slidervalue',
@@ -68,7 +68,7 @@ class TreatmentScenarioForm(ScenarioForm):
     )
     area_max = forms.FloatField(
         required=False,
-        initial=5500000000,
+        initial=2500000000,
         widget=forms.TextInput(
             attrs={
                 'class': 'slidervalue',
@@ -81,9 +81,9 @@ class TreatmentScenarioForm(ScenarioForm):
         widget=DualSliderWidget(
             'area_min',
             'area_max',
-            min=3000000000,
-            max=6000000000,
-            step=100000000
+            min=0,
+            max=3000000000,
+            step=50000000
         )
     )
 
@@ -105,3 +105,4 @@ class TreatmentScenarioForm(ScenarioForm):
         exclude = list(ScenarioForm.Meta.exclude)
         for f in model.output_fields():
             exclude.append(f.attname)
+        widgets = {}

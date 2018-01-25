@@ -25,7 +25,7 @@ class TreatmentScenario(Scenario):
         verbose_name = 'Treatment'
         # icon_url = 'marco/img/multi.png'
         form = 'ucsrb.forms.TreatmentScenarioForm'
-        form_template = 'ucsrb_scenarios/form.html'
+        form_template = 'scenarios/form.html'
         show_template = 'scenarios/show.html'
 
 class VegPlanningUnit(PlanningUnit):
