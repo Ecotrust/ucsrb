@@ -39,8 +39,9 @@ nav .navbar-toggler .navbar-toggler-icon {
 
 #scenario-nav li {
     margin: 0;
-    padding: 1.25rem 3rem;
+    padding: 1.25rem 2.5rem;
     position: relative;
+    text-align: center;
 }
 
     #scenario-nav li:after {
@@ -60,20 +61,36 @@ nav .navbar-toggler .navbar-toggler-icon {
     border: none;
     background: transparent;
     cursor: pointer;
-    text-align: center;
     padding: 0;
 }
 
 #scenario-nav button img {
-    height: 9rem;
+    height: 5rem;
+    margin-bottom: 1rem;
     pointer-events: none;
+    width: auto;
+}
+
+#scenario-nav h3 {
+    margin: 0 auto;
+    width: 100%;
+    pointer-events: none;
+}
+
+#scenario-nav.icons-only h3 {
+    display: none;
+}
+
+#scenario-nav.icons-only img {
+    height: 3rem;
+    margin: 0;
 }
 
 #file-nav {
     background: #e6e7e8;
     font-size: 1.06125em;
     font-weight: 600;
-    padding: 2rem 2rem 0 2rem;
+    padding: 4rem 2rem 0 4rem;
 }
 
 #file-nav li {
@@ -86,12 +103,16 @@ nav .navbar-toggler .navbar-toggler-icon {
     text-decoration: none;
 }
 
+#file-nav.less-padding {
+    padding: 1rem 2rem 0;
+}
+
 /**
  * map styles
  */
 
 .map-wrap {
-    height: 60vh;
+    height: 80vh;
     position: relative;
 }
 
@@ -103,7 +124,8 @@ nav .navbar-toggler .navbar-toggler-icon {
  * panel styles
  */
 #right-panel {
-    background: rgba(0,105,85,0.2);
+    /* background: rgba(0,105,85,0.2); */
+    display: none;
     position: absolute;
     right: 1em;
     top: 1em;

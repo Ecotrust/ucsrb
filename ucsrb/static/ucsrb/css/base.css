@@ -73,8 +73,14 @@ h1 {
     font-weight: 900;
 }
 
+h3 {
+    color: #3a5675;
+    font-size: 1.375em;
+    font-weight: 700;
+}
+
 footer {
-    padding-bottom: 3rem;
+    padding: 3rem 0;
 }
 
 footer p {

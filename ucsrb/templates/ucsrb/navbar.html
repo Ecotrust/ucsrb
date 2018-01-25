@@ -4,7 +4,7 @@
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <h1>Forest Viewer Title</h1>
+        <h1>Snow2flow</h1>
         <div class="collapse navbar-collapse" id="menu">
             <a href="" class="nav-item">Terms Defined</a>
             <a href="" class="nav-item">Tutorial</a>
@@ -15,17 +15,19 @@
 
 <div class="nav-wrap container-fluid">
     <div class="row">
-        <ul id="scenario-nav" class="col-9 nav justify-content-center">
-            <li class="nav-item">
-                <button data-scenario-type="select"><img src="{% static 'ucsrb/img/icon/i_select.svg' %}" alt="select stream segment" /></button>
+        <div class="col-1"></div>
+        <ul id="scenario-nav" class="col-7 nav justify-content-center">
+            <li class="col-sm">
+                <button data-scenario-type="select"><img src="{% static 'ucsrb/img/icon/stream_select.svg' %}" alt="select stream segment" /><h3>Select stream segment</h3></button>
             </li>
-            <li class="nav-item">
-                <button class="nav-item" data-scenario-type="filter"><img src="{% static 'ucsrb/img/icon/i_filter.svg' %}" alt="filter forest region" /></button>
+            <li class="col-sm">
+                <button data-scenario-type="filter"><img src="{% static 'ucsrb/img/icon/filter_forest.svg' %}" alt="filter forest region" /><h3>Filter forest regions</h3></button>
             </li>
-            <li class="nav-item">
-                <button class="nav-item" data-scenario-type="draw"><img src="{% static 'ucsrb/img/icon/i_draw.svg' %}" alt="draw treatment area" /></button>
+            <li class="col-sm">
+                <button data-scenario-type="draw"><img src="{% static 'ucsrb/img/icon/draw_area.svg' %}" alt="draw treatment area" /><h3>Draw treatment area</h3></button>
             </li>
         </ul>
+        <div class="col-1"></div>
         <nav id="file-nav" class="col-3 nav flex-column">
             <li class="nav-item"><a href=""><i><img src="{% static '/ucsrb/img/icon/i_back.svg' %}" /></i> back</a></li>
             <li class="nav-item"><a href=""><i><img src="{% static '/ucsrb/img/icon/i_folder.svg' %}" /></i> load saved</a></li>

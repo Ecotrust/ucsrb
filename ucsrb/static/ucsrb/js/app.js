@@ -6,7 +6,6 @@ var app = {
    */
   setState: function(type) {
     app.state.scenarioType = type;
-    console.log(type);
     app.init[type]();
   },
   set scenarioPanelContent(content) {
@@ -30,10 +29,7 @@ app.init = {
         app.map.layer.streams.init(data);
       })
       .then(function() {
-        app.map.interaction.add('select');
-      })
-      .then(function() {
-        app.map.interaction.selectSegment();
+        app.map.interaction.select.segment();
       })
       .then(function() {
         console.log('%clistening for stream segement selection...', 'color: orange;');
@@ -43,7 +39,7 @@ app.init = {
       });
   },
   'filter': function() {
-
+    app.map.addLayer(app.map.layer.huc10);
   },
   'draw': function() {
 

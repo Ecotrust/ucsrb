@@ -105,6 +105,10 @@
     font-weight: 700;
 }
 
+.home-intro .row {
+    margin-bottom: 2rem;
+}
+
 .home-about {
     text-align: left;
 }
