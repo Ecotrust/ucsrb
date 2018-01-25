@@ -6,30 +6,39 @@ from django.template import loader
 import json
 from ucsrb.models import TreatmentScenario
 
-def index(request):
-    template = loader.get_template('ucsrb/index.html')
+def getBaseContext():
     context = {
-        'title': 'UCSRB FSTAT',
+        #title var should be used in header template
+        'title': 'UCSRB',
         'self': {
             'title': 'UCSRB Snowpack Treatment'
         }
     }
+    return context
+
+
+def index(request):
+    template = loader.get_template('ucsrb/index.html')
+    context = getBaseContext()
     return HttpResponse(template.render(context, request))
 
 def home(request):
     template = loader.get_template('ucsrb/home.html')
-    context = {
-        'title': 'UCSRB',
-        'self': {
-            'title': 'UCSRB'
-        }
-    }
+    context = getBaseContext()
     return HttpResponse(template.render(context, request))
 
 def app(request):
     template = loader.get_template('ucsrb/app.html')
     context = {}
     return HttpResponse(template.render(context, request))
+
+
+def account(request):
+    template = loader.get_template('ucsrb/blocks/login.html')
+    context = getBaseContext()
+
+    from accounts.views import login_page
+    return login_page(request, template_string, context)
 
 ###########################################################
 ###             API Calls                                 #

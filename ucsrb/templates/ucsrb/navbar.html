@@ -8,9 +8,13 @@
         <div class="collapse navbar-collapse" id="menu">
             <a href="" class="nav-item">Terms Defined</a>
             <a href="" class="nav-item">Tutorial</a>
-            <a href="" class="nav-item">Log in</a>
+            <button data-toggle="modal" data-target="#login-modal" class="nav-item">Log in</button>
         </div>
     </nav>
+</div>
+
+<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="login-modal" aria-hidden="true">
+  {% include 'ucsrb/blocks/login_modal.html' %}
 </div>
 
 <div class="nav-wrap container-fluid">
