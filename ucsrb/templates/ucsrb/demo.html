@@ -1,0 +1,182 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <script src="https://code.jquery.com/jquery-1.7.1.js" integrity="sha256-n8wkEJNAWUaIUDnfQoz6fwBRofK9vMWjE6F3qeNfiAY=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.1/css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v4.6.1/build/ol.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.0.1/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+
+    <link rel="stylesheet" href="{% static 'scenarios/css/scenarios_form.css' %}" type="text/css">
+
+    <style>
+      .map {
+        width: 70%;
+      }
+      .header {
+        position: absolute;
+        right: 0;
+        top: 0;
+        box-sizing: border-box;
+        width: 30%;
+        text-align: left;
+        padding: 0 1em;
+      }
+      .panel {
+        padding: 1em;
+        box-sizing: border-box;
+        width: 30%;
+        right: 0;
+        top: 8%;
+        /*background-color: green;*/
+        border: 1px solid black;
+        height: 90%;
+        position: absolute;
+      }
+      .panel_inner {
+        /*position: relative;*/
+      }
+      #scenarios, #scenario_form {
+        margin-bottom: 3px;
+        min-width: 90%;
+        padding: 4px;
+        max-height: 50%;
+        position: absolute;
+        overflow-y: auto;
+      }
+      #scenarios {
+        top: 0;
+      }
+      #scenario_form {
+        border: 1px solid black;
+        bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <div class='header'>
+      <h1>Scenarios</h1>
+    </div>
+    <div id="panel" class="panel">
+      <div class='panel_inner'>
+        <div id='scenarios'></div>
+        <div id='scenario_form'></div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/2.1.0/knockout-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.3.2/knockout.mapping.js"></script>
+    <script src="{% static 'js/knockout-bindings.js' %}"></script>
+    <script>
+      if (typeof app === 'undefined') {
+        app = {};
+      }
+    </script>
+
+    <!-- Get var map_settings -->
+    <script src="{% static 'scenarios/js/' %}{{ MAP_TECH }}_settings.js"></script>
+
+    <script>
+        if (!app.state) {
+          app.state = {}
+        }
+        app.map = mapSettings.getInitMap();
+        app.scenariosLayer = mapSettings.getInitFilterResultsLayer('scenarios', false);
+        // TODO: OL4 specific code. It's okay if the demo is always ol4.
+        var PUStyle = new ol.style.Style({
+            fill: new ol.style.Fill({color: [80,80,80, 0.5]}),
+            stroke: new ol.style.Stroke({
+              color:[0, 0, 0, 0.8],
+              width: 1
+            }),
+        });
+        app.planningUnitsLayer = mapSettings.getInitFilterResultsLayer('planning units', PUStyle);
+        // TODO: OpenLayers specific code!!!
+        app.scenariosSource = app.scenariosLayer.getSource();
+        app.planningUnitsSource = app.planningUnitsLayer.getSource();
+        app.map.addLayer(app.planningUnitsLayer);
+        app.map.addLayer(app.scenariosLayer);
+
+
+        $(function() {
+            $.ajax({
+              url: '/scenario/get_planningunits',
+              type: 'GET',
+              dataType: 'json'
+            })
+            .done(function(features) {
+              for(var i = 0; i < features.length; i++) {
+                feature = features[i].wkt;
+                app.planningUnitsLayer.addWKTFeatures(feature);
+              }
+              try {
+                // TODO: OL Specific code!!!
+                app.map.getView().fit(app.planningUnitsSource.getExtent(), {duration: 1500});
+              } catch (e) {
+                window.alert('No data received. Please add some features.');
+              }
+            })
+            .fail(function() {
+              alert("error");
+            });
+        });
+
+
+    </script>
+
+    <script src="{% static 'scenarios/js/models.js' %}"></script>
+    <script src="{% static 'ucsrb/js/scenarios.js' %}"></script>
+
+    <script>
+      {% if GET_SCENARIOS_URL %}
+        get_scenarios_url = '{{GET_SCENARIOS_URL}}';
+      {% else %}
+        get_scenarios_url = '/scenario/get_scenarios';
+      {% endif %}
+      $.ajax({
+        url: get_scenarios_url,
+        type: 'GET',
+        dataType: 'json'
+      })
+      .done(function(scenarios) {
+        html = '<ul>'
+        for (var i = 0; i < scenarios.length; i++) {
+          scenario = scenarios[i];
+          if(scenario.name == '') {
+            scenario_name = 'Scenario ' + scenario.id;
+          } else {
+            scenario_name = scenario.name;
+          }
+          {% if SCENARIO_LINK_BASE %}
+            scenario_link = '{{SCENARIO_LINK_BASE}}' + "_" + scenario.id;
+          {% else %}
+            scenario_link = "/features/scenario/scenarios_scenario_" + scenario.id;
+          {% endif %}
+
+          html = html + '<li><a href="' + scenario_link + '/" target="_blank">' + scenario_name + '</a></li>';
+        }
+        html = html + '</ul>';
+        $('#scenarios').html(html)
+        {% if SCENARIO_FORM_URL %}
+          scenario_form_url = '{{SCENARIO_FORM_URL}}';
+        {% else %}
+          scenario_form_url = '/features/scenario/form/';
+        {% endif %}
+        app.viewModel.scenarios.createNewScenario(scenario_form_url);
+      })
+      .fail(function() {
+        alert("error");
+      });
+
+    </script>
+  </body>
+</html>

@@ -6,6 +6,7 @@ from django.template import loader
 import json
 from ucsrb.models import TreatmentScenario
 from django.conf import settings
+from django.views.decorators.cache import cache_page
 
 def index(request):
     template = loader.get_template('ucsrb/index.html')
@@ -892,6 +893,66 @@ def get_results_by_state(request):
     }
     return JsonResponse(return_json)
 
+'''
+'''
+
+def run_filter_query(filters):
+    from collections import OrderedDict
+    from ucsrb.models import VegPlanningUnit
+    # TODO: This would be nicer if it generically knew how to filter fields
+    # by name, and what kinds of filters they were. For now, hard code.
+    notes = []
+    query = VegPlanningUnit.objects.all()
+
+    import ipdb; ipdb.set_trace()
+    if 'avoid_private' in filters.keys() and filters['avoid_private']:
+        if 'avoid_private_input' in filters.keys():
+            if filters['avoid_private_input'] == 'Avoid':
+                pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
+            else:
+                pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() in ['private land', 'private']]
+        else:
+            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
+        query = (query.filter(pk__in=pu_ids))
+
+    # if 'area' in filters.keys() and filters['area']:
+    #     # RDH 1/8/18: filter(geometry__area_range(...)) does not seem available.
+    #     # query = query.filter(geometry__area__range=(filters['area_min'], filters['area_max']))
+    #
+    #     # RDH 1/9/18: Why can't we use the model's 'Run Filters' function?
+    #     # RDH 1/26/18: Because the model object doesn't exist yet.
+    #     pu_ids = [pu.pk for pu in query if pu.geometry.area <= float(filters['area_max']) and pu.geometry.area>= float(filters['area_min'])]
+    #     query = (query.filter(pk__in=pu_ids))
+
+    return (query, notes)
+
+'''
+'''
+# @cache_page(60 * 60) # 1 hour of caching
+def get_filter_count(request, query=False, notes=[]):
+    if not query:
+        filter_dict = dict(request.GET.items())
+        (query, notes) = run_filter_query(filter_dict)
+    from scenarios import views as scenarioViews
+    return scenarioViews.get_filter_count(request, query, notes)
+    # return HttpResponse(query.count(), status=200)
+
+
+'''
+'''
+# @cache_page(60 * 60) # 1 hour of caching
+def get_filter_results(request, query=False, notes=[]):
+    if not query:
+        filter_dict = dict(request.GET.items())
+        (query, notes) = run_filter_query(filter_dict)
+    from scenarios import views as scenarioViews
+    return scenarioViews.get_filter_results(request, query, notes)
+
+    # return # of grid cells and dissolved geometry in geojson
+    # return HttpResponse(dumps(json))
+
+
+
 def get_planningunits(request):
     from ucsrb.models import VegPlanningUnit
     from json import dumps
@@ -927,18 +988,6 @@ from scenarios.views import get_scenarios as scenarios_get_scenarios
 def get_scenarios(request, scenario_model='treatmentscenario'):
     return scenarios_get_scenarios(request, scenario_model, 'ucsrb')
 
-def demo(request, template='scenarios/demo.html'):
-    try:
-        context = {
-            'GET_SCENARIOS_URL': settings.GET_SCENARIOS_URL,
-            'SCENARIO_FORM_URL': settings.SCENARIO_FORM_URL,
-            'SCENARIO_LINK_BASE': settings.SCENARIO_LINK_BASE,
-        }
-    except:
-        context = {}
-    try:
-        context['MAP_TECH'] = settings.MAP_TECH
-    except:
-        context['MAP_TECH'] = 'ol4'
-
-    return render(request, template, context)
+def demo(request, template='ucsrb/demo.html'):
+    from scenarios import views as scenarios_views
+    return scenarios_views.demo(request, template)

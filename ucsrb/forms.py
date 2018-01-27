@@ -46,9 +46,9 @@ class TreatmentScenarioForm(ScenarioForm):
     #     )
     # )
 
-    area = HiddenScenarioBooleanField(
-        label="Area",
-        help_text="Area of Planning Unit in sq. meters",
+    avoid_private = HiddenScenarioBooleanField(
+        label="Avoid Private Land",
+        help_text="Do not treat privately owned forest land",
         # required=False,
         # widget=CheckboxInput(
         #     attrs={
@@ -56,6 +56,29 @@ class TreatmentScenarioForm(ScenarioForm):
         #     }
         # )
     )
+
+    avoid_private_input = forms.ChoiceField(
+        required=False,
+        widget=forms.Select(
+            attrs={'class': 'parameters'}
+        ),
+        choices=(
+            ('Avoid', 'Avoid'),
+            ('Target', 'Target')),
+        initial='Avoid'
+    )
+
+    area = HiddenScenarioBooleanField(
+        label="Area",
+        help_text="Area in square Meters",
+        # required=False,
+        # widget=CheckboxInput(
+        #     attrs={
+        #         'class': 'parameters hidden_checkbox'
+        #     }
+        # )
+    )
+
     area_min = forms.FloatField(
         required=False,
         initial=100000000,
@@ -94,11 +117,13 @@ class TreatmentScenarioForm(ScenarioForm):
         return self._get_fields(names)
 
     def get_step_1_fields(self):
-        names = []
+        names = [
+            ('avoid_private', None, None, 'avoid_private_input'),
+        ]
         return self._get_fields(names)
 
     def get_steps(self):
-        return self.get_step_0_fields(),
+        return self.get_step_0_fields(), self.get_step_1_fields(),
 
     class Meta(ScenarioForm.Meta):
         model = TreatmentScenario
