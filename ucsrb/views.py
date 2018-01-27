@@ -3,28 +3,28 @@ from django.shortcuts import render
 # Create your views here.
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
+from django.contrib.auth import authenticate, login, logout
 import json
 from ucsrb.models import TreatmentScenario
 
-def getBaseContext():
+def index(request):
+    template = loader.get_template('ucsrb/index.html')
     context = {
-        #title var should be used in header template
-        'title': 'UCSRB',
+        'title': 'UCSRB FSTAT',
         'self': {
             'title': 'UCSRB Snowpack Treatment'
         }
     }
-    return context
-
-
-def index(request):
-    template = loader.get_template('ucsrb/index.html')
-    context = getBaseContext()
     return HttpResponse(template.render(context, request))
 
 def home(request):
     template = loader.get_template('ucsrb/home.html')
-    context = getBaseContext()
+    context = {
+        'title': 'UCSRB',
+        'self': {
+            'title': 'UCSRB'
+        }
+    }
     return HttpResponse(template.render(context, request))
 
 def app(request):
@@ -32,13 +32,23 @@ def app(request):
     context = {}
     return HttpResponse(template.render(context, request))
 
+def sign_in(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        login(request, user)
+        # allow user to save, load, or continue
+        return HttpResponse('success')
+    else:
+        # Return an 'invalid login' error message.
+        return HttpResponse('invalid login')
 
-def account(request):
-    template = loader.get_template('ucsrb/blocks/login.html')
-    context = getBaseContext()
-
-    from accounts.views import login_page
-    return login_page(request, template_string, context)
+def sign_out(request):
+    logout(request)
+    # Redirect to a success page or success message
+    # no error thrown by logout
+    return HttpResponse('logout successful')
 
 ###########################################################
 ###             API Calls                                 #

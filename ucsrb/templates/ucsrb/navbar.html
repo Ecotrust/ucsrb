@@ -8,13 +8,10 @@
         <div class="collapse navbar-collapse" id="menu">
             <a href="" class="nav-item">Terms Defined</a>
             <a href="" class="nav-item">Tutorial</a>
-            <button data-toggle="modal" data-target="#login-modal" class="nav-item">Log in</button>
+            <button data-toggle="modal" data-target="#login-modal" class="nav-item">Sign in</button>
+            <button id="sign-out" class="nav-item">Sign out</button>
         </div>
     </nav>
-</div>
-
-<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="login-modal" aria-hidden="true">
-  {% include 'ucsrb/blocks/login_modal.html' %}
 </div>
 
 <div class="nav-wrap container-fluid">
@@ -22,13 +19,13 @@
         <div class="col-1"></div>
         <ul id="scenario-nav" class="col-7 nav justify-content-center">
             <li class="col-sm">
-                <button data-scenario-type="select"><img src="{% static 'ucsrb/img/icon/stream_select.svg' %}" alt="select stream segment" /><h3>Select stream segment</h3></button>
+                <button data-scenario-type="select"><img src="{% static 'ucsrb/img/icon/stream_select.svg' %}" alt="select segment" /><h3>Select stream segment</h3></button>
             </li>
             <li class="col-sm">
-                <button data-scenario-type="filter"><img src="{% static 'ucsrb/img/icon/filter_forest.svg' %}" alt="filter forest region" /><h3>Filter forest regions</h3></button>
+                <button data-scenario-type="filter"><img src="{% static 'ucsrb/img/icon/filter_forest.svg' %}" alt="filter region" /><h3>Filter forest regions</h3></button>
             </li>
             <li class="col-sm">
-                <button data-scenario-type="draw"><img src="{% static 'ucsrb/img/icon/draw_area.svg' %}" alt="draw treatment area" /><h3>Draw treatment area</h3></button>
+                <button data-scenario-type="draw"><img src="{% static 'ucsrb/img/icon/draw_area.svg' %}" alt="draw area" /><h3>Draw treatment area</h3></button>
             </li>
         </ul>
         <div class="col-1"></div>

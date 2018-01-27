@@ -34,16 +34,21 @@
 </head>
 
 <body class="{% block body_class %}classless-page{% endblock %} {% block layout %}base{% endblock %}-layout">
-    <header>
-        {% block header %}
-            {% include 'ucsrb/navbar.html' %}
-        {% endblock header %}
-    </header>
 
-    <main>
-        {% block content %}{% endblock content %}
-        {% block outer_content %}{% endblock outer_content %}
-    </main>
+    {% block header_wrap %}
+        <header>
+            {% block header %}
+                {% include 'ucsrb/navbar.html' %}
+            {% endblock header %}
+        </header>
+    {% endblock header_wrap %}
+
+    {% block main %}
+        <main>
+            {% block content %}{% endblock content %}
+            {% block outer_content %}{% endblock outer_content %}
+        </main>
+    {% endblock main %}
 
     {% block footer_wrap %}
         <footer>
@@ -53,16 +58,26 @@
         </footer>
     {% endblock %}
 
+    {% block modal %}
+        {% block login_modal %}
+            <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="login-modal" aria-hidden="true">
+                {% include 'ucsrb/blocks/login_modal.html' %}
+            </div>
+        {% endblock login_modal %}
+    {% endblock modal %}
+
     {% block js %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
         <!-- Automatically provides/replaces `Promise` if missing or broken. -->
         <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js"></script>
+        <script src="{% static 'ucsrb/js/main.js' %}"></script>
     {% endblock js %}
 
     {% block extra_js %}{% endblock %}
 
     {% block top-level %}{% endblock %}
+
 </body>
 </html>

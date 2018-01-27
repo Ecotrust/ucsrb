@@ -1,9 +1,0 @@
-<form class="form" method="post" action="/account/{% if next %}?next={{ next }}{% endif %}">
-  {% csrf_token %}
-
-  {{ form.as_div }}
-
-  <div class="modal-center">
-    <input type="submit" class="btn" value="Login"><br/>
-  </div>
-</form>

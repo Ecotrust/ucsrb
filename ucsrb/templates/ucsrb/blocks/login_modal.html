@@ -1,6 +1,5 @@
 {% load static %}
 
-{% block outer_content %}
 <div class="modal-dialog" role="document">
   <div class="modal-content">
     <div class="modal-header">
@@ -10,11 +9,11 @@
       </button>
     </div>
     <div class="modal-body">
-        {% include 'ucsrb/blocks/login_form.html' %}
+        {% include 'ucsrb/blocks/login.html' %}
     </div>
     <div class="modal-body">
         <h2>Register</h2>
-        {% include 'ucsrb/blocks/registration_form.html' %}
+        {# {% include 'ucsrb/blocks/registration_form.html' %} #}
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -22,4 +21,3 @@
   </div>
 </div>
 </div>
-{% endblock %}
