@@ -51,7 +51,7 @@ var main = {
     },
     signUp: function(event, form) {
       var formData = $(form).serialize();
-      var url = 'register/'; // default form action url
+      var url = 'sign_up/'; // default form action url
         // check if a different action should be used for url
         if (event.target.action.length > 0) {
           url = event.target.action;
