@@ -1,36 +1,44 @@
 window.addEventListener("load", function () {
+  // Sign in
   document.getElementById('sign-in').addEventListener('submit', function(event) {
     event.preventDefault();
     main.auth.signIn(event, this);
   });
-  document.getElementById('sign-out').addEventListener('click', function(event) {
+  // Register
+  document.getElementById('sign-up').addEventListener('submit', function(event) {
     event.preventDefault();
-    main.auth.signOut();
-  })
+    main.auth.signUp(event, this);
+  });
+  // Sign out
+  document.getElementById('menu').addEventListener('click', function(event) {
+    if (event.target.nodeName == 'BUTTON') {
+      event.preventDefault();
+      if (event.target.dataset.action == 'sign-out') {
+        main.auth.signOut();
+      } else if (event.target.dataset.action == 'sign-in-modal') {
+        $('#login-modal').modal('show');
+      }
+    }
+  });
 });
 
 var main = {
   auth: {
     signIn: function(event, form) {
       var formData = $(form).serialize();
-      if (event.target.action.length > 0) {
-        var url = event.target.action;
-      } else {
-        var url = 'sign_in/'
-      }
+      var url = 'sign_in/'; // default form action url
+        // check if a different action should be used for url
+        if (event.target.action.length > 0) {
+          url = event.target.action;
+        }
       $.ajax({
         url: url,
         type: 'POST',
         data: formData,
         dataType: 'json',
         success: function (data) {
-          console.log('yes');
-          main.auth.signInSuccess();
+          main.auth.success();
         }
-      })
-      .done(function() {
-        console.log('yes');
-        main.auth.signInSuccess();
       })
     },
     signOut: function(event) {
@@ -41,7 +49,25 @@ var main = {
         }
       })
     },
-    signInSuccess: function() {
+    signUp: function(event, form) {
+      var formData = $(form).serialize();
+      var url = 'register/'; // default form action url
+        // check if a different action should be used for url
+        if (event.target.action.length > 0) {
+          url = event.target.action;
+        }
+      $.ajax({
+        url: url,
+        type: 'POST',
+        data: formData,
+        dataType: 'json',
+        success: function (data) {
+          main.auth.success();
+          console.log(data);
+        }
+      })
+    },
+    success: function() {
       $('#login-modal').modal('hide');
     }
   },

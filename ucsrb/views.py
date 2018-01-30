@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 import json
 from ucsrb.models import TreatmentScenario
 
@@ -33,22 +34,55 @@ def app(request):
     return HttpResponse(template.render(context, request))
 
 def sign_in(request):
+    context = {}
     username = request.POST['username']
     password = request.POST['password']
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
+        context['success'] = True
+        context['username'] = username
+        context['user_id'] = user.id
         # allow user to save, load, or continue
-        return HttpResponse('success')
+        return JsonResponse(context)
     else:
+        context['success'] = False
+        context['error_msg'] = 'Invalid username/password.'
         # Return an 'invalid login' error message.
-        return HttpResponse('invalid login')
+        return JsonResponse(context)
 
 def sign_out(request):
     logout(request)
     # Redirect to a success page or success message
     # no error thrown by logout
     return HttpResponse('logout successful')
+
+def register(request):
+    context = {}
+    username = request.POST['username']
+    email = request.POST['email']
+    password = request.POST['password']
+    password_confirm = request.POST['password_confirm']
+    if password != password_confirm:
+        context['success'] = False
+        context['error_msg'] = 'Password does not match the confirm password.'
+        return JsonResponse(context)
+    try:
+        user = User.objects.create_user(username, email, password)
+        user_auth = authenticate(request, username=username, password=password)
+        if user_auth is not None:
+            login(request, user)
+            context['success'] = True
+            context['username'] = username
+            return JsonResponse(context)
+        else:
+            context['success'] = False
+            context['error_msg'] = 'Invalid username/password.'
+            return JsonResponse(context)
+    except:
+        context['success'] = False
+        context['error_msg'] = 'User already exists.'
+        return JsonResponse(context)
 
 ###########################################################
 ###             API Calls                                 #

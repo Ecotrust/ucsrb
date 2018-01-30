@@ -8,8 +8,12 @@
         <div class="collapse navbar-collapse" id="menu">
             <a href="" class="nav-item">Terms Defined</a>
             <a href="" class="nav-item">Tutorial</a>
-            <button data-toggle="modal" data-target="#login-modal" class="nav-item">Sign in</button>
-            <button id="sign-out" class="nav-item">Sign out</button>
+            {% if user.is_authenticated %}
+                {{ user.username }}
+                <button id="sign-out" data-action="sign-out" class="nav-item">Sign out</button>
+            {% else %}
+                <button id="sign-in-modal" data-action="sign-in-modal" class="nav-item">Sign in</button>
+            {% endif %}
         </div>
     </nav>
 </div>

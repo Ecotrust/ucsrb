@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^logout/$', auth_views.logout, {'next_page': '/sign_out'}, name='logout'),
     url(r'^sign_in/$', views.sign_in, name='sign_in'),
     url(r'^sign_out/$', views.sign_out, name='sign_out'),
+    url(r'^register/$', views.register, name='register'),
 
     ### API urls
     url(r'^get_veg_unit_by_bbox', views.get_veg_unit_by_bbox),

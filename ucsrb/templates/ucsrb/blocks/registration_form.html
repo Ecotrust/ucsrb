@@ -1,7 +1,23 @@
-<form method="post" action="/accounts/register/" class="registration-form">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <div class="form-center">
-    <button type="submit" class="btn">Register</button>
-  </div>
+<form method="post" id="sign-up">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="col-form-label">Username</label>
+        <input type="text" name="username" class="form-control">
+    </div>
+    <div class="form-group">
+        <label class="col-form-label">Email</label>
+        <input type="email" name="email" class="form-control">
+    </div>
+    <div class="form-group">
+        <label class="col-form-label">Password</label>
+        <input type="password" name="password" class="form-control">
+    </div>
+    <div class="form-group">
+        <label class="col-form-label">Confirm Password</label>
+        <input type="password" name="password_confirm" class="form-control">
+    </div>
+    <div class="form-group">
+        <input type="submit" value="register" />
+        {# <input type="hidden" name="next" value="{{ next }}" /> #}
+    </div>
 </form>
