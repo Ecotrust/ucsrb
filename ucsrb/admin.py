@@ -8,8 +8,12 @@ from django.contrib.gis.admin import GeoModelAdmin, OSMGeoAdmin
 class VegPlanningUnitAdmin(OSMGeoAdmin):
     list_display = ('pk', 'pub_priv_own', 'vegetation_type', 'forest_class')
 
+class TreatmentScenarioAdmin(OSMGeoAdmin):
+    list_display = ('name', 'user', 'description')
+
 geoadmin.site.register(VegPlanningUnit, VegPlanningUnitAdmin)
-geoadmin.site.register(TreatmentScenario, OSMGeoAdmin)
+# geoadmin.site.register(TreatmentScenario, OSMGeoAdmin)
+geoadmin.site.register(TreatmentScenario, TreatmentScenarioAdmin)
 admin.site.register(ScenarioState)
 geoadmin.site.register(FocusArea, OSMGeoAdmin)
 

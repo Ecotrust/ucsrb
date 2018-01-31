@@ -128,8 +128,10 @@ var madrona = {
 
 function scenarioFormModel(options) {
     var self = this;
-    self.area = ko.observable(false);
-    self.avoid_private = ko.observable(false);
+    self.input_parameter_private_own = ko.observable(false);
+    self.input_parameter_pub_priv_own = ko.observable(false);
+    self.input_parameter_lsr_percent = ko.observable(false);
+    self.input_parameter_has_critical_habitat = ko.observable(false);
 
     self.lastChange = (new Date()).getTime();
 

@@ -22,6 +22,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=('scenarios.scenario',),
+            # bases=('scenarios.scenario',),
         ),
     ]

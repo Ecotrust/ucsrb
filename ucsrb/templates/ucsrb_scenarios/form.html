@@ -12,7 +12,6 @@
             <i class="icon-large icon-refresh icon-spin" style="margin-left: 5px; height: 5px" data-bind="visible: showingFilteringResults() && showButtonSpinner()"></i>
         </a>
     </div>
-    <p>Action: {{ action }}</p>
     <form id="scenarios-form" action="{{ action }}" method="post" name="scenarios-form">
         {% for hidden in form.hidden_fields %}
             <div style="display:none;">
@@ -34,7 +33,8 @@
                             <div class="accordion-heading" data-bind="click: function() {app.viewModel.scenarios.scenarioFormModel.toggleParameter('{{ field.html_name }}'); }">
                                 <label class="accordion-toggle">
                                     {{ field.as_widget }}
-                                    <i class="check icon-large icon-check" data-bind="visible: {{ field.html_name }}()"></i>
+                                    <i class="check icon-large icon-check" data-bind="visible: app.viewModel.scenarios.scenarioFormModel.{{ field.html_name }}()"></i>
+                                    <!-- <i class="check icon-large icon-check" data-bind="visible: app.viewModel.scenarios.scenarioFormModel.avoid_private()"></i> -->
                                     <i class="check icon-large icon-check-empty"></i>
                                     <span class="parameter-label" style="margin-left: 5px">{{ field.label }}</span>
                                     <i class="info-icon icon-info-sign field-tooltip"
@@ -45,6 +45,7 @@
                                 </label>
                             </div>
                             {% if field_min or field_max or field_input or field_checkbox %}
+                            <!-- <div id="{{ field.html_name }}_widget" class="inputfield accordion-body collapse" data-bind="css: {'in': {{ field.html_name }}()}"> -->
                             <div id="{{ field.html_name }}_widget" class="inputfield accordion-body collapse" data-bind="css: {'in': {{ field.html_name }}()}">
                                 <div class="accordion-inner">
                                     <div>
@@ -208,7 +209,6 @@
 
       jQuery.getScript("{% static 'scenarios/js/scenarios_form.js' %}", function () {
           console.debug("Loaded: {% static 'scenarios/js/scenarios_form.js' %}");
-          app.viewModel.scenarios.scenarioFormModel.avoid_private = ko.observable(false);
       });
 
       $('.field-tooltip').tooltip({trigger:'hover'});

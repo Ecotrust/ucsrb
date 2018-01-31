@@ -4,7 +4,8 @@ from django.contrib.gis.db import models as gismodels
 from django.contrib.auth.models import User
 from features.registry import register
 from features.models import MultiPolygonFeature
-from scenarios.models import Scenario, PlanningUnit
+# from scenarios.models import Scenario, PlanningUnit
+from scenarios.models import Scenario
 
 GEOMETRY_DB_SRID = settings.GEOMETRY_DB_SRID
 
@@ -38,33 +39,18 @@ class ScenarioState(models.Model):
 
 @register
 class TreatmentScenario(Scenario):
+    # id = models.IntegerField(primary_key=True)
     scenario = models.ForeignKey(ScenarioState, null=True, blank=True, default=None)#, models.CASCADE)
 
     # Avoid Private land? (USE PUB_PRIV_OWN!)
     input_parameter_private_own = models.BooleanField(default=False)
 
     # pub_priv_own = models.CharField(max_length=255)         #PubPrivOwn
-    OWNERSHIP_CHOICES = (
-        # ('NULL', '---'),
-        ('Bureau of Land Management', 'Bureau of Land Management'),
-        ('Bureau of Reclamation', 'Bureau of Reclamation'),
-        ('National Park Service', 'National Park Service'),
-        ('Native American Land', 'Native American Land'),
-        ('Private land', 'Private Land'),
-        ('Public Land', 'Public Land'),
-        ('U.S. Air Force', 'U.S. Air Force'),
-        ('U.S. Army', 'U.S. Army'),
-        ('U.S. Fish & Wildlife Service', 'U.S. Fish & Wildlife Service'),
-        ('USDA Forest Service', 'USDA Forest Service'),
-        ('Washington Department of Fish & Wildlife', 'Washington Department of Fish & Wildlife'),
-        ('Washington Department of Forestry', 'Washington Department of Forestry'),
-        ('Washington Department of Natural Resources', 'Washington Department of Natural Resources'),
-        ('Washington Department of Parks and Recreation', 'Washington Department of Parks and Recreation'),
-        ('Washington State Government', 'Washington State Government'),
-    )
+    OWNERSHIP_CHOICES = settings.OWNERSHIP_CHOICES
+
     # Target Land Ownership
     input_parameter_pub_priv_own = models.BooleanField(default=False)
-    input_pub_priv_own = models.CharField(max_length=255, blank=True, null=True, choices=OWNERSHIP_CHOICES)
+    input_pub_priv_own = models.CharField(max_length=255, blank=True, null=True, default=None, choices=OWNERSHIP_CHOICES)
 
     # lsr_percent = models.FloatField()                       #LSRpct ("Late Successional Reserve")
     # Avoid Late Successional Reserve?
@@ -94,17 +80,41 @@ class TreatmentScenario(Scenario):
     # slope = models.FloatField()                             #SlopeMean
     # Max Slope
     input_parameter_slope = models.BooleanField(default=False)
-    input_max_slope = models.FloatField(null=True, blank=True, default=False)
+    input_max_slope = models.FloatField(null=True, blank=True, default=None)
 
     # percent_fractional_coverage = models.FloatField()       #FrctCvg
     # Current Fractional Coverage
     input_parameter_percent_fractional_coverage = models.BooleanField(default=False)
-    input_min_percent_fractional_coverage = models.FloatField(null=True, blank=True, default=False)
-    input_max_percent_fractional_coverage = models.FloatField(null=True, blank=True, default=False)
+    input_min_percent_fractional_coverage = models.FloatField(null=True, blank=True, default=None)
+    input_max_percent_fractional_coverage = models.FloatField(null=True, blank=True, default=None)
 
     # percent_high_fire_risk_area = models.FloatField()       #HRFApct
     # Target High Fire Risk Areas
     input_parameter_percent_high_fire_risk_area = models.BooleanField(default=False)
+
+    def run_filters(self, query):
+        import ipdb; ipdb.set_trace()
+        if self.input_parameter_private_own:
+            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
+            query = (query.filter(pk__in=pu_ids))
+
+        if self.input_parameter_pub_priv_own and self.input_pub_priv_own:
+            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() == self.input_pub_priv_own.lower()]
+            query = (query.filter(pk__in=pu_ids))
+
+        if self.input_parameter_lsr_percent:
+            pu_ids = [pu.pk for pu in query if pu.lsr_percent < settings.LSR_THRESHOLD]
+            query = (query.filter(pk__in=pu_ids))
+
+        if self.input_parameter_has_critical_habitat:
+            pu_ids = [pu.pk for pu in query if pu.percent_critical_habitat < settings.CRIT_HAB_THRESHOLD and not pu.has_critical_habitat]
+            query = (query.filter(pk__in=pu_ids))
+        return query
+
+    def run(self, result=None):
+        result = VegPlanningUnit.objects.all()
+        return super(TreatmentScenario, self).run(result)
+
 
     class Options:
         verbose_name = 'Treatment'
@@ -114,7 +124,8 @@ class TreatmentScenario(Scenario):
         form_template = 'ucsrb_scenarios/form.html'
         show_template = 'scenarios/show.html'
 
-class VegPlanningUnit(PlanningUnit):
+class VegPlanningUnit(models.Model):
+    # id = models.IntegerField(primary_key=True)
     planning_unit_id = models.IntegerField()                #EtID
     veg_unit_id = models.IntegerField()                     #ID
     gridcode = models.IntegerField()                        #GRIDCODE
@@ -138,27 +149,30 @@ class VegPlanningUnit(PlanningUnit):
     percent_fractional_coverage = models.FloatField()       #FrctCvg
     percent_high_fire_risk_area = models.FloatField()       #HRFApct
 
+    vegetation_type = models.CharField(max_length=255, blank=True, null=True)
+    forest_height = models.IntegerField()
+    forest_class = models.CharField(max_length=255, blank=True, null=True)
+
+    geometry = gismodels.MultiPolygonField(srid=settings.GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Veg Unit Geometry")
+    objects = gismodels.GeoManager()
+
     def is_private(self):
         return self.pub_priv_own == 'private'
 
     def has_roads(self):
         return self.percent_roadless < 100
 
-    # def has_critical_habitat(self):
-    #     return self.percent_critical_habitat > 0
-
     def has_high_fire_risk(self):
         return self.percent_high_fire_risk_area > 0
 
-    vegetation_type = models.CharField(max_length=255, blank=True, null=True)
-    forest_height = models.IntegerField()
-    forest_class = models.CharField(max_length=255, blank=True, null=True)
-
-    # canopy_coverage = models.IntegerField()
-    # max_wind_speed = models.FloatField()
-    #
-    # majority_sediment = models.CharField(max_length=35, null=True, blank=True)  #LeaseBlock Update: might change back to IntegerField
-    # variety_sediment = models.IntegerField()
-    # is_private = models.BooleanField(default=False)
-    # miles_from_road_access = models.IntegerField()
-    # slope = models.IntegerField()
+    @property
+    def kml_done(self):
+        return """
+        <Placemark id="%s">
+            <visibility>1</visibility>
+            <styleUrl>#%s-default</styleUrl>
+            %s
+        </Placemark>
+        """ % ( self.uid, self.model_uid(),
+                asKml(self.geometry.transform( settings.GEOMETRY_CLIENT_SRID, clone=True ))
+              )

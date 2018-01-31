@@ -904,8 +904,7 @@ def run_filter_query(filters):
     notes = []
     query = VegPlanningUnit.objects.all()
 
-    import ipdb; ipdb.set_trace()
-    if 'avoid_private' in filters.keys() and filters['avoid_private']:
+    if 'input_parameter_private_own' in filters.keys() and filters['input_parameter_private_own']:
         if 'avoid_private_input' in filters.keys():
             if filters['avoid_private_input'] == 'Avoid':
                 pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
@@ -913,6 +912,21 @@ def run_filter_query(filters):
                 pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() in ['private land', 'private']]
         else:
             pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
+        query = (query.filter(pk__in=pu_ids))
+
+    if 'input_parameter_pub_priv_own' in filters.keys() and filters['input_parameter_pub_priv_own']:
+        if 'input_pub_priv_own' in filters.keys():
+            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() == filters['input_pub_priv_own'].lower()]
+        else:
+            pu_ids = [pu.pk for pu in query]
+        query = (query.filter(pk__in=pu_ids))
+
+    if 'input_parameter_lsr_percent' in filters.keys() and filters['input_parameter_lsr_percent']:
+        pu_ids = [pu.pk for pu in query if pu.lsr_percent < settings.LSR_THRESHOLD]
+        query = (query.filter(pk__in=pu_ids))
+
+    if 'input_parameter_has_critical_habitat' in filters.keys() and filters['input_parameter_has_critical_habitat']:
+        pu_ids = [pu.pk for pu in query if pu.percent_critical_habitat < settings.CRIT_HAB_THRESHOLD and not pu.has_critical_habitat]
         query = (query.filter(pk__in=pu_ids))
 
     # if 'area' in filters.keys() and filters['area']:
@@ -947,10 +961,6 @@ def get_filter_results(request, query=False, notes=[]):
         (query, notes) = run_filter_query(filter_dict)
     from scenarios import views as scenarioViews
     return scenarioViews.get_filter_results(request, query, notes)
-
-    # return # of grid cells and dissolved geometry in geojson
-    # return HttpResponse(dumps(json))
-
 
 
 def get_planningunits(request):
