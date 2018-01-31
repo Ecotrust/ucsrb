@@ -93,7 +93,6 @@ class TreatmentScenario(Scenario):
     input_parameter_percent_high_fire_risk_area = models.BooleanField(default=False)
 
     def run_filters(self, query):
-        import ipdb; ipdb.set_trace()
         if self.input_parameter_private_own:
             pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
             query = (query.filter(pk__in=pu_ids))
