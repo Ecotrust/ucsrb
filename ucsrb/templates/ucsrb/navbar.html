@@ -1,39 +1,45 @@
 {% load static %}
 <div class="nav-wrap top-nav-wrap">
-    <nav class="navbar navbar-light">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">
+    <nav class="navbar navbar-light pl-5">
+        <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <a href="/home"><h1>Snow2flow</h1></a>
         <div class="collapse navbar-collapse" id="menu">
-            <a href="" class="nav-item">Terms Defined</a>
-            <a href="" class="nav-item">Tutorial</a>
-            {% if user.is_authenticated %}
-                {{ user.username }}
-                <button id="sign-out" data-action="sign-out" class="nav-item">Sign out</button>
-            {% else %}
-                <button id="sign-in-modal" data-action="sign-in-modal" class="nav-item">Sign in</button>
-            {% endif %}
+            <div class="list-group w50">
+                <a href="" class="list-group-item list-group-item-action">Terms Defined</a>
+                <a href="" class="list-group-item list-group-item-action">Tutorial</a>
+                {% if user.is_authenticated %}
+                    <a href="/account/" class="list-group-item list-group-item-action">{{ user.username }}</a>
+                    <button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>
+                {% else %}
+                    <button id="sign-in-modal" data-action="sign-in-modal" class="list-group-item list-group-item-action">Sign in</button>
+                {% endif %}
+            </div>
         </div>
     </nav>
 </div>
 
-<div class="nav-wrap container-fluid">
-    <div class="row">
-        <ul id="scenario-nav" class="col-9 nav nav-fill justify-content-center">
-            <li class="nav-item col-4 col-xl-3">
+<div class="nav-wrap secondary-nav container-fluid">
+    <div class="row h-100">
+        <ul id="scenario-nav" class="col-9 nav justify-content-center align-items-center">
+            <li class="nav-item col">
                 <button data-scenario-type="select"><img src="{% static 'ucsrb/img/icon/stream_select.svg' %}" alt="select segment" /><h3>Select stream segment</h3></button>
             </li>
-            <li class="nav-item col-4 col-xl-3">
+            <li class="nav-item col">
                 <button data-scenario-type="filter"><img src="{% static 'ucsrb/img/icon/filter_forest.svg' %}" alt="filter region" /><h3>Filter forest regions</h3></button>
             </li>
-            <li class="nav-item col-4 col-xl-3">
+            <li class="nav-item col">
                 <button data-scenario-type="draw"><img src="{% static 'ucsrb/img/icon/draw_area.svg' %}" alt="draw area" /><h3>Draw treatment area</h3></button>
             </li>
         </ul>
-        <nav id="file-nav" class="col-3 nav flex-column">
-            <li class="nav-item"><a href=""><i><img src="{% static '/ucsrb/img/icon/i_back.svg' %}" /></i> back</a></li>
-            <li class="nav-item"><a href=""><i><img src="{% static '/ucsrb/img/icon/i_folder.svg' %}" /></i> load saved</a></li>
+        <nav id="file-nav" class="col-3 nav justify-content-center flex-column">
+            <div class="nav-item">
+                <a href="" id="nav-back" class="hidden"><i><img src="{% static '/ucsrb/img/icon/i_back.svg' %}" /></i> back</a>
+            </div>
+            <div class="nav-item">
+                <a href="" id="nav-load-save"><i><img src="{% static '/ucsrb/img/icon/i_folder.svg' %}" /></i> load saved</a>
+            </div>
         </nav>
     </div>
 </div>

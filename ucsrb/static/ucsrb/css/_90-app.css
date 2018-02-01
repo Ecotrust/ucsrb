@@ -2,7 +2,11 @@
     html {
         font-size: 1.125em;
     }
-    
+
+    h3 {
+        font-size: 1.3125em;
+    }
+
     #right-panel {
         width: 30%;
     }

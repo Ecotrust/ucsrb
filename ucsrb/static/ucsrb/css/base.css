@@ -57,11 +57,14 @@ p {
 
 a {
     color: #67b8c6;
+    opacity: 1;
+    transition: 0.1s all ease-in;
 }
 
 a:hover {
     color: #3a5675;
     cursor: pointer;
+    text-decoration: none;
 }
 
 a.btn {
@@ -70,12 +73,19 @@ a.btn {
 }
 
 h1 {
+    color: #fff;
+    font-weight: 900;
+}
+
+h2 {
+    color: #fff;
+    font-size: 2em;
     font-weight: 900;
 }
 
 h3 {
     color: #3a5675;
-    font-size: 1.375em;
+    font-size: 1.125em;
     font-weight: 700;
 }
 

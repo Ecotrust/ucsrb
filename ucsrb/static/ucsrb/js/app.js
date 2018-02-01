@@ -46,6 +46,34 @@ app.init = {
   },
 }
 
+app.nav = {
+  state: 'tall',
+  short: function() {
+    $('.nav-wrap').addClass('icons-only');
+    $('.map-wrap').addClass('short-nav');
+    $('.overlay').addClass('fade-out');
+    setTimeout(function() {
+      $('#scenario-nav').addClass('justify-content-start');
+      $('#scenario-nav').removeClass('justify-content-center');
+      $('#scenario-nav .col').each(function(i) {
+        $(this).addClass('col-2');
+      })
+      $('.overlay').addClass('d-none');
+    }, 1000);
+  },
+  tall: function() {
+    $('.nav-wrap').removeClass('icons-only');
+    $('.nav-wrap').removeClass('short-nav');
+    setTimeout(function() {
+      $('#scenario-nav').removeClass('justify-content-start');
+      $('#scenario-nav').addClass('justify-content-center');
+      $('#scenario-nav .col').each(function(i) {
+        $(this).removeClass('col-2');
+      })
+    }, 1000);
+  },
+}
+
 // TODO rewrite panel object
 var scenarioTypePanel = {
   showNextBtn: function() {
