@@ -4,7 +4,7 @@
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <h1>Snow2flow</h1>
+        <a href="/home"><h1>Snow2flow</h1></a>
         <div class="collapse navbar-collapse" id="menu">
             <a href="" class="nav-item">Terms Defined</a>
             <a href="" class="nav-item">Tutorial</a>
@@ -20,19 +20,17 @@
 
 <div class="nav-wrap container-fluid">
     <div class="row">
-        <div class="col-1"></div>
-        <ul id="scenario-nav" class="col-7 nav justify-content-center">
-            <li class="col-sm">
+        <ul id="scenario-nav" class="col-9 nav nav-fill justify-content-center">
+            <li class="nav-item col-4 col-xl-3">
                 <button data-scenario-type="select"><img src="{% static 'ucsrb/img/icon/stream_select.svg' %}" alt="select segment" /><h3>Select stream segment</h3></button>
             </li>
-            <li class="col-sm">
+            <li class="nav-item col-4 col-xl-3">
                 <button data-scenario-type="filter"><img src="{% static 'ucsrb/img/icon/filter_forest.svg' %}" alt="filter region" /><h3>Filter forest regions</h3></button>
             </li>
-            <li class="col-sm">
+            <li class="nav-item col-4 col-xl-3">
                 <button data-scenario-type="draw"><img src="{% static 'ucsrb/img/icon/draw_area.svg' %}" alt="draw area" /><h3>Draw treatment area</h3></button>
             </li>
         </ul>
-        <div class="col-1"></div>
         <nav id="file-nav" class="col-3 nav flex-column">
             <li class="nav-item"><a href=""><i><img src="{% static '/ucsrb/img/icon/i_back.svg' %}" /></i> back</a></li>
             <li class="nav-item"><a href=""><i><img src="{% static '/ucsrb/img/icon/i_folder.svg' %}" /></i> load saved</a></li>

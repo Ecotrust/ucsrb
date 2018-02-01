@@ -61,6 +61,7 @@ nav .navbar-toggler .navbar-toggler-icon {
     border: none;
     background: transparent;
     cursor: pointer;
+    outline: none;
     padding: 0;
 }
 
@@ -68,34 +69,29 @@ nav .navbar-toggler .navbar-toggler-icon {
     height: 5rem;
     margin-bottom: 1rem;
     pointer-events: none;
+    transition: 0.3s height ease-in 0.4s;
     width: auto;
 }
 
 #scenario-nav h3 {
     margin: 0 auto;
-    width: 100%;
     pointer-events: none;
-}
-
-#scenario-nav.icons-only h3 {
-    display: none;
-}
-
-#scenario-nav.icons-only img {
-    height: 3rem;
-    margin: 0;
+    transition: 0.15s transform ease-in;
+    transform: rotateX(0deg);
+    width: 100%;
 }
 
 #file-nav {
     background: #e6e7e8;
     font-size: 1.06125em;
     font-weight: 600;
-    padding: 4rem 2rem 0 4rem;
+    padding: 4.75rem 2rem 4.75rem 4rem;
+    transition: 0.3s padding ease-in 0.4s;
 }
 
 #file-nav li {
     display: block;
-    margin: 0 0 .5rem;
+    margin: 0 0;
 }
 
 #file-nav a {
@@ -103,7 +99,17 @@ nav .navbar-toggler .navbar-toggler-icon {
     text-decoration: none;
 }
 
-#file-nav.less-padding {
+.icons-only #scenario-nav h3 {
+    animation: shrink .1s linear forwards 0.15s;
+    transform: rotateX(90deg);
+}
+
+.icons-only #scenario-nav img {
+    height: 3rem;
+    margin: 0;
+}
+
+.icons-only #file-nav {
     padding: 1rem 2rem 0;
 }
 
@@ -139,3 +145,16 @@ nav .navbar-toggler .navbar-toggler-icon {
 #right-panel div.show {
     visibility: visible;
 }
+
+/**
+ * keyframe animation
+ */
+
+ @keyframes shrink {
+   0% {
+       height: 1;
+   }
+   100% {
+       height: 0;
+   }
+ }

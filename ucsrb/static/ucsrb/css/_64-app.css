@@ -1,4 +1,8 @@
 @media all and (min-width: 64em) {
+    html {
+        font-size: 1.06125em;
+    }
+
     #right-panel {
         width: 35%;
     }
