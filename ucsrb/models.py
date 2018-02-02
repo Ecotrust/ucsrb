@@ -108,6 +108,41 @@ class TreatmentScenario(Scenario):
         if self.has_critical_habitat:
             pu_ids = [pu.pk for pu in query if pu.percent_critical_habitat < settings.CRIT_HAB_THRESHOLD and not pu.has_critical_habitat]
             query = (query.filter(pk__in=pu_ids))
+
+        if self.percent_roadless:
+            pu_ids = [pu.pk for pu in query if pu.percent_roadless < settings.ROADLESS_THRESHOLD]
+            query = (query.filter(pk__in=pu_ids))
+
+        if self.road_distance:
+            if self.road_distance_max:
+                pu_ids = [pu.pk for pu in query if pu.road_distance <= self.road_distance_max]
+                query = (query.filter(pk__in=pu_ids))
+
+        if self.percent_wetland:
+            pu_ids = [pu.pk for pu in query if pu.percent_wetland < settings.WETLAND_THRESHOLD]
+            query = (query.filter(pk__in=pu_ids))
+
+        if self.percent_riparian:
+            pu_ids = [pu.pk for pu in query if pu.percent_riparian < settings.RIPARIAN_THRESHOLD]
+            query = (query.filter(pk__in=pu_ids))
+
+        if self.slope:
+            if self.slope_max:
+                pu_ids = [pu.pk for pu in query if pu.slope <= self.slope_max]
+                query = (query.filter(pk__in=pu_ids))
+
+        if self.percent_fractional_coverage:
+            if self.percent_fractional_coverage_min:
+                pu_ids = [pu.pk for pu in query if pu.percent_fractional_coverage >= self.percent_fractional_coverage_min]
+                query = (query.filter(pk__in=pu_ids))
+            if self.percent_fractional_coverage_max:
+                pu_ids = [pu.pk for pu in query if pu.percent_fractional_coverage <= self.percent_fractional_coverage_max]
+                query = (query.filter(pk__in=pu_ids))
+
+        if self.percent_high_fire_risk_area:
+            pu_ids = [pu.pk for pu in query if pu.percent_high_fire_risk_area < settings.FIRE_RISK_THRESHOLD]
+            query = (query.filter(pk__in=pu_ids))
+
         return query
 
     def run(self, result=None):

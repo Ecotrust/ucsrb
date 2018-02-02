@@ -938,6 +938,40 @@ def run_filter_query(filters):
     #     pu_ids = [pu.pk for pu in query if pu.geometry.area <= float(filters['area_max']) and pu.geometry.area>= float(filters['area_min'])]
     #     query = (query.filter(pk__in=pu_ids))
 
+    if 'percent_roadless' in filters.keys() and filters['percent_roadless']:
+        pu_ids = [pu.pk for pu in query if pu.percent_roadless < settings.ROADLESS_THRESHOLD]
+        query = (query.filter(pk__in=pu_ids))
+
+    if 'road_distance' in filters.keys() and filters['road_distance']:
+        if 'road_distance_max' in filters.keys():
+            pu_ids = [pu.pk for pu in query if pu.road_distance <= float(filters['road_distance_max'])]
+            query = (query.filter(pk__in=pu_ids))
+
+    if 'percent_wetland' in filters.keys() and filters['percent_wetland']:
+        pu_ids = [pu.pk for pu in query if pu.percent_wetland < settings.WETLAND_THRESHOLD]
+        query = (query.filter(pk__in=pu_ids))
+
+    if 'percent_riparian' in filters.keys() and filters['percent_riparian']:
+        pu_ids = [pu.pk for pu in query if pu.percent_riparian < settings.RIPARIAN_THRESHOLD]
+        query = (query.filter(pk__in=pu_ids))
+
+    if 'slope' in filters.keys() and filters['slope']:
+        if 'slope_max' in filters.keys():
+            pu_ids = [pu.pk for pu in query if pu.slope <= float(filters['slope_max'])]
+            query = (query.filter(pk__in=pu_ids))
+
+    if 'percent_fractional_coverage' in filters.keys() and filters['percent_fractional_coverage']:
+        if 'percent_fractional_coverage_min' in filters.keys():
+            pu_ids = [pu.pk for pu in query if pu.percent_fractional_coverage >= float(filters['percent_fractional_coverage_min'])]
+            query = (query.filter(pk__in=pu_ids))
+        if 'percent_fractional_coverage_max' in filters.keys():
+            pu_ids = [pu.pk for pu in query if pu.percent_fractional_coverage <= float(filters['percent_fractional_coverage_max'])]
+            query = (query.filter(pk__in=pu_ids))
+
+    if 'percent_high_fire_risk_area' in filters.keys() and filters['percent_high_fire_risk_area']:
+        pu_ids = [pu.pk for pu in query if pu.percent_high_fire_risk_area < settings.FIRE_RISK_THRESHOLD]
+        query = (query.filter(pk__in=pu_ids))
+
     return (query, notes)
 
 '''

@@ -105,7 +105,7 @@ class TreatmentScenarioForm(ScenarioForm):
             attrs={
                 'class': 'slidervalue',
                 # 'pre_text': 'to',
-                'post_text': 'miles'
+                'post_text': '%'
             }
         )
     )

@@ -98,7 +98,6 @@
 
                                         <script type="text/javascript">
                                             {% if field_min and not field_max %}
-                                                console.log('--- MIN SINGLE SLIDER ---');
                                                 $('#slider-{{ field_input.html_name }}').bind( "slidestop", function(event, ui) {
                                                     // $(this).slider('value', ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
                                                     if (app.viewModel.scenarios.scenarioFormModel) {
@@ -107,37 +106,29 @@
                                                 });
                                                 $('#slider-{{ field_input.html_name }}').bind( "slide slidechange", function(event, ui) {
                                                     $('#slider-{{ field_min.html_name }}').slider('value', ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
+                                                    $('#id_{{ field_min.html_name }}').val(ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
                                                     if (app.viewModel.scenarios.scenarioFormModel) {
                                                         app.viewModel.scenarios.scenarioFormModel.gridCellsRemaining('...');
                                                     }
                                                 });
                                             {% elif field_max and not field_min %}
-                                                console.log('--- MAX SINGLE SLIDER ---');
                                                 $('#slider-{{ field_input.html_name }}').bind( "slidestop", function(event, ui) {
-                                                    console.log('input stop: ' + ui.value);
                                                     $(this).slider('value', ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
                                                     if (app.viewModel.scenarios.scenarioFormModel) {
                                                         app.viewModel.scenarios.scenarioFormModel.updateFiltersAndCount('{{ field.html_name }}');
                                                     }
                                                 });
-                                                // $('#slider-{{ field_max.html_name }}').bind( "slidestop", function(event, ui) {
-                                                //     $(this).slider('value', ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
-                                                //     if (app.viewModel.scenarios.scenarioFormModel) {
-                                                //         app.viewModel.scenarios.scenarioFormModel.updateFiltersAndCount('{{ field.html_name }}');
-                                                //     }
-                                                // });
-                                                $('#slider-{{ field_max.field_input }}').bind( "slide slidechange", function(event, ui) {
-                                                  console.log('max slide: ' + ui.value);
-                                                });
-                                                $('#slider-{{ field_input.field_input }}').bind( "slide slidechange", function(event, ui) {
-                                                    console.log('input slide: ' + ui.value);
-                                                    $('#slider-{{ field_max.field_input }}').slider('value', ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
-                                                    if (app.viewModel.scenarios.scenarioFormModel) {
-                                                        app.viewModel.scenarios.scenarioFormModel.gridCellsRemaining('...');
+                                                $('#slider-{{ field_input.html_name }}').slider(
+                                                  {
+                                                    slide: function(event, ui) {
+                                                      $('#id_{{ field_max.html_name }}').val(ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
+                                                      if (app.viewModel.scenarios.scenarioFormModel) {
+                                                          app.viewModel.scenarios.scenarioFormModel.gridCellsRemaining('...');
+                                                      }
                                                     }
-                                                });
+                                                  }
+                                                );
                                             {% elif field_min and field_max %}
-                                                console.log('--- DUAL SLIDER ---');
                                                 $('#slider-{{ field_input.html_name }}').bind( "slidestop", function(event, ui) {
                                                     $(this).slider('value', ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
                                                     if (app.viewModel.scenarios.scenarioFormModel) {
