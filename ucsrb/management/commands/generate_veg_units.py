@@ -47,7 +47,7 @@ class Command(BaseCommand):
             'forest_height': [55],
             'forest_class': ['forest class']
         }
-        insert_values = {}
+        init_values = {}
         for key in test_values.keys():
             init_values[key] = test_values[key][0]
 
