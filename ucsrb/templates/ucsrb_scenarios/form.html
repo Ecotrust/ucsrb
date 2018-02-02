@@ -1,10 +1,18 @@
 <div class="featurepanel">
-
     {% load static from staticfiles %}
 
-    <h4>UCSRB Scenario</h4>
-
-    <form id="scenario-form" action="{{ action }}" method="post">
+    {% if form.media %} {{ form.media }} {% endif %}
+    <h4>{{title}}</h4>
+    <div class="show-blocks-btn">
+        <a class="button btn enabled-grid-button" style="padding: 4px 9px; margin-right: 10px;" data-bind="click: showFilteringResults">
+            <span>Show Filter Results</span>
+            <span class="badge" style="margin-right: 5px; margin-left: -5px;" data-bind="text: gridCellsRemaining()"></span>
+            <i class="icon-large icon-check-empty" style="margin-left: 5px;" data-bind="visible: ! showingFilteringResults()"></i>
+            <i class="icon-large icon-check" style="margin-left: 5px;" data-bind="visible: showingFilteringResults() && !showButtonSpinner()"></i>
+            <i class="icon-large icon-refresh icon-spin" style="margin-left: 5px; height: 5px" data-bind="visible: showingFilteringResults() && showButtonSpinner()"></i>
+        </a>
+    </div>
+    <form id="scenarios-form" action="{{ action }}" method="post" name="scenarios-form">
         {% for hidden in form.hidden_fields %}
             <div style="display:none;">
                 {{ hidden.errors }}
@@ -13,279 +21,186 @@
         {% endfor %}
         <div id="error_bar"></div>
 
-        <div id="step1" class="step">
-            <p class="step-text"><i>Step 1 of 3 </i></p>
-
-            <p class="instructions">Select 1 or more criteria for this sector.</p>
-
-            <label class="step-header">Class Header</label>
-
-            <div id="step1_inputs">
+        {% for step in form.get_steps %}
+        <div id="step{{ forloop.counter }}" class="step">
+            <p class="step-text"><i>Step {{ forloop.counter }} of {{ form.get_steps|length|add:"1" }} </i></p>
+            <p class="instructions">Select criteria to filter your results</p>
+            <div id="step{{ forloop.counter }}_inputs">
                 <ul class="parameters">
-                    <!--
+                    {% for field, field_min, field_max, field_input, field_checkbox in step %}
                     <li>
-                        <div class="accordion" id="wind-speed-accordion">
-                            <div class="accordion-heading" data-bind="click: toggleWindSpeedWidget">
+                        <div class="accordion" id="{{ field.html_name }}_accordion">
+                            <div class="accordion-heading" data-bind="click: function() {app.viewModel.scenarios.scenarioFormModel.toggleParameter('{{ field.html_name }}'); }">
                                 <label class="accordion-toggle">
-                                    {{ form.input_parameter_wind_speed }}
-                                    <i class="fa fa-check-square" data-bind="visible: windSpeedParameter()"></i>
-                                    <i class="fa fa-square-o" data-bind="visible: !windSpeedParameter()"></i>
-                                    <span class="parameter-label">Wind Speed</span>
-                                </label>
-                                <i class="fa fa-info-circle info-icon"
-                                   data-toggle="tooltip"
-                                   data-content="Estimated wind speed at 90m from data published by the National Renewable Energy Laboratory (NREL)."
-                                   data-placement="right"
-                                   data-container="body"></i>
-                            </div>
-                            <div id="wind_speed_widget"
-                                 class="inputfield accordion-body collapse"
-                                 data-bind="css: {'in': windSpeedParameter()}">
-                                <div class="accordion-inner">
-                                    <div>Potential: <span id="wind_speed_text" class="label potential">Outstanding</span></div>
-                                    <div>
-                                        Min Avg Speed (m/s):
-                                        {{ form.input_avg_wind_speed }}
-                                        {{ form.input_avg_wind_speed.errors }}
-                                    </div>
-
-                                    <div>
-                                        <a class="btn btn-default btn-sm"
-                                           data-bind="css: { 'active': windSpeedLayer.active(), 'not-active': ! windSpeedLayer.active() }, click: toggleWindSpeedLayer">
-                                            <span>Wind Speed Data</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    -->
-                    <!-- Substation -->
-                    <!--
-                    <li>
-                        <div class="accordion" id="distance-to-substation-accordion">
-                            <div class="accordion-heading" data-bind="click: toggleSubstationWidget">
-                                <label class="accordion-toggle">
-                                    {{ form.input_parameter_distance_to_substation }}
-                                    <i class="fa fa-check-square" data-bind="visible: distanceToSubstationParameter()"></i>
-                                    <i class="fa fa-square-o" data-bind="visible: !distanceToSubstationParameter()"></i>
-
-                                    <span class="parameter-label">Distance to Coastal Substation </span>
-                                    <i class="fa fa-info-circle info-icon"
-                                       data-toggle="popover"
-                                       data-content="Distance to the nearest onshore 500kV substation. Note that substation locations are not shown in the planner due to the proprietary nature of the source data."
-                                       data-placement="right"
-                                       data-container="body">
+                                    {{ field.as_widget }}
+                                    <i class="check icon-large icon-check" data-bind="visible: app.viewModel.scenarios.scenarioFormModel.{{ field.html_name }}()"></i>
+                                    <!-- <i class="check icon-large icon-check" data-bind="visible: app.viewModel.scenarios.scenarioFormModel.avoid_private()"></i> -->
+                                    <i class="check icon-large icon-check-empty"></i>
+                                    <span class="parameter-label" style="margin-left: 5px">{{ field.label }}</span>
+                                    <i class="info-icon icon-info-sign field-tooltip"
+                                       data-toggle="tooltip"
+                                       data-original-title="{{ field.help_text }}"
+                                       data-placement="top">
                                     </i>
                                 </label>
                             </div>
-                            <div id="distance_to_substation_widget"
-                                 class="inputfield accordion-body collapse"
-                                 data-bind="css: {'in': distanceToSubstationParameter()}">
+                            {% if field_min or field_max or field_input or field_checkbox %}
+                            <!-- <div id="{{ field.html_name }}_widget" class="inputfield accordion-body collapse" data-bind="css: {'in': {{ field.html_name }}()}"> -->
+                            <div id="{{ field.html_name }}_widget" class="inputfield accordion-body collapse" data-bind="css: {'in': {{ field.html_name }}()}">
                                 <div class="accordion-inner">
-                        <span>
-                            Maximum Distance (in miles)
-                            {{ form.input_distance_to_substation }}
-                            {{ form.input_distance_to_substation.errors }}
-                        </span>
+                                    <div>
+
+                                        {% if field_min %}
+                                            {{ field_min.field.widget.attrs.pre_text | safe }}
+                                            {{ field_min.as_widget }}
+                                            {{ field_min.field.widget.attrs.post_text | safe }}
+                                        {% endif %}{% if field_max %}
+                                            {{ field_max.field.widget.attrs.pre_text | safe  }}
+                                            {{ field_max.as_widget }}
+                                            {{ field_max.field.widget.attrs.post_text | safe  }}
+                                        {% endif %}{% if field_input %}
+                                            {{ field_input.field.widget.attrs.pre_text | safe  }}
+                                            {{ field_input.as_widget }}
+                                            {{ field_input.field.widget.attrs.post_text | safe  }}
+                                        {% endif %}{% if field_checkbox %}
+                                            {{ field_checkbox.field.widget.attrs.pre_text | safe }}
+                                            {{ field_checkbox.as_widget }}
+                                            {{ field_checkbox.field.widget.attrs.post_text | safe }}
+                                        {% endif %}
+
+                                        {% if field.field.widget.attrs.layer_id and field.field.widget.attrs.layer_title %}
+                                        <div class="btn-group btn-group-layer show-layer-btn-group">
+                                            <a  class="btn btn-info-sign"
+                                                style="height: 16px; line-height: 16px"
+                                                data-bind="click: function() { toggleLayerInfo( {{ field.field.widget.attrs.layer_id }} ); }, css: { 'active': isLayerInfoActive( {{ field.field.widget.attrs.layer_id }} ) }">
+                                                <i class="icon-info-sign icon-large"></i>
+                                            </a>
+
+                                            <a  class="btn btn-layer show-layer-btn"
+                                                style="height: 16px; line-height: 16px"
+                                                data-bind="css: { 'active': isLayerActive(), 'not-active': ! isLayerActive( {{ field.field.widget.attrs.layer_id }} ) }, click: function() { toggleLayer( {{ field.field.widget.attrs.layer_id }} ); }">
+                                                <div style="font-weight: normal">
+                                                    <span>{{ field.field.widget.attrs.layer_title }}</span>
+                                                    <i  class="check icon-large icon-check"
+                                                        style="top: 8px"
+                                                        data-bind="visible: isLayerActive( {{ field.field.widget.attrs.layer_id }} ) && isLayerVisible( {{ field.field.widget.attrs.layer_id }} )">
+                                                    </i>
+                                                    <i  class="check icon-large icon-check-empty"
+                                                        style="top: 8px"
+                                                        data-bind="visible: ! isLayerActive( {{ field.field.widget.attrs.layer_id }} ) || ! isLayerVisible( {{ field.field.widget.attrs.layer_id }} )">
+                                                    </i>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        {% endif %}
+
+                                        {{ field.errors }}
+
+                                        <script type="text/javascript">
+                                            {% if field_min and not field_max %}
+                                                $('#slider-{{ field_input.html_name }}').bind( "slidestop", function(event, ui) {
+                                                    // $(this).slider('value', ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
+                                                    if (app.viewModel.scenarios.scenarioFormModel) {
+                                                        app.viewModel.scenarios.scenarioFormModel.updateFiltersAndCount('{{ field.html_name }}');
+                                                    }
+                                                });
+                                                $('#slider-{{ field_input.html_name }}').bind( "slide slidechange", function(event, ui) {
+                                                    $('#slider-{{ field_min.html_name }}').slider('value', ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
+                                                    $('#id_{{ field_min.html_name }}').val(ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
+                                                    if (app.viewModel.scenarios.scenarioFormModel) {
+                                                        app.viewModel.scenarios.scenarioFormModel.gridCellsRemaining('...');
+                                                    }
+                                                });
+                                            {% elif field_max and not field_min %}
+                                                $('#slider-{{ field_input.html_name }}').bind( "slidestop", function(event, ui) {
+                                                    $(this).slider('value', ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
+                                                    if (app.viewModel.scenarios.scenarioFormModel) {
+                                                        app.viewModel.scenarios.scenarioFormModel.updateFiltersAndCount('{{ field.html_name }}');
+                                                    }
+                                                });
+                                                $('#slider-{{ field_input.html_name }}').slider(
+                                                  {
+                                                    slide: function(event, ui) {
+                                                      $('#id_{{ field_max.html_name }}').val(ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
+                                                      if (app.viewModel.scenarios.scenarioFormModel) {
+                                                          app.viewModel.scenarios.scenarioFormModel.gridCellsRemaining('...');
+                                                      }
+                                                    }
+                                                  }
+                                                );
+                                            {% elif field_min and field_max %}
+                                                $('#slider-{{ field_input.html_name }}').bind( "slidestop", function(event, ui) {
+                                                    $(this).slider('value', ui.value); // this line prevents the slider value from being 1 tick off (value update is normally lagging this event trigger)
+                                                    if (app.viewModel.scenarios.scenarioFormModel) {
+                                                        app.viewModel.scenarios.scenarioFormModel.updateFiltersAndCount('{{ field.html_name }}');
+                                                    }
+                                                });
+                                                $('#slider-{{ field_min.html_name }}').bind( "slide slidechange", function(event, ui) {
+                                                    if (app.viewModel.scenarios.scenarioFormModel) {
+                                                        app.viewModel.scenarios.scenarioFormModel.gridCellsRemaining('...');
+                                                    }
+                                                });
+                                            {% elif field_checkbox %}
+                                                $('[name="{{ field_checkbox.html_name }}"').change( function(change_event) {
+                                                    if (app.viewModel.scenarios.scenarioFormModel) {
+                                                        if (!change_event.target.checked) {
+                                                            app.viewModel.scenarios.scenarioFormModel.removeFilter('{{ field_checkbox.html_name }}_' + change_event.target.value.toString());
+                                                        }
+                                                        app.viewModel.scenarios.scenarioFormModel.updateFiltersAndCount('{{ field.html_name }}');
+                                                    }
+                                                });
+                                            {% else %}
+                                                $('#id_{{ field_input.html_name }}').change( function() {
+                                                    if (app.viewModel.scenarios.scenarioFormModel) {
+                                                        app.viewModel.scenarios.scenarioFormModel.updateFiltersAndCount('{{ field.html_name }}');
+                                                    }
+                                                });
+                                            {% endif %}
+                                        </script>
+                                    </div>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                     </li>
-                    -->
-                    <li></li>
-
+                    {% endfor %}
                 </ul>
             </div>
-            <p></p>
         </div>
-        <!--
-        <div id="step2" class="step">
-            <p class="step-text"><i>Step 2 of 3 </i></p>
+        {% endfor %}
 
-            <p class="instructions">Choose any filtering criteria from other
-                sectors </p>
-            <label class="step-header">Shipping</label>
-
-            <div id="step2_inputs">
-                <ul class="parameters">
-                    <li>
-                        <div class="accordion">
-                            <div class="accordion-heading"
-                                 data-bind="click: toggleShippingLanesWidget">
-                                <label class="accordion-toggle">
-                                    {{ form.input_filter_distance_to_shipping }}
-                                    <i class="fa fa-check-square" data-bind="visible: distanceToShippingParameter()"></i>
-                                    <i class="fa fa-square-o" data-bind="visible: !distanceToShippingParameter()"></i>
-
-                                    <span class="parameter-label">Distance to Ship Routing Measures </span>
-                                    <i class="fa fa-info-circle info-icon"
-                                       data-toggle="popover"
-                                       data-content="Ship Routing Measures are designated traffic areas providing access routes for vessels proceeding to and from U.S. ports."
-                                       data-placement="right"
-                                       data-container="body">
-                                    </i>
-                                </label>
-                            </div>
-                            <div id="distance_to_shipping_widget"
-                                 class="inputfield accordion-body collapse"
-                                 data-bind="css: {'in': distanceToShippingParameter()}">
-                                <div class="accordion-inner">
-                                    <div>
-                                        <label class="parameter-label"> Minimum Distance
-                                            (miles)
-                                            {{ form.input_distance_to_shipping }}
-                                            {{ form.input_distance_to_shipping.errors }}
-                                        </label>
-                                    </div>
-                                    <div>
-                                        <a class="btn btn-default btn-sm"
-                                           data-bind="css: { 'active': shippingLanesLayer.active(), 'not-active': ! shippingLanesLayer.active() }, click: toggleShippingLanesLayer">
-                                            <span>Show Ship Routing Measures Data</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+        <div id="step{{ form.get_steps|length|add:"1" }}" class="step">
+            <p class="step-text"><i>Step {{ form.get_steps|length|add:"1" }} of {{ form.get_steps|length|add:"1" }} </i>
+            <div data-bind="css: { 'disabled': gridCellsRemaining()==0 }">
+                <p class="instructions">Provide a <b>Name</b> to identify your Grid Filtering design </p>
+                <div class="step{{ form.get_steps|length|add:"1" }}-inputs">
+                    <div class="last-step-param">
+                        {{ form.name.errors }}
+                        {{ form.name }}
+                        <div id="invalid-name-message" class="control-group error" style="display: none; margin-top: -10px; margin-left: -5px;">
+                            <span class="help-inline">The <b>Name</b> field is required.</span>
                         </div>
-                    </li>
-                    <li>
-                        <div class="accordion">
-                            <div class="accordion-heading"
-                                 data-bind="click: toggleShipTrafficWidget">
-
-                                {{ form.input_filter_ais_density }}
-
-                                <label id="ship_traffic_density_widget" class="accordion-toggle checkbox">
-                                    <i class="fa fa-check-square" data-bind="visible: shipTrafficDensityParameter()"></i>
-                                    <i class="fa fa-square-o" data-bind="visible: !shipTrafficDensityParameter()"></i>
-
-                                    <span class="parameter-label">Exclude Areas with High or Moderate Traffic </span>
-                                    <i class="fa fa-info-circle info-icon"
-                                       data-toggle="popover"
-                                       data-content="Areas for which AIS data indicate higher ship traffic can be excluded."
-                                       data-placement="right"
-                                       data-container="body">
-                                    </i>
-                                </label>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <label class="step-header">Security</label>
-
-            <div id="step2_inputs">
-                <ul class="parameters">
-                    <li>
-                        <div class="accordion">
-                            <div class="accordion-heading"
-                                 data-bind="click: toggleUXOWidget">
-
-                                {{ form.input_filter_uxo }}
-
-                                <label class="accordion-toggle checkbox">
-                                    <i class="fa fa-check-square" data-bind="visible: uxoParameter()"></i>
-                                    <i class="fa fa-square-o" data-bind="visible: !uxoParameter()"></i>
-
-                                    <span class="parameter-label">Exclude Areas with Unexploded Ordnances</span>
-                                    <i class="fa fa-info-circle info-icon"
-                                       data-toggle="popover"
-                                       data-content="Generalized and known areas where unexploded ordnance were dumped can be excluded."
-                                       data-placement="right"
-                                       data-container="body">
-                                    </i>
-                                </label>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <p></p>
-        </div>
-        -->
-
-        <div id="step3" class="step">
-            <p class="step-text"><i>Step 3 of 3 </i>
-
-            <p class="instructions">Provide a <b>Name</b> to identify your Wind
-                Energy Siting </p>
-
-            <div class="step3-inputs">
-                <div class="step3-param">
-                    {{ form.name.errors }}
-                    {{ form.name }}
-                    <div id="invalid-name-message" class="control-group error"
-                         style="display: none; margin-top: -10px; margin-left: -5px;">
-                        <span class="help-inline">The <b>Name</b> field is required.</span>
+                    </div>
+                    <p class="instructions">Optionally, you may add a <b>Description</b> <!--and/or attach a file--> </p>
+                    <div class="last-step-param">
+                        {{ form.description.errors }}
+                        {{ form.description }}
                     </div>
                 </div>
-                <p class="instructions">Optionally, you may add a
-                    <b>Description</b> <!--and/or attach a file--> </p>
-
-                <div class="step3-param">
-                    {{ form.description.errors }}
-                    {{ form.description }}
-                </div>
-                <!--
-        <div class="step3-param">
-            {{ form.support_file.label_tag }}
-            {{ form.support_file.errors }}
-            {% if form.support_file.help_text %}
-                <p>{{ form.support_file.help_text }}</p>
-            {% endif %}
-            {{ form.support_file }}
-        </div>
-        -->
-                <div id="scenario-cp">
-                    <!--<input type="color" value="#ff0667" data-text="hidden" style="height:20px;width:20px;" />-->
-                </div>
+            </div>
+            <div id="empty-results-warning" data-bind="visible: gridCellsRemaining()==0" class="well text-error">
+                <p><i class="icon-large icon-warning-sign"></i> Wait!  Your filtering results are empty!</p>
             </div>
         </div>
 
-        <p>
-            <button type="submit" value="submit" class="btn-submit btn">submit
-            </button>
-        </p>
+        <p><button type="submit" value="submit" class="btn-submit btn">submit</button></p>
     </form>
 
-    <div class="show-blocks-btn">
-        <span data-bind="visible: !isLeaseblockLayerVisible()">
-            <a class="btn btn-default" data-bind="click: activateLeaseblockLayer">
-                <span class="badge" style="margin-right: 5px; margin-left: -5px;"
-                      data-bind="text: leaseblocksLeft"></span> Lease Blocks
-                Remaining
-                <i class="fa fa-square-o"
-                   style="margin-right: -5px; margin-left: 5px;"></i>
-            </a>
-        </span>
-        <span data-bind="visible: isLeaseblockLayerVisible()">
-            <a class="btn btn-default" data-bind="click: deactivateLeaseblockLayer">
-                <span class="badge" style="margin-right: 5px; margin-left: -5px;"
-                      data-bind="text: leaseblocksLeft"></span>
-                Lease Blocks Remaining
-                <i class="fa fa-check-square"
-                   style="margin-right: -5px; margin-left: 5px;"></i>
-            </a>
-        </span>
-    </div>
-
     <div class="wizard_nav" style="width:100%">
-        <div class="btn-group pull-right">
-            <a href="#" class="btn btn-default"
-               onclick="this.blur(); return false;"
-               id="button_prev">
-                <span>&lt; Previous</span>
-            </a>
-
-            <a href="#" class="btn btn-primary" onclick="this.blur(); return false;"
-               id="button_next">
-                <span>Next &gt;</span>
-            </a>
-
-            <a href="#" class="submit_button btn btn-primary"
-               onclick="this.blur(); return false;">
-                <span>Save</span>
-            </a>
+        <div class="btn-group pull-right" style="margin-right: 14px">
+            <a href="#" class="button btn" onclick="this.blur(); return false;" id="button_prev"><span>&lt; Previous</span></a>
+            <a href="#" class="button btn"  onclick="this.blur(); return false;" id="button_next"><span>Next &gt;</span></a>
+            <a href="#" class="submit_button button btn" onclick="this.blur(); return false;"><span>Save</span></a>
         </div>
     </div>
 
@@ -296,12 +211,14 @@
         </div>
     </div>
 
-
     <script type="text/javascript">
-        jQuery.getScript("{% static 'scenarios_form.js' %}", function () {
-            console.debug("Loaded: {% static 'scenarios_form.js' %}");
-        });
-    </script>
+      var max_step = {{ form.get_steps|length|add:"1" }};
 
+      jQuery.getScript("{% static 'scenarios/js/scenarios_form.js' %}", function () {
+          console.debug("Loaded: {% static 'scenarios/js/scenarios_form.js' %}");
+      });
+
+      $('.field-tooltip').tooltip({trigger:'hover'});
+    </script>
 
 </div>

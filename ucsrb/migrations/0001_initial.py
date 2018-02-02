@@ -30,6 +30,6 @@ class Migration(migrations.Migration):
                 ('slope', models.IntegerField()),
                 ('canopy_coverage', models.IntegerField()),
             ],
-            bases=('scenarios.planningunit',),
+            # bases=('scenarios.planningunit',),
         ),
     ]

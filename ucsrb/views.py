@@ -7,6 +7,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 import json
 from ucsrb.models import TreatmentScenario
+from django.conf import settings
+from django.views.decorators.cache import cache_page
 
 def index(request):
     template = loader.get_template('ucsrb/index.html')
@@ -944,6 +946,110 @@ def get_results_by_state(request):
     }
     return JsonResponse(return_json)
 
+'''
+'''
+
+def run_filter_query(filters):
+    from collections import OrderedDict
+    from ucsrb.models import VegPlanningUnit
+    # TODO: This would be nicer if it generically knew how to filter fields
+    # by name, and what kinds of filters they were. For now, hard code.
+    notes = []
+    query = VegPlanningUnit.objects.all()
+
+    if 'private_own' in filters.keys() and filters['private_own']:
+        if 'avoid_private_input' in filters.keys():
+            if filters['avoid_private_input'] == 'Avoid':
+                pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
+            else:
+                pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() in ['private land', 'private']]
+        else:
+            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
+        query = (query.filter(pk__in=pu_ids))
+
+    if 'pub_priv_own' in filters.keys() and filters['pub_priv_own']:
+        if 'pub_priv_own_input' in filters.keys():
+            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() == filters['pub_priv_own_input'].lower()]
+        else:
+            pu_ids = [pu.pk for pu in query]
+        query = (query.filter(pk__in=pu_ids))
+
+    if 'lsr_percent' in filters.keys() and filters['lsr_percent']:
+        pu_ids = [pu.pk for pu in query if pu.lsr_percent < settings.LSR_THRESHOLD]
+        query = (query.filter(pk__in=pu_ids))
+
+    if 'has_critical_habitat' in filters.keys() and filters['has_critical_habitat']:
+        pu_ids = [pu.pk for pu in query if pu.percent_critical_habitat < settings.CRIT_HAB_THRESHOLD and not pu.has_critical_habitat]
+        query = (query.filter(pk__in=pu_ids))
+
+    # if 'area' in filters.keys() and filters['area']:
+    #     # RDH 1/8/18: filter(geometry__area_range(...)) does not seem available.
+    #     # query = query.filter(geometry__area__range=(filters['area_min'], filters['area_max']))
+    #
+    #     # RDH 1/9/18: Why can't we use the model's 'Run Filters' function?
+    #     # RDH 1/26/18: Because the model object doesn't exist yet.
+    #     pu_ids = [pu.pk for pu in query if pu.geometry.area <= float(filters['area_max']) and pu.geometry.area>= float(filters['area_min'])]
+    #     query = (query.filter(pk__in=pu_ids))
+
+    if 'percent_roadless' in filters.keys() and filters['percent_roadless']:
+        pu_ids = [pu.pk for pu in query if pu.percent_roadless < settings.ROADLESS_THRESHOLD]
+        query = (query.filter(pk__in=pu_ids))
+
+    if 'road_distance' in filters.keys() and filters['road_distance']:
+        if 'road_distance_max' in filters.keys():
+            pu_ids = [pu.pk for pu in query if pu.road_distance <= float(filters['road_distance_max'])]
+            query = (query.filter(pk__in=pu_ids))
+
+    if 'percent_wetland' in filters.keys() and filters['percent_wetland']:
+        pu_ids = [pu.pk for pu in query if pu.percent_wetland < settings.WETLAND_THRESHOLD]
+        query = (query.filter(pk__in=pu_ids))
+
+    if 'percent_riparian' in filters.keys() and filters['percent_riparian']:
+        pu_ids = [pu.pk for pu in query if pu.percent_riparian < settings.RIPARIAN_THRESHOLD]
+        query = (query.filter(pk__in=pu_ids))
+
+    if 'slope' in filters.keys() and filters['slope']:
+        if 'slope_max' in filters.keys():
+            pu_ids = [pu.pk for pu in query if pu.slope <= float(filters['slope_max'])]
+            query = (query.filter(pk__in=pu_ids))
+
+    if 'percent_fractional_coverage' in filters.keys() and filters['percent_fractional_coverage']:
+        if 'percent_fractional_coverage_min' in filters.keys():
+            pu_ids = [pu.pk for pu in query if pu.percent_fractional_coverage >= float(filters['percent_fractional_coverage_min'])]
+            query = (query.filter(pk__in=pu_ids))
+        if 'percent_fractional_coverage_max' in filters.keys():
+            pu_ids = [pu.pk for pu in query if pu.percent_fractional_coverage <= float(filters['percent_fractional_coverage_max'])]
+            query = (query.filter(pk__in=pu_ids))
+
+    if 'percent_high_fire_risk_area' in filters.keys() and filters['percent_high_fire_risk_area']:
+        pu_ids = [pu.pk for pu in query if pu.percent_high_fire_risk_area < settings.FIRE_RISK_THRESHOLD]
+        query = (query.filter(pk__in=pu_ids))
+
+    return (query, notes)
+
+'''
+'''
+# @cache_page(60 * 60) # 1 hour of caching
+def get_filter_count(request, query=False, notes=[]):
+    if not query:
+        filter_dict = dict(request.GET.items())
+        (query, notes) = run_filter_query(filter_dict)
+    from scenarios import views as scenarioViews
+    return scenarioViews.get_filter_count(request, query, notes)
+    # return HttpResponse(query.count(), status=200)
+
+
+'''
+'''
+# @cache_page(60 * 60) # 1 hour of caching
+def get_filter_results(request, query=False, notes=[]):
+    if not query:
+        filter_dict = dict(request.GET.items())
+        (query, notes) = run_filter_query(filter_dict)
+    from scenarios import views as scenarioViews
+    return scenarioViews.get_filter_results(request, query, notes)
+
+
 def get_planningunits(request):
     from ucsrb.models import VegPlanningUnit
     from json import dumps
@@ -952,34 +1058,33 @@ def get_planningunits(request):
     planningunits = VegPlanningUnit.objects.all()
     for p_unit in planningunits:
         json.append({
-            'id': p_unit.id,
+            'id': p_unit.pk,
             'wkt': p_unit.geometry.wkt,
-            'has_roads': p_unit.has_roads,
-            'has_endangered_habitat': p_unit.has_endangered_habitat,
-            'is_private': p_unit.is_private,
-            'has_high_fire_risk': p_unit.has_high_fire_risk,
-            'miles_from_road_access': p_unit.miles_from_road_access,
-            'vegetation_type': p_unit.vegetation_type,
-            'forest_height': p_unit.forest_height,
-            'forest_class': p_unit.forest_class,
+            'acres': p_unit.acres,
+            'huc_2_id': p_unit.huc_2_id,
+            'huc_4_id': p_unit.huc_4_id,
+            'huc_6_id': p_unit.huc_6_id,
+            'huc_8_id': p_unit.huc_8_id,
+            'huc_10_id': p_unit.huc_10_id,
+            'huc_12_id': p_unit.huc_12_id,
+            'pub_priv_own': p_unit.pub_priv_own,
+            'lsr_percent': p_unit.lsr_percent,
+            'has_critical_habitat': p_unit.has_critical_habitat,
+            'percent_critical_habitat': p_unit.percent_critical_habitat,
+            'percent_roadless': p_unit.percent_roadless,
+            'percent_wetland': p_unit.percent_wetland,
+            'percent_riparian': p_unit.percent_riparian,
             'slope': p_unit.slope,
-            'canopy_coverage': p_unit.canopy_coverage,
+            'road_distance': p_unit.road_distance,
+            'percent_fractional_coverage': p_unit.percent_fractional_coverage,
+            'percent_high_fire_risk_area': p_unit.percent_high_fire_risk_area,
         })
     return HttpResponse(dumps(json))
 
 from scenarios.views import get_scenarios as scenarios_get_scenarios
-def get_scenarios(request, scenario_model=TreatmentScenario):
-    return scenarios_get_scenarios(request, scenario_model)
+def get_scenarios(request, scenario_model='treatmentscenario'):
+    return scenarios_get_scenarios(request, scenario_model, 'ucsrb')
 
-def demo(request, template='scenarios/demo.html'):
-    try:
-        from ucsrb import project_settings as settings
-        context = {
-            'GET_SCENARIOS_URL': settings.GET_SCENARIOS_URL,
-            'SCENARIO_FORM_URL': settings.SCENARIO_FORM_URL,
-            'SCENARIO_LINK_BASE': settings.SCENARIO_LINK_BASE
-        }
-    except:
-        context = {}
-
-    return render(request, template, context)
+def demo(request, template='ucsrb/demo.html'):
+    from scenarios import views as scenarios_views
+    return scenarios_views.demo(request, template)

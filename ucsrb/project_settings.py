@@ -195,9 +195,43 @@ INSTALLED_APPS = [
     ### END INSERTED INSTALLED APPS ###
 ]
 
-GET_SCENARIOS_URL = '/get_scenarios'
+GET_SCENARIOS_URL = '/ucsrb/get_scenarios/'
 SCENARIO_FORM_URL = '/features/treatmentscenario/form/'
 SCENARIO_LINK_BASE = '/features/treatmentscenario/ucsrb_treatmentscenario'
+
+########################################
+######      FILTER CHOICES      ########
+########################################
+OWNERSHIP_CHOICES = (
+    # ('NULL', '---'),
+    ('Bureau of Land Management', 'Bureau of Land Management'),
+    ('Bureau of Reclamation', 'Bureau of Reclamation'),
+    ('National Park Service', 'National Park Service'),
+    ('Native American Land', 'Native American Land'),
+    ('Private land', 'Private Land'),
+    ('Public Land', 'Public Land'),
+    ('U.S. Air Force', 'U.S. Air Force'),
+    ('U.S. Army', 'U.S. Army'),
+    ('U.S. Fish & Wildlife Service', 'U.S. Fish & Wildlife Service'),
+    ('USDA Forest Service', 'USDA Forest Service'),
+    ('Washington Department of Fish & Wildlife', 'Washington Department of Fish & Wildlife'),
+    ('Washington Department of Forestry', 'Washington Department of Forestry'),
+    ('Washington Department of Natural Resources', 'Washington Department of Natural Resources'),
+    ('Washington Department of Parks and Recreation', 'Washington Department of Parks and Recreation'),
+    ('Washington State Government', 'Washington State Government'),
+)
+
+DEFAULT_PRESENCE_THRESHOLD = 10 # % of planning unit with a given property to count as 'having' that property
+LSR_THRESHOLD = DEFAULT_PRESENCE_THRESHOLD
+CRIT_HAB_THRESHOLD = DEFAULT_PRESENCE_THRESHOLD
+ROADLESS_THRESHOLD = 50
+WETLAND_THRESHOLD = 50
+RIPARIAN_THRESHOLD = 50
+FIRE_RISK_THRESHOLD = 30
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 4000
+
+MAP_TECH = 'ol4'
 
 try:
     ### START MODULE SETTINGS IMPORT ###
