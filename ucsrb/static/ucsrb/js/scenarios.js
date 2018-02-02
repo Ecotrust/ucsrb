@@ -128,10 +128,19 @@ var madrona = {
 
 function scenarioFormModel(options) {
     var self = this;
-    self.input_parameter_private_own = ko.observable(false);
-    self.input_parameter_pub_priv_own = ko.observable(false);
-    self.input_parameter_lsr_percent = ko.observable(false);
-    self.input_parameter_has_critical_habitat = ko.observable(false);
+    self.private_own = ko.observable(false);
+    self.pub_priv_own = ko.observable(false);
+    // self.pub_priv_own_input = ko.observable(false);
+    self.lsr_percent = ko.observable(false);
+    self.has_critical_habitat = ko.observable(false);
+    self.percent_roadless = ko.observable(false);
+    self.road_distance = ko.observable(false);
+    // self.road_distance_max = ko.observable(false);
+    self.percent_wetland = ko.observable(false);
+    self.percent_riparian = ko.observable(false);
+    self.slope = ko.observable(false);
+    self.percent_fractional_coverage = ko.observable(false);
+    self.percent_high_fire_risk_area = ko.observable(false);
 
     self.lastChange = (new Date()).getTime();
 
@@ -388,28 +397,58 @@ function scenarioFormModel(options) {
         self.updateFilter(param, min, max, input, checkboxes);
     };
 
+    // TODO: Cleanup needed. This was written to take 5 parameters to explicitly
+    //  assign values on function call. Instead, these will all be null and require
+    //  jQuery to identify values - this also means strict enforcement of field
+    //  names/ids.
     self.updateFilter = function(param, min, max, input, checkboxes) {
         var key;
         self.filters[param] = true;
-        if (min) {
-            key = param + '_min';
-            self.filters[key] = min;
+        var key_object = {
+          '_min': min,
+          '_max': max,
+          '_input': input,
+          '_checkboxes': checkboxes
         }
-        if (max) {
-            key = param + '_max';
-            self.filters[key] = max;
-        }
-        if (input) {
-            key = param + '_input';
-            self.filters[key] = input;
-        }
-        if (checkboxes) {
-            key = param + '_checkboxes';
-            self.filters[key] = true;
-            for(var i = 0; i < checkboxes.length; i++) {
-                key = param + '_checkboxes_' + checkboxes[i];
-                self.filters[key] = true;
+        for (var i = 0; i < Object.keys(key_object).length; i++) {
+          suffix = Object.keys(key_object)[i];
+          if (suffix == '_checkboxes') {
+            field_value = key_object[suffix];
+            // Handle directly passed variable for checkboxes
+            if (field_value) {
+              key = param + suffix;
+              self.filters[key] = true;
+              for(var j = 0; j < checkboxes.length; j++) {
+                  key = param + '_checkboxes_' + checkboxes[j];
+                  self.filters[key] = true;
+              }
+            // Look for existing values in the form iteslf with jQuery
+            } else if ($('#id_' + key).length > 0 && $('#id_' + key)[0].checked) {
+              self.filters[key] = true;
+              var checkboxes = [];
+              var j = 0;
+              var checkbox_key = key + '_0';
+              while ($('id_' + checkbox_key)[0]) {
+                var box = $('#id_' + checkbox_key)[0];
+                if (box.checked) {
+                  // checkboxes.push(box.value);
+                  self.filters[checkbox_key] = true;
+                }
+                j++;
+                checkbox_key = key + '_' + j.toString();
+              }
             }
+          } else {
+            // Handle directly passed variable
+            field_value = key_object[suffix];
+            if (field_value) {
+              key = param + suffix;
+              self.filters[key] = field_value;
+            // Look for existing values in the form iteslf with jQuery
+            } else if ($('#id_' + key).length > 0) {
+              self.filters[key] = $('#id_' + key).value();
+            }
+          }
         }
     };
 

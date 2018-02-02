@@ -904,7 +904,7 @@ def run_filter_query(filters):
     notes = []
     query = VegPlanningUnit.objects.all()
 
-    if 'input_parameter_private_own' in filters.keys() and filters['input_parameter_private_own']:
+    if 'private_own' in filters.keys() and filters['private_own']:
         if 'avoid_private_input' in filters.keys():
             if filters['avoid_private_input'] == 'Avoid':
                 pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
@@ -914,18 +914,18 @@ def run_filter_query(filters):
             pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
         query = (query.filter(pk__in=pu_ids))
 
-    if 'input_parameter_pub_priv_own' in filters.keys() and filters['input_parameter_pub_priv_own']:
-        if 'input_pub_priv_own' in filters.keys():
-            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() == filters['input_pub_priv_own'].lower()]
+    if 'pub_priv_own' in filters.keys() and filters['pub_priv_own']:
+        if 'pub_priv_own_input' in filters.keys():
+            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() == filters['pub_priv_own_input'].lower()]
         else:
             pu_ids = [pu.pk for pu in query]
         query = (query.filter(pk__in=pu_ids))
 
-    if 'input_parameter_lsr_percent' in filters.keys() and filters['input_parameter_lsr_percent']:
+    if 'lsr_percent' in filters.keys() and filters['lsr_percent']:
         pu_ids = [pu.pk for pu in query if pu.lsr_percent < settings.LSR_THRESHOLD]
         query = (query.filter(pk__in=pu_ids))
 
-    if 'input_parameter_has_critical_habitat' in filters.keys() and filters['input_parameter_has_critical_habitat']:
+    if 'has_critical_habitat' in filters.keys() and filters['has_critical_habitat']:
         pu_ids = [pu.pk for pu in query if pu.percent_critical_habitat < settings.CRIT_HAB_THRESHOLD and not pu.has_critical_habitat]
         query = (query.filter(pk__in=pu_ids))
 

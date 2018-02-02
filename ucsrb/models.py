@@ -43,76 +43,76 @@ class TreatmentScenario(Scenario):
     scenario = models.ForeignKey(ScenarioState, null=True, blank=True, default=None)#, models.CASCADE)
 
     # Avoid Private land? (USE PUB_PRIV_OWN!)
-    input_parameter_private_own = models.BooleanField(default=False)
+    private_own = models.BooleanField(default=False)
 
     # pub_priv_own = models.CharField(max_length=255)         #PubPrivOwn
     OWNERSHIP_CHOICES = settings.OWNERSHIP_CHOICES
 
     # Target Land Ownership
-    input_parameter_pub_priv_own = models.BooleanField(default=False)
-    input_pub_priv_own = models.CharField(max_length=255, blank=True, null=True, default=None, choices=OWNERSHIP_CHOICES)
+    pub_priv_own = models.BooleanField(default=False)
+    pub_priv_own_input = models.CharField(max_length=255, blank=True, null=True, default=None, choices=OWNERSHIP_CHOICES)
 
     # lsr_percent = models.FloatField()                       #LSRpct ("Late Successional Reserve")
     # Avoid Late Successional Reserve?
-    input_parameter_lsr_percent = models.BooleanField(default=False)
+    lsr_percent = models.BooleanField(default=False)
 
     # has_critical_habitat = models.BooleanField(default=False) #CritHabLn
     # Avoid Critical Habitat?
-    input_parameter_has_critical_habitat = models.BooleanField(default=False)
+    has_critical_habitat = models.BooleanField(default=False)
 
     # percent_roadless = models.FloatField()                  #IRApct ("Inventoried Roadless Area")
     # Avoid Inventoried Roadless Areas
-    input_parameter_percent_roadless = models.BooleanField(default=False)
+    percent_roadless = models.BooleanField(default=False)
 
     # road_distance = models.FloatField()                     #RdDstEucMn ("Euclidean mean distance to roads")
     # Max distance from roads
-    input_parameter_road_distance = models.BooleanField(default=False)
-    input_max_road_distance = models.FloatField(null=True, blank=True, default=None)
+    road_distance = models.BooleanField(default=False)
+    road_distance_max = models.FloatField(null=True, blank=True, default=None)
 
     # percent_wetland = models.FloatField()                   #NWIwetpct
     # Avoid Wetlands?
-    input_parameter_percent_wetland = models.BooleanField(default=False)
+    percent_wetland = models.BooleanField(default=False)
 
     # percent_riparian = models.FloatField()                  #NWIrippct
     # Avoid Riparian Areas?
-    input_parameter_percent_riparian = models.BooleanField(default=False)
+    percent_riparian = models.BooleanField(default=False)
 
     # slope = models.FloatField()                             #SlopeMean
     # Max Slope
-    input_parameter_slope = models.BooleanField(default=False)
-    input_max_slope = models.FloatField(null=True, blank=True, default=None)
+    slope = models.BooleanField(default=False)
+    slope_max = models.FloatField(null=True, blank=True, default=None)
 
     # percent_fractional_coverage = models.FloatField()       #FrctCvg
     # Current Fractional Coverage
-    input_parameter_percent_fractional_coverage = models.BooleanField(default=False)
-    input_min_percent_fractional_coverage = models.FloatField(null=True, blank=True, default=None)
-    input_max_percent_fractional_coverage = models.FloatField(null=True, blank=True, default=None)
+    percent_fractional_coverage = models.BooleanField(default=False)
+    percent_fractional_coverage_min = models.FloatField(null=True, blank=True, default=None)
+    percent_fractional_coverage_max = models.FloatField(null=True, blank=True, default=None)
 
     # percent_high_fire_risk_area = models.FloatField()       #HRFApct
     # Target High Fire Risk Areas
-    input_parameter_percent_high_fire_risk_area = models.BooleanField(default=False)
+    percent_high_fire_risk_area = models.BooleanField(default=False)
 
     def run_filters(self, query):
-        if self.input_parameter_private_own:
+        if self.private_own:
             pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
             query = (query.filter(pk__in=pu_ids))
 
-        if self.input_parameter_pub_priv_own and self.input_pub_priv_own:
-            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() == self.input_pub_priv_own.lower()]
+        if self.pub_priv_own and self.pub_priv_own_input:
+            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() == self.pub_priv_own_input.lower()]
             query = (query.filter(pk__in=pu_ids))
 
-        if self.input_parameter_lsr_percent:
+        if self.lsr_percent:
             pu_ids = [pu.pk for pu in query if pu.lsr_percent < settings.LSR_THRESHOLD]
             query = (query.filter(pk__in=pu_ids))
 
-        if self.input_parameter_has_critical_habitat:
+        if self.has_critical_habitat:
             pu_ids = [pu.pk for pu in query if pu.percent_critical_habitat < settings.CRIT_HAB_THRESHOLD and not pu.has_critical_habitat]
             query = (query.filter(pk__in=pu_ids))
         return query
 
     def run(self, result=None):
         result = VegPlanningUnit.objects.all()
-        return super(TreatmentScenario, self).run(result)
+        return super(type(self), self).run(result)
 
 
     class Options:
