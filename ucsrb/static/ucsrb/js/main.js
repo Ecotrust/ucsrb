@@ -37,6 +37,7 @@ var main = {
         data: formData,
         dataType: 'json',
         success: function (data) {
+          console.log(data);
           main.auth.success();
         }
       })
@@ -68,6 +69,12 @@ var main = {
       })
     },
     success: function() {
+      var saveState = app.request.saveState();
+      if (saveState == 'success') {
+        document.location.reload();
+      } else {
+        document.location.reload();
+      }
       $('#login-modal').modal('hide');
     }
   },

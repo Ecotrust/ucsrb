@@ -117,7 +117,11 @@ app.map.interaction = {
       });
       app.map.addInteraction(select);
       return select.on('select', function(event) {
-        console.log('yes');
+        var collection = event.target.getFeatures();
+        collection.forEach(function(el,i,arr) {
+          var props = el.getProperties();
+          app.request.get_basin(props.properties.id);
+        });
       });
     },
   },

@@ -81,17 +81,17 @@ nav .navbar-toggler .navbar-toggler-icon {
         animation: shrink-height .3s linear forwards .6s;
     }
 
-#scenario-nav {
+#process-nav {
     transition: 0.3s all linear;
 }
 
-#scenario-nav li {
+#process-nav li {
     margin: 0;
     position: relative;
     text-align: center;
 }
 
-    #scenario-nav li:after {
+    #process-nav li:after {
         content: '';
         border-right: 10px solid #e6e7e8;
         height: 60%;
@@ -101,22 +101,22 @@ nav .navbar-toggler .navbar-toggler-icon {
         right: -5px;
     }
 
-    #scenario-nav li:last-of-type:after {
+    #process-nav li:last-of-type:after {
         border-right: none;
     }
 
-#scenario-nav button {
+#process-nav button {
     border: none;
     background: transparent;
     cursor: pointer;
     outline: none;
     padding: 0;
 }
-    #scenario-nav button.active {
+    #process-nav button.active {
         transition: 1s all ease-in 2s;
     }
 
-    #scenario-nav button.active:after {
+    #process-nav button.active:after {
         background: #fff;
         box-shadow: 2px 2px 4px rgba(0,0,0,0.31);
         content: '';
@@ -129,14 +129,14 @@ nav .navbar-toggler .navbar-toggler-icon {
         z-index: 1;
     }
 
-#scenario-nav button img {
+#process-nav button img {
     max-height: 5.5rem;
     margin-bottom: 1rem;
     pointer-events: none;
     max-width: 96%;
 }
 
-#scenario-nav h3 {
+#process-nav h3 {
     margin: 0 auto;
     pointer-events: none;
     transition: 0.2s all linear;
@@ -165,16 +165,16 @@ nav .navbar-toggler .navbar-toggler-icon {
 .icons-only {
     box-shadow: 0 2px 4px rgba(0,0,0,0.31);
 }
-.icons-only #scenario-nav h3 {
+.icons-only #process-nav h3 {
     animation: shrink-height_zero-one .25s linear forwards 0.35s;
     transform: rotateX(90deg);
 }
 
-.icons-only #scenario-nav img {
+.icons-only #process-nav img {
     animation: shrink-img .25s linear forwards 0.35s;
 }
 
-.icons-only #scenario-nav li:after {
+.icons-only #process-nav li:after {
     height: 80%;
 }
 
@@ -236,20 +236,12 @@ nav .navbar-toggler .navbar-toggler-icon {
  * panel styles
  */
 #right-panel {
-    /* background: rgba(0,105,85,0.2); */
-    display: none;
+    background: rgba(0,105,85,0.2);
+    /* display: none; */
     position: absolute;
     right: 1em;
     top: 1em;
     width: 90%;
-}
-
-#right-panel div {
-    visibility: hidden;
-}
-
-#right-panel div.show {
-    visibility: visible;
 }
 
 /**
