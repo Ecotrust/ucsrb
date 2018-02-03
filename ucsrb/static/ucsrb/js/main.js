@@ -46,7 +46,7 @@ var main = {
       $.ajax({
         url: 'sign_out/',
         success: function (data) {
-          console.log(data);
+          document.location.href = '/';
         }
       })
     },

@@ -13,10 +13,6 @@ var app = {
 app.init = {
   'select': function() {
     // app.request.get_viewer_select();
-    app.request.get_filter_form()
-        .then(function(data) {
-            app.state.panelContent = data // set panel state
-        })
     // TODO get bbox from map window and assign to var
     var bbox = [-13406452.813644003, 6045242.123841717, -13403748.852081062, 6047669.009725289];
     app.request.get_segment_by_bbox(bbox)
@@ -103,10 +99,12 @@ app.request = {
     return $.ajax({
         url: `/features/treatmentscenario/form`,
         dataType: 'html',
+        success: function() {
+            console.log('%csuccessfully returned filter form', 'color: green');
+        }
       })
       .done(function(response) {
-        console.log('%csuccessfully returned filter form', 'color: green');
-        return response;
+          return response;
       })
   },
   /**
