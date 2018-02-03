@@ -170,7 +170,7 @@ app.request = {
       });
   },
   get_basin: function(pp_id) {
-    $.ajax({
+    return $.ajax({
       url: '/viewer/select/get_basin',
       data: {
         pourPoint: pp_id,

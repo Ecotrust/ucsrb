@@ -120,7 +120,14 @@ app.map.interaction = {
         var collection = event.target.getFeatures();
         collection.forEach(function(el,i,arr) {
           var props = el.getProperties();
-          app.request.get_basin(props.properties.id);
+          app.request.get_basin(props.properties.id)
+              .then(function(data) {
+                 app.request.saveState(); // save state prior to filter
+              });
+          app.request.get_filter_form()
+              .then(function(data) {
+                  app.state.panelContent = data // set panel state
+              });
         });
       });
     },
