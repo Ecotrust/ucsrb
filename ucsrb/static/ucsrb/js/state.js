@@ -18,7 +18,7 @@ app.state = {
   },
   set panelContent(content) {
     this.panel.content = content;
-    app.panel.setRPanelContent(content);
+    app.panel.setPanelContent(content);
   },
   set panelheight(height) {
     this.panel.height = height;

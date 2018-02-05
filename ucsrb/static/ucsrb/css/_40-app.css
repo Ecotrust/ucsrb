@@ -1,5 +1,5 @@
 @media all and (min-width: 40em) {
-    #right-panel {
+    #panel #scenarios {
         width: 50%;
     }
 }

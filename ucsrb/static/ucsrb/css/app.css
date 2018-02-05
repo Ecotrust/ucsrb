@@ -111,22 +111,23 @@ nav .navbar-toggler .navbar-toggler-icon {
     cursor: pointer;
     outline: none;
     padding: 0;
+    position: relative;
 }
     #process-nav button.active {
         transition: 1s all ease-in 2s;
     }
 
     #process-nav button.active:after {
-        background: #fff;
-        box-shadow: 2px 2px 4px rgba(0,0,0,0.31);
+        bottom: -5vh;
+        border-left: 3vh solid transparent;
+        border-right: 3vh solid transparent;
+        border-top: 3vh solid #fff;
         content: '';
-        height: 30px;
+        left: 50%;
         opacity: 1;
         position: absolute;
-        transform: rotate(45deg) translate(-15px,5px);
-        transform-origin: center left;
-        width: 30px;
-        z-index: 1;
+        transform: translate(-3vh,0);
+        z-index: 0;
     }
 
 #process-nav button img {
@@ -235,8 +236,8 @@ nav .navbar-toggler .navbar-toggler-icon {
 /**
  * panel styles
  */
-#right-panel {
-    background: rgba(0,105,85,0.3);
+#panel #scenarios {
+    background: rgba(255,255,255,0.8);
     bottom: 3rem;
     overflow: scroll;
     position: absolute;
@@ -244,7 +245,7 @@ nav .navbar-toggler .navbar-toggler-icon {
     top: 1em;
     width: 90%;
 }
-    #right-panel:empty {
+    #panel #scenarios:empty {
         display: none;
     }
 
