@@ -236,13 +236,17 @@ nav .navbar-toggler .navbar-toggler-icon {
  * panel styles
  */
 #right-panel {
-    background: rgba(0,105,85,0.2);
-    /* display: none; */
+    background: rgba(0,105,85,0.3);
+    bottom: 3rem;
+    overflow: scroll;
     position: absolute;
     right: 1em;
     top: 1em;
     width: 90%;
 }
+    #right-panel:empty {
+        display: none;
+    }
 
 /**
  * keyframe animation

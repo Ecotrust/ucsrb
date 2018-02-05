@@ -97,7 +97,8 @@ app.request = {
    */
   get_filter_form: function() {
     return $.ajax({
-        url: `/features/treatmentscenario/form`,
+        url: `/features/treatmentscenario/form/`,
+        type: 'GET',
         dataType: 'html',
         success: function() {
             console.log('%csuccessfully returned filter form', 'color: green');
@@ -125,7 +126,7 @@ app.request = {
         return response;
       })
       .fail(function(response) {
-        console.log(`%cfail: ${response}`, 'color: red');
+        console.log(`%cfail @ get segment by bbox: %o`, 'color: red', response);
         return false;
       });
   },
@@ -146,7 +147,7 @@ app.request = {
         return response;
       })
       .fail(function(response) {
-        console.log(`%cfail: ${response}`, 'color: red');
+        console.log(`%cfail @ segment by id: %o`, 'color: red', response);
       });
   },
   /**
@@ -166,7 +167,7 @@ app.request = {
           return response;
       })
       .fail(function(response) {
-        console.log(`%cfail: ${response}`, 'color: red');
+        console.log(`%cfail @ get pourpoint id: %o`, 'color: red', response);
       });
   },
   get_basin: function(pp_id) {
@@ -181,7 +182,7 @@ app.request = {
         return response;
       },
       error: function(response, status) {
-        console.log(`%cfail: ${response}`, 'color: red');
+        console.log(`%cfail @ get basin: %o`, 'color: red', response);
         return status;
       }
     })
@@ -205,7 +206,7 @@ app.request = {
         return status;
       },
       error: function(response, status) {
-        console.log(`%cfail: ${response}`, 'color: red');
+        console.log(`%cfail @ save state: %o`, 'color: red', response);
         return status;
       }
     })

@@ -2,58 +2,7 @@ app.mapbox = {
   key: 'pk.eyJ1IjoiaG9kZ2ltb3RvIiwiYSI6IjVJNU1UMWsifQ.RHNVad4mnDISsAL_B3h30Q',
 };
 
-app.map = new ol.Map({
-  target: 'map',
-  layers: [
-    new ol.layer.VectorTile({
-     declutter: true,
-     name: 'Base Layer',
-     source: new ol.source.VectorTile({
-       attributions: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> ' +
-         '© <a href="https://www.openstreetmap.org/copyright">' +
-         'OpenStreetMap contributors</a>',
-       format: new ol.format.MVT(),
-       url: 'https://{a-d}.tiles.mapbox.com/v4/mapbox.mapbox-streets-v6/' +
-           '{z}/{x}/{y}.vector.pbf?access_token=' + app.mapbox.key
-     }),
-     style: createMapboxStreetsV6Style(ol.style.Style, ol.style.Fill, ol.style.Stroke, ol.style.Icon, ol.style.Text)
-   }),
-   // // new ol.layer.Tile({
-   //    name: 'HUC_12',
-   //    source: new ol.source.XYZ({
-   //      url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcqvx3v02cnr2spem8kzm7rs/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
-   //    }),
-   //  }),
-   //  new ol.layer.Tile({
-   //    name: 'HUC 10',
-   //    source: new ol.source.XYZ({
-   //      url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcqvt8el5jmh2sqncjcya3mx/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
-   //    }),
-   //  }),
-   //  new ol.layer.Tile({
-   //    name: 'Streams',
-   //    source: new ol.source.XYZ({
-   //      url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcqw3lxq3luo2spnc87wb6q8/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
-   //    }),
-   //  }),
-   //  new ol.layer.Tile({
-   //    name: 'PourPoints',
-   //    source: new ol.source.XYZ({
-   //      url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcqw0cln0t1t2stppz5vzd0d/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
-   //    }),
-   //  }),
-   //  new ol.layer.Tile({
-   //    name: 'Shed802',
-   //    source: new ol.source.XYZ({
-   //      url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcs55i2d6t0b2smjsebrise8/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
-   //    }),
-   //  }),
-  ],
-  view: new ol.View({
-    center: [-13405984.640957793,6046804.319313334],
-    zoom: 8
-  })
-});
+app.map = mapSettings.getInitMap();
 
 app.map.styles = {
   'Point': new ol.style.Style({
@@ -229,5 +178,13 @@ app.map.layer = {
       // format: new ol.format.MVT(),
       url: 'https://api.mapbox.com/styles/v1/hodgimoto/cjcl80xms0bmv2stg8k8x99k7/tiles/256/{z}/{x}/{y}@2x?access_token=' + app.mapbox.key,
     }),
-  })
+  }),
+  scenarios: {
+      layer: mapSettings.getInitFilterResultsLayer('scenarios', false),
+      // source: app.map.layer.scenarios.layer.getSource(),
+  },
+  planningUnits: {
+      layer: mapSettings.getInitFilterResultsLayer('planning units', app.map.styles['Polygon']),
+      // source: app.map.layer.scenarios.layer.getSource(),
+  },
 }

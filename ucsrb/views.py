@@ -33,6 +33,7 @@ def home(request):
 def app(request):
     template = loader.get_template('ucsrb/app.html')
     context = {}
+    context['MAP_TECH'] = 'ol4'
     return HttpResponse(template.render(context, request))
 
 def sign_in(request):
