@@ -15,6 +15,22 @@ class HiddenScenarioBooleanField(forms.BooleanField):
     )
 
 class TreatmentScenarioForm(ScenarioForm):
+    from ucsrb.models import FocusArea
+
+    focus_area = HiddenScenarioBooleanField(
+        label="Filter By Boundary",
+        help_text="This should be true: ALWAYS",
+        initial=True
+    )
+
+    focus_area_options = FocusArea.objects.all()
+    focus_area_input = forms.ModelChoiceField(
+        queryset=focus_area_options,
+        label="Treatment Boundary",
+        help_text="This should be invisible. Ppt Basin, HUC, or RMU Focus_Area ID",
+        required=False,     # CHANGE THIS!
+    )
+
     private_own = HiddenScenarioBooleanField(
         label="Avoid Private Land",
         help_text="Do not treat privately owned forest land",
@@ -167,14 +183,25 @@ class TreatmentScenarioForm(ScenarioForm):
 
     def get_step_0_fields(self):
         names = [
+            ('focus_area', None, None, 'focus_area_input'),
             ('private_own', None, None, None),
             ('pub_priv_own', None, None, 'pub_priv_own_input'),
             ('lsr_percent', None, None, None),
             ('has_critical_habitat', None, None, None),
+        ]
+        return self._get_fields(names)
+
+    def get_step_1_fields(self):
+        names = [
             ('percent_roadless', None, None, None),
             ('road_distance', None, 'road_distance_max', 'road_distance_input'),
             ('percent_wetland', None, None, None),
             ('percent_riparian', None, None, None),
+        ]
+        return self._get_fields(names)
+
+    def get_step_2_fields(self):
+        names = [
             ('slope', None, 'slope_max', 'slope_input'),
             (
                 'percent_fractional_coverage',
@@ -186,12 +213,11 @@ class TreatmentScenarioForm(ScenarioForm):
         ]
         return self._get_fields(names)
 
-    def get_step_1_fields(self):
-        names = []
-        return self._get_fields(names)
-
     def get_steps(self):
-        return self.get_step_0_fields(),
+        return self.get_step_0_fields(), self.get_step_1_fields(), self.get_step_2_fields(),
+
+    def is_valid(self, *args, **kwargs):
+        return super(ScenarioForm, self).is_valid()
 
     class Meta(ScenarioForm.Meta):
         model = TreatmentScenario

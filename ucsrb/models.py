@@ -35,10 +35,11 @@ class ScenarioState(models.Model):
         ('Draw', 'Draw')
     ]
     scenario_type = models.CharField(max_length=10, choices=SCENARIO_TYPE_CHOICES)
-    focus_area = models.ForeignKey(FocusArea, null=True, blank=True, default=None)#, models.SET_NULL)
 
 @register
 class TreatmentScenario(Scenario):
+    focus_area = models.BooleanField(default=False)
+    focus_area_input = models.ForeignKey(FocusArea, null=True, blank=True, default=None)#, models.SET_NULL)
     # id = models.IntegerField(primary_key=True)
     scenario = models.ForeignKey(ScenarioState, null=True, blank=True, default=None)#, models.CASCADE)
 
@@ -93,6 +94,9 @@ class TreatmentScenario(Scenario):
     percent_high_fire_risk_area = models.BooleanField(default=False)
 
     def run_filters(self, query):
+        if self.focus_area_input:
+            query = (query.filter(geometry__intersects=self.focus_area_input.geometry))
+
         if self.private_own:
             pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
             query = (query.filter(pk__in=pu_ids))

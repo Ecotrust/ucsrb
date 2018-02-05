@@ -21,7 +21,7 @@ import accounts.urls
 from ucsrb.views import demo, get_planningunits, get_filter_count, get_filter_results
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/?', admin.site.urls),
     ### INSERT PROJECT URL INCLUDES HERE ###
     url(r'^features/', include('features.urls')),
     url(r'^manipulators/', include('manipulators.urls')),
