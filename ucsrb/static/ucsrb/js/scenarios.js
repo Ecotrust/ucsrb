@@ -128,6 +128,7 @@ var madrona = {
 
 function scenarioFormModel(options) {
     var self = this;
+    self.focus_area = ko.observable(false);
     self.private_own = ko.observable(false);
     self.pub_priv_own = ko.observable(false);
     // self.pub_priv_own_input = ko.observable(false);
