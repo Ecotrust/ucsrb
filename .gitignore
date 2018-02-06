@@ -2,3 +2,5 @@ ucsrb.egg-info
 *.pyc
 .DS_Store
 .idea
+
+layers/*
