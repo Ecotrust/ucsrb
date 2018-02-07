@@ -17,7 +17,9 @@ class FocusArea(models.Model):
     unit_type = models.CharField(max_length=20, null=True, blank=True, default=None, choices=UNIT_TYPE_CHOICES)
 
     # The HUC/RMU/PP ID
-    unit_id = models.IntegerField(null=True, blank=True, default=None)
+    unit_id = models.CharField(max_length=100, null=True, blank=True, default=None)
+
+    description = models.CharField(max_length=255, null=True, blank=True, default=None)
 
     geometry = gismodels.MultiPolygonField(srid=GEOMETRY_DB_SRID,
             null=True, blank=True, verbose_name="Focus Area Geometry")

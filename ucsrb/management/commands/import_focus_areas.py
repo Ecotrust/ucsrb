@@ -57,9 +57,6 @@ class Command(BaseCommand):
             self.stdout.write('--- ERROR: Unable to open zipfile ---')
             sys.exit()
 
-        # Delete previous Focus Areas of given type
-        FocusArea.objects.filter(unit_type=in_type).delete()
-
         with zipfile.ZipFile(in_file_name, 'r', zip_format) as zipshape:
             shapefiles = [fname for fname in zipshape.namelist() if fname[-4:] == '.shp']
             dbffiles = [fname for fname in zipshape.namelist() if fname[-4:] == '.dbf']
@@ -90,17 +87,43 @@ class Command(BaseCommand):
             fieldsArray = [x[0] for x in shape.fields]
 
             # TODO: Define id_fields for all supported in_types!
+            id_field = None
+            desc_field = None
             if in_type == 'HUC10':
                 id_field = 'HUC_10'
+                desc_field = 'HU_10_Name'
+            if in_type == 'HUC12':
+                id_field = 'HUC_12'
+                desc_field = 'HU_12_NAME'
+            if in_type == 'RMU':
+                id_field = None
+            if in_type == 'PourPoint':
+                id_field = None
+
+            if not id_field:
+                self.stdout.write('--- ERROR: ID Field unknown. Check your file type argument. ---')
+                sys.exit()
 
             #fields has DeletionFlag as first item, not included in records indeces
             unit_id_index = fieldsArray.index(id_field) - 1
+            if desc_field:
+                unit_desc_index = fieldsArray.index(desc_field) -1
 
             from django.contrib.gis.geos import GEOSGeometry, Polygon, MultiPolygon
             import json
             import_count = 0
+
+            # Delete previous Focus Areas of given type
+            self.stdout.write('Deleting all existing %s focus areas...' % in_type)
+            FocusArea.objects.filter(unit_type=in_type).delete()
+
+            self.stdout.write('Writing new %s focus areas...' % in_type)
             for shapeRecord in shape.shapeRecords():
                 unit_id = shapeRecord.record[unit_id_index]
+                if desc_field:
+                    description = str(shapeRecord.record[unit_desc_index])
+                else:
+                    description = None
                 geometry = GEOSGeometry(json.dumps(shapeRecord.shape.__geo_interface__), srid=settings.IMPORT_SRID)
                 if geometry.geom_type == 'Polygon':
                     multiGeometry = MultiPolygon((geometry))
@@ -111,7 +134,8 @@ class Command(BaseCommand):
                     sys.exit()
                 FocusArea.objects.create(
                     unit_type = in_type,
-                    unit_id = unit_id,
+                    unit_id = str(unit_id),
+                    description = description,
                     geometry = multiGeometry
                 )
                 import_count += 1
