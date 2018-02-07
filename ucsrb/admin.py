@@ -11,11 +11,14 @@ class VegPlanningUnitAdmin(OSMGeoAdmin):
 class TreatmentScenarioAdmin(OSMGeoAdmin):
     list_display = ('name', 'user', 'description')
 
+class FocusAreaAdmin(OSMGeoAdmin):
+    list_display = ('unit_id', 'unit_type')
+
 geoadmin.site.register(VegPlanningUnit, VegPlanningUnitAdmin)
 # geoadmin.site.register(TreatmentScenario, OSMGeoAdmin)
 geoadmin.site.register(TreatmentScenario, TreatmentScenarioAdmin)
 admin.site.register(ScenarioState)
-geoadmin.site.register(FocusArea, OSMGeoAdmin)
+geoadmin.site.register(FocusArea, FocusAreaAdmin)
 
 
 # class VegPlanningUnitAdmin(OSMGeoAdmin):

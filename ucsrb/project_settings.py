@@ -199,6 +199,7 @@ INSTALLED_APPS = [
 ######        LAYER DATA        ########
 ########################################
 FOCUS_AREA_TYPES = ['HUC10', 'HUC12', 'RMU', 'Pour Point', 'Drawing']
+IMPORT_SRID = 3857
 
 
 GET_SCENARIOS_URL = '/ucsrb/get_scenarios/'
