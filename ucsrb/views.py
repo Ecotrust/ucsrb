@@ -1034,7 +1034,7 @@ def run_filter_query(filters):
 
 '''
 '''
-# @cache_page(60 * 60) # 1 hour of caching
+@cache_page(60 * 60) # 1 hour of caching
 def get_filter_count(request, query=False, notes=[]):
     if not query:
         filter_dict = dict(request.GET.items())
@@ -1046,7 +1046,7 @@ def get_filter_count(request, query=False, notes=[]):
 
 '''
 '''
-# @cache_page(60 * 60) # 1 hour of caching
+@cache_page(60 * 60) # 1 hour of caching
 def get_filter_results(request, query=False, notes=[]):
     if not query:
         filter_dict = dict(request.GET.items())
@@ -1055,6 +1055,7 @@ def get_filter_results(request, query=False, notes=[]):
     return scenarioViews.get_filter_results(request, query, notes)
 
 
+@cache_page(60 * 60) # 1 hour of caching
 def get_planningunits(request):
     from ucsrb.models import VegPlanningUnit
     from json import dumps
