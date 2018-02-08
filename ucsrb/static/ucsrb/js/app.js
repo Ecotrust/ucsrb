@@ -14,7 +14,7 @@ app.init = {
     'select': function() {
         // app.request.get_viewer_select();
         // TODO get bbox from map window and assign to var
-        var bbox = [-13406452.813644003, 6045242.123841717, -13403748.852081062, 6047669.009725289];
+        var bbox = [-13505560.671219192, 6217028.00835033, -13356557.351569131, 6280740.477905572];
         app.request.get_segment_by_bbox(bbox)
         .then(function(data) {
             app.map.layer.streams.init(data);
@@ -28,7 +28,7 @@ app.init = {
             app.map.interaction.select.segment();
         })
         .then(function() {
-            console.log('%clistening for stream segement selection...', 'color: orange;');
+            console.log('%clistening for stream segement selection...', 'color: #d6afff;');
         })
         .catch(function(data) {
             console.warn('failed to add map layer');
@@ -51,14 +51,15 @@ app.nav = {
         // style nav
         $('.nav-wrap').addClass('icons-only');
         $('.map-wrap').addClass('short-nav');
-        $('.overlay').addClass('fade-out');
+        $('.overlay').addClass('fade-out short-overlay');
         setTimeout(function() {
             $('#process-nav').addClass('justify-content-start');
             $('#process-nav').removeClass('justify-content-center');
             $('#process-nav .col').each(function(i) {
                 $(this).addClass('col-2');
             })
-            $('.overlay').addClass('d-none');
+            $('.overlay').removeClass('fade-out');
+            app.state.step = 0;
         }, 1000);
     },
     tall: function() {
@@ -73,11 +74,30 @@ app.nav = {
             })
         }, 1000);
     },
+    instructions: {
+        select: [
+            'Select the stream segment where you want to see changes in flow',
+            'Select specific point along stream reach to evaluate changes in flow associated with management activity upstream',
+            'Use filters to narrow your treatment region to fewer than 100 acres',
+        ],
+        filter: [
+            'Select forest unit to filter',
+            'Use filters to narrow your treatment region to fewer than 100 acres',
+        ],
+        draw: [
+            'Click on the map to start drawing your stand',
+            'Add additional points then double-click to finish; Re-select point to edit'
+        ],
+    },
 }
 
 app.panel = {
-    setPanelContent: function() {
-        $('#scenarios').html(app.state.panelContent);
+    form: {
+        init: function() {
+            app.map.layer.planningUnits.init();
+            app.map.layer.scenarios.init();
+            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
+        },
     }
 }
 
@@ -95,23 +115,6 @@ app.request = {
         //     url: `/viewer/select`,
         //     dataType: 'html',
         //   });
-    },
-    /**
-    * get scenario filter form from scenario model
-    * @return {[html]} [form html template]
-    */
-    get_filter_form: function() {
-        return $.ajax({
-            url: `/features/treatmentscenario/form/`,
-            type: 'GET',
-            dataType: 'html',
-            success: function() {
-                console.log('%csuccessfully returned filter form', 'color: green');
-            }
-        })
-        .done(function(response) {
-            return response;
-        })
     },
     /**
     * Planning Units
@@ -134,17 +137,20 @@ app.request = {
             console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
         });
     },
-    get_scenarios: function(url) {
-        $.ajax({
-          url: '/scenario/get_scenarios',
+    get_scenarios: function() {
+        return $.ajax({
+          url: '/ucsrb/get_scenarios/',
           type: 'GET',
-          dataType: 'json'
+          dataType: 'json',
+          success: function() {
+              console.log('%csuccessfully got scenarios', 'color: green');
+          },
         })
         .done(function(response) {
           return response;
         })
-        .fail(function() {
-          alert("error");
+        .fail(function(response) {
+          console.log(`%cfail @ get scenarios: %o`, 'color: red', response);
         });
     },
     /**

@@ -69,19 +69,14 @@ app.map.interaction = {
                 var collection = event.target.getFeatures();
                 collection.forEach(function(el,i,arr) {
                     var props = el.getProperties();
+                    console.log('%c selected: %o', 'color: #05b8c3', arr);
                     app.request.get_basin(props.properties.id)
                         .then(function(data) {
                             app.request.saveState(); // save state prior to filter
                         });
-                    // app.request.get_scenarios()
-                        // .then(function(data) {
-                        //     app.map.layer.scenarios.init();
-                        // });
-                    app.request.get_filter_form()
-                        .then(function(data) {
-                            app.state.panelContent = data // set panel state
-                        });
                 });
+                app.panel.form.init();
+                app.state.step = 2;
             });
         },
     },
@@ -170,6 +165,7 @@ app.map.layer = {
                 app.map.layer.pourpoints.layer.setSource(app.map.layer.pourpoints.source);
                 app.map.addLayer(app.map.layer.pourpoints.layer);
                 app.map.layer.pourpoints.counter++;
+                app.state.step = 1;
             } else {
                 console.log('streams already added');
             }
@@ -184,54 +180,53 @@ app.map.layer = {
         }),
     }),
     scenarios: {
-        layer: function() {
-            return mapSettings.getInitFilterResultsLayer('scenarios', false);
-        },
+        count: 0,
+        layer: mapSettings.getInitFilterResultsLayer('scenarios', false),
         source: function() {
             return app.map.layer.scenarios.layer.getSource();
         },
         init: function(data) {
-            // html = '<ul>'
-            // for (var i = 0; i < scenarios.length; i++) {
-            //   scenario = scenarios[i];
-            //   if(scenario.name == '') {
-            //     scenario_name = 'Scenario ' + scenario.id;
-            //   } else {
-            //     scenario_name = scenario.name;
-            //   }
-            //   {% if SCENARIO_LINK_BASE %}
-            //     scenario_link = '{{SCENARIO_LINK_BASE}}' + "_" + scenario.id;
-            //   {% else %}
-            //     scenario_link = "/features/scenario/scenarios_scenario_" + scenario.id;
-            //   {% endif %}
-            //
-            //   html = html + '<li><a href="' + scenario_link + '/" target="_blank">' + scenario_name + '</a></li>';
-            // }
-            // html = html + '</ul>';
-            // $('#scenarios').html(html)
-            // {% if SCENARIO_FORM_URL %}
-            //   scenario_form_url = '{{SCENARIO_FORM_URL}}';
-            // {% else %}
-            //   scenario_form_url = '/features/scenario/form/';
-            // {% endif %}
-            // app.viewModel.scenarios.createNewScenario(scenario_form_url);
+            if (app.map.layer.scenarios.count < 1) {
+                app.map.addLayer(app.map.layer.scenarios.layer);
+                app.request.get_scenarios()
+                    .then(function(response) {
+                        var html = `<div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="savedScenarioDropdownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Saved Treatment</button>
+                                        <div class="dropdown-menu" aria-labelledby="savedScenarioDropdownBtn">`;
+                        response.forEach(function(scenario,i,arr) {
+                            var scenario_name = scenario.name;
+                            if (scenario.name == '') {
+                                scenario_name = `Scenario ${scenario.id}`;
+                            }
+                            var scenario_link = `/features/treatmentscenario/ucsrb_treatmentscenario/${scenario.id}`;
+                            html += `<a class="dropdown-item" href="${scenario_link}/">${scenario_name}</a>`;
+                        });
+                        html += "</div>"
+                        $('#scenarios').html(html);
+                    });
+                app.map.layer.scenarios.count = app.map.layer.scenarios.count + 1;
+            }
         }
     },
     planningUnits: {
-        layer: function() {
-            return mapSettings.getInitFilterResultsLayer('planning units', app.map.styles['Polygon']);
+        count: 0,
+        layer: mapSettings.getInitFilterResultsLayer('planning units', app.map.styles['Polygon']),
+        source: function() {
+            return app.map.layer.planningUnits.layer.getSource();
         },
-        source: function() {},
         addFeatures: function(features) {
-            for(var i = 0; i < features.length; i++) {
-                feature = features[i].wkt;
-                app.map.layer.planningUnits.layer.addWKTFeatures(feature);
-            }
-            try {
-                // TODO: OL Specific code!!!
-                app.map.getView().fit(app.map.layer.planningUnits.layer.getExtent(), {duration: 1500});
-            } catch (e) {
-                window.alert('No data received. Please add some features.');
+            features.forEach(function(el,i,arr) {
+                app.map.layer.planningUnits.layer.addWKTFeatures(el);
+            });
+        },
+        init: function() {
+            if (app.map.layer.planningUnits.count < 1) {
+                app.map.addLayer(app.map.layer.planningUnits.layer);
+                app.request.get_planningunits()
+                    .then(function(response) {
+                        app.map.layer.planningUnits.addFeatures(response);
+                    });
+                app.map.layer.planningUnits.count = app.map.layer.planningUnits.count + 1;
             }
         }
     },

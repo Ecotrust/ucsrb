@@ -10,7 +10,11 @@
 {% block body_class %}home{% endblock body_class %}
 {% block layout %}landing{% endblock layout %}
 
-{% block header %}{% endblock header %}
+{% block header %}
+    <div class="nav-home">
+        {% include 'ucsrb/blocks/nav.html' %}
+    </div>
+{% endblock header %}
 
 {% block content %}
 

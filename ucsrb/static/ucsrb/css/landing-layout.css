@@ -7,6 +7,30 @@
 }
 
 /**
+ *
+ * home page nav
+ */
+.nav-home {
+    position: absolute;
+    top: 2%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 4;
+}
+
+.nav-home h1 {
+    display: none;
+}
+
+.nav-home .navbar-toggler {
+    background: rgba(255,255,255,0.5);
+    left: 92%;
+    margin-top: 2vh;
+    position: relative;
+}
+
+/**
  * Hero image area (top of screen)
  * @css
  */

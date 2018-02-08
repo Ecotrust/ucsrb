@@ -27,19 +27,19 @@ header {
      background: #58595B;
      color: #fff;
      display: block;
-     height: 15vh;
+     height: 9vh;
 }
 
 nav .navbar-toggler {
     background: #67b8c6;
     border-radius: 50%;
     border: none;
-    height: 3.5rem;
-    line-height: 3.5rem;
+    height: 6vh;
+    line-height: 9vh;
     outline: none;
     text-align: center;
     padding: 0;
-    width: 3.5rem;
+    width: 6vh;
 }
 
 nav .navbar-toggler .navbar-toggler-icon {
@@ -47,6 +47,7 @@ nav .navbar-toggler .navbar-toggler-icon {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+    line-height: 9vh;
     display: block;
     margin: 0 auto;
 }
@@ -56,11 +57,11 @@ nav .navbar-toggler .navbar-toggler-icon {
 
 .top-nav-wrap .navbar {
     justify-content: flex-start;
-    padding: 1em;
+    padding: 0;
 }
 
 .top-nav-wrap .navbar h1 {
-    line-height: 2;
+    line-height: 9vh;
     margin: 0 1em;
 }
 
@@ -188,7 +189,7 @@ nav .navbar-toggler .navbar-toggler-icon {
  */
 
 .map-wrap {
-    height: 73vh;
+    height: 79vh;
     overflow: hidden;
     position: relative;
     transition: 0.3s all ease-in 0.1s;
@@ -201,18 +202,22 @@ nav .navbar-toggler .navbar-toggler-icon {
     }
 
 .map-wrap .overlay {
-    background: rgba(58,86,117,0.84);
+    background: rgba(58,86,117,0.8);
     bottom: 0;
+    color: #fff;
     left: 0;
+    opacity: 1;
     position: absolute;
     right: 0;
-    transition: 0.4s all ease-in 0.5s;
+    transition: 0.4s opacity ease-in 0.5s;
     top: 0;
     z-index: 1;
 }
     .map-wrap .overlay.fade-out {
         background: rgba(58,86,117,0);
+        opacity: 0;
     }
+
 
 .map-wrap .overlay .instructions {
     padding-top: 50%;
@@ -229,25 +234,178 @@ nav .navbar-toggler .navbar-toggler-icon {
         transform: translate(-24px,0);
     }
 
+.map-wrap .overlay.short-overlay {
+    bottom: auto;
+    height: 9vh;
+}
+
+.map-wrap .short-overlay .instructions .hvh {
+    height: 9vh;
+}
+
+.map-wrap .short-overlay .instructions #instruction {
+    margin: 0 auto;
+    width: 70%;
+}
+
+.map-wrap .overlay.short-overlay h2 {
+    display: none;
+}
+
+.map-wrap .overlay.short-overlay .instructions {
+    padding-top: 0;
+}
+    .map-wrap .overlay.short-overlay .instructions:before {
+        display: none;
+    }
+
 #map {
     height: 100%;
 }
 
 /**
+ *
+ * Map controls
+ */
+
+#map .ol-control {
+    z-index: 1;
+}
+
+#map .ol-zoom {
+    left: auto;
+    right: .5em;
+}
+
+#map .ol-rotate {
+    top: 4em;
+}
+
+/**
  * panel styles
  */
-#panel #scenarios {
-    background: rgba(255,255,255,0.8);
-    bottom: 3rem;
+#panel {
+    background: rgba(255,255,255,0.9);
+    border-radius: 1em;
+    bottom: 2.5rem;
+    right: .5rem;
+    top: 10vh;
     overflow: scroll;
     position: absolute;
-    right: 1em;
-    top: 1em;
-    width: 90%;
 }
-    #panel #scenarios:empty {
-        display: none;
+
+#panel #scenario_form,
+#panel #scenarios {
+    font-size: .875em;
+    opacity: 1;
+    position: relative;
+    transition: .3s all ease-in-out;
+    width: 50vw;
+}
+#panel #scenario_form:empty,
+#panel #scenarios:empty {
+    opacity: 0;
+    width: 0;
+}
+
+#panel #scenario_form:not(:empty) {
+    padding: .75rem 1rem;
+}
+
+#panel #scenario_form .btn {
+    font-size: 1em;
+}
+
+.panel #scenarios-form {
+    border: none;
+    border-radius: 0;
+    height: auto;
+    margin: 0 auto;
+    overflow: auto;
+    padding: 0;
+    width: 100%;
+}
+
+.step-inputs {
+    background: rgba(230,231,232,.6);
+    font-size: .9375em;
+    font-weight: 400;
+    padding: 1rem 1rem .5rem;
+}
+
+.panel .form-group {
+    margin-bottom: .5rem;
+}
+
+.panel .instructions {
+    font-weight: 700;
+}
+
+.panel h4 {
+    font-size: 1.25em;
+    margin-bottom: .5rem;
+}
+
+.panel .show-blocks-btn {
+    margin-top: 0;
+    padding-bottom: 0;
+}
+
+.panel .show-blocks-btn a {
+    height: auto;
+    line-height: 1.5;
+}
+
+.progress {
+    margin: .5rem 0;
+    height: 8px;
+}
+
+.progress-bar {
+    background: #67b8c6;
+}
+    #step1.max4 .progress-bar {
+        width: 25%;
     }
+    #step2.max4 .progress-bar {
+        width: 50%;
+    }
+    #step3.max4 .progress-bar {
+        width: 75%;
+    }
+    #step4.max4 .progress-bar {
+        width: 100%;
+    }
+
+.panel form input,
+.panel form textarea {
+    font-size: 1em;
+    max-width: 100%;
+}
+
+.panel form textarea {
+    height: 5rem;
+}
+
+.panel .wizard_nav .row {
+    margin: 0 auto 1.5rem;
+}
+
+.panel #scenarios-form .accordion-heading .accordion-toggle {
+    margin-bottom: 0;
+    padding: 0 15px;
+}
+
+.panel #scenarios-form .accordion-toggle i.check,
+.panel #scenarios-form .accordion-toggle i.icon-check-empty {
+    left: 12px;
+    font-size: .9375em;
+    top: 1px;
+}
+
+.panel #scenarios-form .accordion-heading .accordion-toggle .parameter-label {
+    font-size: 1em;
+}
 
 /**
  * keyframe animation
@@ -283,3 +441,19 @@ nav .navbar-toggler .navbar-toggler-icon {
        margin-bottom: 0;
    }
  }
+
+ @keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translate3d(100%, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.fadeInRight {
+  animation-name: fadeInRight;
+}
