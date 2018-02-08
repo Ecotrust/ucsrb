@@ -246,6 +246,7 @@ try:
     from accounts.settings import *
     from data_manager.settings import *
     from drawing.settings import *
+    from scenarios.settings import *
     ### END MODULE SETTINGS IMPORT ###
 except ImportError:
     pass
