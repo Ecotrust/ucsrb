@@ -17,11 +17,14 @@
             </li>
         </ul>
         <nav id="file-nav" class="col-3 nav justify-content-center flex-column">
-            <div class="nav-item">
-                <a href="" id="nav-back" class="hidden"><i><img src="{% static '/ucsrb/img/icon/i_back.svg' %}" /></i> back</a>
-            </div>
-            <div class="nav-item">
-                <a href="" id="nav-load-save"><i><img src="{% static '/ucsrb/img/icon/i_folder.svg' %}" /></i> load saved</a>
+            <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle" type="button" id="fileNavButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Options
+                </button>
+                <div class="dropdown-menu" aria-labelledby="fileNavButton">
+                    <a href="" id="nav-back" class="hidden dropdown-item"><i><img src="{% static '/ucsrb/img/icon/i_back.svg' %}" /></i> back</a>
+                    <a href="" id="nav-load-save" class="dropdown-item"><i><img src="{% static '/ucsrb/img/icon/i_folder.svg' %}" /></i> load saved</a>
+                </div>
             </div>
         </nav>
     </div>
