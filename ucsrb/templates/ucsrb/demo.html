@@ -115,28 +115,28 @@
         app.map.addLayer(app.scenariosLayer);
 
 
-        $(function() {
-            $.ajax({
-              url: '/scenario/get_planningunits',
-              type: 'GET',
-              dataType: 'json'
-            })
-            .done(function(features) {
-              for(var i = 0; i < features.length; i++) {
-                feature = features[i].wkt;
-                app.planningUnitsLayer.addWKTFeatures(feature);
-              }
-              try {
-                // TODO: OL Specific code!!!
-                app.map.getView().fit(app.planningUnitsSource.getExtent(), {duration: 1500});
-              } catch (e) {
-                window.alert('No data received. Please add some features.');
-              }
-            })
-            .fail(function() {
-              alert("error");
-            });
-        });
+        // $(function() {
+        //     $.ajax({
+        //       url: '/scenario/get_planningunits',
+        //       type: 'GET',
+        //       dataType: 'json'
+        //     })
+        //     .done(function(features) {
+        //       for(var i = 0; i < features.length; i++) {
+        //         feature = features[i].wkt;
+        //         app.planningUnitsLayer.addWKTFeatures(feature);
+        //       }
+        //       try {
+        //         // TODO: OL Specific code!!!
+        //         app.map.getView().fit(app.planningUnitsSource.getExtent(), {duration: 1500});
+        //       } catch (e) {
+        //         window.alert('No data received. Please add some features.');
+        //       }
+        //     })
+        //     .fail(function() {
+        //       alert("error");
+        //     });
+        // });
 
 
     </script>
