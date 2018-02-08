@@ -10,16 +10,16 @@ from scenarios.models import Scenario
 GEOMETRY_DB_SRID = settings.GEOMETRY_DB_SRID
 
 class FocusArea(models.Model):
-    UNIT_TYPE_CHOICES = [
-        ('HUC10', 'HUC10'),
-        ('HUC12', 'HUC12'),
-        ('RMU', 'RMU'),
-        ('Pour Point', 'Pour Point')
-    ]
+    UNIT_TYPE_CHOICES = []
+    for type in settings.FOCUS_AREA_TYPES:
+        UNIT_TYPE_CHOICES.append((type, type))
+
     unit_type = models.CharField(max_length=20, null=True, blank=True, default=None, choices=UNIT_TYPE_CHOICES)
 
     # The HUC/RMU/PP ID
-    unit_id = models.IntegerField(null=True, blank=True, default=None)
+    unit_id = models.CharField(max_length=100, null=True, blank=True, default=None)
+
+    description = models.CharField(max_length=255, null=True, blank=True, default=None)
 
     geometry = gismodels.MultiPolygonField(srid=GEOMETRY_DB_SRID,
             null=True, blank=True, verbose_name="Focus Area Geometry")

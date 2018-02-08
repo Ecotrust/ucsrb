@@ -195,6 +195,13 @@ INSTALLED_APPS = [
     ### END INSERTED INSTALLED APPS ###
 ]
 
+########################################
+######        LAYER DATA        ########
+########################################
+FOCUS_AREA_TYPES = ['HUC10', 'HUC12', 'RMU', 'PourPoint', 'Drawing']
+IMPORT_SRID = 3857
+
+
 GET_SCENARIOS_URL = '/ucsrb/get_scenarios/'
 SCENARIO_FORM_URL = '/features/treatmentscenario/form/'
 SCENARIO_LINK_BASE = '/features/treatmentscenario/ucsrb_treatmentscenario'
