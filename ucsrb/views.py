@@ -956,11 +956,14 @@ def run_filter_query(filters):
     # TODO: This would be nicer if it generically knew how to filter fields
     # by name, and what kinds of filters they were. For now, hard code.
     notes = []
-    query = VegPlanningUnit.objects.all()
 
     if 'focus_area' in filters.keys() and 'focus_area_input' in filters.keys() and filters['focus_area']:
         focus_area = FocusArea.objects.get(pk=filters['focus_area_input']).geometry;
-        query = (query.filter(geometry__intersects=focus_area))
+        query = VegPlanningUnit.objects.filter(geometry__intersects=focus_area)
+    else:
+        notes = ['Please Filter By Focus Area']
+        query = VegPlanningUnit.objects.filter(pk=None)
+        return (query, notes)
 
     if 'private_own' in filters.keys() and filters['private_own']:
         if 'avoid_private_input' in filters.keys():
@@ -1034,7 +1037,7 @@ def run_filter_query(filters):
 
 '''
 '''
-# @cache_page(60 * 60) # 1 hour of caching
+@cache_page(60 * 60) # 1 hour of caching
 def get_filter_count(request, query=False, notes=[]):
     if not query:
         filter_dict = dict(request.GET.items())
@@ -1046,7 +1049,7 @@ def get_filter_count(request, query=False, notes=[]):
 
 '''
 '''
-# @cache_page(60 * 60) # 1 hour of caching
+@cache_page(60 * 60) # 1 hour of caching
 def get_filter_results(request, query=False, notes=[]):
     if not query:
         filter_dict = dict(request.GET.items())
@@ -1055,6 +1058,7 @@ def get_filter_results(request, query=False, notes=[]):
     return scenarioViews.get_filter_results(request, query, notes)
 
 
+@cache_page(60 * 60) # 1 hour of caching
 def get_planningunits(request):
     from ucsrb.models import VegPlanningUnit
     from json import dumps
