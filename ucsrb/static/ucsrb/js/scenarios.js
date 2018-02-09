@@ -1969,7 +1969,7 @@ function scenariosModel(options) {
 
         if ( !self.drawingsLoaded ) {
             // load the scenarios
-            self.loadScenariosFromServer();
+            // self.loadScenariosFromServer();
 
             // load the drawing
             self.loadDrawingsFromServer();
