@@ -195,6 +195,17 @@ INSTALLED_APPS = [
     ### END INSERTED INSTALLED APPS ###
 ]
 
+try:
+    ### START MODULE SETTINGS IMPORT ###
+    from features.settings import *
+    from accounts.settings import *
+    from data_manager.settings import *
+    from drawing.settings import *
+    from scenarios.settings import *
+    ### END MODULE SETTINGS IMPORT ###
+except ImportError:
+    pass
+
 ########################################
 ######        LAYER DATA        ########
 ########################################
@@ -240,15 +251,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 4000
 
 MAP_TECH = 'ol4'
 
-try:
-    ### START MODULE SETTINGS IMPORT ###
-    from features.settings import *
-    from accounts.settings import *
-    from data_manager.settings import *
-    from drawing.settings import *
-    ### END MODULE SETTINGS IMPORT ###
-except ImportError:
-    pass
+MAX_SCENARIO_RESULTS = 5000
 
 try:
     from marineplanner.local_settings import *
