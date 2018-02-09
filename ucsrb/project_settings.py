@@ -251,6 +251,8 @@ try:
 except ImportError:
     pass
 
+MAX_SCENARIO_RESULTS = 25000
+
 try:
     from marineplanner.local_settings import *
 except ImportError:
