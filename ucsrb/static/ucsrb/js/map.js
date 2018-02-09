@@ -92,8 +92,8 @@ app.map.popup = {}
 */
 app.map.layer = {
     streams: {
-        data: {},
-        counter: 0,
+        data: {}, // store init data
+        counter: 0, // so layer is only added once
         source: new ol.source.Vector({
             format: new ol.format.GeoJSON()
         }),
@@ -111,7 +111,8 @@ app.map.layer = {
             });
         },
         init: function(data) {
-            if (app.map.layer.streams.counter == 0) {
+            // Check if layer has already been added
+            if (app.map.layer.streams.counter === 0) {
                 app.map.layer.streams.data = data;
                 var feature = app.map.layer.streams.feature(data);
                 app.map.layer.streams.source.addFeature(feature);
@@ -119,11 +120,11 @@ app.map.layer = {
                 app.map.addLayer(app.map.layer.streams.layer);
                 app.map.layer.streams.counter++;
             } else {
-                console.log('streams already added');
+                console.log('%cstreams already added', 'color: orange;');
             }
         },
         segment: {
-            data: {},
+            data: {}, // store init data
             init: function(data) {
                 if (data.selected.length > 0) {
                     var selected = data.selected[0].getProperties();
@@ -136,8 +137,8 @@ app.map.layer = {
         },
     },
     pourpoints: {
-        data: {},
-        counter: 0,
+        data: {}, // store init data
+        counter: 0, // so layer is only added once
         source: new ol.source.Vector({
             format: new ol.format.GeoJSON()
         }),
@@ -148,10 +149,8 @@ app.map.layer = {
             zIndex: 1,
         }),
         init: function() {
-            /**
-            * check if pourpoints layer has already been added
-            */
-            if (app.map.layer.pourpoints.counter == 0) {
+            // Check if layer has already been added
+            if (app.map.layer.pourpoints.counter === 0) {
                 app.map.layer.pourpoints.data.forEach(function(pp,i,a) {
                     var feature = new ol.Feature({
                         geometry: new ol.geom.Point(pp.geometry.geometry.coordinates),
@@ -165,9 +164,9 @@ app.map.layer = {
                 app.map.layer.pourpoints.layer.setSource(app.map.layer.pourpoints.source);
                 app.map.addLayer(app.map.layer.pourpoints.layer);
                 app.map.layer.pourpoints.counter++;
-                app.state.step = 1;
+                app.state.step = 1; // step forward in state
             } else {
-                console.log('streams already added');
+                console.log('%cstreams already added', 'color: orange');
             }
         }
     },
@@ -180,13 +179,13 @@ app.map.layer = {
         }),
     }),
     scenarios: {
-        count: 0,
+        counter: 0, // so layer is only added once
         layer: mapSettings.getInitFilterResultsLayer('scenarios', false),
         source: function() {
             return app.map.layer.scenarios.layer.getSource();
         },
         init: function(data) {
-            if (app.map.layer.scenarios.count < 1) {
+            if (app.map.layer.scenarios.counter < 1) {
                 app.map.addLayer(app.map.layer.scenarios.layer);
                 app.request.get_scenarios()
                     .then(function(response) {
@@ -204,12 +203,14 @@ app.map.layer = {
                         html += "</div>"
                         $('#scenarios').html(html);
                     });
-                app.map.layer.scenarios.count = app.map.layer.scenarios.count + 1;
+                app.map.layer.scenarios.counter++;
+            } else {
+                console.log('%cscenarios layer already added', 'color: orange');
             }
         }
     },
     planningUnits: {
-        count: 0,
+        counter: 0,
         layer: mapSettings.getInitFilterResultsLayer('planning units', app.map.styles['Polygon']),
         source: function() {
             return app.map.layer.planningUnits.layer.getSource();
@@ -220,13 +221,15 @@ app.map.layer = {
             });
         },
         init: function() {
-            if (app.map.layer.planningUnits.count < 1) {
+            if (app.map.layer.planningUnits.counter < 1) {
                 app.map.addLayer(app.map.layer.planningUnits.layer);
                 app.request.get_planningunits()
                     .then(function(response) {
                         app.map.layer.planningUnits.addFeatures(response);
                     });
-                app.map.layer.planningUnits.count = app.map.layer.planningUnits.count + 1;
+                app.map.layer.planningUnits.counter++;
+            } else {
+                console.log('%cplanning unit layer already added', 'color: orange');
             }
         }
     },
