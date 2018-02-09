@@ -150,7 +150,10 @@ class TreatmentScenario(Scenario):
         return query
 
     def run(self, result=None):
-        result = VegPlanningUnit.objects.all()
+        if self.focus_area_input:
+            result = VegPlanningUnit.objects.filter(geometry__intersects=self.focus_area_input.geometry)
+        else:
+            result = VegPlanningUnit.objects.all()
         return super(type(self), self).run(result)
 
 
