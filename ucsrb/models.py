@@ -26,6 +26,18 @@ class FocusArea(models.Model):
 
     objects = gismodels.GeoManager()
 
+    def __str__(self):
+        if self.description:
+            return self.description
+        else:
+            return '%s: %s' % (self.unit_type, self.unit_id)
+
+    def __unicode__(self):
+        if self.description:
+            return u'%s' % self.description
+        else:
+            return u'%s: %s' % (self.unit_type, self.unit_id)
+
 class ScenarioState(models.Model):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User)
