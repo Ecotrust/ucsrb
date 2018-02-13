@@ -8,7 +8,8 @@
     }
 
     #panel #scenario_form,
-    #panel #scenarios {
+    #panel #scenarios,
+    #panel #results  {
         width: 28vw;
     }
 }

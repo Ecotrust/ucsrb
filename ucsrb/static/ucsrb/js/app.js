@@ -12,7 +12,6 @@ var app = {
 
 app.init = {
     'select': function() {
-        // app.request.get_viewer_select();
         // TODO get bbox from map window and assign to var
         var bbox = [-13505560.671219192, 6217028.00835033, -13356557.351569131, 6280740.477905572];
         app.request.get_segment_by_bbox(bbox)
@@ -92,29 +91,233 @@ app.nav = {
 }
 
 app.panel = {
+    moveLeft:  function() {
+        app.state.panel.position = 'left';
+        app.panel.element.classList.remove('right');
+        app.panel.element.classList.add('left');
+    },
+    moveRight:  function() {
+        app.state.panel.position = 'right';
+        app.panel.element.classList.remove('left');
+        app.panel.element.classList.add('right');
+    },
+    setContent: function(content) {
+        app.state.panel.content = content;
+        app.panel.element.innerHTML = content;
+    },
     form: {
         init: function() {
-            app.map.layer.planningUnits.init();
-            app.map.layer.scenarios.init();
-            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
+            // app.map.layer.planningUnits.init();
+            // app.map.layer.scenarios.init();
+            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/')
+                    .then(function() {
+                        console.log('yo');
+                        document.querySelector('.submit_button').addEventListener('click', function(event) {
+                            window.setTimeout(function() {
+                                if (app.viewModel.scenarios.scenarioForm()) {
+                                    console.log(`%c form not submitted; %o`, 'color: salmon;', event);
+                                } else {
+                                    console.log(`%c form submitted; %o`, 'color: green;', event);
+                                    app.panel.results.init();
+                                }
+                            }, 1000); // what for scenarioform to be set to false.
+                                        // this happens in scenario.js:94
+                                        // using settimeout for now to avoid merge conflict in sceanario.js
+                                        // ideally the submitForm function in scenario.js would have a completion event or be a promise
+                        });
+                    })
         },
+    },
+    results: {
+        init: function() {
+            app.panel.moveLeft();
+            app.request.get_results(app.viewModel.scenarios.scenarioList()[0].uid)
+                .then(function(response) {
+                    var res = [{
+                        id: 25,
+                        pp_id: 10,
+                        year: 2020,
+                        flow: {
+                            annual: {
+                                min: 300,
+                                mean: 400,
+                                max: 500,
+                            },
+                            monthly: {
+                                1: {
+                                    min: 300,
+                                    mean: 400,
+                                    max: 500,
+                                    sevenday: {
+                                        low: 300,
+                                        mean: 400,
+                                        high: 500,
+                                    },
+                                },
+                                2: {
+                                    min: 300,
+                                    mean: 400,
+                                    max: 500,
+                                    sevenday: {
+                                        low: 300,
+                                        mean: 400,
+                                        high: 500,
+                                    },
+                                },
+                                3: {
+                                    min: 300,
+                                    mean: 400,
+                                    max: 500,
+                                    sevenday: {
+                                        low: 300,
+                                        mean: 400,
+                                        high: 500,
+                                    },
+                                },
+                                4: {
+                                    min: 300,
+                                    mean: 400,
+                                    max: 500,
+                                    sevenday: {
+                                        low: 300,
+                                        mean: 400,
+                                        high: 500,
+                                    },
+                                },
+                                5: {
+                                    min: 300,
+                                    mean: 400,
+                                    max: 500,
+                                    sevenday: {
+                                        low: 300,
+                                        mean: 400,
+                                        high: 500,
+                                    },
+                                },
+                                6: {
+                                    min: 300,
+                                    mean: 400,
+                                    max: 500,
+                                    sevenday: {
+                                        low: 300,
+                                        mean: 400,
+                                        high: 500,
+                                    },
+                                },
+                                7: {
+                                    min: 300,
+                                    mean: 400,
+                                    max: 500,
+                                    sevenday: {
+                                        low: 300,
+                                        mean: 400,
+                                        high: 500,
+                                    },
+                                },
+                                8: {
+                                    min: 300,
+                                    mean: 400,
+                                    max: 500,
+                                    sevenday: {
+                                        low: 300,
+                                        mean: 400,
+                                        high: 500,
+                                    },
+                                },
+                                9: {
+                                    min: 300,
+                                    mean: 400,
+                                    max: 500,
+                                    sevenday: {
+                                        low: 300,
+                                        mean: 400,
+                                        high: 500,
+                                    },
+                                },
+                                10: {
+                                    min: 300,
+                                    mean: 400,
+                                    max: 500,
+                                    sevenday: {
+                                        low: 300,
+                                        mean: 400,
+                                        high: 500,
+                                    },
+                                },
+                                11: {
+                                    min: 300,
+                                    mean: 400,
+                                    max: 500,
+                                    sevenday: {
+                                        low: 300,
+                                        mean: 400,
+                                        high: 500,
+                                    },
+                                },
+                                12: {
+                                    min: 300,
+                                    mean: 400,
+                                    max: 500,
+                                    sevenday: {
+                                        low: 300,
+                                        mean: 400,
+                                        high: 500,
+                                    },
+                                },
+                            },
+                        },
+                        delta: 10,
+                        watershed: {},
+                        veg: {},
+                    }]
+                    var html;
+
+                    html += `<div id="results">`;
+                        res.forEach(function(val) {
+                            html += `<div class="aggregate">Aggregate</div>`;
+                                html += `<div>pourpoint id: ${val.pp_id}</div>`;
+                                html += `<div>year: ${val.year}</div>`;
+                                html += `<div>delta: ${val.delta}</div>`;
+                                html += `<svg width="300" height="300"></svg>`;
+                            html += '</div>';
+                        });
+                    html += '</div>';
+                    app.panel.setContent(html);
+                    app.visualization.init(res[0]);
+                });
+        },
+    },
+    domElement: function() { // extra function for those who dont like js getters
+        return this.element;
+    },
+    get element() {
+        return document.querySelector('.panel');
     }
 }
 
-/*
-* Application AJAX requests object and methods
-* {get_segment_by_bbox} segment by bounding box
-* {get_segment_by_id} segment by id
-* {get_pourpoint_by_id} pourpoint by id
-* {filter_results} filter results
+/**
+ * Application AJAX requests object and methods
+    * {get_results} results for treatment scenario
+    * {get_segment_by_bbox} segment by bounding box
+    * {get_segment_by_id} segment by id
+    * {get_pourpoint_by_id} pourpoint by id
+    * {filter_results} filter results
 *
 */
 app.request = {
-    get_viewer_select: function() {
-        // return $.ajax({
-        //     url: `/viewer/select`,
-        //     dataType: 'html',
-        //   });
+    /**
+     * get results for treatment scenario
+     * @param  {[number]} id treatment scenario id [on scenario this is created]
+     * @return {[json]} result data
+     */
+    get_results: function(id) {
+        return $.ajax(`/viewer/get_results/${id}`)
+            .done(function(response) {
+                console.log('%csuccessfully returned result: %o', 'color: green', response);
+            })
+            .fail(function(response) {
+                console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
+            });
     },
     /**
     * Planning Units
@@ -122,20 +325,14 @@ app.request = {
     * @return {[json]} features list
     */
     get_planningunits: function() {
-        return $.ajax({
-            url: '/scenario/get_planningunits',
-            type: 'GET',
-            dataType: 'json',
-            success: function() {
-                console.log('%csuccessfully returned planning units', 'color: green');
-            },
-        })
-        .done(function(response) {
-            return response;
-        })
-        .fail(function(response) {
-            console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
-        });
+        return $.ajax('/scenario/get_planningunits')
+            .done(function(response) {
+                console.log('%csuccessfully returned planning units: %o', 'color: green', response);
+                return response;
+            })
+            .fail(function(response) {
+                console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
+            });
     },
     get_scenarios: function() {
         return $.ajax({
@@ -146,12 +343,12 @@ app.request = {
               console.log('%csuccessfully got scenarios', 'color: green');
           },
         })
-        .done(function(response) {
-          return response;
-        })
-        .fail(function(response) {
-          console.log(`%cfail @ get scenarios: %o`, 'color: red', response);
-        });
+            .done(function(response) {
+              return response;
+            })
+            .fail(function(response) {
+              console.log(`%cfail @ get scenarios: %o`, 'color: red', response);
+            });
     },
     /**
     * get stream segments by bounding box
@@ -166,55 +363,50 @@ app.request = {
             },
             dataType: 'json'
         })
-        .done(function(response) {
-            console.log('%csuccessfully returned segments by bbox', 'color: green');
-            return response;
-        })
-        .fail(function(response) {
-            console.log(`%cfail @ get segment by bbox: %o`, 'color: red', response);
-            return false;
-        });
+            .done(function(response) {
+                console.log('%csuccessfully returned segments by bbox', 'color: green');
+                return response;
+            })
+            .fail(function(response) {
+                console.log(`%cfail @ get segment by bbox: %o`, 'color: red', response);
+                return false;
+            });
     },
     /**
-    * Request stream segement by id
-    * @param {number|int} id
-    * Returns stream segement Object
-    * @returns {Object} segment
-    * @property {string} name
-    * @property {int} id
-    * @property {geojson} geometery
-    * @property {Array} pourpoints
-    * @property {Object|id,geometry,name} list of objects
-    */
+     * Request stream segement by id
+     * @param {number|int} id
+     * @returns {Object} stream segement
+     * @property segment name id geometry pourpoints[id, geometry, name]
+     */
     get_segment_by_id: function(id) {
         return $.ajax(`/segment/${id}`)
-        .done(function(response) {
-            return response;
-        })
-        .fail(function(response) {
-            console.log(`%cfail @ segment by id: %o`, 'color: red', response);
-        });
+            .done(function(response) {
+                return response;
+            })
+            .fail(function(response) {
+                console.log(`%cfail @ segment by id: %o`, 'color: red', response);
+            });
     },
     /**
-    * Request pourpoint by id
-    * @param {number|int} id
-    * Returns pourpoint Object
-    * @returns {Object} pourpoint
-    * @property {string} name
-    * @property {number} id
-    * @property {number} acres
-    * @property {Object} point_geometry
-    * @property {Object} area_geometry
-    */
+     * Request pourpoint by id
+     * @param {number|int} id
+     * @returns {Object} pourpoint
+     * @property name id acres point_geometry area_geometry
+     */
     get_pourpoint_by_id: function(id) {
         return $.ajax(`pourpoint/${id}`)
-        .done(function(response) {
-            return response;
-        })
-        .fail(function(response) {
-            console.log(`%cfail @ get pourpoint id: %o`, 'color: red', response);
-        });
+            .done(function(response) {
+                return response;
+            })
+            .fail(function(response) {
+                console.log(`%cfail @ get pourpoint id: %o`, 'color: red', response);
+            });
     },
+    /**
+     * get a pourpoint's basin
+     * @param  {number} pp_id [id]
+     * @return {[GeoJSON]} drainage basin
+     */
     get_basin: function(pp_id) {
         return $.ajax({
             url: '/viewer/select/get_basin',

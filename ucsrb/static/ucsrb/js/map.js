@@ -51,7 +51,7 @@ app.map.interaction = {
             var select = new ol.interaction.Select({
                 style: app.map.styles['LineStringSelected'],
                 layers: [app.map.layer.streams.layer],
-                hitTolerance: 1
+                hitTolerance: 10
             });
             app.map.addInteraction(select);
             select.on('select', function(event) {

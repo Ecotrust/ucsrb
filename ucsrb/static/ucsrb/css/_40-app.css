@@ -1,6 +1,7 @@
 @media all and (min-width: 40em) {
     #panel #scenario_form,
-    #panel #scenarios {
+    #panel #scenarios,
+    #panel #results  {
         width: 40vw;
     }
 }

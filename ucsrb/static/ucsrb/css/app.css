@@ -35,9 +35,10 @@ nav .navbar-toggler {
     border-radius: 50%;
     border: none;
     height: 6vh;
-    line-height: 9vh;
     outline: none;
+    margin: 0 .75rem;
     text-align: center;
+    position: relative;
     padding: 0;
     width: 6vh;
 }
@@ -47,6 +48,7 @@ nav .navbar-toggler .navbar-toggler-icon {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+    height: 2.6125vh;
     line-height: 9vh;
     display: block;
     margin: 0 auto;
@@ -61,8 +63,9 @@ nav .navbar-toggler .navbar-toggler-icon {
 }
 
 .top-nav-wrap .navbar h1 {
+    font-size: 2.25em;
     line-height: 9vh;
-    margin: 0 1em;
+    margin: 0 1rem;
 }
 
 #menu {
@@ -154,19 +157,10 @@ nav .navbar-toggler .navbar-toggler-icon {
     transition: 0.25s padding linear 0.35s;
 }
 
-#file-nav li {
-    display: block;
-    margin: 0;
-}
-
-#file-nav a {
-    display: inline-block;
-    text-decoration: none;
-}
-
 .icons-only {
     box-shadow: 0 2px 4px rgba(0,0,0,0.31);
 }
+
 .icons-only #process-nav h3 {
     animation: shrink-height_zero-one .25s linear forwards 0.35s;
     transform: rotateX(90deg);
@@ -293,9 +287,18 @@ nav .navbar-toggler .navbar-toggler-icon {
     overflow: scroll;
     position: absolute;
 }
+    #panel.left {
+        left: .5rem;
+        right: auto;
+    }
+    #panel.right {
+        left: auto;
+        right: .5rem;
+    }
 
 #panel #scenario_form,
-#panel #scenarios {
+#panel #scenarios,
+#panel #results {
     font-size: .875em;
     opacity: 1;
     position: relative;
@@ -308,7 +311,8 @@ nav .navbar-toggler .navbar-toggler-icon {
     width: 0;
 }
 
-#panel #scenario_form:not(:empty) {
+#panel #scenario_form:not(:empty),
+#panel #scenarios:not(:empty) {
     padding: .75rem 1rem;
 }
 
