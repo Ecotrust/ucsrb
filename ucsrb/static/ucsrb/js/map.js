@@ -54,13 +54,20 @@ app.map.styles = {
     'FocusArea': new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: '#58595b',
-            // lineDash: [12],
             lineCap: 'cap',
             lineJoin: 'miter',
             width: 3,
         }),
         fill: new ol.style.Fill({
             color: 'rgba(0, 0, 0, 0)'
+        })
+    }),
+    'Streams':new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: 'rgba(1, 254, 136, 100)',
+            lineCap: 'cap',
+            lineJoin: 'miter',
+            width: 5,
         })
     })
 };
@@ -112,6 +119,12 @@ app.map.interaction = {
 */
 
 app.mapbox.layers = {
+  'demo_routed_streams-12s94p': {
+    id: 'ucsrbsupport.5t2cnpoc',
+    id_field: 'EtID',
+    name_field: 'Name',
+    name: 'Streams'
+  },
   'huc10_3857': {
     id: 'ucsrbsupport.HUC10_3857',
     id_field: 'HUC_10',
@@ -127,51 +140,60 @@ app.mapbox.layers = {
 }
 
 app.map.layer = {
-    streams: {
-        data: {}, // store init data
-        counter: 0, // so layer is only added once
-        source: new ol.source.Vector({
-            format: new ol.format.GeoJSON()
+    // streams: {
+    //     data: {}, // store init data
+    //     counter: 0, // so layer is only added once
+    //     source: new ol.source.Vector({
+    //         format: new ol.format.GeoJSON()
+    //     }),
+    //     layer: new ol.layer.Vector({
+    //         style: app.map.styles['LineString']
+    //     }),
+    //     feature: function(data) {
+    //         return new ol.Feature({
+    //             geometry: new ol.geom.LineString(data.geometry.geometry.coordinates),
+    //             name: data.name,
+    //             properties: {
+    //                 id: data.id,
+    //                 pourpoints: data.pourpoints
+    //             }
+    //         });
+    //     },
+    //     init: function(data) {
+    //         // Check if layer has already been added
+    //         if (app.map.layer.streams.counter === 0) {
+    //             app.map.layer.streams.data = data;
+    //             var feature = app.map.layer.streams.feature(data);
+    //             app.map.layer.streams.source.addFeature(feature);
+    //             app.map.layer.streams.layer.setSource(app.map.layer.streams.source);
+    //             app.map.addLayer(app.map.layer.streams.layer);
+    //             app.map.layer.streams.counter++;
+    //         } else {
+    //             console.log('%cstreams already added', 'color: orange;');
+    //         }
+    //     },
+    //     segment: {
+    //         data: {}, // store init data
+    //         init: function(data) {
+    //             if (data.selected.length > 0) {
+    //                 var selected = data.selected[0].getProperties();
+    //                 app.map.layer.streams.segment.data = selected;
+    //                 app.map.layer.pourpoints.data = selected.properties.pourpoints;
+    //                 app.map.layer.pourpoints.init();
+    //                 app.map.interaction.select.pourpoint();
+    //             }
+    //         },
+    //     },
+    // },
+    streams: new ol.layer.VectorTile({
+        name: 'Streams',
+        source: new ol.source.VectorTile({
+          attributions: 'NRCS',
+          format: new ol.format.MVT(),
+          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['demo_routed_streams-12s94p'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
-        layer: new ol.layer.Vector({
-            style: app.map.styles['LineString']
-        }),
-        feature: function(data) {
-            return new ol.Feature({
-                geometry: new ol.geom.LineString(data.geometry.geometry.coordinates),
-                name: data.name,
-                properties: {
-                    id: data.id,
-                    pourpoints: data.pourpoints
-                }
-            });
-        },
-        init: function(data) {
-            // Check if layer has already been added
-            if (app.map.layer.streams.counter === 0) {
-                app.map.layer.streams.data = data;
-                var feature = app.map.layer.streams.feature(data);
-                app.map.layer.streams.source.addFeature(feature);
-                app.map.layer.streams.layer.setSource(app.map.layer.streams.source);
-                app.map.addLayer(app.map.layer.streams.layer);
-                app.map.layer.streams.counter++;
-            } else {
-                console.log('%cstreams already added', 'color: orange;');
-            }
-        },
-        segment: {
-            data: {}, // store init data
-            init: function(data) {
-                if (data.selected.length > 0) {
-                    var selected = data.selected[0].getProperties();
-                    app.map.layer.streams.segment.data = selected;
-                    app.map.layer.pourpoints.data = selected.properties.pourpoints;
-                    app.map.layer.pourpoints.init();
-                    app.map.interaction.select.pourpoint();
-                }
-            },
-        },
-    },
+        style: app.map.styles.Streams
+    }),
     pourpoints: {
         data: {}, // store init data
         counter: 0, // so layer is only added once
@@ -308,7 +330,7 @@ onFeatureClick = function(evt) {
     if (layersClicked.indexOf(layerName) < 0) {
       layersClicked.push(layerName);
       var layerDetails = app.mapbox.layers[layerName];
-      markup += `${markup}<table>`;
+      markup += `<table>`;
       markup += `<tr><th>${layerDetails.name}</th><td>${properties[layerDetails.name_field]}</td></tr>`;
       markup += '</table>';
     }

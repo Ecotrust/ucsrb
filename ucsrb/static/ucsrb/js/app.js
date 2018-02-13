@@ -14,25 +14,26 @@ app.init = {
     'select': function() {
         // app.request.get_viewer_select();
         // TODO get bbox from map window and assign to var
-        var bbox = [-13505560.671219192, 6217028.00835033, -13356557.351569131, 6280740.477905572];
-        app.request.get_segment_by_bbox(bbox)
-        .then(function(data) {
-            app.map.layer.streams.init(data);
-        })
-        .then(function() {
-            app.map.getView().fit(bbox, {
-                duration: 1000
-            })
-        })
-        .then(function() {
-            app.map.interaction.select.segment();
-        })
-        .then(function() {
-            console.log('%clistening for stream segement selection...', 'color: #d6afff;');
-        })
-        .catch(function(data) {
-            console.warn('failed to add map layer');
-        });
+        // var bbox = [-13505560.671219192, 6217028.00835033, -13356557.351569131, 6280740.477905572];
+        // app.request.get_segment_by_bbox(bbox)
+        // .then(function(data) {
+        //     app.map.layer.streams.init(data);
+        // })
+        // .then(function() {
+        //     app.map.getView().fit(bbox, {
+        //         duration: 1000
+        //     })
+        // })
+        // .then(function() {
+        //     app.map.interaction.select.segment();
+        // })
+        // .then(function() {
+        //     console.log('%clistening for stream segement selection...', 'color: #d6afff;');
+        // })
+        // .catch(function(data) {
+        //     console.warn('failed to add map layer');
+        // });
+        app.map.addLayer(app.map.layer.streams);
     },
     'filter': function() {
         app.map.addLayer(app.map.layer.huc10);
