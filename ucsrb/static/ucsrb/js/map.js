@@ -1,7 +1,3 @@
-app.mapbox = {
-    key: 'pk.eyJ1IjoiaG9kZ2ltb3RvIiwiYSI6IjVJNU1UMWsifQ.RHNVad4mnDISsAL_B3h30Q',
-};
-
 app.map = mapSettings.getInitMap();
 
 app.map.styles = {
@@ -40,9 +36,33 @@ app.map.styles = {
             width: 3,
         }),
         fill: new ol.style.Fill({
+            color: 'rgba(0, 0, 0, 0)'
+        })
+    }),
+    'PolygonSelected': new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: '#58595b',
+            lineDash: [12],
+            lineCap: 'cap',
+            lineJoin: 'miter',
+            width: 3,
+        }),
+        fill: new ol.style.Fill({
             color: 'rgba(0, 0, 255, 0.1)'
         })
     }),
+    'FocusArea': new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: '#58595b',
+            // lineDash: [12],
+            lineCap: 'cap',
+            lineJoin: 'miter',
+            width: 3,
+        }),
+        fill: new ol.style.Fill({
+            color: 'rgba(0, 0, 0, 0)'
+        })
+    })
 };
 
 app.map.interaction = {
@@ -85,11 +105,27 @@ app.map.interaction = {
     }
 }
 
-app.map.popup = {}
+
 
 /**
 * Map - Layers, Sources, Features
 */
+
+app.mapbox.layers = {
+  'huc10_3857': {
+    id: 'ucsrbsupport.HUC10_3857',
+    id_field: 'HUC_10',
+    name_field: 'HU_10_Name',
+    name: 'HUC 10'
+  },
+  'huc12_3857': {
+    id: 'ucsrbsupport.HUC12_3857',
+    id_field: 'HUC_12',
+    name_field: 'HU_12_Name',
+    name: 'HUC 12'
+  }
+}
+
 app.map.layer = {
     streams: {
         data: {}, // store init data
@@ -170,13 +206,23 @@ app.map.layer = {
             }
         }
     },
-    huc10: new ol.layer.Tile({
+    huc10: new ol.layer.VectorTile({
         name: 'HUC 10',
-        source: new ol.source.XYZ({
-            // attributions: '',
-            // format: new ol.format.MVT(),
-            url: 'https://api.mapbox.com/styles/v1/hodgimoto/cjcl80xms0bmv2stg8k8x99k7/tiles/256/{z}/{x}/{y}@2x?access_token=' + app.mapbox.key,
+        source: new ol.source.VectorTile({
+          attributions: 'NRCS',
+          format: new ol.format.MVT(),
+          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.huc10_3857.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
+        style: app.map.styles.FocusArea
+    }),
+    huc12: new ol.layer.VectorTile({
+        name: 'HUC 12',
+        source: new ol.source.VectorTile({
+          attributions: 'NRCS',
+          format: new ol.format.MVT(),
+          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.huc12_3857.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
+        }),
+        style: app.map.styles.FocusArea
     }),
     scenarios: {
         counter: 0, // so layer is only added once
@@ -211,7 +257,7 @@ app.map.layer = {
     },
     planningUnits: {
         counter: 0,
-        layer: mapSettings.getInitFilterResultsLayer('planning units', app.map.styles['Polygon']),
+        layer: mapSettings.getInitFilterResultsLayer('planning units', app.map.styles['PolygonSelected']),
         source: function() {
             return app.map.layer.planningUnits.layer.getSource();
         },
@@ -234,3 +280,48 @@ app.map.layer = {
         }
     },
 }
+
+// Despite the name, this is being used for pointermove/hover
+onFeatureClick = function(evt) {
+  if (!app.map.popup) {
+    app.map.popup = new ol.Overlay({
+      element: document.getElementById('popup')
+    });
+    app.map.addOverlay(app.map.popup);
+  }
+
+  var element = app.map.popup.getElement();
+  var coordinate = evt.coordinate;
+  var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
+    coordinate, 'EPSG:3857', 'EPSG:4326'
+  ));
+  $(element).popover('dispose');
+  app.map.popup.setPosition(coordinate);
+  let markup = '';
+  featureCount = 0;
+  layersClicked = [];
+  map.forEachFeatureAtPixel(evt.pixel, function(feature) {
+    featureCount += 1;
+    console.log('feature: ' + featureCount);
+    const properties = feature.getProperties();
+    var layerName = properties.layer;
+    if (layersClicked.indexOf(layerName) < 0) {
+      layersClicked.push(layerName);
+      var layerDetails = app.mapbox.layers[layerName];
+      markup += `${markup}<table>`;
+      markup += `<tr><th>${layerDetails.name}</th><td>${properties[layerDetails.name_field]}</td></tr>`;
+      markup += '</table>';
+    }
+  }, {hitTolerance: 1});
+  if (markup) {
+    $(element).popover({
+      'placement': 'top',
+      'animation': false,
+      'html': true,
+      'content': markup
+    });
+    $(element).popover('show');
+  }
+}
+
+app.map.popup = mapSettings.addPopup('pointermove', onFeatureClick);

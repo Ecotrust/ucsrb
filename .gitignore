@@ -2,5 +2,5 @@ ucsrb.egg-info
 *.pyc
 .DS_Store
 .idea
-
+ucsrb/local_settings.py
 layers/*

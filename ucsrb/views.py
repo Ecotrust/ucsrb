@@ -32,7 +32,9 @@ def home(request):
 
 def app(request):
     template = loader.get_template('ucsrb/app.html')
-    context = {}
+    context = {
+        'MAPBOX_TOKEN': settings.MAPBOX_ACCESS_TOKEN
+    }
     context['MAP_TECH'] = 'ol4'
     return HttpResponse(template.render(context, request))
 
