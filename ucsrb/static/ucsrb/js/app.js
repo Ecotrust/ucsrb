@@ -10,6 +10,12 @@ var app = {
     },
 }
 
+scenario_type_selection_made = function() {
+  var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
+  extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+  app.map.zoomToExtent(extent);
+}
+
 app.init = {
     'select': function() {
         // app.request.get_viewer_select();
@@ -34,12 +40,14 @@ app.init = {
         //     console.warn('failed to add map layer');
         // });
         app.map.addLayer(app.map.layer.streams);
+        scenario_type_selection_made();
     },
     'filter': function() {
         app.map.addLayer(app.map.layer.huc10);
+        scenario_type_selection_made();
     },
     'draw': function() {
-
+      scenario_type_selection_made();
     }
 }
 

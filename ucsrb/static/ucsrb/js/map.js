@@ -69,7 +69,19 @@ app.map.styles = {
             lineJoin: 'miter',
             width: 5,
         })
-    })
+    }),
+    'PourPoint': new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 10,
+            fill:  new ol.style.Fill({
+                color: '#ffffff'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#aaffff',
+                width: 5,
+            }),
+        })
+    }),
 };
 
 app.map.interaction = {
@@ -134,8 +146,14 @@ app.mapbox.layers = {
   'huc12_3857': {
     id: 'ucsrbsupport.HUC12_3857',
     id_field: 'HUC_12',
-    name_field: 'HU_12_Name',
+    name_field: 'HU_12_NAME',
     name: 'HUC 12'
+  },
+  'Pour_points_3857-83a1zv': {
+    id: 'ucsrbsupport.7cqwgmiz',
+    id_field: 'OBJECTID',
+    name_field: 'g_name',
+    name: 'Pour Points'
   }
 }
 
@@ -187,6 +205,7 @@ app.map.layer = {
     // },
     streams: new ol.layer.VectorTile({
         name: 'Streams',
+        title: 'Streams',
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
           format: new ol.format.MVT(),
@@ -195,41 +214,20 @@ app.map.layer = {
         style: app.map.styles.Streams
     }),
     pourpoints: {
-        data: {}, // store init data
-        counter: 0, // so layer is only added once
-        source: new ol.source.Vector({
-            format: new ol.format.GeoJSON()
+      layer: new ol.layer.VectorTile({
+        name: 'PourPoints',
+        title: 'PourPoints',
+        source: new ol.source.VectorTile({
+          attributions: 'Ecotrust',
+          format: new ol.format.MVT(),
+          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['Pour_points_3857-83a1zv'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
-        layer: new ol.layer.Vector({
-            style: function(feature) {
-                return app.map.styles['Point'];
-            },
-            zIndex: 1,
-        }),
-        init: function() {
-            // Check if layer has already been added
-            if (app.map.layer.pourpoints.counter === 0) {
-                app.map.layer.pourpoints.data.forEach(function(pp,i,a) {
-                    var feature = new ol.Feature({
-                        geometry: new ol.geom.Point(pp.geometry.geometry.coordinates),
-                        name: pp.name,
-                        properties: {
-                            id: pp.id
-                        }
-                    });
-                    app.map.layer.pourpoints.source.addFeature(feature);
-                });
-                app.map.layer.pourpoints.layer.setSource(app.map.layer.pourpoints.source);
-                app.map.addLayer(app.map.layer.pourpoints.layer);
-                app.map.layer.pourpoints.counter++;
-                app.state.step = 1; // step forward in state
-            } else {
-                console.log('%cstreams already added', 'color: orange');
-            }
-        }
+        style: app.map.styles.PourPoint
+      })
     },
     huc10: new ol.layer.VectorTile({
         name: 'HUC 10',
+        title: 'HUC 10',
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
           format: new ol.format.MVT(),
@@ -239,6 +237,7 @@ app.map.layer = {
     }),
     huc12: new ol.layer.VectorTile({
         name: 'HUC 12',
+        title: 'HUC 12',
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
           format: new ol.format.MVT(),
@@ -254,7 +253,7 @@ app.map.layer = {
         },
         init: function(data) {
             if (app.map.layer.scenarios.counter < 1) {
-                app.map.addLayer(app.map.layer.scenarios.layer);
+                // app.map.addLayer(app.map.layer.scenarios.layer);
                 app.request.get_scenarios()
                     .then(function(response) {
                         var html = `<div class="dropdown">
@@ -290,7 +289,7 @@ app.map.layer = {
         },
         init: function() {
             if (app.map.layer.planningUnits.counter < 1) {
-                app.map.addLayer(app.map.layer.planningUnits.layer);
+                // app.map.addLayer(app.map.layer.planningUnits.layer);
                 app.request.get_planningunits()
                     .then(function(response) {
                         app.map.layer.planningUnits.addFeatures(response);
@@ -302,6 +301,36 @@ app.map.layer = {
         }
     },
 }
+
+
+var overlays = false
+for (var i=0; i < app.map.getLayers().getArray().length; i++) {
+  if (app.map.getLayers().getArray()[i].get('title') == 'Overlays') {
+    overlays = app.map.getLayers().getArray()[i];
+  }
+}
+
+if (overlays) {
+  overlays.getLayers().getArray().push(app.map.layer.streams);
+  // app.map.addLayer(app.map.layer.streams);
+  overlays.getLayers().getArray().push(app.map.layer.pourpoints.layer);
+  // overlays.getLayers().getArray().push(app.map.layer.pourpoints.layer);
+  // app.map.addLayer(app.map.layer.pourpoints.layer);
+  overlays.getLayers().getArray().push(app.map.layer.huc10);
+  // app.map.addLayer(app.map.layer.huc10);
+  overlays.getLayers().getArray().push(app.map.layer.huc12);
+  // app.map.addLayer(app.map.layer.huc12);
+  overlays.getLayers().getArray().push(app.map.layer.scenarios.layer);
+  // app.map.addLayer(app.map.layer.scenarios.layer);
+  // app.map.addLayer(app.map.layer.planningUnits.layer);
+
+}
+
+var layerSwitcher = new ol.control.LayerSwitcher({
+  tipLabel: 'Legend'
+});
+
+app.map.addControl(layerSwitcher);
 
 // Despite the name, this is being used for pointermove/hover
 onFeatureClick = function(evt) {
@@ -346,4 +375,5 @@ onFeatureClick = function(evt) {
   }
 }
 
-app.map.popup = mapSettings.addPopup('pointermove', onFeatureClick);
+// app.map.popup = mapSettings.addPopup('pointermove', onFeatureClick);
+app.map.popup = mapSettings.addPopup('click', onFeatureClick);

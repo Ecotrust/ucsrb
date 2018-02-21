@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.0.1/css/font-awesome.min.css">
 
+    <link rel="stylesheet" href="{% static 'visualize/css/ol4_settings.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'visualize/css/map_popup.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'scenarios/css/scenarios_form.css' %}" type="text/css">
 {% endblock site_style %}
@@ -56,6 +57,7 @@
     <script src="{% static 'js/knockout-bindings.js' %}"></script>
 
     <script src="{% static 'ucsrb/js/ol.js' %}"></script>
+    <script src="{% static 'ucsrb/lib/ol-layerswitcher/dist/ol-layerswitcher.js' %}"></script>
     <script src="{% static 'ucsrb/js/app.js' %}"></script>
 
     <script src="{% static 'visualize/js/' %}{{ MAP_TECH }}_settings.js"></script>
