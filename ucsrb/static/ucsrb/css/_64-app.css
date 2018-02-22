@@ -7,9 +7,11 @@
         font-size: 1.25em;
     }
 
-    #panel #scenario_form,
-    #panel #scenarios,
-    #panel #results  {
+    #panel #scenario_form:not(:empty),
+    #panel #scenarios:not(:empty),
+    #panel #results:not(:empty)  {
         width: 28vw;
+        min-width: 400px;
+        max-width: 500px;
     }
 }

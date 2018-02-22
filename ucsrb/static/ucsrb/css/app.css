@@ -181,10 +181,11 @@ nav .navbar-toggler .navbar-toggler-icon {
 /**
  * map styles
  */
-
-.map-wrap {
+main {
     height: 79vh;
-    overflow: hidden;
+}
+.map-wrap {
+    height: 100%;
     position: relative;
     transition: 0.3s all ease-in 0.1s;
     margin-top: -18vh;
@@ -271,6 +272,10 @@ nav .navbar-toggler .navbar-toggler-icon {
     right: .5em;
 }
 
+#map .ol-zoom button {
+    font-size: 1em;
+}
+
 #map .ol-rotate {
     top: 4em;
 }
@@ -288,10 +293,12 @@ nav .navbar-toggler .navbar-toggler-icon {
     position: absolute;
 }
     #panel.left {
+        background: rgba(255,255,255,1);
         left: .5rem;
         right: auto;
     }
     #panel.right {
+        background: rgba(255,255,255,0.9);
         left: auto;
         right: .5rem;
     }
@@ -306,14 +313,16 @@ nav .navbar-toggler .navbar-toggler-icon {
     width: 50vw;
 }
 #panel #scenario_form:empty,
-#panel #scenarios:empty {
+#panel #scenarios:empty,
+#panel #results:empty {
     opacity: 0;
     width: 0;
 }
 
 #panel #scenario_form:not(:empty),
-#panel #scenarios:not(:empty) {
-    padding: .75rem 1rem;
+#panel #scenarios:not(:empty),
+#panel #results:not(:empty) {
+    padding: 1.5rem 1rem;
 }
 
 #panel #scenario_form .btn {
@@ -331,10 +340,9 @@ nav .navbar-toggler .navbar-toggler-icon {
 }
 
 .step-inputs {
-    background: rgba(230,231,232,.6);
     font-size: .9375em;
     font-weight: 400;
-    padding: 1rem 1rem .5rem;
+    padding: 1rem 1.25rem .75rem;
 }
 
 .panel .form-group {
@@ -347,7 +355,7 @@ nav .navbar-toggler .navbar-toggler-icon {
 
 .panel h4 {
     font-size: 1.25em;
-    margin-bottom: .5rem;
+    margin-bottom: 1rem;
 }
 
 .panel .show-blocks-btn {
@@ -361,12 +369,14 @@ nav .navbar-toggler .navbar-toggler-icon {
 }
 
 .progress {
-    margin: .5rem 0;
-    height: 8px;
+    background: rgba(230,231,232,0.15);
+    border-radius: 0;
+    margin: .5rem 0 0;
+    height: 4px;
 }
 
 .progress-bar {
-    background: #67b8c6;
+    background: rgba(230,231,232,0.95);
 }
     #step1.max4 .progress-bar {
         width: 25%;
@@ -391,6 +401,8 @@ nav .navbar-toggler .navbar-toggler-icon {
     height: 5rem;
 }
 
+.panel .wizard_nav {}
+
 .panel .wizard_nav .row {
     margin: 0 auto 1.5rem;
 }
@@ -409,6 +421,42 @@ nav .navbar-toggler .navbar-toggler-icon {
 
 .panel #scenarios-form .accordion-heading .accordion-toggle .parameter-label {
     font-size: 1em;
+}
+
+/**
+ * panel results charts d3.js
+ */
+.result-chart {
+    width: 100%;
+}
+
+.result-section dl {
+    font-weight: 500;
+    font-size: .75em;
+    line-height: 2;
+    padding-left: 1.5rem;
+}
+
+.result-section dt {
+    color: #68B8C6;
+    font-weight: 500;
+}
+
+.result-section dd {
+    margin-bottom: 0;
+}
+
+.aggregate .media img {
+    max-width: 56px;
+}
+
+.result-section .expand {
+    max-width: 48px;
+    padding: 10px;
+}
+
+.result-section .expand img {
+    max-width: 20px;
 }
 
 /**

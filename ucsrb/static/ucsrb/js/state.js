@@ -38,6 +38,8 @@ app.state = {
         return {
             method: this.method,
             focusArea: this.focusAreaState,
+            nav: this.nav,
+            step: this.step,
         }
     }
 }
