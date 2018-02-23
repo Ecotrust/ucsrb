@@ -39,14 +39,15 @@ app.init = {
         // .catch(function(data) {
         //     console.warn('failed to add map layer');
         // });
-        app.map.addLayer(app.map.layer.streams);
+        app.map.toggleLayer('streams');
         scenario_type_selection_made();
     },
     'filter': function() {
-        app.map.addLayer(app.map.layer.huc10);
+        app.map.toggleLayer('huc12');
         scenario_type_selection_made();
     },
     'draw': function() {
+      // enable drawing
       scenario_type_selection_made();
     }
 }

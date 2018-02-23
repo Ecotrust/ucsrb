@@ -261,6 +261,7 @@ nav .navbar-toggler .navbar-toggler-icon {
 
 #map {
     height: 100%;
+    height: 100vh;
 }
 
 /**

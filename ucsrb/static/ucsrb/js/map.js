@@ -158,93 +158,64 @@ app.mapbox.layers = {
 }
 
 app.map.layer = {
-    // streams: {
-    //     data: {}, // store init data
-    //     counter: 0, // so layer is only added once
-    //     source: new ol.source.Vector({
-    //         format: new ol.format.GeoJSON()
-    //     }),
-    //     layer: new ol.layer.Vector({
-    //         style: app.map.styles['LineString']
-    //     }),
-    //     feature: function(data) {
-    //         return new ol.Feature({
-    //             geometry: new ol.geom.LineString(data.geometry.geometry.coordinates),
-    //             name: data.name,
-    //             properties: {
-    //                 id: data.id,
-    //                 pourpoints: data.pourpoints
-    //             }
-    //         });
-    //     },
-    //     init: function(data) {
-    //         // Check if layer has already been added
-    //         if (app.map.layer.streams.counter === 0) {
-    //             app.map.layer.streams.data = data;
-    //             var feature = app.map.layer.streams.feature(data);
-    //             app.map.layer.streams.source.addFeature(feature);
-    //             app.map.layer.streams.layer.setSource(app.map.layer.streams.source);
-    //             app.map.addLayer(app.map.layer.streams.layer);
-    //             app.map.layer.streams.counter++;
-    //         } else {
-    //             console.log('%cstreams already added', 'color: orange;');
-    //         }
-    //     },
-    //     segment: {
-    //         data: {}, // store init data
-    //         init: function(data) {
-    //             if (data.selected.length > 0) {
-    //                 var selected = data.selected[0].getProperties();
-    //                 app.map.layer.streams.segment.data = selected;
-    //                 app.map.layer.pourpoints.data = selected.properties.pourpoints;
-    //                 app.map.layer.pourpoints.init();
-    //                 app.map.interaction.select.pourpoint();
-    //             }
-    //         },
-    //     },
-    // },
-    streams: new ol.layer.VectorTile({
+    streams: {
+      layer: new ol.layer.VectorTile({
         name: 'Streams',
         title: 'Streams',
+        id: 'streams',
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
           format: new ol.format.MVT(),
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['demo_routed_streams-12s94p'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
-        style: app.map.styles.Streams
-    }),
+        style: app.map.styles.Streams,
+        visible: false
+        // declutter: true
+      })
+    },
     pourpoints: {
       layer: new ol.layer.VectorTile({
         name: 'PourPoints',
         title: 'PourPoints',
+        id: 'pourpoints',
         source: new ol.source.VectorTile({
           attributions: 'Ecotrust',
           format: new ol.format.MVT(),
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['Pour_points_3857-83a1zv'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
-        style: app.map.styles.PourPoint
+        style: app.map.styles.PourPoint,
+        visible: false
+        // declutter: true
       })
     },
-    huc10: new ol.layer.VectorTile({
+    huc10: {
+      layer: new ol.layer.VectorTile({
         name: 'HUC 10',
         title: 'HUC 10',
+        id: 'huc10',
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
           format: new ol.format.MVT(),
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.huc10_3857.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
-        style: app.map.styles.FocusArea
-    }),
-    huc12: new ol.layer.VectorTile({
+        style: app.map.styles.FocusArea,
+        visible: false
+      })
+    },
+    huc12: {
+      layer: new ol.layer.VectorTile({
         name: 'HUC 12',
         title: 'HUC 12',
+        id: 'huc12',
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
           format: new ol.format.MVT(),
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.huc12_3857.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
-        style: app.map.styles.FocusArea
-    }),
+        style: app.map.styles.FocusArea,
+        visible: false
+      })
+    },
     scenarios: {
         counter: 0, // so layer is only added once
         layer: mapSettings.getInitFilterResultsLayer('scenarios', false),
@@ -303,77 +274,94 @@ app.map.layer = {
 }
 
 
-var overlays = false
+app.map.layer.scenarios.layer.set('id','scenarios');
+app.map.layer.planningUnits.layer.set('id', 'planningUnits');
+
+app.map.overlays = false
 for (var i=0; i < app.map.getLayers().getArray().length; i++) {
   if (app.map.getLayers().getArray()[i].get('title') == 'Overlays') {
-    overlays = app.map.getLayers().getArray()[i];
+    app.map.overlays = app.map.getLayers().getArray()[i];
   }
 }
 
-if (overlays) {
-  overlays.getLayers().getArray().push(app.map.layer.streams);
-  // app.map.addLayer(app.map.layer.streams);
-  overlays.getLayers().getArray().push(app.map.layer.pourpoints.layer);
-  // overlays.getLayers().getArray().push(app.map.layer.pourpoints.layer);
-  // app.map.addLayer(app.map.layer.pourpoints.layer);
-  overlays.getLayers().getArray().push(app.map.layer.huc10);
-  // app.map.addLayer(app.map.layer.huc10);
-  overlays.getLayers().getArray().push(app.map.layer.huc12);
-  // app.map.addLayer(app.map.layer.huc12);
-  overlays.getLayers().getArray().push(app.map.layer.scenarios.layer);
-  // app.map.addLayer(app.map.layer.scenarios.layer);
-  // app.map.addLayer(app.map.layer.planningUnits.layer);
-
+if (app.map.overlays) {
+  app.map.overlays.getLayers().push(app.map.layer.huc12.layer);
+  app.map.overlays.getLayers().push(app.map.layer.huc10.layer);
+  app.map.overlays.getLayers().push(app.map.layer.streams.layer);
+  app.map.overlays.getLayers().push(app.map.layer.pourpoints.layer);
+  // app.map.overlays.getLayers().push(app.map.layer.planningUnits.layer);
+  app.map.overlays.getLayers().push(app.map.layer.scenarios.layer);
 }
 
-var layerSwitcher = new ol.control.LayerSwitcher({
+app.map.layerSwitcher = new ol.control.LayerSwitcher({
   tipLabel: 'Legend'
 });
 
-app.map.addControl(layerSwitcher);
+app.map.addControl(app.map.layerSwitcher);
 
-// Despite the name, this is being used for pointermove/hover
+app.map.layerSwitcher.overlays = {};
+overlays = $(".layer-switcher .panel .group label:contains('Overlays')").parent().children('ul').children('.layer');
+overlays.each(function() {
+  label = this.children[1].innerText;
+  id = this.children[0].id;
+  lyr_obj = Object.values(app.map.layer).filter(function( obj ) { return obj.layer.get('title') == label;})[0];
+  app.map.layerSwitcher.overlays[lyr_obj.layer.get('id')] = {
+    checkboxId: id,
+    layer: lyr_obj.layer
+  };
+});
+
 onFeatureClick = function(evt) {
   if (!app.map.popup) {
     app.map.popup = new ol.Overlay({
       element: document.getElementById('popup')
     });
     app.map.addOverlay(app.map.popup);
-  }
 
-  var element = app.map.popup.getElement();
-  var coordinate = evt.coordinate;
-  var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
-    coordinate, 'EPSG:3857', 'EPSG:4326'
-  ));
-  $(element).popover('dispose');
-  app.map.popup.setPosition(coordinate);
-  let markup = '';
-  featureCount = 0;
-  layersClicked = [];
-  map.forEachFeatureAtPixel(evt.pixel, function(feature) {
-    featureCount += 1;
-    console.log('feature: ' + featureCount);
-    const properties = feature.getProperties();
-    var layerName = properties.layer;
-    if (layersClicked.indexOf(layerName) < 0) {
-      layersClicked.push(layerName);
-      var layerDetails = app.mapbox.layers[layerName];
-      markup += `<table>`;
-      markup += `<tr><th>${layerDetails.name}</th><td>${properties[layerDetails.name_field]}</td></tr>`;
-      markup += '</table>';
+    var element = app.map.popup.getElement();
+    var coordinate = evt.coordinate;
+    var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
+      coordinate, 'EPSG:3857', 'EPSG:4326'
+    ));
+    $(element).popover('dispose');
+    app.map.popup.setPosition(coordinate);
+    let markup = '';
+    featureCount = 0;
+    layersClicked = [];
+    map.forEachFeatureAtPixel(evt.pixel, function(feature) {
+      featureCount += 1;
+      console.log('feature: ' + featureCount);
+      const properties = feature.getProperties();
+      var layerName = properties.layer;
+      if (layersClicked.indexOf(layerName) < 0) {
+        layersClicked.push(layerName);
+        var layerDetails = app.mapbox.layers[layerName];
+        markup += `<table>`;
+        markup += `<tr><th>${layerDetails.name}</th><td>${properties[layerDetails.name_field]}</td></tr>`;
+        markup += '</table>';
+      }
+    }, {hitTolerance: 3});
+    if (markup) {
+      $(element).popover({
+        'placement': 'top',
+        'animation': false,
+        'html': true,
+        'content': markup,
+        'container': element
+      });
+      $(element).popover('show');
     }
-  }, {hitTolerance: 1});
-  if (markup) {
-    $(element).popover({
-      'placement': 'top',
-      'animation': false,
-      'html': true,
-      'content': markup
-    });
-    $(element).popover('show');
+  } else {
+    var element = app.map.popup.getElement();
+    $(element).popover('dispose');
+    app.map.popup=false;
   }
 }
 
-// app.map.popup = mapSettings.addPopup('pointermove', onFeatureClick);
-app.map.popup = mapSettings.addPopup('click', onFeatureClick);
+// mapSettings.addPopup('pointermove', onFeatureClick);
+mapSettings.addPopup('click', onFeatureClick);
+
+app.map.toggleLayer = function(layerName) {
+  app.map.layer[layerName].layer.setVisible(true);
+  $('#'+ app.map.layerSwitcher.overlays[layerName].checkboxId).prop('checked', true);
+}
