@@ -291,7 +291,7 @@ nav .navbar-toggler .navbar-toggler-icon {
     bottom: 2.5rem;
     right: .5rem;
     top: 10vh;
-    overflow: scroll;
+    overflow: auto;
     position: absolute;
 }
 

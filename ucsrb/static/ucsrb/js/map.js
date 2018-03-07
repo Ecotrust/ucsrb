@@ -294,7 +294,7 @@ if (app.map.overlays) {
 }
 
 app.map.layerSwitcher = new ol.control.LayerSwitcher({
-  tipLabel: 'Legend'
+  tipLabel: 'Layers'
 });
 
 app.map.addControl(app.map.layerSwitcher);
