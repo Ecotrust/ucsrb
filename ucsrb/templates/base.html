@@ -37,7 +37,7 @@
 </head>
 
 <body class="{% block body_class %}classless-page{% endblock %} {% block layout %}base{% endblock %}-layout">
-
+    {% csrf_token %}
     {% block header_wrap %}
         <header>
             {% block header %}

@@ -179,6 +179,7 @@ INSTALLED_APPS = [
     'marineplanner',
     'core',
     'compressor',
+    'import_export',
     ### BEGIN INSERTED INSTALLED APPS ###
     'features',
     'manipulators',
