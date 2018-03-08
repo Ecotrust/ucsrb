@@ -10,45 +10,37 @@ var app = {
     },
 }
 
-scenario_type_selection_made = function() {
+scenario_type_selection_made = function(selectionType) {
   var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
   extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-  app.map.zoomToExtent(extent);
+  if (selectionType == 'select') {
+    app.map.getView().animate({zoom: 10, center: [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2]});
+  } else {
+    app.map.zoomToExtent(extent);
+  }
 }
 
 app.init = {
     'select': function() {
-        // app.request.get_viewer_select();
-        // TODO get bbox from map window and assign to var
-        // var bbox = [-13505560.671219192, 6217028.00835033, -13356557.351569131, 6280740.477905572];
-        // app.request.get_segment_by_bbox(bbox)
-        // .then(function(data) {
-        //     app.map.layer.streams.init(data);
-        // })
-        // .then(function() {
-        //     app.map.getView().fit(bbox, {
-        //         duration: 1000
-        //     })
-        // })
-        // .then(function() {
-        //     app.map.interaction.select.segment();
-        // })
-        // .then(function() {
-        //     console.log('%clistening for stream segement selection...', 'color: #d6afff;');
-        // })
-        // .catch(function(data) {
-        //     console.warn('failed to add map layer');
-        // });
-        app.map.toggleLayer('streams');
-        scenario_type_selection_made();
+        app.map.clearLayers();
+        app.state.step = 0;
+        app.map.selection.setSelect(app.map.selection.selectSelectSingleClick);
+        app.map.enableLayer('streams');
+        scenario_type_selection_made('select');
     },
     'filter': function() {
-        app.map.toggleLayer('huc12');
-        scenario_type_selection_made();
+        app.map.clearLayers();
+        app.state.step = 0;
+        app.map.selection.setSelect(app.map.selection.selectFilterSingleClick);
+        app.map.enableLayer('huc12');
+        scenario_type_selection_made('filter');
     },
     'draw': function() {
       // enable drawing
-      scenario_type_selection_made();
+      app.map.clearLayers();
+      app.state.step = 0;
+      app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
+      scenario_type_selection_made('draw');
     }
 }
 

@@ -3,16 +3,16 @@ app.state = {
     panel: {
         content: '',
         position: '',
-        height: '',
+        height: ''
     },
     instructions: '',
     focusArea: {
         method: '',
         geometry: {},
-        pp_id: 0,
+        pp_id: 0
     },
     nav: 'tall',
-    step: 0,
+    stepVal: 0,
     set setMethod(method) {
         this.method = method;
         this.focusArea.method = method;
@@ -31,6 +31,8 @@ app.state = {
     },
     set step(step) {
         app.state.instructions = app.nav.instructions[app.state.methodState][step];
+        this.stepVal = step;
+        //TODO: Recognize and trigger filtering/drawing steps.
     },
     get methodState() {
         return this.method;
@@ -44,7 +46,7 @@ app.state = {
     get saveState() {
         return {
             method: this.method,
-            focusArea: this.focusAreaState,
+            focusArea: this.focusAreaState
         }
     }
 }
