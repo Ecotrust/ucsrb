@@ -458,3 +458,11 @@ nav .navbar-toggler .navbar-toggler-icon {
 .fadeInRight {
   animation-name: fadeInRight;
 }
+
+.bs-popover-auto[x-placement^=top], .bs-popover-top {
+    margin-bottom: 1rem;
+}
+
+.popover {
+  z-index: 1;
+}
