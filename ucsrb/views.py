@@ -92,28 +92,51 @@ def register(request):
 ###########################################################
 ###             API Calls                                 #
 ###########################################################
+def build_bbox(minX, minY, maxX, maxY):
+    from django.contrib.gis.geos import Polygon, Point
+    bbox = Polygon( ((minX,minY), (minX,maxY), (maxX,maxY), (maxX,minY), (minX,minY)) )
+    bboxCenter = Point( ((minX + maxX)/2,(minY+maxY)/2))
+    return (bbox, bboxCenter)
+
 def get_veg_unit_by_bbox(request):
     [minX, minY, maxX, maxY] = [float(x) for x in request.GET.getlist('bbox_coords[]')]
-    # TODO: Get all veg units that intersect bbox (planning units)
-    # TODO: Select first returned veg unit (handle 0)
+    bbox, bboxCenter = build_bbox(minX, minY, maxX, maxY)
+    # Get all veg units that intersect bbox (planning units)
+    from .models import VegPlanningUnit
+    vegUnits = VegPlanningUnit.objects.filter(geometry__intersects=bbox)
+    # Select center-most veg unit (handle 0)
+    if vegUnits.count() > 1:
+        centerVegUnit = VegPlanningUnit.objects.filter(geometry__intersects=bboxCenter)
+        if centerVegUnit.count() == 1:
+            retVegUnit = centerVegUnit[0].geometry.geojson
+        else:
+            retVegUnit = vegUnits[0].geometry.geojson
+    elif vegUnits.count() == 1:
+        retVegUnit = vegUnits[0].geometry.geojson
+    else:
+        retVegUnit = {}
     # TODO: build context and return.
-    return_json = {
-        'id': 1,
-        'veg_unit_attrs': [
-            ['int_attr', 100],
-            ['float_attr', 99.999],
-            ['str_attr', 'one hundred'],
-            ['bool_attr', True],
-            ['list_attr', [1,2,3,4]]
-        ]
-    }
-    return JsonResponse(return_json)
+
+    return JsonResponse(json.loads(retVegUnit))
 
 def get_segment_by_bbox(request):
     [minX, minY, maxX, maxY] = [float(x) for x in request.GET.getlist('bbox_coords[]')]
+    bbox, bboxCenter = build_bbox(minX, minY, maxX, maxY)
     # TODO: Get all stream segments that intersect bbox
+    # from .models import StreamSegment
+    # segments = StreamSegments.objects.filter(geometry__intersect=bbox)
+
     # TODO: Select first returned stream segment (handle 0)
-    # TODO: get list of Pourpoints associated with stream segment
+    # if segments.count() > 1:
+    #     centerSegment = StreamSegment.objects.filter(geometry__intersects=bboxCenter)
+    #     if centerSegment.count() == 1:
+    #         retSegment = centerSegment[0]
+    #     else:
+    #         retSegment = segments[0]
+    # elif segments.count() ==1:
+    #     retSegment = segments[0]
+    # else:
+    #     retSegment = {}
     # TODO: build context and return.
     return_json = {
         'name': 'Stream Segment Name',

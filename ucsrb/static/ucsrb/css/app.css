@@ -465,4 +465,19 @@ nav .navbar-toggler .navbar-toggler-icon {
 
 .popover {
   z-index: 1;
+  min-width: 250px;
+}
+
+.popover-header {
+  padding-right: 33px;
+}
+
+.popover-header button {
+  right: 5px;
+  top: 5px;
+  position: absolute;
+  height: 24px;
+  width: 24px;
+  padding: 0;
+
 }

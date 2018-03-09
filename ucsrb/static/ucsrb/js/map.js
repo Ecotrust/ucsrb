@@ -140,8 +140,13 @@ setFilter = function(feat, layer) {
   app.map.mask.set('active', true);
 }
 
+removeFilter = function() {
+  app.map.mask.set('active', false);
+}
+
 confirmSelection = function(feat, markup, vector) {
-  layer = app.map.layer[app.mapbox.layers[feat.getProperties().layer].map_layer_id];
+  mbLayer = app.mapbox.layers[feat.getProperties().layer];
+  layer = app.map.layer[mbLayer.map_layer_id];
   features = (new ol.format.GeoJSON()).readFeatures(vector, {
       dataProjection: 'EPSG:3857',
     featureProjection: 'EPSG:3857'
@@ -157,16 +162,35 @@ confirmSelection = function(feat, markup, vector) {
   extent = feat.getExtent();
   coordinate = [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2];
   app.map.popup.setPosition(coordinate);
+  var unit_type = mbLayer.name;
+  var unit_name = feat.get(mbLayer.name_field);
+  var title = unit_type + ': ' + unit_name + '&nbsp<button class="btn btn-danger" type="button" onclick="closeConfirmSelection();">&times;</button>';
 
   $(element).popover({
     'placement': 'top',
     'animation': false,
     'html': true,
     'content': markup,
-    'container': element
+    'container': element,
+    'title': title
   });
   $(element).popover('show');
   app.map.zoomToExtent(extent);
+}
+
+closeConfirmSelection = function() {
+  var element = app.map.popup.getElement();
+  $(element).popover('hide');
+  $(element).popover('dispose');
+  app.map.popupLock = false;
+  removeFilter();
+}
+
+generateFilterPopup = function(content) {
+   // return '<button class="btn btn-danger" type="button" onclick="closeConfirmSelection();">&times;</button>' +
+   return '' +
+    content + '<button class="btn btn-success" type="button">Yes</button>' +
+    '<div class="bottom-confirm-buttons"><button class="btn btn-danger" type="button" onclick="closeConfirmSelection();">No</button></div>';
 }
 
 focusAreaSelectAction = function(feat, vector) {
@@ -174,7 +198,7 @@ focusAreaSelectAction = function(feat, vector) {
   if (app.state.stepVal < 1) {
     app.state.step = 1; // step forward in state
   }
-  markup = '<p>Find harvest locations within this watershed?</p>';
+  markup = generateFilterPopup('<p>Find harvest locations within this watershed?</p>');
   confirmSelection(feat, markup, vector);
 };
 
@@ -194,7 +218,7 @@ pourPointSelectAction = function(feat, vector) {
   }
   //TODO: get ppt id and query server for basin
   var ppt_id = feat.getProperties().OBJECTID
-  markup = '<p>Find harvest locations within this basin?</p>';
+  markup = generateFilterPopup('<p>Find harvest locations within this basin?</p>');
   confirmSelection(feat, markup, vector);
 };
 
@@ -341,7 +365,6 @@ if (app.map.overlays) {
   // app.map.overlays.getLayers().push(app.map.layer.planningUnits.layer);
   app.map.overlays.getLayers().push(app.map.layer.scenarios.layer);
 }
-
 
 app.map.layerSwitcher = new ol.control.LayerSwitcher({
   tipLabel: 'Layers'
