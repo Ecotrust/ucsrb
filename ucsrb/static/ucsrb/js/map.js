@@ -134,14 +134,51 @@ app.mapbox.layers = {
   }
 };
 
-focusAreaSelectAction = function(feat) {
+setFilter = function(feat, layer) {
+  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[0,0,0,0.6]})});
+  layer.addFilter(app.map.mask);
+  app.map.mask.set('active', true);
+}
+
+confirmSelection = function(feat, markup, vector) {
+  layer = app.map.layer[app.mapbox.layers[feat.getProperties().layer].map_layer_id];
+  features = (new ol.format.GeoJSON()).readFeatures(vector, {
+      dataProjection: 'EPSG:3857',
+    featureProjection: 'EPSG:3857'
+  });
+  setFilter(features[0], layer.layer);
+  app.map.popupLock = true;
+  var element = app.map.popup.getElement();
+  $(element).popover('dispose');
+  app.map.popup = new ol.Overlay({
+    element: document.getElementById('popup')
+  });
+  app.map.addOverlay(app.map.popup);
+  extent = feat.getExtent();
+  coordinate = [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2];
+  app.map.popup.setPosition(coordinate);
+
+  $(element).popover({
+    'placement': 'top',
+    'animation': false,
+    'html': true,
+    'content': markup,
+    'container': element
+  });
+  $(element).popover('show');
+  app.map.zoomToExtent(extent);
+}
+
+focusAreaSelectAction = function(feat, vector) {
   app.map.zoomToExtent(feat.getExtent());
   if (app.state.stepVal < 1) {
     app.state.step = 1; // step forward in state
   }
+  markup = '<p>Find harvest locations within this watershed?</p>';
+  confirmSelection(feat, markup, vector);
 };
 
-streamSelectAction = function(feat) {
+streamSelectAction = function(feat, vector) {
   app.map.enableLayer('pourpoints');
   app.map.zoomToExtent(feat.getExtent());
   if (app.state.stepVal < 1) {
@@ -149,14 +186,16 @@ streamSelectAction = function(feat) {
   }
 };
 
-pourPointSelectAction = function(feat) {
+pourPointSelectAction = function(feat, vector) {
   var center = [feat.getExtent()[0], feat.getExtent()[1]];
   app.map.getView().animate({center: center})
   if (app.state.stepVal < 2) {
     app.state.step = 2; // step forward in state
   }
-  //TODO: get ppt id and query server for basin, masking all else out (wrap in a feature);
+  //TODO: get ppt id and query server for basin
   var ppt_id = feat.getProperties().OBJECTID
+  markup = '<p>Find harvest locations within this basin?</p>';
+  confirmSelection(feat, markup, vector);
 };
 
 app.map.layer = {
@@ -171,7 +210,8 @@ app.map.layer = {
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['demo_routed_streams-12s94p'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.Streams,
-        visible: false
+        visible: false,
+        renderBuffer: 500
         // declutter: true
       }),
       selectAction: streamSelectAction
@@ -187,7 +227,8 @@ app.map.layer = {
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['Pour_points_3857-83a1zv'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.PourPoint,
-        visible: false
+        visible: false,
+        renderBuffer: 500
         // declutter: true
       }),
       selectAction: pourPointSelectAction
@@ -203,7 +244,8 @@ app.map.layer = {
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.huc10_3857.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.FocusArea,
-        visible: false
+        visible: false,
+        renderBuffer: 500
       }),
       selectAction: focusAreaSelectAction
     },
@@ -218,7 +260,8 @@ app.map.layer = {
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.huc12_3857.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.FocusArea,
-        visible: false
+        visible: false,
+        renderBuffer: 500
       }),
       selectAction: focusAreaSelectAction
     },

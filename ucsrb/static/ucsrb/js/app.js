@@ -219,7 +219,7 @@ app.request = {
     },
     get_basin: function(pp_id) {
         return $.ajax({
-            url: '/viewer/select/get_basin',
+            url: '/ucsrb/get_basin',
             data: {
                 pourPoint: pp_id,
                 method: app.state.method,
@@ -231,6 +231,27 @@ app.request = {
             },
             error: function(response, status) {
                 console.log(`%cfail @ get basin: %o`, 'color: red', response);
+                return status;
+            }
+        })
+    },
+    get_focus_area: function(feature, layerName) {
+        props = feature.getProperties();
+        id = props[app.mapbox.layers[props.layer].id_field];
+        return $.ajax({
+            url: '/ucsrb/get_focus_area',
+            data: {
+                id: id,
+                layer: layerName,
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(`%csuccess: got focus area`, 'color: green');
+                app.map.layer[layerName].selectAction(feature, response);
+                // return response;
+            },
+            error: function(response, status) {
+                console.log(`%cfail @ get focus area: %o`, 'color: red', response);
                 return status;
             }
         })

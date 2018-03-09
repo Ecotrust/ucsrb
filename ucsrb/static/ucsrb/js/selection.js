@@ -47,10 +47,15 @@ app.map.Pointer = function() {
 ol.inherits(app.map.Pointer, ol.interaction.Pointer);
 
 /**
+* Popup Logic
+*/
+app.map.popupLock = false;
+
+/**
 * @param {ol.MapBrowserEvent} evt Event.
 */
 app.map.Pointer.prototype.handleMoveEvent = function(evt) {
-  if (app.map.popup) {
+  if (app.map.popup && !app.map.popupLock) {
     var element = app.map.popup.getElement();
     $(element).popover('dispose');
     app.map.popup=false;
@@ -60,9 +65,6 @@ app.map.Pointer.prototype.handleMoveEvent = function(evt) {
     let markup = '';
     layersClicked = [];
     feature = null;
-    app.map.selection.select.getFeatures().forEach(function(feat) {
-
-    });
 
     map.forEachFeatureAtPixel(evt.pixel,
       function(feat) {
@@ -79,7 +81,7 @@ app.map.Pointer.prototype.handleMoveEvent = function(evt) {
       }
     );
 
-    if (markup) {
+    if (markup && !app.map.popupLock) {
       app.map.popup = new ol.Overlay({
         element: document.getElementById('popup')
       });
@@ -212,8 +214,8 @@ app.map.selection.setSelect = function(selectionInteraction) {
       e.mapBrowserEvent.coordinate, 'EPSG:3857', 'EPSG:4326'
     )));
     app.map.selection.select.getFeatures().forEach(function(feat) {
-      var layer = app.map.selection.select.getLayer(feat);
-      app.map.layer[layer.get('id')].selectAction(feat);
+      var layer = app.map.selection.select.getLayer(feat).get('id');
+      app.request.get_focus_area(feat, layer);
     });
   });
 };

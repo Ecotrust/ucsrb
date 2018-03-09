@@ -433,6 +433,20 @@ def get_pourpoint_by_id(request, id):
     }
     return JsonResponse(return_json)
 
+def get_basin(request):
+    return JsonResponse({})
+
+def get_focus_area(request):
+    focus_area = {}
+    if request.method == 'GET':
+        from .models import FocusArea
+        unit_id = request.GET['id']
+        layer = request.GET['layer']
+        focus_area = FocusArea.objects.get(unit_type=layer.upper(), unit_id=unit_id).geometry.geojson
+
+    return JsonResponse(json.loads(focus_area))
+
+
 def filter_results(request):
     # TODO: Determine if pourpoint or management unit (ppid or muid with int in GET)
     # TODO: Query for pp or mu by id

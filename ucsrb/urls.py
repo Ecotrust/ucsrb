@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'^filter_results', views.filter_results),
     url(r'^get_results_by_scenario_id', views.get_results_by_scenario_id),
     url(r'^get_results_by_state', views.get_results_by_state),
+    url(r'^get_focus_area', views.get_focus_area),
+    url(r'^get_basin', views.get_focus_area),
 
     ### Filter/Scenarios Work
     url(r'get_scenarios/(?P<scenario_model_name>[\w_]+)/$', views.get_scenarios),
