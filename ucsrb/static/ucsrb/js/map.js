@@ -135,9 +135,13 @@ app.mapbox.layers = {
 };
 
 setFilter = function(feat, layer) {
+  if (app.map.mask) {
+    layer.removeFilter(app.map.mask);
+  }
   app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[0,0,0,0.6]})});
   layer.addFilter(app.map.mask);
   app.map.mask.set('active', true);
+  app.map.zoomToExtent(feat.getGeometry().getExtent());
 }
 
 removeFilter = function() {
@@ -175,7 +179,6 @@ confirmSelection = function(feat, markup, vector) {
     'title': title
   });
   $(element).popover('show');
-  app.map.zoomToExtent(extent);
 }
 
 closeConfirmSelection = function() {
@@ -189,12 +192,13 @@ closeConfirmSelection = function() {
 generateFilterPopup = function(content) {
    // return '<button class="btn btn-danger" type="button" onclick="closeConfirmSelection();">&times;</button>' +
    return '' +
-    content + '<button class="btn btn-success" type="button">Yes</button>' +
-    '<div class="bottom-confirm-buttons"><button class="btn btn-danger" type="button" onclick="closeConfirmSelection();">No</button></div>';
+    content + '<div class="popover-bottom-confirm-buttons">' +
+    '<button class="btn btn-success" type="button">Yes</button>' +
+    '<button class="btn btn-danger" type="button" onclick="closeConfirmSelection();">No</button>' +
+    '</div>';
 }
 
 focusAreaSelectAction = function(feat, vector) {
-  app.map.zoomToExtent(feat.getExtent());
   if (app.state.stepVal < 1) {
     app.state.step = 1; // step forward in state
   }

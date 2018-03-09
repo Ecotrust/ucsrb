@@ -481,3 +481,9 @@ nav .navbar-toggler .navbar-toggler-icon {
   padding: 0;
 
 }
+
+
+.popover-bottom-confirm-buttons button {
+  margin-left: 15px;
+  margin-right: 15px;
+}
