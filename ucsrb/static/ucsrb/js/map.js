@@ -336,7 +336,7 @@ app.map.layer = {
     },
     planningUnits: {
         counter: 0,
-        layer: mapSettings.getInitFilterResultsLayer('planning units', app.map.styles['PolygonSelected']),
+        layer: mapSettings.getInitFilterResultsLayer('planning units', app.map.styles['Polygon']),
         source: function() {
             return app.map.layer.planningUnits.layer.getSource();
         },

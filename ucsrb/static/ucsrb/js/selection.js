@@ -200,7 +200,7 @@ app.map.selection.selectFilterSingleClick = new ol.interaction.Select(
       app.map.layer.huc10.layer,
       app.map.layer.huc12.layer
     ],
-    style: app.map.styles.PolygonSelected
+    style: app.map.styles.Polygon
   }
 );
 
