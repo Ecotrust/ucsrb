@@ -217,25 +217,7 @@ app.request = {
             console.log(`%cfail @ get pourpoint id: %o`, 'color: red', response);
         });
     },
-    get_basin: function(pp_id) {
-        return $.ajax({
-            url: '/ucsrb/get_basin',
-            data: {
-                pourPoint: pp_id,
-                method: app.state.method,
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log(`%csuccess: got basin`, 'color: green');
-                return response;
-            },
-            error: function(response, status) {
-                console.log(`%cfail @ get basin: %o`, 'color: red', response);
-                return status;
-            }
-        })
-    },
-    get_focus_area: function(feature, layerName) {
+    get_focus_area: function(feature, layerName, callback) {
         props = feature.getProperties();
         id = props[app.mapbox.layers[props.layer].id_field];
         return $.ajax({
@@ -247,14 +229,66 @@ app.request = {
             dataType: 'json',
             success: function(response) {
                 console.log(`%csuccess: got focus area`, 'color: green');
-                app.map.layer[layerName].selectAction(feature, response);
-                // return response;
+                callback(feature, response);
             },
             error: function(response, status) {
                 console.log(`%cfail @ get focus area: %o`, 'color: red', response);
+                callback(null, response);
                 return status;
             }
         })
+    },
+    get_focus_area_at: function(feature, layerName, callback) {
+      // This is sloppy, but I don't know how to get the geometry from a VectorTile feature.
+      point = feature.b;
+      return $.ajax({
+          url: '/ucsrb/get_focus_area_at',
+          data: {
+              point: point,
+              layer: layerName,
+          },
+          dataType: 'json',
+          success: function(response) {
+              console.log(`%csuccess: got focus area at point`, 'color: green');
+              callback(feature, response);
+          },
+          error: function(response, status) {
+              console.log(`%cfail @ get focus area at point: %o`, 'color: red', response);
+              callback(null, response);
+          }
+      })
+  },
+    get_basin: function(feature, callback) {
+      var pp_id = feature.getProperties().OBJECTID;
+      return $.ajax({
+        url: '/ucsrb/get_basin',
+        data: {
+          pourPoint: pp_id,
+          // method: app.state.method,
+        },
+        dataType: 'json',
+        success: function(response) {
+          console.log(`%csuccess: got basin`, 'color: green');
+          callback(feature, response);
+          return response;
+        },
+        error: function(response, status) {
+          console.log(`%cfail @ get basin: %o`, 'color: red', response);
+          // we don't have the ppt basins yet, just get a HUC12 for now.
+          app.request.get_focus_area_at(feature, 'HUC12', function(feature, hucFeat) {
+            vectors = (new ol.format.GeoJSON()).readFeatures(hucFeat.geojson, {
+                dataProjection: 'EPSG:3857',
+              featureProjection: 'EPSG:3857'
+            });
+            // set property id with hucFeat.id
+            vector = vectors[0].getGeometry();
+            vector.set('layer', 'huc12_3857');
+            vector.set('HUC_12', hucFeat.id.toString());
+            app.request.get_focus_area(vector, 'HUC12', callback);
+          });
+          return status;
+        }
+      })
     },
     filter_results: function(pourpoint) {
         $.ajax({

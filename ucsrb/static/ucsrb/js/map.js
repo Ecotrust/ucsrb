@@ -155,7 +155,12 @@ confirmSelection = function(feat, markup, vector) {
       dataProjection: 'EPSG:3857',
     featureProjection: 'EPSG:3857'
   });
-  setFilter(features[0], layer.layer);
+  if (app.state.method == 'select') {
+    // hack for when we have no ppt basins and default to HUC 12.
+    setFilter(features[0], app.map.layer.pourpoints.layer);
+  } else {
+    setFilter(features[0], layer.layer);
+  }
   app.map.popupLock = true;
   var element = app.map.popup.getElement();
   $(element).popover('dispose');
@@ -198,15 +203,20 @@ generateFilterPopup = function(content) {
     '</div>';
 }
 
-focusAreaSelectAction = function(feat, vector) {
-  if (app.state.stepVal < 1) {
-    app.state.step = 1; // step forward in state
-  }
-  markup = generateFilterPopup('<p>Find harvest locations within this watershed?</p>');
-  confirmSelection(feat, markup, vector);
+focusAreaSelectAction = function(feat) {
+  var layer = app.map.selection.select.getLayer(feat).get('id');
+  app.request.get_focus_area(feat, layer, function(feat, vector) {
+    if (feat){
+      if (app.state.stepVal < 1) {
+        app.state.step = 1; // step forward in state
+      }
+      markup = generateFilterPopup('<p>Find harvest locations within this watershed?</p>');
+      confirmSelection(feat, markup, vector);
+    }
+  });
 };
 
-streamSelectAction = function(feat, vector) {
+streamSelectAction = function(feat) {
   app.map.enableLayer('pourpoints');
   app.map.zoomToExtent(feat.getExtent());
   if (app.state.stepVal < 1) {
@@ -214,16 +224,16 @@ streamSelectAction = function(feat, vector) {
   }
 };
 
-pourPointSelectAction = function(feat, vector) {
-  var center = [feat.getExtent()[0], feat.getExtent()[1]];
-  app.map.getView().animate({center: center})
-  if (app.state.stepVal < 2) {
-    app.state.step = 2; // step forward in state
-  }
-  //TODO: get ppt id and query server for basin
-  var ppt_id = feat.getProperties().OBJECTID
-  markup = generateFilterPopup('<p>Find harvest locations within this basin?</p>');
-  confirmSelection(feat, markup, vector);
+pourPointSelectAction = function(feat) {
+  app.request.get_basin(feat, function(feat, vector) {
+    if (feat){
+      if (app.state.stepVal < 2) {
+        app.state.step = 2; // step forward in state
+      }
+      markup = generateFilterPopup('<p>Find harvest locations within this basin?</p>');
+      confirmSelection(feat, markup, vector);
+    }
+  });
 };
 
 app.map.layer = {

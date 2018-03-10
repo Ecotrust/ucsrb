@@ -457,7 +457,27 @@ def get_pourpoint_by_id(request, id):
     return JsonResponse(return_json)
 
 def get_basin(request):
-    return JsonResponse({})
+    if request.method == 'GET':
+        from .models import FocusArea
+        unit_id = request.GET['pourPoint']
+        layer = 'PourPoint'
+        focus_area = FocusArea.objects.get(unit_type=layer, unit_id=unit_id).geometry.geojson
+    return JsonResponse(json.loads(focus_area))
+
+'''
+Take a point in 3857 and return the feature at that point for a given FocusArea type
+Primarily developed as a failsafe for not having pour point basin data.
+'''
+def get_focus_area_at(request):
+    from django.contrib.gis.geos import Point
+    focus_area = {}
+    if request.method == 'GET':
+        from .models import FocusArea
+        point = request.GET.getlist('point[]')
+        pointGeom = Point( (float(point[0]), float(point[1])))
+        layer = request.GET['layer']
+        focus_area = FocusArea.objects.get(unit_type=layer, geometry__intersects=pointGeom)
+    return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (focus_area.unit_id, focus_area.geometry.geojson)))
 
 def get_focus_area(request):
     focus_area = {}

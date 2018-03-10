@@ -215,7 +215,7 @@ app.map.selection.setSelect = function(selectionInteraction) {
     )));
     app.map.selection.select.getFeatures().forEach(function(feat) {
       var layer = app.map.selection.select.getLayer(feat).get('id');
-      app.request.get_focus_area(feat, layer);
+      app.map.layer[layer].selectAction(feat);
     });
   });
 };
