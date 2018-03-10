@@ -40,13 +40,13 @@ app.map.styles = {
     'Polygon': new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: '#58595b',
-            lineDash: [12],
+            // lineDash: [12],
             lineCap: 'cap',
             lineJoin: 'miter',
-            width: 3,
+            width: 0,   //Don't show!!!
         }),
         fill: new ol.style.Fill({
-            color: 'rgba(0, 0, 0, 0)'
+            color: 'rgba(0, 0, 0, 0)'   //Don't show!!!
         })
     }),
     'PolygonSelected': new ol.style.Style({
@@ -148,6 +148,19 @@ removeFilter = function() {
   app.map.mask.set('active', false);
 }
 
+confirmationReceived = function() {
+  if (app.state.method == 'select') {
+    if (app.state.stepVal < 2) {
+      app.state.step = 2; // step forward in state
+    }
+  } else {
+    if (app.state.stepVal < 1) {
+      app.state.step = 1; // step forward in state
+    }
+  }
+  closeConfirmSelection(true);
+}
+
 confirmSelection = function(feat, markup, vector) {
   mbLayer = app.mapbox.layers[feat.getProperties().layer];
   layer = app.map.layer[mbLayer.map_layer_id];
@@ -173,7 +186,7 @@ confirmSelection = function(feat, markup, vector) {
   app.map.popup.setPosition(coordinate);
   var unit_type = mbLayer.name;
   var unit_name = feat.get(mbLayer.name_field);
-  var title = unit_type + ': ' + unit_name + '&nbsp<button class="btn btn-danger" type="button" onclick="closeConfirmSelection();">&times;</button>';
+  var title = unit_type + ': ' + unit_name + '&nbsp<button class="btn btn-danger" type="button" onclick="closeConfirmSelection(false);">&times;</button>';
 
   $(element).popover({
     'placement': 'top',
@@ -186,20 +199,22 @@ confirmSelection = function(feat, markup, vector) {
   $(element).popover('show');
 }
 
-closeConfirmSelection = function() {
+closeConfirmSelection = function(accepted) {
   var element = app.map.popup.getElement();
   $(element).popover('hide');
   $(element).popover('dispose');
-  app.map.popupLock = false;
-  removeFilter();
+  if (!accepted) {
+    app.map.popupLock = false;
+    removeFilter();
+  }
 }
 
 generateFilterPopup = function(content) {
    // return '<button class="btn btn-danger" type="button" onclick="closeConfirmSelection();">&times;</button>' +
    return '' +
     content + '<div class="popover-bottom-confirm-buttons">' +
-    '<button class="btn btn-success" type="button">Yes</button>' +
-    '<button class="btn btn-danger" type="button" onclick="closeConfirmSelection();">No</button>' +
+    '<button class="btn btn-success" type="button" onclick="confirmationReceived()">Yes</button>' +
+    '<button class="btn btn-danger" type="button" onclick="closeConfirmSelection(false);">No</button>' +
     '</div>';
 }
 
@@ -207,9 +222,6 @@ focusAreaSelectAction = function(feat) {
   var layer = app.map.selection.select.getLayer(feat).get('id');
   app.request.get_focus_area(feat, layer, function(feat, vector) {
     if (feat){
-      if (app.state.stepVal < 1) {
-        app.state.step = 1; // step forward in state
-      }
       markup = generateFilterPopup('<p>Find harvest locations within this watershed?</p>');
       confirmSelection(feat, markup, vector);
     }
@@ -227,9 +239,6 @@ streamSelectAction = function(feat) {
 pourPointSelectAction = function(feat) {
   app.request.get_basin(feat, function(feat, vector) {
     if (feat){
-      if (app.state.stepVal < 2) {
-        app.state.step = 2; // step forward in state
-      }
       markup = generateFilterPopup('<p>Find harvest locations within this basin?</p>');
       confirmSelection(feat, markup, vector);
     }

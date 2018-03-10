@@ -44,6 +44,30 @@ app.init = {
     }
 }
 
+initFiltering = function() {
+  setTimeout(function() {
+    if ($('#focus_area_accordion').length > 0) {
+      $('#id_focus_area').prop('checked', true);
+      $('#id_focus_area_input').val(app.state.focusAreaState.id);
+      $('#focus_area_accordion').hide();
+      app.viewModel.scenarios.scenarioFormModel.toggleParameter('focus_area');
+    } else {
+      initFiltering();
+    }
+  }, 100);
+};
+
+app.panel = {
+    form: {
+        init: function() {
+            app.map.layer.planningUnits.init();
+            app.map.layer.scenarios.init();
+            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
+            initFiltering();
+        },
+    }
+}
+
 app.nav = {
     setState: function(height) {
         app.state.navHeight = height;
@@ -91,15 +115,20 @@ app.nav = {
             'Add additional points then double-click to finish; Re-select point to edit'
         ],
     },
-}
-
-app.panel = {
-    form: {
-        init: function() {
-            app.map.layer.planningUnits.init();
-            app.map.layer.scenarios.init();
-            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
-        },
+    stepActions: {
+      select: [
+        false,
+        false,
+        app.panel.form.init
+      ],
+      filter: [
+        false,
+        app.panel.form.init
+      ],
+      draw: [
+        false,    //TODO: enable drawing
+        false     //TODO: ??? enable editing?
+      ]
     }
 }
 
@@ -229,7 +258,8 @@ app.request = {
             dataType: 'json',
             success: function(response) {
                 console.log(`%csuccess: got focus area`, 'color: green');
-                callback(feature, response);
+                app.state.setFocusArea = response;
+                callback(feature, response.geojson);
             },
             error: function(response, status) {
                 console.log(`%cfail @ get focus area: %o`, 'color: red', response);
@@ -269,7 +299,8 @@ app.request = {
         dataType: 'json',
         success: function(response) {
           console.log(`%csuccess: got basin`, 'color: green');
-          callback(feature, response);
+          app.state.setFocusArea = response;
+          callback(feature, response.geojson);
           return response;
         },
         error: function(response, status) {
