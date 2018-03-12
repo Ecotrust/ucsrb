@@ -7,13 +7,26 @@ app.map = mapSettings.getInitMap();
 app.map.styles = {
     'Point': new ol.style.Style({
         image: new ol.style.Circle({
-            radius: 10,
+            radius: 8,
             fill:  new ol.style.Fill({
-                color: '#ffffff'
+                color: '#67b8c6',
             }),
             stroke: new ol.style.Stroke({
-                color: '#aaffff',
-                width: 5,
+                color: '#ffffff',
+                width: 2,
+            }),
+        }),
+        zIndex: 1,
+    }),
+    'PointSelected': new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 16,
+            fill:  new ol.style.Fill({
+                color: '#4D4D4D',
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#ffffff',
+                width: 3,
             }),
         })
     }),
@@ -22,25 +35,25 @@ app.map.styles = {
             color: '#67b8c6',
             lineCap: 'cap',
             lineJoin: 'miter',
-            width: 4,
+            width: 8,
         })
     }),
     'LineStringSelected': new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: '#3a5675',
-            width: 6,
-        })
+            width: 20,
+        }),
     }),
     'Polygon': new ol.style.Style({
         stroke: new ol.style.Stroke({
-            color: '#58595b',
+            color: 'rgba(93, 116, 82, 0.9)',
             lineDash: [12],
             lineCap: 'cap',
             lineJoin: 'miter',
-            width: 3,
+            width: 1,
         }),
         fill: new ol.style.Fill({
-            color: 'rgba(0, 0, 255, 0.1)'
+            color: 'rgba(93, 116, 82, 0.45)'
         })
     }),
 };
@@ -48,24 +61,25 @@ app.map.styles = {
 app.map.interaction = {
     select: {
         segment: function() {
-            var select = new ol.interaction.Select({
+            app.map.interaction.olSelect = new ol.interaction.Select({
                 style: app.map.styles['LineStringSelected'],
                 layers: [app.map.layer.streams.layer],
                 hitTolerance: 10
             });
-            app.map.addInteraction(select);
-            select.on('select', function(event) {
+            app.map.addInteraction(app.map.interaction.olSelect);
+            app.map.interaction.olSelect.on('select', function(event) {
                 app.map.layer.streams.segment.init(event);
             });
         },
         pourpoint: function() {
-            var select = new ol.interaction.Select({
-                style: app.map.styles['Point'],
+            app.map.removeInteraction(app.map.interaction.olSelect);
+            app.map.interaction.olSelect = new ol.interaction.Select({
+                style: app.map.styles['PointSelected'],
                 layers: [app.map.layer.pourpoints.layer],
-                hitTolerance: 1,
+                hitTolerance: 2,
             });
-            app.map.addInteraction(select);
-            return select.on('select', function(event) {
+            app.map.addInteraction(app.map.interaction.olSelect);
+            return app.map.interaction.olSelect.on('select', function(event) {
                 var collection = event.target.getFeatures();
                 collection.forEach(function(el,i,arr) {
                     var props = el.getProperties();
@@ -80,8 +94,20 @@ app.map.interaction = {
             });
         },
     },
-    get selection() {
-        return this.select;
+    draw: {
+        source: new ol.source.Vector(),
+        layer: new ol.layer.Vector({
+            style: app.map.styles['Polygon'],
+        }),
+        init: function() {
+            app.map.interaction.draw.layer.setSource(app.map.interaction.draw.source);
+            app.map.addLayer(app.map.interaction.draw.layer);
+            app.map.interaction.draw = new ol.interaction.Draw({
+                source: app.map.interaction.draw.source,
+                type: 'Polygon',
+            });
+            app.map.addInteraction(app.map.interaction.draw);
+        },
     }
 }
 
@@ -176,6 +202,30 @@ app.map.layer = {
             // attributions: '',
             // format: new ol.format.MVT(),
             url: 'https://api.mapbox.com/styles/v1/hodgimoto/cjcl80xms0bmv2stg8k8x99k7/tiles/256/{z}/{x}/{y}@2x?access_token=' + app.mapbox.key,
+        }),
+    }),
+    demo_basin: new ol.layer.Tile({
+        name: 'basin',
+        source: new ol.source.XYZ({
+            url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcs55i2d6t0b2smjsebrise8/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+        }),
+    }),
+    demo_pourpoint: new ol.layer.Tile({
+        name: 'pourpoint',
+        source: new ol.source.XYZ({
+            url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcs6xklx0vqi2rp5ib93ogeh/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+        }),
+    }),
+    demo_stream: new ol.layer.Tile({
+        name: 'stream',
+        source: new ol.source.XYZ({
+            url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcs7bpiu6uzl2so8svgny8bl/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+        }),
+    }),
+    demo_streams: new ol.layer.Tile({
+        name: 'streams',
+        source: new ol.source.XYZ({
+            url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcqw3lxq3luo2spnc87wb6q8/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
         }),
     }),
     scenarios: {
