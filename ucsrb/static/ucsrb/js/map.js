@@ -372,7 +372,7 @@ app.map.layer = {
 app.map.layer.scenarios.layer.set('id','scenarios');
 app.map.layer.planningUnits.layer.set('id', 'planningUnits');
 
-app.map.overlays = false
+app.map.overlays = false;
 for (var i=0; i < app.map.getLayers().getArray().length; i++) {
   if (app.map.getLayers().getArray()[i].get('title') == 'Overlays') {
     app.map.overlays = app.map.getLayers().getArray()[i];
