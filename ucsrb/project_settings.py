@@ -179,6 +179,7 @@ INSTALLED_APPS = [
     'marineplanner',
     'core',
     'compressor',
+    'import_export',
     ### BEGIN INSERTED INSTALLED APPS ###
     'features',
     'manipulators',
@@ -252,9 +253,16 @@ except ImportError:
     pass
 
 MAX_SCENARIO_RESULTS = 25000
+MAPBOX_ACCESS_TOKEN = 'set_in_local_settings'
 
 try:
+    # Local settings should probably be collected to project folder instead.
     from marineplanner.local_settings import *
+except ImportError:
+    pass
+
+try:
+    from ucsrb.local_settings import *
 except ImportError:
     pass
 

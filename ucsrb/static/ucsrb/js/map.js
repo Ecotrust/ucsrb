@@ -1,7 +1,3 @@
-app.mapbox = {
-    key: 'pk.eyJ1IjoiaG9kZ2ltb3RvIiwiYSI6IjVJNU1UMWsifQ.RHNVad4mnDISsAL_B3h30Q',
-};
-
 app.map = mapSettings.getInitMap();
 
 app.map.styles = {
@@ -41,12 +37,35 @@ app.map.styles = {
     'LineStringSelected': new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: '#3a5675',
-            width: 20,
+            width: 6,
         }),
+        image: new ol.style.Circle({
+            radius: 10,
+            fill:  new ol.style.Fill({
+                color: '#FCC'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#3a5675',
+                width: 5,
+            }),
+        })
     }),
     'Polygon': new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: 'rgba(93, 116, 82, 0.9)',
+            // lineDash: [12],
+            lineCap: 'cap',
+            lineJoin: 'miter',
+            width: 0,   //Don't show!!!
+            // width: 20,
+        }),
+        fill: new ol.style.Fill({
+            color: 'rgba(0, 0, 0, 0)'   //Don't show!!!
+        })
+    }),
+    'PolygonSelected': new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: '#58595b',
             lineDash: [12],
             lineCap: 'cap',
             lineJoin: 'miter',
@@ -56,178 +75,256 @@ app.map.styles = {
             color: 'rgba(93, 116, 82, 0.45)'
         })
     }),
-};
-
-app.map.interaction = {
-    select: {
-        segment: function() {
-            app.map.interaction.olSelect = new ol.interaction.Select({
-                style: app.map.styles['LineStringSelected'],
-                layers: [app.map.layer.streams.layer],
-                hitTolerance: 10
-            });
-            app.map.addInteraction(app.map.interaction.olSelect);
-            app.map.interaction.olSelect.on('select', function(event) {
-                app.map.layer.streams.segment.init(event);
-            });
-        },
-        pourpoint: function() {
-            app.map.removeInteraction(app.map.interaction.olSelect);
-            app.map.interaction.olSelect = new ol.interaction.Select({
-                style: app.map.styles['PointSelected'],
-                layers: [app.map.layer.pourpoints.layer],
-                hitTolerance: 2,
-            });
-            app.map.addInteraction(app.map.interaction.olSelect);
-            return app.map.interaction.olSelect.on('select', function(event) {
-                var collection = event.target.getFeatures();
-                collection.forEach(function(el,i,arr) {
-                    var props = el.getProperties();
-                    console.log('%c selected: %o', 'color: #05b8c3', arr);
-                    app.request.get_basin(props.properties.id)
-                        .then(function(data) {
-                            app.request.saveState(); // save state prior to filter
-                        });
-                });
-                app.panel.form.init();
-                app.state.step = 2;
-            });
-        },
-    },
-    draw: {
-        source: new ol.source.Vector(),
-        layer: new ol.layer.Vector({
-            style: app.map.styles['Polygon'],
+    'FocusArea': new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: '#58595b',
+            lineCap: 'cap',
+            lineJoin: 'miter',
+            width: 3,
         }),
-        init: function() {
-            app.map.interaction.draw.layer.setSource(app.map.interaction.draw.source);
-            app.map.addLayer(app.map.interaction.draw.layer);
-            app.map.interaction.draw = new ol.interaction.Draw({
-                source: app.map.interaction.draw.source,
-                type: 'Polygon',
-            });
-            app.map.addInteraction(app.map.interaction.draw);
-        },
-    }
-}
-
-app.map.popup = {}
+        fill: new ol.style.Fill({
+            color: 'rgba(0, 0, 0, 0)'
+        })
+    }),
+    'Streams':new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: 'rgba(1, 254, 136, 100)',
+            lineCap: 'cap',
+            lineJoin: 'miter',
+            width: 5,
+        })
+    }),
+    'PourPoint': new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 10,
+            fill:  new ol.style.Fill({
+                color: '#ffffff'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#aaffff',
+                width: 5,
+            }),
+        })
+    }),
+};
 
 /**
 * Map - Layers, Sources, Features
 */
+
+app.mapbox.layers = {
+  'demo_routed_streams-12s94p': {
+    id: 'ucsrbsupport.5t2cnpoc',
+    id_field: 'EtID',
+    name_field: 'Name',
+    name: 'Streams',
+    report_methods: ['select'],
+    map_layer_id: 'streams'
+  },
+  'huc10_3857': {
+    id: 'ucsrbsupport.HUC10_3857',
+    id_field: 'HUC_10',
+    name_field: 'HU_10_Name',
+    name: 'HUC 10',
+    report_methods: ['filter'],
+    map_layer_id: 'huc10'
+  },
+  'huc12_3857': {
+    id: 'ucsrbsupport.HUC12_3857',
+    id_field: 'HUC_12',
+    name_field: 'HU_12_NAME',
+    name: 'HUC 12',
+    report_methods: ['filter'],
+    map_layer_id: 'huc12'
+  },
+  'Pour_points_3857-83a1zv': {
+    id: 'ucsrbsupport.7cqwgmiz',
+    id_field: 'OBJECTID',
+    name_field: 'g_name',
+    name: 'Pour Points',
+    report_methods: ['select'],
+    map_layer_id: 'pourpoints'
+  }
+};
+
+setFilter = function(feat, layer) {
+  if (app.map.mask) {
+    layer.removeFilter(app.map.mask);
+  }
+  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[0,0,0,0.6]})});
+  layer.addFilter(app.map.mask);
+  app.map.mask.set('active', true);
+  app.map.zoomToExtent(feat.getGeometry().getExtent());
+}
+
+removeFilter = function() {
+  app.map.mask.set('active', false);
+}
+
+confirmationReceived = function() {
+  if (app.state.method == 'select') {
+    if (app.state.stepVal < 2) {
+      app.state.step = 2; // step forward in state
+    }
+  } else {
+    if (app.state.stepVal < 1) {
+      app.state.step = 1; // step forward in state
+    }
+  }
+  closeConfirmSelection(true);
+}
+
+confirmSelection = function(feat, markup, vector) {
+  mbLayer = app.mapbox.layers[feat.getProperties().layer];
+  layer = app.map.layer[mbLayer.map_layer_id];
+  features = (new ol.format.GeoJSON()).readFeatures(vector, {
+      dataProjection: 'EPSG:3857',
+    featureProjection: 'EPSG:3857'
+  });
+  if (app.state.method == 'select') {
+    // hack for when we have no ppt basins and default to HUC 12.
+    setFilter(features[0], app.map.layer.pourpoints.layer);
+  } else {
+    setFilter(features[0], layer.layer);
+  }
+  app.map.popupLock = true;
+  var element = app.map.popup.getElement();
+  $(element).popover('dispose');
+  app.map.popup = new ol.Overlay({
+    element: document.getElementById('popup')
+  });
+  app.map.addOverlay(app.map.popup);
+  extent = feat.getExtent();
+  coordinate = [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2];
+  app.map.popup.setPosition(coordinate);
+  var unit_type = mbLayer.name;
+  var unit_name = feat.get(mbLayer.name_field);
+  var title = unit_type + ': ' + unit_name + '&nbsp<button class="btn btn-danger" type="button" onclick="closeConfirmSelection(false);">&times;</button>';
+
+  $(element).popover({
+    'placement': 'top',
+    'animation': false,
+    'html': true,
+    'content': markup,
+    'container': element,
+    'title': title
+  });
+  $(element).popover('show');
+}
+
+closeConfirmSelection = function(accepted) {
+  var element = app.map.popup.getElement();
+  $(element).popover('hide');
+  $(element).popover('dispose');
+  if (!accepted) {
+    app.map.popupLock = false;
+    removeFilter();
+  }
+}
+
+generateFilterPopup = function(content) {
+   // return '<button class="btn btn-danger" type="button" onclick="closeConfirmSelection();">&times;</button>' +
+   return '' +
+    content + '<div class="popover-bottom-confirm-buttons">' +
+    '<button class="btn btn-success" type="button" onclick="confirmationReceived()">Yes</button>' +
+    '<button class="btn btn-danger" type="button" onclick="closeConfirmSelection(false);">No</button>' +
+    '</div>';
+}
+
+focusAreaSelectAction = function(feat) {
+  var layer = app.map.selection.select.getLayer(feat).get('id');
+  app.request.get_focus_area(feat, layer, function(feat, vector) {
+    if (feat){
+      markup = generateFilterPopup('<p>Find harvest locations within this watershed?</p>');
+      confirmSelection(feat, markup, vector);
+    }
+  });
+};
+
+streamSelectAction = function(feat) {
+  app.map.enableLayer('pourpoints');
+  app.map.zoomToExtent(feat.getExtent());
+  if (app.state.stepVal < 1) {
+    app.state.step = 1; // step forward in state
+  }
+};
+
+pourPointSelectAction = function(feat) {
+  app.request.get_basin(feat, function(feat, vector) {
+    if (feat){
+      markup = generateFilterPopup('<p>Find harvest locations within this basin?</p>');
+      confirmSelection(feat, markup, vector);
+    }
+  });
+};
+
 app.map.layer = {
     streams: {
-        data: {}, // store init data
-        counter: 0, // so layer is only added once
-        source: new ol.source.Vector({
-            format: new ol.format.GeoJSON()
+      layer: new ol.layer.VectorTile({
+        name: 'Streams',
+        title: 'Streams',
+        id: 'streams',
+        source: new ol.source.VectorTile({
+          attributions: 'NRCS',
+          format: new ol.format.MVT(),
+          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['demo_routed_streams-12s94p'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
-        layer: new ol.layer.Vector({
-            style: app.map.styles['LineString']
-        }),
-        feature: function(data) {
-            return new ol.Feature({
-                geometry: new ol.geom.LineString(data.geometry.geometry.coordinates),
-                name: data.name,
-                properties: {
-                    id: data.id,
-                    pourpoints: data.pourpoints
-                }
-            });
-        },
-        init: function(data) {
-            // Check if layer has already been added
-            if (app.map.layer.streams.counter === 0) {
-                app.map.layer.streams.data = data;
-                var feature = app.map.layer.streams.feature(data);
-                app.map.layer.streams.source.addFeature(feature);
-                app.map.layer.streams.layer.setSource(app.map.layer.streams.source);
-                app.map.addLayer(app.map.layer.streams.layer);
-                app.map.layer.streams.counter++;
-            } else {
-                console.log('%cstreams already added', 'color: orange;');
-            }
-        },
-        segment: {
-            data: {}, // store init data
-            init: function(data) {
-                if (data.selected.length > 0) {
-                    var selected = data.selected[0].getProperties();
-                    app.map.layer.streams.segment.data = selected;
-                    app.map.layer.pourpoints.data = selected.properties.pourpoints;
-                    app.map.layer.pourpoints.init();
-                    app.map.interaction.select.pourpoint();
-                }
-            },
-        },
+        style: app.map.styles.Streams,
+        visible: false,
+        renderBuffer: 500
+        // declutter: true
+      }),
+      selectAction: streamSelectAction
     },
     pourpoints: {
-        data: {}, // store init data
-        counter: 0, // so layer is only added once
-        source: new ol.source.Vector({
-            format: new ol.format.GeoJSON()
+      layer: new ol.layer.VectorTile({
+        name: 'PourPoints',
+        title: 'PourPoints',
+        id: 'pourpoints',
+        source: new ol.source.VectorTile({
+          attributions: 'Ecotrust',
+          format: new ol.format.MVT(),
+          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['Pour_points_3857-83a1zv'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
-        layer: new ol.layer.Vector({
-            style: function(feature) {
-                return app.map.styles['Point'];
-            },
-            zIndex: 1,
-        }),
-        init: function() {
-            // Check if layer has already been added
-            if (app.map.layer.pourpoints.counter === 0) {
-                app.map.layer.pourpoints.data.forEach(function(pp,i,a) {
-                    var feature = new ol.Feature({
-                        geometry: new ol.geom.Point(pp.geometry.geometry.coordinates),
-                        name: pp.name,
-                        properties: {
-                            id: pp.id
-                        }
-                    });
-                    app.map.layer.pourpoints.source.addFeature(feature);
-                });
-                app.map.layer.pourpoints.layer.setSource(app.map.layer.pourpoints.source);
-                app.map.addLayer(app.map.layer.pourpoints.layer);
-                app.map.layer.pourpoints.counter++;
-                app.state.step = 1; // step forward in state
-            } else {
-                console.log('%cstreams already added', 'color: orange');
-            }
-        }
+        style: app.map.styles.PourPoint,
+        visible: false,
+        renderBuffer: 500
+        // declutter: true
+      }),
+      selectAction: pourPointSelectAction
     },
-    huc10: new ol.layer.Tile({
+    huc10: {
+      layer: new ol.layer.VectorTile({
         name: 'HUC 10',
-        source: new ol.source.XYZ({
-            // attributions: '',
-            // format: new ol.format.MVT(),
-            url: 'https://api.mapbox.com/styles/v1/hodgimoto/cjcl80xms0bmv2stg8k8x99k7/tiles/256/{z}/{x}/{y}@2x?access_token=' + app.mapbox.key,
+        title: 'HUC 10',
+        id: 'huc10',
+        source: new ol.source.VectorTile({
+          attributions: 'NRCS',
+          format: new ol.format.MVT(),
+          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.huc10_3857.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
-    }),
-    demo_basin: new ol.layer.Tile({
-        name: 'basin',
-        source: new ol.source.XYZ({
-            url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcs55i2d6t0b2smjsebrise8/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+        style: app.map.styles.FocusArea,
+        visible: false,
+        renderBuffer: 500
+      }),
+      selectAction: focusAreaSelectAction
+    },
+    huc12: {
+      layer: new ol.layer.VectorTile({
+        name: 'HUC 12',
+        title: 'HUC 12',
+        id: 'huc12',
+        source: new ol.source.VectorTile({
+          attributions: 'NRCS',
+          format: new ol.format.MVT(),
+          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.huc12_3857.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
-    }),
-    demo_pourpoint: new ol.layer.Tile({
-        name: 'pourpoint',
-        source: new ol.source.XYZ({
-            url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcs6xklx0vqi2rp5ib93ogeh/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
-        }),
-    }),
-    demo_stream: new ol.layer.Tile({
-        name: 'stream',
-        source: new ol.source.XYZ({
-            url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcs7bpiu6uzl2so8svgny8bl/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
-        }),
-    }),
-    demo_streams: new ol.layer.Tile({
-        name: 'streams',
-        source: new ol.source.XYZ({
-            url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjcqw3lxq3luo2spnc87wb6q8/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
-        }),
-    }),
+        style: app.map.styles.FocusArea,
+        visible: false,
+        renderBuffer: 500
+      }),
+      selectAction: focusAreaSelectAction
+    },
     scenarios: {
         counter: 0, // so layer is only added once
         layer: mapSettings.getInitFilterResultsLayer('scenarios', false),
@@ -236,7 +333,7 @@ app.map.layer = {
         },
         init: function(data) {
             if (app.map.layer.scenarios.counter < 1) {
-                app.map.addLayer(app.map.layer.scenarios.layer);
+                // app.map.addLayer(app.map.layer.scenarios.layer);
                 app.request.get_scenarios()
                     .then(function(response) {
                         var html = `<div class="dropdown">
@@ -272,7 +369,7 @@ app.map.layer = {
         },
         init: function() {
             if (app.map.layer.planningUnits.counter < 1) {
-                app.map.addLayer(app.map.layer.planningUnits.layer);
+                // app.map.addLayer(app.map.layer.planningUnits.layer);
                 app.request.get_planningunits()
                     .then(function(response) {
                         app.map.layer.planningUnits.addFeatures(response);
@@ -283,4 +380,69 @@ app.map.layer = {
             }
         }
     },
+};
+
+
+app.map.layer.scenarios.layer.set('id','scenarios');
+app.map.layer.planningUnits.layer.set('id', 'planningUnits');
+
+app.map.overlays = false
+for (var i=0; i < app.map.getLayers().getArray().length; i++) {
+  if (app.map.getLayers().getArray()[i].get('title') == 'Overlays') {
+    app.map.overlays = app.map.getLayers().getArray()[i];
+  }
+}
+
+if (app.map.overlays) {
+  app.map.overlays.getLayers().push(app.map.layer.huc12.layer);
+  app.map.overlays.getLayers().push(app.map.layer.huc10.layer);
+  app.map.overlays.getLayers().push(app.map.layer.streams.layer);
+  app.map.overlays.getLayers().push(app.map.layer.pourpoints.layer);
+  // app.map.overlays.getLayers().push(app.map.layer.planningUnits.layer);
+  app.map.overlays.getLayers().push(app.map.layer.scenarios.layer);
+}
+
+app.map.layerSwitcher = new ol.control.LayerSwitcher({
+  tipLabel: 'Layers'
+});
+
+app.map.addControl(app.map.layerSwitcher);
+
+app.map.layerSwitcher.overlays = {};
+overlays = $(".layer-switcher .panel .group label:contains('Overlays')").parent().children('ul').children('.layer');
+overlays.each(function() {
+  label = this.children[1].innerText;
+  id = this.children[0].id;
+  lyr_obj = Object.values(app.map.layer).filter(function( obj ) { return obj.layer.get('title') == label;})[0];
+  app.map.layerSwitcher.overlays[lyr_obj.layer.get('id')] = {
+    checkboxId: id,
+    layer: lyr_obj.layer
+  };
+});
+
+app.map.enableLayer = function(layerName) {
+  app.map.layer[layerName].layer.setVisible(true);
+  $('#'+ app.map.layerSwitcher.overlays[layerName].checkboxId).prop('checked', true);
+};
+
+app.map.disableLayer = function(layerName) {
+  app.map.layer[layerName].layer.setVisible(false);
+  if (app.map.layerSwitcher.overlays[layerName]) {
+    $('#'+ app.map.layerSwitcher.overlays[layerName].checkboxId).prop('checked', false);
+  }
+};
+
+app.map.toggleLayer = function(layerName) {
+  if ($('#'+ app.map.layerSwitcher.overlays[layerName].checkboxId).prop('checked')){
+    app.map.disableLayer(layerName);
+  } else {
+    app.map.enableLayer(layerName);
+  }
+};
+
+app.map.clearLayers = function() {
+  var layerNames = Object.keys(app.map.layer);
+  for (var i = 0; i < layerNames.length; i++) {
+    app.map.disableLayer(layerNames[i]);
+  }
 }

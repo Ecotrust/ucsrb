@@ -32,7 +32,9 @@ def home(request):
 
 def app(request):
     template = loader.get_template('ucsrb/app.html')
-    context = {}
+    context = {
+        'MAPBOX_TOKEN': settings.MAPBOX_ACCESS_TOKEN
+    }
     context['MAP_TECH'] = 'ol4'
     return HttpResponse(template.render(context, request))
 
@@ -90,28 +92,51 @@ def register(request):
 ###########################################################
 ###             API Calls                                 #
 ###########################################################
+def build_bbox(minX, minY, maxX, maxY):
+    from django.contrib.gis.geos import Polygon, Point
+    bbox = Polygon( ((minX,minY), (minX,maxY), (maxX,maxY), (maxX,minY), (minX,minY)) )
+    bboxCenter = Point( ((minX + maxX)/2,(minY+maxY)/2))
+    return (bbox, bboxCenter)
+
 def get_veg_unit_by_bbox(request):
     [minX, minY, maxX, maxY] = [float(x) for x in request.GET.getlist('bbox_coords[]')]
-    # TODO: Get all veg units that intersect bbox (planning units)
-    # TODO: Select first returned veg unit (handle 0)
+    bbox, bboxCenter = build_bbox(minX, minY, maxX, maxY)
+    # Get all veg units that intersect bbox (planning units)
+    from .models import VegPlanningUnit
+    vegUnits = VegPlanningUnit.objects.filter(geometry__intersects=bbox)
+    # Select center-most veg unit (handle 0)
+    if vegUnits.count() > 1:
+        centerVegUnit = VegPlanningUnit.objects.filter(geometry__intersects=bboxCenter)
+        if centerVegUnit.count() == 1:
+            retVegUnit = centerVegUnit[0].geometry.geojson
+        else:
+            retVegUnit = vegUnits[0].geometry.geojson
+    elif vegUnits.count() == 1:
+        retVegUnit = vegUnits[0].geometry.geojson
+    else:
+        retVegUnit = {}
     # TODO: build context and return.
-    return_json = {
-        'id': 1,
-        'veg_unit_attrs': [
-            ['int_attr', 100],
-            ['float_attr', 99.999],
-            ['str_attr', 'one hundred'],
-            ['bool_attr', True],
-            ['list_attr', [1,2,3,4]]
-        ]
-    }
-    return JsonResponse(return_json)
+
+    return JsonResponse(json.loads(retVegUnit))
 
 def get_segment_by_bbox(request):
     [minX, minY, maxX, maxY] = [float(x) for x in request.GET.getlist('bbox_coords[]')]
+    bbox, bboxCenter = build_bbox(minX, minY, maxX, maxY)
     # TODO: Get all stream segments that intersect bbox
+    # from .models import StreamSegment
+    # segments = StreamSegments.objects.filter(geometry__intersect=bbox)
+
     # TODO: Select first returned stream segment (handle 0)
-    # TODO: get list of Pourpoints associated with stream segment
+    # if segments.count() > 1:
+    #     centerSegment = StreamSegment.objects.filter(geometry__intersects=bboxCenter)
+    #     if centerSegment.count() == 1:
+    #         retSegment = centerSegment[0]
+    #     else:
+    #         retSegment = segments[0]
+    # elif segments.count() ==1:
+    #     retSegment = segments[0]
+    # else:
+    #     retSegment = {}
     # TODO: build context and return.
     return_json = {
         'name': 'Stream Segment Name',
@@ -430,6 +455,41 @@ def get_pourpoint_by_id(request, id):
           }
     }
     return JsonResponse(return_json)
+
+def get_basin(request):
+    # focus_area = {"id": None, "geojson": None}
+    if request.method == 'GET':
+        from .models import FocusArea
+        unit_id = request.GET['pourPoint']
+        layer = 'PourPoint'
+        focus_area = FocusArea.objects.get(unit_type=layer, unit_id=unit_id)
+    return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (focus_area.pk, focus_area.geometry.geojson)))
+
+'''
+Take a point in 3857 and return the feature at that point for a given FocusArea type
+Primarily developed as a failsafe for not having pour point basin data.
+'''
+def get_focus_area_at(request):
+    from django.contrib.gis.geos import Point
+    focus_area = {"id": None, "geojson": None}
+    if request.method == 'GET':
+        from .models import FocusArea
+        point = request.GET.getlist('point[]')
+        pointGeom = Point( (float(point[0]), float(point[1])))
+        layer = request.GET['layer']
+        focus_area = FocusArea.objects.get(unit_type=layer, geometry__intersects=pointGeom)
+    return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (focus_area.unit_id, focus_area.geometry.geojson)))
+
+def get_focus_area(request):
+    focus_area = {"id": None, "geojson": None}
+    if request.method == 'GET':
+        from .models import FocusArea
+        unit_id = request.GET['id']
+        layer = request.GET['layer']
+        focus_area = FocusArea.objects.get(unit_type=layer.upper(), unit_id=unit_id)
+
+    return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (focus_area.pk, focus_area.geometry.geojson)))
+
 
 def filter_results(request):
     # TODO: Determine if pourpoint or management unit (ppid or muid with int in GET)

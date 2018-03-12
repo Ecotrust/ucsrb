@@ -229,3 +229,5 @@ class VegPlanningUnit(models.Model):
         """ % ( self.uid, self.model_uid(),
                 asKml(self.geometry.transform( settings.GEOMETRY_CLIENT_SRID, clone=True ))
               )
+
+# class Report(models.Model):

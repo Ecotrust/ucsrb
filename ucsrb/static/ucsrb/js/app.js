@@ -10,35 +10,63 @@ var app = {
     },
 }
 
+scenario_type_selection_made = function(selectionType) {
+  var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
+  extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+  if (selectionType == 'select') {
+    app.map.getView().animate({zoom: 10, center: [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2]});
+  } else {
+    app.map.zoomToExtent(extent);
+  }
+}
+
 app.init = {
     'select': function() {
-        // TODO get bbox from map window and assign to var
-        var bbox = [-13505560.671219192, 6217028.00835033, -13356557.351569131, 6280740.477905572];
-        app.request.get_segment_by_bbox(bbox)
-        .then(function(data) {
-            app.map.layer.streams.init(data);
-        })
-        .then(function() {
-            app.map.getView().fit(bbox, {
-                duration: 1000
-            })
-        })
-        .then(function() {
-            app.map.interaction.select.segment();
-        })
-        .then(function() {
-            app.map.addLayer(app.map.layer.demo_streams);
-            // app.map.addLayer(app.map.layer.demo_stream);
-        })
-        .catch(function(data) {
-            console.warn('failed to add map layer');
-        });
+        app.map.clearLayers();
+        app.state.step = 0;
+        app.map.selection.setSelect(app.map.selection.selectSelectSingleClick);
+        app.map.enableLayer('streams');
+        scenario_type_selection_made('select');
     },
     'filter': function() {
-        app.map.addLayer(app.map.layer.huc10);
+        app.map.clearLayers();
+        app.state.step = 0;
+        app.map.selection.setSelect(app.map.selection.selectFilterSingleClick);
+        app.map.enableLayer('huc12');
+        scenario_type_selection_made('filter');
     },
     'draw': function() {
-        app.map.interaction.draw.init();
+      // enable drawing
+      app.map.clearLayers();
+      app.state.step = 0;
+      app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
+      scenario_type_selection_made('draw');
+      //TODO: trigger this with button or something once user has navigated
+      app.map.interaction.draw.init();
+    }
+}
+
+initFiltering = function() {
+  setTimeout(function() {
+    if ($('#focus_area_accordion').length > 0) {
+      $('#id_focus_area').prop('checked', true);
+      $('#id_focus_area_input').val(app.state.focusAreaState.id);
+      $('#focus_area_accordion').hide();
+      app.viewModel.scenarios.scenarioFormModel.toggleParameter('focus_area');
+    } else {
+      initFiltering();
+    }
+  }, 100);
+};
+
+app.panel = {
+    form: {
+        init: function() {
+            app.map.layer.planningUnits.init();
+            app.map.layer.scenarios.init();
+            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
+            initFiltering();
+        },
     }
 }
 
@@ -89,6 +117,21 @@ app.nav = {
             'Add additional points then double-click to finish; Re-select point to edit'
         ],
     },
+    stepActions: {
+      select: [
+        false,
+        false,
+        app.panel.form.init
+      ],
+      filter: [
+        false,
+        app.panel.form.init
+      ],
+      draw: [
+        false,    //TODO: enable drawing
+        false     //TODO: ??? enable editing?
+      ]
+    }
 }
 
 app.panel = {
@@ -279,28 +322,85 @@ app.request = {
                 console.log(`%cfail @ get pourpoint id: %o`, 'color: red', response);
             });
     },
+    get_focus_area: function(feature, layerName, callback) {
+        props = feature.getProperties();
+        id = props[app.mapbox.layers[props.layer].id_field];
+        return $.ajax({
+            url: '/ucsrb/get_focus_area',
+            data: {
+                id: id,
+                layer: layerName,
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(`%csuccess: got focus area`, 'color: green');
+                app.state.setFocusArea = response;
+                callback(feature, response.geojson);
+            },
+            error: function(response, status) {
+                console.log(`%cfail @ get focus area: %o`, 'color: red', response);
+                callback(null, response);
+                return status;
+            }
+        })
+    },
+    get_focus_area_at: function(feature, layerName, callback) {
+      // This is sloppy, but I don't know how to get the geometry from a VectorTile feature.
+      point = feature.b;
+      return $.ajax({
+          url: '/ucsrb/get_focus_area_at',
+          data: {
+              point: point,
+              layer: layerName,
+          },
+          dataType: 'json',
+          success: function(response) {
+              console.log(`%csuccess: got focus area at point`, 'color: green');
+              callback(feature, response);
+          },
+          error: function(response, status) {
+              console.log(`%cfail @ get focus area at point: %o`, 'color: red', response);
+              callback(null, response);
+          }
+      })
+    },
     /**
      * get a pourpoint's basin
      * @param  {number} pp_id [id]
      * @return {[GeoJSON]} drainage basin
      */
-    get_basin: function(pp_id) {
-        return $.ajax({
-            url: '/viewer/select/get_basin',
-            data: {
-                pourPoint: pp_id,
-                method: app.state.method,
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log(`%csuccess: got basin`, 'color: green');
-                return response;
-            },
-            error: function(response, status) {
-                console.log(`%cfail @ get basin: %o`, 'color: red', response);
-                return status;
-            }
-        })
+    get_basin: function(feature, callback) {
+      var pp_id = feature.getProperties().OBJECTID;
+      return $.ajax({
+        url: '/ucsrb/get_basin',
+        data: {
+          pourPoint: pp_id,
+          // method: app.state.method,
+        },
+        dataType: 'json',
+        success: function(response) {
+          console.log(`%csuccess: got basin`, 'color: green');
+          app.state.setFocusArea = response;
+          callback(feature, response.geojson);
+          return response;
+        },
+        error: function(response, status) {
+          console.log(`%cfail @ get basin: %o`, 'color: red', response);
+          // we don't have the ppt basins yet, just get a HUC12 for now.
+          app.request.get_focus_area_at(feature, 'HUC12', function(feature, hucFeat) {
+            vectors = (new ol.format.GeoJSON()).readFeatures(hucFeat.geojson, {
+                dataProjection: 'EPSG:3857',
+              featureProjection: 'EPSG:3857'
+            });
+            // set property id with hucFeat.id
+            vector = vectors[0].getGeometry();
+            vector.set('layer', 'huc12_3857');
+            vector.set('HUC_12', hucFeat.id.toString());
+            app.request.get_focus_area(vector, 'HUC12', callback);
+          });
+          return status;
+        }
+      })
     },
     filter_results: function(pourpoint) {
         $.ajax({

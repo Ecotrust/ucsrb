@@ -3,15 +3,16 @@ app.state = {
     panel: {
         content: '',
         position: '',
+        height: ''
     },
     instructions: '',
     focusArea: {
         method: '',
-        geometry: {},
-        pp_id: 0,
+        geometry: null,
+        id: null
     },
     nav: 'tall',
-    step: 0,
+    stepVal: 0,
     set setMethod(method) {
         this.method = method;
         this.focusArea.method = method;
@@ -24,6 +25,16 @@ app.state = {
     },
     set step(step) {
         app.state.instructions = app.nav.instructions[app.state.methodState][step];
+        this.stepVal = step;
+        if (app.nav.stepActions[app.state.methodState][step]) {
+          app.nav.stepActions[app.state.methodState][step]();
+        }
+        //TODO: Recognize and trigger filtering/drawing steps.
+    },
+    set setFocusArea(focusAreaObject) {
+      this.focusArea.method = this.method;
+      this.focusArea.id = focusAreaObject.id;
+      this.focusArea.geometry = focusAreaObject.geojson;
     },
     get methodState() {
         return this.method;
