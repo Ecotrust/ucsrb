@@ -9,6 +9,7 @@
         --secondary: #67b8c6;
             --link: #67b8c6;
         --accent: #e2e05e;
+        --bg: #EAF2F4;
         --text: #58595b;
 
         --margin-bottom: 1.5rem;
@@ -34,14 +35,17 @@ img {
     max-width: 100%;
 }
 
-i {
+i.svg_icon {
     display: inline-block;
     height: 1rem;
-    line-height: 1rem;
-    margin: 0 .5rem .25rem 0;
-    vertical-align: middle;
+    margin: 0 .5rem 0 0;
     width: 1rem;
 }
+
+    i.svg_icon img {
+        height: 100%;
+        width: 100%;
+    }
 
 hr {
     background: #e2e05e;

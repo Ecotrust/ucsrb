@@ -94,7 +94,6 @@ app.map.styles = {
     }),
 };
 
-
 /**
 * Map - Layers, Sources, Features
 */

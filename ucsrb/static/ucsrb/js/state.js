@@ -17,12 +17,6 @@ app.state = {
         this.method = method;
         this.focusArea.method = method;
     },
-    set panelContent(content) {
-        this.panel.content = content;
-    },
-    set panelheight(height) {
-        this.panel.height = height;
-    },
     set navHeight(height) {
         this.nav = height;
     },
@@ -54,7 +48,9 @@ app.state = {
     get saveState() {
         return {
             method: this.method,
-            focusArea: this.focusAreaState
+            focusArea: this.focusAreaState,
+            nav: this.nav,
+            step: this.step,
         }
     }
 }
