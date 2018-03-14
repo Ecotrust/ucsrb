@@ -4,7 +4,11 @@
 
 isFeatureRelevant = function(feature) {
   // return (layersClicked.indexOf(layerName) < 0 && app.mapbox.layers[layerName].report_methods.indexOf(app.state.method) >= 0) {
-  return app.mapbox.layers[feature.getProperties().layer].report_methods.indexOf(app.state.method) >= 0;
+  try {
+    return app.mapbox.layers[feature.getProperties().layer].report_methods.indexOf(app.state.method) >= 0;
+  } catch (err) {
+    return false;
+  }
 }
 
 // Mostly ripped from http://openlayers.org/en/master/examples/custom-interactions.html
@@ -12,11 +16,11 @@ isFeatureRelevant = function(feature) {
  * @constructor
  * @extends {ol.interaction.Pointer}
  */
-app.map.Pointer = function() {
+app.map.PointerType = function() {
 
   ol.interaction.Pointer.call(this, {
-    handleMoveEvent: app.map.Pointer.prototype.handleMoveEvent,
-    handleUpEvent: app.map.Pointer.prototype.handleUpEvent
+    handleMoveEvent: app.map.PointerType.prototype.handleMoveEvent,
+    handleUpEvent: app.map.PointerType.prototype.handleUpEvent
   });
 
   /**
@@ -44,7 +48,7 @@ app.map.Pointer = function() {
   this.previousCursor_ = undefined;
 
 };
-ol.inherits(app.map.Pointer, ol.interaction.Pointer);
+ol.inherits(app.map.PointerType, ol.interaction.Pointer);
 
 /**
 * Popup Logic
@@ -54,7 +58,7 @@ app.map.popupLock = false;
 /**
 * @param {ol.MapBrowserEvent} evt Event.
 */
-app.map.Pointer.prototype.handleMoveEvent = function(evt) {
+app.map.PointerType.prototype.handleMoveEvent = function(evt) {
   if (app.map.popup && !app.map.popupLock) {
     var element = app.map.popup.getElement();
     $(element).popover('dispose');
@@ -69,7 +73,7 @@ app.map.Pointer.prototype.handleMoveEvent = function(evt) {
     map.forEachFeatureAtPixel(evt.pixel,
       function(feat) {
         feature = feat;
-        if (isFeatureRelevant) {
+        if (isFeatureRelevant(feat)) {
           const properties = feat.getProperties();
           var layerName = properties.layer;
           layersClicked.push(layerName);
@@ -122,59 +126,13 @@ app.map.Pointer.prototype.handleMoveEvent = function(evt) {
 /**
  * @return {boolean} `false` to stop the drag sequence.
  */
-app.map.Pointer.prototype.handleUpEvent = function() {
+app.map.PointerType.prototype.handleUpEvent = function() {
   this.coordinate_ = null;
   this.feature_ = null;
   return false;
 };
 
-app.map.addInteraction(new app.map.Pointer);
-
-
-
-/**
-* Interactions, Controls, and Widgets
-*/
-
-// app.map.interaction = {
-//     select: {
-//         segment: function() {
-//             var select = new ol.interaction.Select({
-//                 style: app.map.styles['LineStringSelected'],
-//                 layers: [app.map.layer.streams.layer],
-//                 hitTolerance: 10
-//             });
-//             app.map.addInteraction(select);
-//             select.on('select', function(event) {
-//                 app.map.layer.streams.segment.init(event);
-//             });
-//         },
-//         pourpoint: function() {
-//             var select = new ol.interaction.Select({
-//                 style: app.map.styles['Point'],
-//                 layers: [app.map.layer.pourpoints.layer],
-//                 hitTolerance: 10,
-//             });
-//             app.map.addInteraction(select);
-//             return select.on('select', function(event) {
-//                 var collection = event.target.getFeatures();
-//                 collection.forEach(function(el,i,arr) {
-//                     var props = el.getProperties();
-//                     console.log('%c selected: %o', 'color: #05b8c3', arr);
-//                     app.request.get_basin(props.properties.id)
-//                         .then(function(data) {
-//                             app.request.saveState(); // save state prior to filter
-//                         });
-//                 });
-//                 app.panel.form.init();
-//                 app.state.step = 2;
-//             });
-//         },
-//     },
-//     get selection() {
-//         return this.select;
-//     }
-// }
+app.map.Pointer = new app.map.PointerType;
 
 app.map.selection = {};
 // Via http://openlayers.org/en/master/examples/select-features.html?q=select

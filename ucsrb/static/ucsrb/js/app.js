@@ -14,8 +14,16 @@ scenario_type_selection_made = function(selectionType) {
   var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
   extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
   if (selectionType == 'select') {
+    app.map.layer.draw.layer.setVisible(false);
     app.map.getView().animate({zoom: 10, center: [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2]});
+    app.map.addInteraction(app.map.Pointer);
+  } else if (selectionType == 'filter'){
+    app.map.layer.draw.layer.setVisible(false);
+    app.map.addInteraction(app.map.Pointer);
+    app.map.zoomToExtent(extent);
   } else {
+    app.map.layer.draw.layer.setVisible(true);
+    app.map.removeInteraction(app.map.Pointer);
     app.map.zoomToExtent(extent);
   }
 }
@@ -36,13 +44,10 @@ app.init = {
         scenario_type_selection_made('filter');
     },
     'draw': function() {
-      // enable drawing
       app.map.clearLayers();
       app.state.step = 0;
       app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
       scenario_type_selection_made('draw');
-      //TODO: trigger this with button or something once user has navigated
-      app.map.interaction.draw.init();
     }
 }
 
@@ -60,14 +65,96 @@ initFiltering = function() {
 };
 
 app.panel = {
+    moveLeft: function() {
+        app.panel.element.classList.add('left');
+        app.panel.element.classList.remove('right');
+        app.state.panel.position = 'left'; // set state
+    },
+    moveRight: function() {
+        app.panel.element.classList.add('right');
+        app.panel.element.classList.remove('left');
+        app.state.panel.position = 'right'; // set state
+    },
+    setContent: function(content) {
+        app.state.panel.content = content;
+        app.panel.element.innerHTML = content;
+    },
     form: {
         init: function() {
-            app.map.layer.planningUnits.init();
-            app.map.layer.scenarios.init();
-            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
-            initFiltering();
+            app.panel.moveRight();
+            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/')
+                .then(function() {
+                    document.querySelector('.submit_button').addEventListener('click', function(event) {
+                        window.setTimeout(function() {
+                            if (app.viewModel.scenarios.scenarioForm()) {
+                                console.log(`%c form not submitted; %o`, 'color: salmon;', event);
+                            } else {
+                                console.log(`%c form submitted; %o`, 'color: green;', event);
+                                app.panel.results.init();
+                            }
+                        }, 3000); // wait for scenarioform to be set to false.
+                                    // this happens in scenario.js:94
+                                    // using settimeout for now to avoid merge conflict in sceanario.js
+                                    // ideally the submitForm function in scenario.js would have a completion event or be a promise
+                    });
+                })
         },
+    },
+    results: {
+        element: function() {
+            return document.querySelector('#results');
+        },
+        init: function() {
+            app.panel.moveLeft();
+            app.request.get_results(app.viewModel.scenarios.scenarioList()[0].uid)
+                .then(function(response) {
+                    app.panel.results.addAggPanel(response);
+                    app.panel.results.addHydroPanel(response);
+                })
+                .catch(function(response) {
+                    console.log('%c failed to get results: %o', 'style: salmon;', response);
+                });
+        },
+        addAggPanel: function(content) {
+            var html = `<section class="aggregate result-section">`;
+                html += `<div class="media">
+                            <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
+                            <div class="media-body">
+                                <h4 class="mt-0">Aggregate</h4>
+                            </div>
+                            <a id="expand" href="" id="expand" /><img class="align-self-top ml-3" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>
+                         </div>`;
+                 html += '<h5>Forest Management</h5>';
+                     html += app.panel.results.styleObject(content.aggregate_results.forest_types);
+                 html += '<h5>Landforms/Topography</h5>';
+                     html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
+                 html += '<button class="btn btn-outline-primary">Download</button>'
+             html += '</section>';
+             app.panel.setContent(html);
+        },
+        addHydroPanel: function(content) {
+
+        },
+        styleObject: function(obj) {
+            var html = '<dl class="row">';
+            for (var key in obj) {
+                html += `<dd class="col-sm-5">${obj[key]}</dd>
+                         <dt class="col-sm-7">${key}</dt>`
+            }
+            html += '</dl>'
+            return html;
+        },
+    },
+    domElement: function() { // extra function for those who dont like js getters
+        return this.element;
+    // },
+    // get element() {
+    //     return document.querySelector('#panel');
     }
+}
+
+enableDrawing = function() {
+  app.map.draw.enable();
 }
 
 app.nav = {
@@ -128,99 +215,13 @@ app.nav = {
         app.panel.form.init
       ],
       draw: [
-        false,    //TODO: enable drawing
+        enableDrawing,
         false     //TODO: ??? enable editing?
       ]
     }
 }
 
-app.panel = {
-    moveLeft: function() {
-        app.panel.element.classList.add('left');
-        app.panel.element.classList.remove('right');
-        app.state.panel.position = 'left'; // set state
-    },
-    moveRight: function() {
-        app.panel.element.classList.add('right');
-        app.panel.element.classList.remove('left');
-        app.state.panel.position = 'right'; // set state
-    },
-    setContent: function(content) {
-        app.state.panel.content = content;
-        app.panel.element.innerHTML = content;
-    },
-    form: {
-        init: function() {
-            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/')
-                .then(function() {
-                    document.querySelector('.submit_button').addEventListener('click', function(event) {
-                        window.setTimeout(function() {
-                            if (app.viewModel.scenarios.scenarioForm()) {
-                                console.log(`%c form not submitted; %o`, 'color: salmon;', event);
-                            } else {
-                                console.log(`%c form submitted; %o`, 'color: green;', event);
-                                app.panel.results.init();
-                            }
-                        }, 3000); // what for scenarioform to be set to false.
-                                    // this happens in scenario.js:94
-                                    // using settimeout for now to avoid merge conflict in sceanario.js
-                                    // ideally the submitForm function in scenario.js would have a completion event or be a promise
-                    });
-                })
-        },
-    },
-    results: {
-        element: function() {
-            return document.querySelector('#results');
-        },
-        init: function() {
-            app.panel.moveLeft();
-            app.request.get_results(app.viewModel.scenarios.scenarioList()[0].uid)
-                .then(function(response) {
-                    app.panel.results.addAggPanel(response);
-                    app.panel.results.addHydroPanel(response);
-                })
-                .catch(function(response) {
-                    console.log('%c failed to get results: %o', 'style: salmon;', response);
-                });
-        },
-        addAggPanel: function(content) {
-            var html = `<section class="aggregate result-section">`;
-                html += `<div class="media">
-                            <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
-                            <div class="media-body">
-                                <h4 class="mt-0">Aggregate</h4>
-                            </div>
-                            <a id="expand" href="" id="expand" /><img class="align-self-top ml-3" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>
-                         </div>`;
-                 html += '<h5>Forest Management</h5>';
-                     html += app.panel.results.styleObject(content.aggregate_results.forest_types);
-                 html += '<h5>Landforms/Topography</h5>';
-                     html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
-                 html += '<button class="btn btn-outline-primary">Download</button>'
-             html += '</section>';
-             app.panel.setContent(html);
-        },
-        addHydroPanel: function(content) {
 
-        },
-        styleObject: function(obj) {
-            var html = '<dl class="row">';
-            for (var key in obj) {
-                html += `<dd class="col-sm-5">${obj[key]}</dd>
-                         <dt class="col-sm-7">${key}</dt>`
-            }
-            html += '</dl>'
-            return html;
-        },
-    },
-    domElement: function() { // extra function for those who dont like js getters
-        return this.element;
-    },
-    get element() {
-        return document.querySelector('#panel');
-    }
-}
 
 /**
  * Application AJAX requests object and methods
