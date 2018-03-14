@@ -170,36 +170,53 @@ app.panel = {
             app.panel.moveLeft();
             app.request.get_results(id)
                 .then(function(response) {
-                    app.panel.results.addAggPanel(response);
-                    app.panel.results.addHydroPanel(response);
+                    app.panel.results.aggPanel(response);
+                    app.panel.results.hydroPanel(response);
+                    app.panel.results.expander();
                 })
                 .catch(function(response) {
                     console.log('%c failed to get results: %o', 'style: salmon;', response);
                 });
         },
-        addAggPanel: function(content) {
+        expander: function() {
+            if (!document.querySelector('#expand')) {
+                document.getElementById('panel').insertAdjacentHTML('afterbegin', '<a id="expand" href="#" onclick="app.panel.toggleSize()" /><img class="align-self-middle" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>');
+            }
+        },
+        aggPanel: function(content) {
             var html = `<section class="aggregate result-section">`;
                 html += `<div class="media align-items-center">
                             <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
                             <div class="media-body">
                                 <h4 class="mt-0">Aggregate</h4>
                             </div>
-                            <a id="expand" href="#" onclick="app.panel.toggleSize()" /><img class="align-self-middle" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>
                          </div>`;
                 html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
                 html += `<div class="overflow-gradient">
                          <div class="result-list-wrap align-items-center">
                             <h5>Forest Management</h5>`;
-                        html += app.panel.results.styleObject(content.aggregate_results.forest_types);
+                html += app.panel.results.styleObject(content.aggregate_results.forest_types);
                     html += '<h5>Landforms/Topography</h5>';
-                        html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
-                html += '</div></div>';
+                html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
+                    html += '</div></div>';
                 html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
              html += '</section>';
+
              app.panel.setContent(html);
         },
-        addHydroPanel: function(content) {
-
+        hydroPanel: function(content) {
+            var html = `<section class="hydro-results result-section">`;
+            for (var pourpoint of content.pourpoints) {
+                html += `<div id="pp-result-${pourpoint.id}" class="pourpoint-result-wrap">
+                          <div class="media align-items-center">
+                            <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
+                            <div class="media-body">
+                                <h4 class="mt-0">${pourpoint.name}</h4>
+                            </div>
+                          </div>
+                        </div>`;
+                html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
+            }
         },
         styleObject: function(obj) {
             var html = '<dl class="row">';

@@ -503,12 +503,16 @@ main {
     padding: 0 2.5vh;
 }
 
-.result-section #expand {
+#panel #expand {
     height: 2vh;
+    position: absolute;
+    right: 1.5rem;
+    top: 1.5rem;
     width: 2vh;
+    z-index: 2;
 }
 
-.result-section #expand img {
+#panel #expand img {
     width: 100%;
 }
 
