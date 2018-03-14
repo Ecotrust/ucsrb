@@ -370,12 +370,8 @@ app.map.layer = {
         },
         init: function() {
             if (app.map.layer.planningUnits.counter < 1) {
-                // app.map.addLayer(app.map.layer.planningUnits.layer);
-                app.request.get_planningunits()
-                    .then(function(response) {
-                        app.map.layer.planningUnits.addFeatures(response);
-                    });
                 app.map.layer.planningUnits.counter++;
+                console.log('%cplanning unit layer added', 'color: green');
             } else {
                 console.log('%cplanning unit layer already added', 'color: orange');
             }

@@ -240,14 +240,16 @@ app.request = {
     * @return {[json]} features list
     */
     get_planningunits: function() {
-        return $.ajax('/scenario/get_planningunits')
-            .done(function(response) {
+        return $.ajax({
+            url: '/scenario/get_planningunits',
+            success: function(response) {
                 console.log('%csuccessfully returned planning units: %o', 'color: green', response);
                 return response;
-            })
-            .fail(function(response) {
+            },
+            error: function(response) {
                 console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
-            });
+            }
+        });
     },
     get_scenarios: function() {
         return $.ajax('/ucsrb/get_scenarios/')
