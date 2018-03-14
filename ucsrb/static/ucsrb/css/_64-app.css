@@ -9,7 +9,8 @@
 
     #panel #scenario_form:not(:empty),
     #panel #scenarios:not(:empty),
-    #panel #results:not(:empty)  {
+    #panel #results:not(:empty),
+    #panel .result-section:not(:empty)  {
         width: 28vw;
         min-width: 400px;
         max-width: 500px;

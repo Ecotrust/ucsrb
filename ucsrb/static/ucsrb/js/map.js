@@ -271,7 +271,7 @@ app.map.layer = {
         }),
         style: app.map.styles.Streams,
         visible: false,
-        renderBuffer: 500
+        renderBuffer: 500,
         // declutter: true
       }),
       selectAction: streamSelectAction
@@ -335,6 +335,7 @@ app.map.layer = {
             if (app.map.layer.scenarios.counter < 1) {
                 // app.map.addLayer(app.map.layer.scenarios.layer);
                 app.request.get_scenarios()
+                // TODO stop this from blocking fitering
                     .then(function(response) {
                         var html = `<div class="dropdown">
                                         <button class="btn btn-secondary dropdown-toggle" type="button" id="savedScenarioDropdownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Saved Treatment</button>
@@ -381,7 +382,6 @@ app.map.layer = {
         }
     },
 };
-
 
 app.map.layer.scenarios.layer.set('id','scenarios');
 app.map.layer.planningUnits.layer.set('id', 'planningUnits');

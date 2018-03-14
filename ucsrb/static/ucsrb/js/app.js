@@ -151,31 +151,16 @@ app.panel = {
     },
     form: {
         init: function() {
-            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/')
-                .then(function() {
-                    document.querySelector('.submit_button').addEventListener('click', function(event) {
-                        window.setTimeout(function() {
-                            if (app.viewModel.scenarios.scenarioForm()) {
-                                console.log(`%c form not submitted; %o`, 'color: salmon;', event);
-                            } else {
-                                console.log(`%c form submitted; %o`, 'color: green;', event);
-                                app.panel.results.init();
-                            }
-                        }, 3000); // what for scenarioform to be set to false.
-                                    // this happens in scenario.js:94
-                                    // using settimeout for now to avoid merge conflict in sceanario.js
-                                    // ideally the submitForm function in scenario.js would have a completion event or be a promise
-                    });
-                })
+            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
         },
     },
     results: {
         element: function() {
             return document.querySelector('#results');
         },
-        init: function() {
+        init: function(id) {
             app.panel.moveLeft();
-            app.request.get_results(app.viewModel.scenarios.scenarioList()[0].uid)
+            app.request.get_results(id)
                 .then(function(response) {
                     app.panel.results.addAggPanel(response);
                     app.panel.results.addHydroPanel(response);
@@ -193,11 +178,14 @@ app.panel = {
                             </div>
                             <a id="expand" href="" id="expand" /><img class="align-self-top ml-3" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>
                          </div>`;
-                 html += '<h5>Forest Management</h5>';
-                     html += app.panel.results.styleObject(content.aggregate_results.forest_types);
-                 html += '<h5>Landforms/Topography</h5>';
-                     html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
-                 html += '<button class="btn btn-outline-primary">Download</button>'
+                html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`
+                html += `<div class="result-list-wrap">
+                            <h5>Forest Management</h5>`;
+                        html += app.panel.results.styleObject(content.aggregate_results.forest_types);
+                    html += '<h5>Landforms/Topography</h5>';
+                        html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
+                    html += `<button class="btn btn-outline-primary">Download</button>
+                        </div>`
              html += '</section>';
              app.panel.setContent(html);
         },
@@ -345,7 +333,10 @@ app.request = {
         })
     },
     get_focus_area_at: function(feature, layerName, callback) {
-      // This is sloppy, but I don't know how to get the geometry from a VectorTile feature.
+      /**
+       * This is sloppy, but I don't know how to get the geometry from a VectorTile feature.
+       * @todo {Priority low} find try and set geometry from vector tile
+       */
       point = feature.b;
       return $.ajax({
           url: '/ucsrb/get_focus_area_at',

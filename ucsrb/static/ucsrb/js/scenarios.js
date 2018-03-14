@@ -104,10 +104,12 @@ var madrona = {
                 traditional: true,
                 dataType: 'json',
                 success: function(result) {
+                    app.panel.results.init(result['X-Madrona-Show']);
                     app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
                     app.viewModel.scenarios.loadingMessage(false);
                     clearInterval(barTimer);
                     // app.viewModel.scenarios.loadCollectionsFromServer();
+                    console.log(`%c form submitted: %o`, 'color: green;', result);
                 },
                 error: function(result) {
                     app.viewModel.scenarios.loadingMessage(null);
@@ -118,6 +120,7 @@ var madrona = {
                     } else {
                         app.viewModel.scenarios.errorMessage(result.responseText.split('\n\n')[0]);
                     }
+                    console.log(`%c form not submitted; %o`, 'color: salmon;', result);
                 }
             });
         };

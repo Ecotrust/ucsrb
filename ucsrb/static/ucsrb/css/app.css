@@ -256,7 +256,6 @@ main {
 
 #map {
     height: 100%;
-    height: 100vh;
 }
 
 /**
@@ -306,7 +305,8 @@ main {
 
 #panel #scenario_form,
 #panel #scenarios,
-#panel #results {
+#panel #results,
+#panel .result-section {
     font-size: .875em;
     opacity: 1;
     position: relative;
@@ -315,7 +315,8 @@ main {
 }
 #panel #scenario_form:empty,
 #panel #scenarios:empty,
-#panel #results:empty {
+#panel #results:empty,
+#panel .result-section:empty {
     opacity: 0;
     width: 0;
 }
@@ -424,6 +425,17 @@ main {
     font-size: 1em;
 }
 
+.result-section:not(:empty) .media,
+.result-section:not(:empty) .result-list-wrap {
+    padding: 1.5rem;
+}
+
+.feature-result {
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    padding: .5rem 1.5rem;
+    margin: 1rem 0;
+}
 /**
  * panel results charts d3.js
  */
