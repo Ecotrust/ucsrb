@@ -145,6 +145,14 @@ app.panel = {
         app.panel.element.classList.remove('left');
         app.state.panel.position = 'right'; // set state
     },
+    toggleSize: function() {
+        var appPanel = document.querySelector('.result-section');
+        if (appPanel.classList.contains('expanded')) {
+            appPanel.classList.remove('expanded');
+        } else {
+            appPanel.classList.add('expanded');
+        }
+    },
     setContent: function(content) {
         app.state.panel.content = content;
         app.panel.element.innerHTML = content;
@@ -171,21 +179,22 @@ app.panel = {
         },
         addAggPanel: function(content) {
             var html = `<section class="aggregate result-section">`;
-                html += `<div class="media">
+                html += `<div class="media align-items-center">
                             <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
                             <div class="media-body">
                                 <h4 class="mt-0">Aggregate</h4>
                             </div>
-                            <a id="expand" href="" id="expand" /><img class="align-self-top ml-3" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>
+                            <a id="expand" href="#" onclick="app.panel.toggleSize()" /><img class="align-self-middle" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>
                          </div>`;
-                html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`
-                html += `<div class="result-list-wrap">
+                html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
+                html += `<div class="overflow-gradient">
+                         <div class="result-list-wrap align-items-center">
                             <h5>Forest Management</h5>`;
                         html += app.panel.results.styleObject(content.aggregate_results.forest_types);
                     html += '<h5>Landforms/Topography</h5>';
                         html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
-                    html += `<button class="btn btn-outline-primary">Download</button>
-                        </div>`
+                html += '</div></div>';
+                html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
              html += '</section>';
              app.panel.setContent(html);
         },
@@ -240,16 +249,14 @@ app.request = {
     * @return {[json]} features list
     */
     get_planningunits: function() {
-        return $.ajax({
-            url: '/scenario/get_planningunits',
-            success: function(response) {
+        return $.ajax('/scenario/get_planningunits')
+            .done(function(response) {
                 console.log('%csuccessfully returned planning units: %o', 'color: green', response);
                 return response;
-            },
-            error: function(response) {
+            })
+            .fail(function(response) {
                 console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
-            }
-        });
+            });
     },
     get_scenarios: function() {
         return $.ajax('/ucsrb/get_scenarios/')

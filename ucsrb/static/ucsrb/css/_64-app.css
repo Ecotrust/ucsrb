@@ -15,4 +15,9 @@
         min-width: 400px;
         max-width: 500px;
     }
+
+    #panel .result-section:not(:empty).expanded {
+        width: 45vw;
+        max-width: 45vw;
+    }
 }

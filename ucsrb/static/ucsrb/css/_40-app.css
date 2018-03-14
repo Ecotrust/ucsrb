@@ -4,4 +4,8 @@
     #panel #results:not(:empty)  {
         width: 40vw;
     }
+
+    #panel .result-section:not(:empty).expanded {
+        width: 80vw;
+    }
 }

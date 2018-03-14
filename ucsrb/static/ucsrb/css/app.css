@@ -123,14 +123,14 @@ nav .navbar-toggler .navbar-toggler-icon {
 
     #process-nav button.active:after {
         bottom: -5vh;
-        border-left: 3vh solid transparent;
-        border-right: 3vh solid transparent;
-        border-top: 3vh solid #fff;
+        border-left: 3.5vh solid transparent;
+        border-right: 3.5vh solid transparent;
+        border-top: 5vh solid #fff;
         content: '';
         left: 50%;
         opacity: 1;
         position: absolute;
-        transform: translate(-3vh,0);
+        transform: translate(-3.5vh,0);
         z-index: 0;
     }
 
@@ -285,11 +285,10 @@ main {
  */
 #panel {
     background: rgba(255,255,255,0.9);
-    border-radius: 1em;
+    border-radius: .5em;
     bottom: 2.5rem;
     right: .5rem;
     top: 10vh;
-    overflow: auto;
     position: absolute;
 }
     #panel.left {
@@ -430,12 +429,89 @@ main {
     padding: 1.5rem;
 }
 
-.feature-result {
-    border-bottom: 1px solid #ccc;
-    border-top: 1px solid #ccc;
-    padding: .5rem 1.5rem;
-    margin: 1rem 0;
+.result-list-wrap {
+    height: 38.5vh;
+    overflow: scroll;
 }
+
+.overflow-gradient {
+    position: relative;
+}
+    .overflow-gradient:after {
+        background: linear-gradient( rgba(255, 255, 255, 0.001), #fff);
+        bottom: 0;
+        content: '';
+        height: 2rem;
+        left: 0;
+        pointer-events: none;
+        position: absolute;
+        right: 0;
+    }
+
+.media {
+    height: 10vh;
+}
+
+.aggregate .media img {
+    max-width: 56px;
+    max-height: 6vh;
+}
+
+.media h4 {
+    margin-bottom: 0;
+}
+
+.feature-result {
+    border-bottom: 2px solid #e6e7e8;
+    border-top: 2px solid #e6e7e8;
+    font-size: 2vh;
+    line-height: 5vh;
+    height: 5vh;
+    padding: 0 1.5rem;
+}
+
+.feature-result .lead {
+    font-size: 3vh;
+    font-weight: 500;
+}
+
+.feature-result .lead strong {
+    font-weight: 900;
+}
+
+.feature-result h4 {
+    margin-bottom: 0;
+}
+
+.result-section {
+    height: 100%;
+}
+
+.download-wrap {
+    bottom: 0;
+    border-top: 2px solid #e6e7e8;
+    border-radius: 0 0 .5em .5em;
+    height: 10vh;
+    left: 0;
+    padding: 2.25vh 1.5rem;
+    position: absolute;
+    right: 0;
+}
+
+.download-wrap .btn {
+    line-height: 5.5vh;
+    padding: 0 2.5vh;
+}
+
+.result-section #expand {
+    height: 2vh;
+    width: 2vh;
+}
+
+.result-section #expand img {
+    width: 100%;
+}
+
 /**
  * panel results charts d3.js
  */
@@ -457,19 +533,6 @@ main {
 
 .result-section dd {
     margin-bottom: 0;
-}
-
-.aggregate .media img {
-    max-width: 56px;
-}
-
-.result-section .expand {
-    max-width: 48px;
-    padding: 10px;
-}
-
-.result-section .expand img {
-    max-width: 20px;
 }
 
 /**
