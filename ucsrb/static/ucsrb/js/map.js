@@ -178,7 +178,7 @@ confirmSelection = function(feat, markup, vector) {
   mbLayer = app.mapbox.layers[feat.getProperties().layer];
   layer = app.map.layer[mbLayer.map_layer_id];
   features = (new ol.format.GeoJSON()).readFeatures(vector, {
-      dataProjection: 'EPSG:3857',
+    dataProjection: 'EPSG:3857',
     featureProjection: 'EPSG:3857'
   });
   if (app.state.method == 'select') {

@@ -136,13 +136,13 @@ app.nav = {
 
 app.panel = {
     moveLeft: function() {
-        app.panel.element.classList.add('left');
-        app.panel.element.classList.remove('right');
+        app.panel.getElement.classList.add('left');
+        app.panel.getElement.classList.remove('right');
         app.state.panel.position = 'left'; // set state
     },
     moveRight: function() {
-        app.panel.element.classList.add('right');
-        app.panel.element.classList.remove('left');
+        app.panel.getElement.classList.add('right');
+        app.panel.getElement.classList.remove('left');
         app.state.panel.position = 'right'; // set state
     },
     toggleSize: function() {
@@ -155,7 +155,7 @@ app.panel = {
     },
     setContent: function(content) {
         app.state.panel.content = content;
-        app.panel.element.innerHTML = content;
+        app.panel.getPanelContentElement.innerHTML = content;
     },
     form: {
         init: function() {
@@ -163,9 +163,6 @@ app.panel = {
         },
     },
     results: {
-        element: function() {
-            return document.querySelector('#results');
-        },
         init: function(id) {
             app.panel.moveLeft();
             app.request.get_results(id)
@@ -178,9 +175,13 @@ app.panel = {
                     console.log('%c failed to get results: %o', 'style: salmon;', response);
                 });
         },
+        setContent: function(content) {
+            app.state.panel.content = content;
+            app.panel.results.getPanelResultsElement.innerHTML = content;
+        },
         expander: function() {
             if (!document.querySelector('#expand')) {
-                document.getElementById('panel').insertAdjacentHTML('afterbegin', '<a id="expand" href="#" onclick="app.panel.toggleSize()" /><img class="align-self-middle" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>');
+                app.panel.getPanelContentElement.insertAdjacentHTML('afterbegin', '<a id="expand" href="#" onclick="app.panel.toggleSize()" /><img class="align-self-middle" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>');
             }
         },
         aggPanel: function(content) {
@@ -202,7 +203,7 @@ app.panel = {
                 html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
              html += '</section>';
 
-             app.panel.setContent(html);
+             app.panel.results.setContent(html);
         },
         hydroPanel: function(content) {
             var html = `<section class="hydro-results result-section">`;
@@ -217,6 +218,7 @@ app.panel = {
                         </div>`;
                 html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
             }
+            app.panel.results.setContent(html);
         },
         styleObject: function(obj) {
             var html = '<dl class="row">';
@@ -227,12 +229,24 @@ app.panel = {
             html += '</dl>'
             return html;
         },
+        panelResultsElement: function() {
+            return this.getPanelResultsElement;
+        },
+        get getPanelResultsElement() {
+            return document.getElementById('results');
+        }
     },
-    domElement: function() { // extra function for those who dont like js getters
-        return this.element;
+    panelElement: function() { // returns a function. to edit dom element don't forget to invoke: panelElement()
+        return this.getElement;
     },
-    get element() {
-        return document.querySelector('#panel');
+    panelContentElement: function() { // returns a function. to edit dom element don't forget to invoke: panelContentElement()
+        return this.getPanelContentElement;
+    },
+    get getElement() {
+        return document.getElementById('panel');
+    },
+    get getPanelContentElement() {
+        return document.getElementById('panel-content');
     }
 }
 
