@@ -159,7 +159,10 @@ app.panel = {
     },
     form: {
         init: function() {
-            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
+            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/')
+                .then(function(response) {
+                    console.log(response);
+                })
         },
     },
     results: {

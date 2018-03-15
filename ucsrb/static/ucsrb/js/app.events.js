@@ -1,6 +1,7 @@
 $(document).ready(function() {
   $('#process-nav button').click(function(event) {
     app.setState(event.currentTarget.dataset.method);
+    app.state.step = 'reset';
     app.nav.short();
     setTimeout(function() {
       $('#process-nav button').each(function() {

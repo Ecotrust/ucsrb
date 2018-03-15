@@ -12,7 +12,7 @@ app.state = {
         id: null
     },
     nav: 'tall',
-    stepVal: 0,
+    stepVal: null,
     set setMethod(method) {
         this.method = method;
         this.focusArea.method = method;
@@ -24,10 +24,16 @@ app.state = {
         $('#instruction').html(instruction);
     },
     set step(step) {
-        app.state.instructions = app.nav.instructions[app.state.methodState][step];
         this.stepVal = step;
-        if (app.nav.stepActions[app.state.methodState][step]) {
-          app.nav.stepActions[app.state.methodState][step]();
+        if (step === null || step === 'reset') {
+            app.state.panelContent = '';
+            app.panel.getPanelContentElement.innerHTML = '<div id="scenarios"></div><div id="scenario_form"></div><div id="results"></div>';
+            app.panel.moveRight();
+        } else {
+            app.state.instructions = app.nav.instructions[app.state.methodState][step];
+            if (app.nav.stepActions[app.state.methodState][step]) {
+              app.nav.stepActions[app.state.methodState][step]();
+            }
         }
         //TODO: Recognize and trigger filtering/drawing steps.
     },
