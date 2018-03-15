@@ -24,17 +24,13 @@ app.state = {
         $('#instruction').html(instruction);
     },
     set step(step) {
-        this.stepVal = step;
-        if (step === null || step === 'reset') {
-            app.state.panelContent = '';
-            app.panel.getPanelContentElement.innerHTML = '<div id="scenarios"></div><div id="scenario_form"></div><div id="results"></div>';
-            app.panel.moveRight();
-        } else {
-            app.state.instructions = app.nav.instructions[app.state.methodState][step];
-            if (app.nav.stepActions[app.state.methodState][step]) {
-              app.nav.stepActions[app.state.methodState][step]();
-            }
-        }
+      this.stepVal = step;
+      app.state.instructions = app.nav.instructions[app.state.methodState][step];
+      if (app.nav.stepActions[step]) {
+        app.nav.stepActions[step]();
+      } else if (app.nav.stepActions[app.state.methodState][step]) {
+        app.nav.stepActions[app.state.methodState][step]();
+      }
         //TODO: Recognize and trigger filtering/drawing steps.
     },
     set setFocusArea(focusAreaObject) {

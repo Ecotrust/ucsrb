@@ -165,10 +165,20 @@ confirmationReceived = function() {
   if (app.state.method == 'select') {
     if (app.state.stepVal < 2) {
       app.state.step = 2; // step forward in state
+    } else if (app.state.stepVal == 2) {
+      // if already on step 2 then a new pourpoint has been selected
+      // we need to the reset the filter form and then go back to step 2
+      app.state.step = 'reset';
+      app.state.step = 2;
     }
   } else {
     if (app.state.stepVal < 1) {
       app.state.step = 1; // step forward in state
+    } else if (app.state.stepVal == 1) {
+      // if already on step 2 then a new forest unit has been selected
+      // we need to the reset the filter form and then go back to step 1
+      app.state.step = 'reset';
+      app.state.step = 1;
     }
   }
   closeConfirmSelection(true);

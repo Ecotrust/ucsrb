@@ -118,6 +118,10 @@ app.nav = {
         ],
     },
     stepActions: {
+      reset: function() {
+          app.panel.getPanelContentElement.innerHTML = '<div id="scenarios"></div><div id="scenario_form"></div><div id="results"></div>';
+          app.panel.moveRight();
+      },
       select: [
         false,
         false,
@@ -161,7 +165,7 @@ app.panel = {
         init: function() {
             app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/')
                 .then(function(response) {
-                    console.log(response);
+                    console.log('yo');
                 })
         },
     },
