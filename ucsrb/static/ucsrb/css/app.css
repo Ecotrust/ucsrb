@@ -116,7 +116,13 @@ nav .navbar-toggler .navbar-toggler-icon {
     outline: none;
     padding: 0;
     position: relative;
+    transition: opacity 0.2s;
 }
+
+    #process-nav:hover button:not(:hover) {
+        opacity: 0.5;
+    }
+
     #process-nav button.active {
         transition: 1s all ease-in 2s;
     }
@@ -438,10 +444,10 @@ main {
     position: relative;
 }
     .overflow-gradient:after {
-        background: linear-gradient( rgba(255, 255, 255, 0.001), #fff);
+        background: linear-gradient( rgba(255, 255, 255, 0.1), rgba(255,255,255,0.98));
         bottom: 0;
         content: '';
-        height: 2rem;
+        height: 5vh;
         left: 0;
         pointer-events: none;
         position: absolute;
