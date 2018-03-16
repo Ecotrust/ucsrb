@@ -1228,7 +1228,9 @@ function scenariosModel(options) {
           var scenarioForm = document.getElementById(app.viewModel.currentTocId()+'-scenario-form').children[0];
         } catch (err) {
           //RDH 1/10/2018 - this may work for demo. What to do to repopulate the form?
-          var scenarioForm = document.getElementById('scenario_form').children[0];
+          // var scenarioForm = document.getElementById('scenario_form').children[0];
+          // DLP 3.16.18 - removing all children
+          var scenarioForm = document.getElementById('scenario_form');
         }
         $(scenarioForm).empty();
         ko.cleanNode(scenarioForm);

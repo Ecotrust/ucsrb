@@ -74,10 +74,10 @@ drawingIsSmallEnough = function(areaInMeters) {
 
 app.panel = {
     hide: function() {
-      app.panel.panelElement.hidden = true;
+      app.panel.element.hidden = true;
     },
     show: function() {
-      app.panel.panelElement.hidden = false;
+      app.panel.element.hidden = false;
     },
     moveLeft: function() {
         app.panel.show();
@@ -97,7 +97,7 @@ app.panel = {
         app.panel.getPanelContentElement.innerHTML = content;
     },
     toggleSize: function() {
-        var appPanel = document.querySelector('.result-section');
+        var appPanel = app.panel.getElement;
         if (appPanel.classList.contains('expanded')) {
             appPanel.classList.remove('expanded');
         } else {
@@ -131,7 +131,7 @@ app.panel = {
         },
         addResults: function(content) {
             app.state.panel.content = content;
-            app.panel.results.getPanelResultsElement.innerHTML = content;
+            app.panel.results.getPanelResultsElement.innerHTML += content;
         },
         expander: function() {
             if (!document.querySelector('#expand')) {
@@ -240,7 +240,7 @@ app.panel = {
         }
       }
     },
-    panelElement: function() { // returns a function. to edit dom element don't forget to invoke: panelElement()
+    element: function() { // returns a function. to edit dom element don't forget to invoke: element()
         return this.getElement;
     },
     panelContentElement: function() { // returns a function. to edit dom element don't forget to invoke: panelContentElement()

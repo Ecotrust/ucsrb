@@ -327,8 +327,7 @@ main {
 }
 
 #panel #scenario_form:not(:empty),
-#panel #scenarios:not(:empty),
-#panel #results:not(:empty) {
+#panel #scenarios:not(:empty) {
     padding: 1.5rem 1rem;
 }
 
@@ -520,6 +519,10 @@ main {
 
 #panel #expand img {
     width: 100%;
+}
+
+#panel.expanded #expand {
+    transform: rotate(180deg);
 }
 
 /**

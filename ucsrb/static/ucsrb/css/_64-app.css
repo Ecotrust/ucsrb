@@ -16,7 +16,10 @@
         max-width: 500px;
     }
 
-    #panel .result-section:not(:empty).expanded {
+    #panel.expanded #scenario_form:not(:empty),
+    #panel.expanded #scenarios:not(:empty),
+    #panel.expanded #results:not(:empty),
+    #panel.expanded .result-section:not(:empty) {
         width: 45vw;
         max-width: 45vw;
     }

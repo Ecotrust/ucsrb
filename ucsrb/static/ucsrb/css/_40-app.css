@@ -1,11 +1,15 @@
 @media all and (min-width: 40em) {
     #panel #scenario_form:not(:empty),
     #panel #scenarios:not(:empty),
-    #panel #results:not(:empty)  {
+    #panel #results:not(:empty),
+    #panel .result-section:not(:empty)   {
         width: 40vw;
     }
 
-    #panel .result-section:not(:empty).expanded {
+    #panel.expanded #scenario_form:not(:empty),
+    #panel.expanded #scenarios:not(:empty),
+    #panel.expanded #results:not(:empty),
+    #panel.expanded .result-section:not(:empty) {
         width: 80vw;
     }
 }
