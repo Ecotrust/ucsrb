@@ -69,7 +69,6 @@ initFiltering = function() {
 drawingIsSmallEnough = function(areaInMeters) {
   maxAcres = app.map.draw.maxAcres;
   metersPerAcre = 4046.86;
-  console.log('area = ' + areaInMeters);
   return maxAcres*metersPerAcre > areaInMeters;
 }
 

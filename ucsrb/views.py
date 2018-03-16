@@ -511,9 +511,7 @@ def save_drawing(request):
             return response
         final_geometry = scenario.geometry_dissolved
         # EPSG:2163 = US National Atlas Equal Area
-        print(final_geometry.area)
         final_geometry.transform(2163)
-        print(final_geometry.area)
         if final_geometry.area/4046.86 < settings.MIN_TREATMENT_ACRES:
             context['success'] = False
             context['error_msg'] = 'Treatment does not cover enough forested land to make a difference'
