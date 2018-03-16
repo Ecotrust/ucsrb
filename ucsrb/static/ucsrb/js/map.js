@@ -106,7 +106,24 @@ app.map.styles = {
             }),
         })
     }),
+    'Draw': new ol.style.Style({
+      fill: new ol.style.Fill({
+        color: 'rgba(255, 255, 255, 0.4)'
+      }),
+      stroke: new ol.style.Stroke({
+        // color: '#ffcc33',
+        color: 'rgba(215, 160, 11, 1)',
+        width: 4
+      }),
+      image: new ol.style.Circle({
+        radius: 7,
+        fill: new ol.style.Fill({
+          color: 'rgba(255, 204, 51, 1)'
+        })
+      })
+    })
 };
+
 
 /**
 * Map - Layers, Sources, Features
@@ -268,7 +285,58 @@ pourPointSelectAction = function(feat) {
   });
 };
 
+var drawSource = new ol.source.Vector();
+var drawInteraction = new ol.interaction.Draw({
+  source: drawSource,
+  type: "Polygon",
+});
+var snapInteraction = new ol.interaction.Snap({source: drawSource});
+var modifyInteraction = new ol.interaction.Modify({source: drawSource});
+
+app.map.draw = {
+  maxAcres: 5000,
+  source: drawSource,
+  draw: drawInteraction,
+  snap: snapInteraction,
+  modify: modifyInteraction,
+  enable: function() {
+    app.map.addInteraction(drawInteraction);
+    app.map.addInteraction(snapInteraction);
+  },
+  enableEdit: function() {
+    app.map.removeInteraction(drawInteraction);
+    app.map.addInteraction(modifyInteraction);
+    // app.map.addInteraction(snapInteraction);
+  },
+  // disableEdit: function() {
+  //   app.map.removeInteraction(modifyInteraction);
+  //   app.map.removeInteraction(snapInteraction);
+  // },
+  disable: function() {
+    app.map.removeInteraction(modifyInteraction);
+    app.map.removeInteraction(drawInteraction);
+    app.map.removeInteraction(snapInteraction);
+  }
+};
+
+app.map.draw.draw.on('drawstart', function(e) {
+  if (app.state.stepVal == 0) {
+    app.state.step = 1;
+  }
+});
+
+app.map.draw.draw.on('drawend', function(e) {
+  app.map.draw.enableEdit();
+  app.panel.draw.finishDrawing();
+});
+
 app.map.layer = {
+    draw: {
+      layer: new ol.layer.Vector({
+        source: app.map.draw.source,
+        style: app.map.styles.Draw
+      })
+    },
     streams: {
       layer: new ol.layer.VectorTile({
         name: 'Streams',
@@ -400,6 +468,7 @@ for (var i=0; i < app.map.getLayers().getArray().length; i++) {
 }
 
 if (app.map.overlays) {
+  app.map.overlays.getLayers().push(app.map.layer.draw.layer);
   app.map.overlays.getLayers().push(app.map.layer.huc12.layer);
   app.map.overlays.getLayers().push(app.map.layer.huc10.layer);
   app.map.overlays.getLayers().push(app.map.layer.streams.layer);
@@ -452,3 +521,8 @@ app.map.clearLayers = function() {
     app.map.disableLayer(layerNames[i]);
   }
 }
+
+app.map.addScenario = function(vectors) {
+  app.map.draw.source.clear(true);
+  app.map.draw.source.addFeatures(vectors);
+};

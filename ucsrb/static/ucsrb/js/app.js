@@ -14,8 +14,18 @@ scenario_type_selection_made = function(selectionType) {
   var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
   extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
   if (selectionType == 'select') {
+    app.map.removeInteraction(app.map.draw.draw);
+    app.map.layer.draw.layer.setVisible(false);
     app.map.getView().animate({zoom: 10, center: [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2]});
+    app.map.addInteraction(app.map.Pointer);
+  } else if (selectionType == 'filter'){
+    app.map.removeInteraction(app.map.draw.draw);
+    app.map.layer.draw.layer.setVisible(false);
+    app.map.addInteraction(app.map.Pointer);
+    app.map.zoomToExtent(extent);
   } else {
+    app.map.layer.draw.layer.setVisible(true);
+    app.map.removeInteraction(app.map.Pointer);
     app.map.zoomToExtent(extent);
   }
 }
@@ -36,13 +46,10 @@ app.init = {
         scenario_type_selection_made('filter');
     },
     'draw': function() {
-      // enable drawing
       app.map.clearLayers();
       app.state.step = 0;
       app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
       scenario_type_selection_made('draw');
-      //TODO: trigger this with button or something once user has navigated
-      app.map.interaction.draw.init();
     }
 }
 
@@ -59,16 +66,35 @@ initFiltering = function() {
   }, 100);
 };
 
+drawingIsSmallEnough = function(areaInMeters) {
+  maxAcres = app.map.draw.maxAcres;
+  metersPerAcre = 4046.86;
+  return maxAcres*metersPerAcre > areaInMeters;
+}
+
 app.panel = {
+    hide: function() {
+      app.panel.panelElement.hidden = true;
+    },
+    show: function() {
+      app.panel.panelElement.hidden = false;
+    },
     moveLeft: function() {
+        app.panel.show();
         app.panel.getElement.classList.add('left');
         app.panel.getElement.classList.remove('right');
         app.state.panel.position = 'left'; // set state
     },
     moveRight: function() {
+        app.panel.show();
         app.panel.getElement.classList.add('right');
         app.panel.getElement.classList.remove('left');
         app.state.panel.position = 'right'; // set state
+    },
+    setContent: function(content) {
+        app.panel.show();
+        app.state.panel.content = content;
+        app.panel.getPanelContentElement.innerHTML = content;
     },
     toggleSize: function() {
         var appPanel = document.querySelector('.result-section');
@@ -78,12 +104,9 @@ app.panel = {
             appPanel.classList.add('expanded');
         }
     },
-    setContent: function(content) {
-        app.state.panel.content = content;
-        app.panel.getPanelContentElement.innerHTML = content;
-    },
     form: {
         init: function() {
+            app.panel.moveRight();
             app.map.layer.planningUnits.init();
             app.map.layer.scenarios.init();
             app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
@@ -93,6 +116,9 @@ app.panel = {
     results: {
         init: function(id) {
             app.panel.moveLeft();
+            if (!id) {
+                id = app.viewModel.scenarios.scenarioList()[0].uid;
+            }
             app.request.get_results(id)
                 .then(function(response) {
                     app.panel.results.aggPanel(response);
@@ -164,6 +190,56 @@ app.panel = {
             return document.getElementById('results');
         }
     },
+    draw: {
+      finishDrawing: function() {
+        app.panel.moveRight();
+        var html = '<div class="panel-content">' +
+                      '<p><b>Do you want to add another treatment area?</b></p>' +
+                      '<button class="btn" onclick="app.panel.draw.addTreatmentArea()">Yes</button>' +
+                      '<button class="btn" onclick="app.panel.draw.acceptDrawing()">No</button>' +
+                      '<button class="btn" onclick="app.panel.draw.restart()">Restart</button>' +
+                    '</div>';
+        app.panel.setContent(html);
+      },
+      restart: function() {
+        app.map.draw.source.clear(true);
+        app.panel.hide();
+      },
+      addTreatmentArea: function() {
+        app.map.draw.enable();
+        var html = '<div class="panel-content">' +
+                      '<p>Click on the map to start drawing your new treatment area.</p>' +
+                      '<button class="btn" onclick="app.panel.draw.cancelDrawing()">Cancel</button>' +
+                    '</div>';
+        app.panel.setContent(html);
+      },
+      cancelDrawing: function() {
+        app.map.draw.disable();
+        app.panel.draw.finishDrawing();
+      },
+      acceptDrawing: function() {
+        var html = '<div class="panel-content">' +
+                      '<p><b>Do you want to harvest within this treatment area?</b></p>' +
+                      '<button class="btn" onclick="app.panel.draw.saveDrawing()">Yes</button>' +
+                      '<button class="btn" onclick="app.panel.draw.finishDrawing()">No</button>' +
+                    '</div>';
+        app.panel.setContent(html);
+      },
+      saveDrawing: function() {
+        var drawFeatures = app.map.draw.source.getFeatures();
+        totalArea = 0;
+        for (var i = 0; i < drawFeatures.length; i++) {
+          totalArea += ol.Sphere.getArea(drawFeatures[i].getGeometry());
+        }
+        if (drawingIsSmallEnough(totalArea)) {
+          app.request.saveDrawing();
+        } else {
+          areaInAcres = totalArea/4046.86;
+          alert('Your treatment area is too large (' + areaInAcres.toFixed(0) + ' acres). Please keep it below ' + app.map.draw.maxAcres.toString() + ' acres');
+          app.panel.draw.acceptDrawing();
+        }
+      }
+    },
     panelElement: function() { // returns a function. to edit dom element don't forget to invoke: panelElement()
         return this.getElement;
     },
@@ -176,6 +252,10 @@ app.panel = {
     get getPanelContentElement() {
         return document.getElementById('panel-content');
     }
+}
+
+enableDrawing = function() {
+  app.map.draw.enable();
 }
 
 app.nav = {
@@ -235,8 +315,8 @@ app.nav = {
     },
     stepActions: {
       reset: function() {
-          app.panel.getPanelContentElement.innerHTML = '<div id="scenarios"></div><div id="scenario_form"></div><div id="results"></div>';
-          app.panel.moveRight();
+            app.panel.getPanelContentElement.innerHTML = '<div id="scenarios"></div><div id="scenario_form"></div><div id="results"></div>';
+            app.panel.moveRight();
       },
       select: [
         false,
@@ -248,11 +328,41 @@ app.nav = {
         app.panel.form.init
       ],
       draw: [
-        false,    //TODO: enable drawing
+        enableDrawing,
         false     //TODO: ??? enable editing?
       ]
     }
 }
+
+// using jQuery to get CSRF Token
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
 
 /**
  * Application AJAX requests object and methods
@@ -410,7 +520,6 @@ app.request = {
         url: '/ucsrb/get_basin',
         data: {
           pourPoint: pp_id,
-          // method: app.state.method,
         },
         dataType: 'json',
         success: function(response) {
@@ -434,6 +543,37 @@ app.request = {
             app.request.get_focus_area(vector, 'HUC12', callback);
           });
           return status;
+        }
+      })
+    },
+    saveDrawing: function() {
+      var drawFeatures = app.map.draw.source.getFeatures();
+      var geojsonFormat = new ol.format.GeoJSON();
+      var featureJson = geojsonFormat.writeFeatures(drawFeatures);
+
+      return $.ajax({
+        url: '/ucsrb/save_drawing',
+        data: {
+          drawing: featureJson,
+          // TODO: Set name/description with form
+          name: 'foo',
+          description: null
+        },
+        dataType: 'json',
+        method: 'POST',
+        success: function(response) {
+          console.log(`%csuccess: saved drawing`, 'color: green');
+          vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
+            dataProjection: 'EPSG:3857',
+            featureProjection: 'EPSG:3857'
+          });
+          app.map.addScenario(vectors);
+          app.panel.results.init();
+        },
+        error: function(response, status) {
+          console.log(`%cfail @ save drawing: %o`, 'color: red', response);
+          alert(response.responseJSON.error_msg);
+          app.panel.draw.finishDrawing();
         }
       })
     },
