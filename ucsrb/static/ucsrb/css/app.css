@@ -85,17 +85,17 @@ nav .navbar-toggler .navbar-toggler-icon {
         animation: shrink-height .3s linear forwards .6s;
     }
 
-#process-nav {
+.method-nav {
     transition: 0.3s all linear;
 }
 
-#process-nav li {
+.method-nav li {
     margin: 0;
     position: relative;
     text-align: center;
 }
 
-    #process-nav li:after {
+    .method-nav li:after {
         content: '';
         border-right: 10px solid #e6e7e8;
         height: 60%;
@@ -105,11 +105,11 @@ nav .navbar-toggler .navbar-toggler-icon {
         right: -5px;
     }
 
-    #process-nav li:last-of-type:after {
+    .method-nav li:last-of-type:after {
         border-right: none;
     }
 
-#process-nav button {
+.method-nav button {
     border: none;
     background: transparent;
     cursor: pointer;
@@ -119,15 +119,15 @@ nav .navbar-toggler .navbar-toggler-icon {
     transition: opacity 0.2s;
 }
 
-    #process-nav:hover button:not(:hover) {
+    .method-nav:hover button:not(:hover) {
         opacity: 0.5;
     }
 
-    #process-nav button.active {
+    .method-nav button.active {
         transition: 1s all ease-in 2s;
     }
 
-    #process-nav button.active:after {
+    .method-nav button.active:after {
         bottom: -5vh;
         border-left: 3.5vh solid transparent;
         border-right: 3.5vh solid transparent;
@@ -140,14 +140,14 @@ nav .navbar-toggler .navbar-toggler-icon {
         z-index: 0;
     }
 
-#process-nav button img {
+.method-nav button img {
     max-height: 5.5rem;
     margin-bottom: 1rem;
     pointer-events: none;
     max-width: 96%;
 }
 
-#process-nav h3 {
+.method-nav h3 {
     margin: 0 auto;
     pointer-events: none;
     transition: 0.2s all linear;

@@ -60,6 +60,28 @@ initFiltering = function() {
 };
 
 app.panel = {
+    moveLeft: function() {
+        app.panel.getElement.classList.add('left');
+        app.panel.getElement.classList.remove('right');
+        app.state.panel.position = 'left'; // set state
+    },
+    moveRight: function() {
+        app.panel.getElement.classList.add('right');
+        app.panel.getElement.classList.remove('left');
+        app.state.panel.position = 'right'; // set state
+    },
+    toggleSize: function() {
+        var appPanel = document.querySelector('.result-section');
+        if (appPanel.classList.contains('expanded')) {
+            appPanel.classList.remove('expanded');
+        } else {
+            appPanel.classList.add('expanded');
+        }
+    },
+    setContent: function(content) {
+        app.state.panel.content = content;
+        app.panel.getPanelContentElement.innerHTML = content;
+    },
     form: {
         init: function() {
             app.map.layer.planningUnits.init();
@@ -67,12 +89,106 @@ app.panel = {
             app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
             initFiltering();
         },
+    },
+    results: {
+        init: function(id) {
+            app.panel.moveLeft();
+            app.request.get_results(id)
+                .then(function(response) {
+                    app.panel.results.aggPanel(response);
+                    app.panel.results.hydroPanel(response);
+                    app.panel.results.expander();
+                })
+                .catch(function(response) {
+                    console.log('%c failed to get results: %o', 'style: salmon;', response);
+                });
+        },
+        addResults: function(content) {
+            app.state.panel.content = content;
+            app.panel.results.getPanelResultsElement.innerHTML = content;
+        },
+        expander: function() {
+            if (!document.querySelector('#expand')) {
+                app.panel.getPanelContentElement.insertAdjacentHTML('afterbegin', '<a id="expand" href="#" onclick="app.panel.toggleSize()" /><img class="align-self-middle" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>');
+            }
+        },
+        aggPanel: function(content) {
+            var html = `<section class="aggregate result-section">`;
+                html += `<div class="media align-items-center">
+                            <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
+                            <div class="media-body">
+                                <h4 class="mt-0">Aggregate</h4>
+                            </div>
+                         </div>`;
+                html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
+                html += `<div class="overflow-gradient">
+                         <div class="result-list-wrap align-items-center">
+                            <h5>Forest Management</h5>`;
+                html += app.panel.results.styleObject(content.aggregate_results.forest_types);
+                    html += '<h5>Landforms/Topography</h5>';
+                html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
+                    html += '</div></div>';
+                html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
+             html += '</section>';
+
+             app.panel.results.addResults(html);
+        },
+        hydroPanel: function(content) {
+            var html = `<section class="hydro-results result-section">`;
+            for (var pourpoint of content.pourpoints) {
+                html += `<div id="pp-result-${pourpoint.id}" class="pourpoint-result-wrap">
+                          <div class="media align-items-center">
+                            <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
+                            <div class="media-body">
+                                <h4 class="mt-0">${pourpoint.name}</h4>
+                            </div>
+                          </div>
+                        </div>`;
+                html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
+            }
+            app.panel.results.addResults(html);
+        },
+        styleObject: function(obj) {
+            var html = '<dl class="row">';
+            for (var key in obj) {
+                html += `<dd class="col-sm-5">${obj[key]}</dd>
+                         <dt class="col-sm-7">${key}</dt>`
+            }
+            html += '</dl>'
+            return html;
+        },
+        panelResultsElement: function() {
+            return this.getPanelResultsElement;
+        },
+        get getPanelResultsElement() {
+            return document.getElementById('results');
+        }
+    },
+    panelElement: function() { // returns a function. to edit dom element don't forget to invoke: panelElement()
+        return this.getElement;
+    },
+    panelContentElement: function() { // returns a function. to edit dom element don't forget to invoke: panelContentElement()
+        return this.getPanelContentElement;
+    },
+    get getElement() {
+        return document.getElementById('panel');
+    },
+    get getPanelContentElement() {
+        return document.getElementById('panel-content');
     }
 }
 
 app.nav = {
     setState: function(height) {
         app.state.navHeight = height;
+    },
+    showResultsNav: function() {
+        document.getElementById('results-nav').classList.remove('d-none');
+        document.getElementById('process-nav').classList.add('d-none');
+    },
+    hideResultsNav: function() {
+        document.getElementById('results-nav').classList.add('d-none');
+        document.getElementById('process-nav').classList.remove('d-none');
     },
     short: function() {
         app.state.navHeight = 'short'; // set state
@@ -135,125 +251,6 @@ app.nav = {
         false,    //TODO: enable drawing
         false     //TODO: ??? enable editing?
       ]
-    }
-}
-
-app.panel = {
-    moveLeft: function() {
-        app.panel.getElement.classList.add('left');
-        app.panel.getElement.classList.remove('right');
-        app.state.panel.position = 'left'; // set state
-    },
-    moveRight: function() {
-        app.panel.getElement.classList.add('right');
-        app.panel.getElement.classList.remove('left');
-        app.state.panel.position = 'right'; // set state
-    },
-    toggleSize: function() {
-        var appPanel = document.querySelector('.result-section');
-        if (appPanel.classList.contains('expanded')) {
-            appPanel.classList.remove('expanded');
-        } else {
-            appPanel.classList.add('expanded');
-        }
-    },
-    setContent: function(content) {
-        app.state.panel.content = content;
-        app.panel.getPanelContentElement.innerHTML = content;
-    },
-    form: {
-        init: function() {
-            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/')
-                .then(function(response) {
-                    console.log('yo');
-                })
-        },
-    },
-    results: {
-        init: function(id) {
-            app.panel.moveLeft();
-            app.request.get_results(id)
-                .then(function(response) {
-                    app.panel.results.aggPanel(response);
-                    app.panel.results.hydroPanel(response);
-                    app.panel.results.expander();
-                })
-                .catch(function(response) {
-                    console.log('%c failed to get results: %o', 'style: salmon;', response);
-                });
-        },
-        setContent: function(content) {
-            app.state.panel.content = content;
-            app.panel.results.getPanelResultsElement.innerHTML = content;
-        },
-        expander: function() {
-            if (!document.querySelector('#expand')) {
-                app.panel.getPanelContentElement.insertAdjacentHTML('afterbegin', '<a id="expand" href="#" onclick="app.panel.toggleSize()" /><img class="align-self-middle" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>');
-            }
-        },
-        aggPanel: function(content) {
-            var html = `<section class="aggregate result-section">`;
-                html += `<div class="media align-items-center">
-                            <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
-                            <div class="media-body">
-                                <h4 class="mt-0">Aggregate</h4>
-                            </div>
-                         </div>`;
-                html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
-                html += `<div class="overflow-gradient">
-                         <div class="result-list-wrap align-items-center">
-                            <h5>Forest Management</h5>`;
-                html += app.panel.results.styleObject(content.aggregate_results.forest_types);
-                    html += '<h5>Landforms/Topography</h5>';
-                html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
-                    html += '</div></div>';
-                html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
-             html += '</section>';
-
-             app.panel.results.setContent(html);
-        },
-        hydroPanel: function(content) {
-            var html = `<section class="hydro-results result-section">`;
-            for (var pourpoint of content.pourpoints) {
-                html += `<div id="pp-result-${pourpoint.id}" class="pourpoint-result-wrap">
-                          <div class="media align-items-center">
-                            <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
-                            <div class="media-body">
-                                <h4 class="mt-0">${pourpoint.name}</h4>
-                            </div>
-                          </div>
-                        </div>`;
-                html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
-            }
-            app.panel.results.setContent(html);
-        },
-        styleObject: function(obj) {
-            var html = '<dl class="row">';
-            for (var key in obj) {
-                html += `<dd class="col-sm-5">${obj[key]}</dd>
-                         <dt class="col-sm-7">${key}</dt>`
-            }
-            html += '</dl>'
-            return html;
-        },
-        panelResultsElement: function() {
-            return this.getPanelResultsElement;
-        },
-        get getPanelResultsElement() {
-            return document.getElementById('results');
-        }
-    },
-    panelElement: function() { // returns a function. to edit dom element don't forget to invoke: panelElement()
-        return this.getElement;
-    },
-    panelContentElement: function() { // returns a function. to edit dom element don't forget to invoke: panelContentElement()
-        return this.getPanelContentElement;
-    },
-    get getElement() {
-        return document.getElementById('panel');
-    },
-    get getPanelContentElement() {
-        return document.getElementById('panel-content');
     }
 }
 
