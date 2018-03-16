@@ -465,6 +465,71 @@ def get_basin(request):
         focus_area = FocusArea.objects.get(unit_type=layer, unit_id=unit_id)
     return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (focus_area.pk, focus_area.geometry.geojson)))
 
+def save_drawing(request):
+    context = {}
+    if request.method == 'POST':
+        from .models import FocusArea, TreatmentScenario
+        featJson = request.POST['drawing']
+        from django.contrib.gis.geos import MultiPolygon, Polygon, GEOSGeometry
+        polys = []
+        for feature in json.loads(featJson)['features']:
+            polys.append(GEOSGeometry(json.dumps(feature['geometry'])))
+        geometry = MultiPolygon(polys)
+        layer = 'Drawing'
+        focus_area = FocusArea.objects.create(unit_type=layer, geometry=geometry)
+        focus_area.save()
+
+        scenario_name = request.POST['name']
+        description = request.POST['description']
+
+        user = request.user
+        if not user.is_authenticated:
+            if settings.ALLOW_ANONYMOUS_DRAW == True:
+                from django.contrib.auth.models import User
+                user = User.objects.get(pk=settings.ANONYMOUS_USER_PK)
+            else:
+                context['success'] = False
+                context['error_msg'] = 'Anonymous Users Not Allowed. Please log in.'
+                # Return an 'invalid login' error message.
+                response = JsonResponse(context)
+                response.status_code = 401
+                return response
+
+        scenario = TreatmentScenario.objects.create(
+            user=user,
+            name=scenario_name,
+            description=None,
+            focus_area=True,
+            focus_area_input=focus_area
+        )
+
+        if not scenario.geometry_dissolved:
+            context['success'] = False
+            context['error_msg'] = 'Drawing does not cover any forested land in the Upper Columbia'
+            response = JsonResponse(context)
+            response.status_code = 500
+            return response
+        final_geometry = scenario.geometry_dissolved
+        # EPSG:2163 = US National Atlas Equal Area
+        print(final_geometry.area)
+        final_geometry.transform(2163)
+        print(final_geometry.area)
+        if final_geometry.area/4046.86 < settings.MIN_TREATMENT_ACRES:
+            context['success'] = False
+            context['error_msg'] = 'Treatment does not cover enough forested land to make a difference'
+            response = JsonResponse(context)
+            response.status_code = 500
+            return response
+        # return geometry to web mercator
+        final_geometry.transform(3857)
+        return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (scenario.pk, scenario.geometry_dissolved.geojson)))
+    context['success'] = False
+    context['error_msg'] = 'Unable to save drawing.'
+    # Return an 'invalid login' error message.
+    response = JsonResponse(context)
+    response.status_code = 500
+    return response
+
 '''
 Take a point in 3857 and return the feature at that point for a given FocusArea type
 Primarily developed as a failsafe for not having pour point basin data.

@@ -1,1 +1,3 @@
 MAPBOX_ACCESS_TOKEN = 'set_in_local_settings'
+ALLOW_ANONYMOUS_DRAW = False
+ANONYMOUS_USER_PK = 1

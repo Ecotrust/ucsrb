@@ -94,12 +94,12 @@ app.map.styles = {
     }),
     'Draw': new ol.style.Style({
       fill: new ol.style.Fill({
-        color: 'rgba(255, 255, 255, 0.2)'
+        color: 'rgba(255, 255, 255, 0.4)'
       }),
       stroke: new ol.style.Stroke({
         // color: '#ffcc33',
-        color: 'rgba(255, 204, 51, 1)',
-        width: 2
+        color: 'rgba(215, 160, 11, 1)',
+        width: 4
       }),
       image: new ol.style.Circle({
         radius: 7,
@@ -270,6 +270,7 @@ var snapInteraction = new ol.interaction.Snap({source: drawSource});
 var modifyInteraction = new ol.interaction.Modify({source: drawSource});
 
 app.map.draw = {
+  maxAcres: 5000,
   source: drawSource,
   draw: drawInteraction,
   snap: snapInteraction,
@@ -302,6 +303,7 @@ app.map.draw.draw.on('drawstart', function(e) {
 
 app.map.draw.draw.on('drawend', function(e) {
   app.map.draw.enableEdit();
+  app.panel.draw.finishDrawing();
 });
 
 app.map.layer = {
@@ -499,3 +501,8 @@ app.map.clearLayers = function() {
     app.map.disableLayer(layerNames[i]);
   }
 }
+
+app.map.addScenario = function(vectors) {
+  app.map.draw.source.clear(true);
+  app.map.draw.source.addFeatures(vectors);
+};

@@ -166,7 +166,9 @@ class TreatmentScenario(Scenario):
             result = VegPlanningUnit.objects.filter(geometry__intersects=self.focus_area_input.geometry)
         else:
             result = VegPlanningUnit.objects.all()
-        return super(type(self), self).run(result)
+        if result.count() > 0:
+            return super(type(self), self).run(result)
+        return result
 
 
     class Options:
