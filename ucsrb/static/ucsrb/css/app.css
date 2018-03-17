@@ -13,16 +13,22 @@
 }
 
 /**
- * header
+ * =========================================================================
+   Header
+ ===========================================================================
  */
+
 header {
     position: relative;
     z-index: 2;
 }
 
 /**
- * navbar styles
+ * =========================================================================
+   Navbar
+ ===========================================================================
  */
+
 .top-nav-wrap {
      background: #58595B;
      color: #fff;
@@ -73,8 +79,11 @@ nav .navbar-toggler .navbar-toggler-icon {
 }
 
 /**
- * Nav with scenario options (select, filter, draw)
+ * =========================================================================
+   Nav with scenario options (select, filter, draw)
+ ===========================================================================
  */
+
 .secondary-nav {
     background: #fff;
     height: 14rem;
@@ -176,7 +185,17 @@ nav .navbar-toggler .navbar-toggler-icon {
     animation: shrink-img .25s linear forwards 0.35s;
 }
 
-.icons-only #process-nav li:after {
+.icons-only #results-nav h3 {
+    height: 0;
+    transform: rotateX(90deg);
+}
+
+.icons-only #results-nav img {
+    max-height: 3.5rem;
+    margin-bottom: 0;
+}
+
+.icons-only .method-nav li:after {
     height: 80%;
 }
 
@@ -185,8 +204,11 @@ nav .navbar-toggler .navbar-toggler-icon {
 }
 
 /**
- * map styles
+ * =========================================================================
+    Map
+ ===========================================================================
  */
+
 main {
     height: 79vh;
 }
@@ -265,8 +287,9 @@ main {
 }
 
 /**
- *
- * Map controls
+ * =========================================================================
+    Map controls
+ ===========================================================================
  */
 
 #map .ol-control {
@@ -287,8 +310,11 @@ main {
 }
 
 /**
- * panel styles
+ * =========================================================================
+    Panel
+ ===========================================================================
  */
+
 #panel {
     background: rgba(255,255,255,0.9);
     border-radius: .5em;
@@ -429,6 +455,23 @@ main {
     font-size: 1em;
 }
 
+/**
+ * =========================================================================
+    Results
+ ===========================================================================
+ */
+
+#results {
+    height: 100%;
+}
+
+.result-section {
+    display: none;
+}
+    .result-section.show {
+        display: block;
+    }
+
 .result-section:not(:empty) .media,
 .result-section:not(:empty) .result-list-wrap {
     padding: 1.5rem;
@@ -453,16 +496,16 @@ main {
         right: 0;
     }
 
-.media {
+.result-section .media {
     height: 10vh;
 }
 
-.aggregate .media img {
+.result-section .media img {
     max-width: 56px;
     max-height: 6vh;
 }
 
-.media h4 {
+.result-section .media h4 {
     margin-bottom: 0;
 }
 
@@ -492,18 +535,17 @@ main {
     height: 100%;
 }
 
-.download-wrap {
+.result-section .download-wrap {
     bottom: 0;
     border-top: 2px solid #e6e7e8;
     border-radius: 0 0 .5em .5em;
     height: 10vh;
     left: 0;
     padding: 2.25vh 1.5rem;
-    position: absolute;
     right: 0;
 }
 
-.download-wrap .btn {
+.result-section .download-wrap .btn {
     line-height: 5.5vh;
     padding: 0 2.5vh;
 }
@@ -526,8 +568,11 @@ main {
 }
 
 /**
- * panel results charts d3.js
+ * =========================================================================
+   Charting
+ ===========================================================================
  */
+
 .result-chart {
     width: 100%;
 }
@@ -549,7 +594,49 @@ main {
 }
 
 /**
- * keyframe animation
+ * =========================================================================
+    Popup
+ ===========================================================================
+ */
+
+.fadeInRight {
+  animation-name: fadeInRight;
+}
+
+.bs-popover-auto[x-placement^=top], .bs-popover-top {
+    margin-bottom: 1rem;
+}
+
+.popover {
+  z-index: 1;
+  min-width: 250px;
+}
+
+.popover-header {
+  padding-right: 33px;
+}
+
+.popover-header button {
+  right: 5px;
+  top: 5px;
+  position: absolute;
+  height: 24px;
+  width: 24px;
+  padding: 0;
+
+}
+
+
+.popover-bottom-confirm-buttons button {
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+
+/**
+ * =========================================================================
+    CSS Animations
+ ===========================================================================
  */
 
 @keyframes shrink-height {
@@ -593,37 +680,4 @@ main {
     opacity: 1;
     transform: translate3d(0, 0, 0);
   }
-}
-
-.fadeInRight {
-  animation-name: fadeInRight;
-}
-
-.bs-popover-auto[x-placement^=top], .bs-popover-top {
-    margin-bottom: 1rem;
-}
-
-.popover {
-  z-index: 1;
-  min-width: 250px;
-}
-
-.popover-header {
-  padding-right: 33px;
-}
-
-.popover-header button {
-  right: 5px;
-  top: 5px;
-  position: absolute;
-  height: 24px;
-  width: 24px;
-  padding: 0;
-
-}
-
-
-.popover-bottom-confirm-buttons button {
-  margin-left: 15px;
-  margin-right: 15px;
 }

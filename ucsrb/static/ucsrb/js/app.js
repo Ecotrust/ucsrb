@@ -50,6 +50,12 @@ app.init = {
       app.state.step = 0;
       app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
       scenario_type_selection_made('draw');
+    },
+    'hydro': function() {
+        app.panel.results.showHydro();
+    },
+    'aggregate': function() {
+        app.panel.results.showAggregate();
     }
 }
 
@@ -124,6 +130,8 @@ app.panel = {
                     app.panel.results.aggPanel(response);
                     app.panel.results.hydroPanel(response);
                     app.panel.results.expander();
+                    app.panel.results.showAggregate();
+                    app.nav.showResultsNav();
                 })
                 .catch(function(response) {
                     console.log('%c failed to get results: %o', 'style: salmon;', response);
@@ -133,13 +141,21 @@ app.panel = {
             app.state.panel.content = content;
             app.panel.results.getPanelResultsElement.innerHTML += content;
         },
+        showAggregate: function() {
+            $('.result-section').removeClass('show');
+            document.getElementById('aggregate-results').classList.add('show');
+        },
+        showHydro: function() {
+            $('.result-section').removeClass('show');
+            document.getElementById('hydro-results').classList.add('show');
+        },
         expander: function() {
             if (!document.querySelector('#expand')) {
                 app.panel.getPanelContentElement.insertAdjacentHTML('afterbegin', '<a id="expand" href="#" onclick="app.panel.toggleSize()" /><img class="align-self-middle" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>');
             }
         },
         aggPanel: function(content) {
-            var html = `<section class="aggregate result-section">`;
+            var html = `<section class="aggregate result-section" id="aggregate-results">`;
                 html += `<div class="media align-items-center">
                             <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
                             <div class="media-body">
@@ -160,7 +176,7 @@ app.panel = {
              app.panel.results.addResults(html);
         },
         hydroPanel: function(content) {
-            var html = `<section class="hydro-results result-section">`;
+            var html = `<section class="hydro-results result-section" id="hydro-results">`;
             for (var pourpoint of content.pourpoints) {
                 html += `<div id="pp-result-${pourpoint.id}" class="pourpoint-result-wrap">
                           <div class="media align-items-center">
@@ -315,8 +331,8 @@ app.nav = {
     },
     stepActions: {
       reset: function() {
-            app.panel.getPanelContentElement.innerHTML = '<div id="scenarios"></div><div id="scenario_form"></div><div id="results"></div>';
-            app.panel.moveRight();
+        app.panel.getPanelContentElement.innerHTML = '<div id="scenarios"></div><div id="scenario_form"></div><div id="results"></div>';
+        app.panel.moveRight();
       },
       select: [
         false,
@@ -330,7 +346,10 @@ app.nav = {
       draw: [
         enableDrawing,
         false     //TODO: ??? enable editing?
-      ]
+      ],
+      hydro: function() {
+
+      }
     }
 }
 

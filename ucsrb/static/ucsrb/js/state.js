@@ -15,7 +15,6 @@ app.state = {
     stepVal: null,
     set setMethod(method) {
         this.method = method;
-        this.focusArea.method = method;
     },
     set navHeight(height) {
         this.nav = height;
