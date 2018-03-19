@@ -19,4 +19,8 @@ $(document).ready(function() {
     //     })
     // });
     // app.map.addLayer(app.map.layer.otm);
+
+    $('#load-saved').on('show.bs.modal', function (event) {
+        var app.checkScenarioState();
+    });
 });

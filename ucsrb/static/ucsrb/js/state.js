@@ -24,11 +24,11 @@ app.state = {
     },
     set step(step) {
       this.stepVal = step;
-      app.state.instructions = app.nav.instructions[app.state.methodState][step];
+      app.state.instructions = app.nav.instructions[app.state.getMethod][step];
       if (app.nav.stepActions[step]) {
         app.nav.stepActions[step]();
-      } else if (app.nav.stepActions[app.state.methodState][step]) {
-        app.nav.stepActions[app.state.methodState][step]();
+      } else if (app.nav.stepActions[app.state.getMethod][step]) {
+        app.nav.stepActions[app.state.getMethod][step]();
       }
         //TODO: Recognize and trigger filtering/drawing steps.
     },
@@ -37,7 +37,7 @@ app.state = {
       this.focusArea.id = focusAreaObject.id;
       this.focusArea.geometry = focusAreaObject.geojson;
     },
-    get methodState() {
+    get getMethod() {
         return this.method;
     },
     get panelContent() {

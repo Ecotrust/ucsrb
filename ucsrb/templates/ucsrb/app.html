@@ -42,7 +42,6 @@
     </div>
     <div id="panel" class="panel">
         <div id="panel-content" class="panel-content panel_inner">
-        <div class="panel_inner">
           <div id="draw_form"></div>
           <div id="scenarios"></div>
           <div id="scenario_form"></div>
@@ -50,6 +49,9 @@
         </div>
     </div>
 </section>
+
+{% include 'ucsrb/blocks/load_saved.html' %}
+
 {% endblock %}
 
 {% block footer_wrap %}{% endblock %}

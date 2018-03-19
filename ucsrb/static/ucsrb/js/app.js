@@ -8,6 +8,13 @@ var app = {
         app.state.setMethod = method;
         app.init[method]();
     },
+    scenarioInProgress: function() {
+        if (app.state.step === 0 || app.state.method === 'reset') {
+            return false;
+        } else {
+            return true;
+        }
+    },
 }
 
 scenario_type_selection_made = function(selectionType) {
