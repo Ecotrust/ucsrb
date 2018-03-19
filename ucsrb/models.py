@@ -38,6 +38,43 @@ class FocusArea(models.Model):
         else:
             return u'%s: %s' % (self.unit_type, self.unit_id)
 
+class PourPointBasin(models.Model):
+    ppt_ID = models.IntegerField(primary_key=True, verbose_name='Pour Point ID')
+    area = models.FloatField(null=True, blank=True, default=None, verbose_name='Area in Acres')
+    mean_elev = models.IntegerField(null=True, blank=True, default=None, verbose_name='Mean Elevation')
+    avg_slp = models.FloatField(null=True, blank=True, default=None, verbose_name='Average Slope')
+    slp_gt60 = models.IntegerField(default=0, verbose_name='Percent Area w/ Slope > 60%')
+    elev_dif = models.IntegerField(null=True, blank=True, default=None, verbose_name='Elevation Difference in Meters')
+    mean_shade = models.IntegerField(null=True, blank=True, default=None, verbose_name='Mean Shaded Area')
+    veg_prop = models.IntegerField(null=True, blank=True, default=None, verbose_name='Percent Forested')
+    ths_11 = models.IntegerField(verbose_name='Topo-Height Class 11')
+    ths_12 = models.IntegerField(verbose_name='Topo-Height Class 12')
+    ths_13 = models.IntegerField(verbose_name='Topo-Height Class 13')
+    ths_14 = models.IntegerField(verbose_name='Topo-Height Class 14')
+    ths_15 = models.IntegerField(verbose_name='Topo-Height Class 15')
+    ths_21 = models.IntegerField(verbose_name='Topo-Height Class 21')
+    ths_22 = models.IntegerField(verbose_name='Topo-Height Class 22')
+    ths_23 = models.IntegerField(verbose_name='Topo-Height Class 23')
+    ths_24 = models.IntegerField(verbose_name='Topo-Height Class 24')
+    ths_25 = models.IntegerField(verbose_name='Topo-Height Class 25')
+    fc_11 = models.IntegerField(verbose_name='Fractional Coverage 11')
+    fc_12 = models.IntegerField(verbose_name='Fractional Coverage 12')
+    fc_13 = models.IntegerField(verbose_name='Fractional Coverage 13')
+    fc_14 = models.IntegerField(verbose_name='Fractional Coverage 14')
+    fc_15 = models.IntegerField(verbose_name='Fractional Coverage 15')
+    fc_21 = models.IntegerField(verbose_name='Fractional Coverage 21')
+    fc_22 = models.IntegerField(verbose_name='Fractional Coverage 22')
+    fc_23 = models.IntegerField(verbose_name='Fractional Coverage 23')
+    fc_24 = models.IntegerField(verbose_name='Fractional Coverage 24')
+    fc_25 = models.IntegerField(verbose_name='Fractional Coverage 25')
+    dwnst_ppt = models.IntegerField(null=True, blank=True, default=None, verbose_name='Downstream Pourpoint ID')
+
+    def __str__(self):
+        return 'Pour Point Basin %s' % (self.ppt_I)
+
+    def __unicode__(self):
+        return 'Pour Point Basin %s' % (self.ppt_I)
+
 class ScenarioState(models.Model):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User)
