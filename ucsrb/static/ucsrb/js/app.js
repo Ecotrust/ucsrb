@@ -30,24 +30,27 @@ scenario_type_selection_made = function(selectionType) {
   }
 }
 
+setInit = function() {
+  app.map.clearLayers();
+  app.state.step = 0;
+  app.map.draw.disable();
+};
+
 app.init = {
     'select': function() {
-        app.map.clearLayers();
-        app.state.step = 0;
+        setInit();
         app.map.selection.setSelect(app.map.selection.selectSelectSingleClick);
         app.map.enableLayer('streams');
         scenario_type_selection_made('select');
     },
     'filter': function() {
-        app.map.clearLayers();
-        app.state.step = 0;
+        setInit();
         app.map.selection.setSelect(app.map.selection.selectFilterSingleClick);
         app.map.enableLayer('huc12');
         scenario_type_selection_made('filter');
     },
     'draw': function() {
-      app.map.clearLayers();
-      app.state.step = 0;
+      setInit();
       app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
       scenario_type_selection_made('draw');
     },
@@ -586,6 +589,7 @@ app.request = {
             dataProjection: 'EPSG:3857',
             featureProjection: 'EPSG:3857'
           });
+          app.map.draw.disable();
           app.map.addScenario(vectors);
           app.panel.results.init();
         },

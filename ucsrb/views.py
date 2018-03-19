@@ -1215,6 +1215,11 @@ def get_planningunits(request):
 
 from scenarios.views import get_scenarios as scenarios_get_scenarios
 def get_scenarios(request, scenario_model='treatmentscenario'):
+    if ( not request.user.is_authenticated and settings.ALLOW_ANONYMOUS_DRAW and settings.ANONYMOUS_USER_PK):
+        # replace request.user with anonymous user
+        from django.contrib.auth.models import User
+        anonUser = User.objects.get(pk=settings.ANONYMOUS_USER_PK)
+        request.user = anonUser
     return scenarios_get_scenarios(request, scenario_model, 'ucsrb')
 
 def demo(request, template='ucsrb/demo.html'):
