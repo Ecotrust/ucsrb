@@ -188,7 +188,11 @@ app.panel = {
                         </div>`;
                 html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
             }
+            html += '<div id="chart"></div>'
+            html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
+            html += '</section>';
             app.panel.results.addResults(html);
+            app.panel.results.chart.init();
         },
         styleObject: function(obj) {
             var html = '<dl class="row">';
@@ -198,6 +202,20 @@ app.panel = {
             }
             html += '</dl>'
             return html;
+        },
+        chart: {
+            init: function() {
+                bb.generate({
+                    bindto: "#chart",
+                    data: {
+                        type: "bar",
+                        columns: [
+                            ["data1", 30, 200, 100, 170, 150, 250],
+                            ["data2", 130, 100, 140, 35, 110, 50]
+                        ]
+                    }
+                });
+            }
         },
         panelResultsElement: function() {
             return this.getPanelResultsElement;
