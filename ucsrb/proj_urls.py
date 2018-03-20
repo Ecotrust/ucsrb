@@ -18,12 +18,11 @@ from django.contrib import admin
 ### INSERT ADDITIONAL IMPORTS HERE ###
 import accounts.urls
 ### END PROJECT URL IMPORTS ###
-from ucsrb.views import demo, get_planningunits, get_filter_count, get_filter_results, post_scenario_form
+from ucsrb.views import demo, get_planningunits, get_filter_count, get_filter_results
 
 urlpatterns = [
     url(r'^admin/?', admin.site.urls),
     ### INSERT PROJECT URL INCLUDES HERE ###
-    url(r'^features/treatmentscenario/form/$', post_scenario_form),
     url(r'^features/', include('features.urls')),
     url(r'^manipulators/', include('manipulators.urls')),
     url('^account/auth/', include('social.apps.django_app.urls', namespace='social')),
