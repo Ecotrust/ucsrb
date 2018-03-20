@@ -32,8 +32,10 @@ def home(request):
 
 def app(request):
     template = loader.get_template('ucsrb/app.html')
+    # user_scenario_list = get_user_scenario_list(request)
     context = {
-        'MAPBOX_TOKEN': settings.MAPBOX_ACCESS_TOKEN
+        'MAPBOX_TOKEN': settings.MAPBOX_ACCESS_TOKEN,
+        # 'user_scenario_list': user_scenario_list,
     }
     context['MAP_TECH'] = 'ol4'
     return HttpResponse(template.render(context, request))
@@ -88,6 +90,15 @@ def register(request):
         context['success'] = False
         context['error_msg'] = 'User already exists.'
         return JsonResponse(context)
+
+def get_user_scenario_list(request):
+    from django.core import serializers
+    user_scenarios = TreatmentScenario.objects.filter(user=request.user)
+    user_scenarios_list = serializers.serialize("json", user_scenarios)
+    # for us in user_scenarios:
+        # user_scenarios_list.append(us)
+    return HttpResponse(user_scenarios_list)
+
 
 ###########################################################
 ###             API Calls                                 #

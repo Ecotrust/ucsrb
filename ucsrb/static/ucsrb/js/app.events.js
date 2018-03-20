@@ -21,6 +21,12 @@ $(document).ready(function() {
     // app.map.addLayer(app.map.layer.otm);
 
     $('#load-saved').on('show.bs.modal', function (event) {
-        var app.checkScenarioState();
+        if (app.scenarioInProgress()) {
+            app.promptToSave();
+        }
+        $.ajax('/get_user_scenario_list/')
+            .done(function(response) {
+                console.log(response);
+            })
     });
 });

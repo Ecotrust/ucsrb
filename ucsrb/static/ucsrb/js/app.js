@@ -15,6 +15,9 @@ var app = {
             return true;
         }
     },
+    promptToSave: function() {
+        console.log('Save before starting over?');
+    }
 }
 
 scenario_type_selection_made = function(selectionType) {
