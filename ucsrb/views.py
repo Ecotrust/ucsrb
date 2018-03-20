@@ -1158,6 +1158,13 @@ def run_filter_query(filters):
 
     return (query, notes)
 
+def check_user(request):
+    if not request.user.is_authenticated and settings.ALLOW_ANONYMOUS_DRAW and settings.ANONYMOUS_USER_PK:
+        from django.contrib.auth.models import User
+        anon_user = User.objects.get(pk=settings.ANONYMOUS_USER_PK)
+        request.user = anon_user
+    return request
+
 '''
 '''
 @cache_page(60 * 60) # 1 hour of caching
@@ -1174,6 +1181,7 @@ def get_filter_count(request, query=False, notes=[]):
 '''
 @cache_page(60 * 60) # 1 hour of caching
 def get_filter_results(request, query=False, notes=[]):
+    request = check_user(request)
     if not query:
         filter_dict = dict(request.GET.items())
         (query, notes) = run_filter_query(filter_dict)
@@ -1213,13 +1221,15 @@ def get_planningunits(request):
         })
     return HttpResponse(dumps(json))
 
-from scenarios.views import get_scenarios as scenarios_get_scenarios
+def post_scenario_form(request):
+    request = check_user(request)
+    model = TreatmentScenario
+    from features.views import form_resources
+    return form_resources(request, model)
+
 def get_scenarios(request, scenario_model='treatmentscenario'):
-    if ( not request.user.is_authenticated and settings.ALLOW_ANONYMOUS_DRAW and settings.ANONYMOUS_USER_PK):
-        # replace request.user with anonymous user
-        from django.contrib.auth.models import User
-        anonUser = User.objects.get(pk=settings.ANONYMOUS_USER_PK)
-        request.user = anonUser
+    from scenarios.views import get_scenarios as scenarios_get_scenarios
+    request = check_user(request)
     return scenarios_get_scenarios(request, scenario_model, 'ucsrb')
 
 def demo(request, template='ucsrb/demo.html'):
