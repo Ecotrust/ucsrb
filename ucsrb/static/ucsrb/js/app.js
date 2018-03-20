@@ -432,6 +432,16 @@ app.request = {
                 console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
             });
     },
+    get_user_scenarios: function() {
+        return $.ajax('/get_user_scenario_list/')
+            .done(function(response) {
+                console.log('%csuccessfully got user scenarios: %o', 'color: green', response);
+                return response;
+            })
+            .fail(function(response) {
+                console.log(`%cfail @ get scenarios: %o`, 'color: red', response);
+            });
+    },
     get_scenarios: function() {
         return $.ajax('/ucsrb/get_scenarios/')
             .done(function(response) {

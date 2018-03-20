@@ -21,12 +21,18 @@ $(document).ready(function() {
     // app.map.addLayer(app.map.layer.otm);
 
     $('#load-saved').on('show.bs.modal', function (event) {
+        var modal = $(this);
         if (app.scenarioInProgress()) {
             app.promptToSave();
         }
-        $.ajax('/get_user_scenario_list/')
-            .done(function(response) {
-                console.log(response);
+        app.request.get_user_scenarios()
+            .then(function(response) {
+                html = '<ul>';
+                for (scenario in response) {
+                    html += `<li><a href="/get_scenario_by_id/${response[scenario].id}/">${response[scenario].name}</a></li>`;
+                }
+                html += '</ul>';
+                modal.find('.modal-body').html(html);
             })
     });
 });

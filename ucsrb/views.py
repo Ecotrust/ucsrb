@@ -92,12 +92,14 @@ def register(request):
         return JsonResponse(context)
 
 def get_user_scenario_list(request):
-    from django.core import serializers
+    user_scenarios_list = []
     user_scenarios = TreatmentScenario.objects.filter(user=request.user)
-    user_scenarios_list = serializers.serialize("json", user_scenarios)
-    # for us in user_scenarios:
-        # user_scenarios_list.append(us)
-    return HttpResponse(user_scenarios_list)
+    for us in user_scenarios:
+        user_scenarios_list.append({
+            "id": us.pk,
+            "name": us.name,
+        })
+    return JsonResponse(user_scenarios_list, safe=False)
 
 
 ###########################################################
