@@ -18,13 +18,20 @@ app.state = {
     },
     set navHeight(height) {
         this.nav = height;
+        if (height === 'short') {
+            app.nav.short();
+        } else if (height === 'tall') {
+            app.nav.short();
+        }
     },
     set instructions(instruction) {
         $('#instruction').html(instruction);
     },
     set step(step) {
       this.stepVal = step;
-      app.state.instructions = app.nav.instructions[app.state.getMethod][step];
+      if (app.state.getMethod.length > 0) {
+        app.state.instructions = app.nav.instructions[app.state.getMethod][step];
+      }
       if (app.nav.stepActions[step]) {
         app.nav.stepActions[step]();
       } else if (app.nav.stepActions[app.state.getMethod][step]) {

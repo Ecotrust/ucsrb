@@ -132,6 +132,10 @@ app.panel = {
     results: {
         init: function(id) {
             app.panel.moveLeft();
+            if (app.state.nav !== 'short') {
+                app.state.navHeight = 'short';
+                app.state.step = 'results';
+            }
             if (!id) {
                 id = app.viewModel.scenarios.scenarioList()[0].uid;
             }
@@ -156,11 +160,11 @@ app.panel = {
         },
         showAggregate: function() {
             $('.result-section').removeClass('show');
-            document.getElementById('aggregate-results').classList.add('show');
+            $('#aggregate-results').addClass('show');
         },
         showHydro: function() {
             $('.result-section').removeClass('show');
-            document.getElementById('hydro-results').classList.add('show');
+            $('#hydro-results').addClass('show');
         },
         expander: function() {
             if (!document.querySelector('#expand')) {
@@ -300,7 +304,6 @@ app.nav = {
         document.getElementById('process-nav').classList.remove('d-none');
     },
     short: function() {
-        app.state.navHeight = 'short'; // set state
         // style nav
         $('.nav-wrap').addClass('icons-only');
         $('.map-wrap').addClass('short-nav');
@@ -312,11 +315,9 @@ app.nav = {
                 $(this).addClass('col-2');
             })
             $('.overlay').removeClass('fade-out');
-            app.state.step = 0;
         }, 1000);
     },
     tall: function() {
-        app.state.navHeight = 'tall'; // set state
         $('.nav-wrap').removeClass('icons-only');
         $('.nav-wrap').removeClass('short-nav');
         setTimeout(function() {
@@ -360,7 +361,7 @@ app.nav = {
         enableDrawing,
         false     //TODO: ??? enable editing?
       ],
-      hydro: function() {
+      results: function() {
 
       }
     }
@@ -415,6 +416,7 @@ app.request = {
         return $.ajax(`/get_results_by_scenario_id/${id}`)
             .done(function(response) {
                 console.log('%csuccessfully returned result: %o', 'color: green', response);
+                return response;
             })
             .fail(function(response) {
                 console.log(`%cfail @ get planning units response: %o`, 'color: red', response);

@@ -4,7 +4,8 @@ $(document).ready(function() {
         // changing the method, so filter form needs to be cleared for new query
         if ($(this).parents('#process-nav').length > 0) {
             app.state.step = 'reset';
-            app.nav.short();
+            app.state.navHeight = 'short';
+            app.state.step = 0;
         }
         setTimeout(function() {
             $('.method-nav button').each(function() {
@@ -28,12 +29,28 @@ $(document).ready(function() {
         app.request.get_user_scenarios()
             .then(function(response) {
                 console.log(response);
-                html = '<ul>';
+                html = '<ul id="load-saved-list">';
                 for (scenario in response) {
-                    html += `<li><button data-id="${response[scenario].id}" app.request.get_results(${response[scenario].id})>${response[scenario].name}</button></li>`;
+                    html += `<li><button data-id="${response[scenario].id}">${response[scenario].name}</button> ${response[scenario].description}</li>`;
                 }
                 html += '</ul>';
                 modal.find('.modal-body').html(html);
             })
+            .then(function() {
+                document.getElementById('load-saved-list').addEventListener('click', function(event) {
+                    app.panel.results.init(event.target.dataset.id);
+                    var sid = 'ucsrb_treatmentscenario_' + event.target.dataset.id;
+                    app.viewModel.scenarios.addScenarioToMap(null, {
+                        uid: sid,
+                        // zoomTo: true,
+                    });
+                    app.map.clearLayers();
+                    $('#load-saved').modal('hide');
+                    $('.method-nav button').each(function() {
+                        $(this).removeClass('active');
+                    });
+                    $('.method-nav button[data-method="aggregate"]').addClass('active');
+                });
+            });
     });
 });
