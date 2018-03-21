@@ -137,15 +137,18 @@ app.panel = {
             }
             app.request.get_results(id)
                 .then(function(response) {
-                    app.panel.results.aggPanel(response);
-                    app.panel.results.hydroPanel(response);
-                    app.panel.results.expander();
-                    app.panel.results.showAggregate();
-                    app.nav.showResultsNav();
+                    app.panel.results.responseResultById(response);
                 })
                 .catch(function(response) {
                     console.log('%c failed to get results: %o', 'style: salmon;', response);
                 });
+        },
+        responseResultById: function(result) {
+            app.panel.results.aggPanel(result);
+            app.panel.results.hydroPanel(result);
+            app.panel.results.expander();
+            app.panel.results.showAggregate();
+            app.nav.showResultsNav();
         },
         addResults: function(content) {
             app.state.panel.content = content;

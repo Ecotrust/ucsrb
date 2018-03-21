@@ -98,6 +98,7 @@ def get_user_scenario_list(request):
         user_scenarios_list.append({
             "id": us.pk,
             "name": us.name,
+            "description": us.description,
         })
     return JsonResponse(user_scenarios_list, safe=False)
 

@@ -27,9 +27,10 @@ $(document).ready(function() {
         }
         app.request.get_user_scenarios()
             .then(function(response) {
+                console.log(response);
                 html = '<ul>';
                 for (scenario in response) {
-                    html += `<li><a href="/get_scenario_by_id/${response[scenario].id}/">${response[scenario].name}</a></li>`;
+                    html += `<li><button data-id="${response[scenario].id}" app.request.get_results(${response[scenario].id})>${response[scenario].name}</button></li>`;
                 }
                 html += '</ul>';
                 modal.find('.modal-body').html(html);
