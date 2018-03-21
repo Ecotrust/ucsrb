@@ -124,6 +124,7 @@ app.panel = {
     },
     results: {
         init: function(id) {
+            app.nav.stepActions.reset();
             app.panel.moveLeft();
             if (!id) {
                 id = app.viewModel.scenarios.scenarioList()[0].uid;
@@ -210,6 +211,11 @@ app.panel = {
         }
     },
     draw: {
+      setContent: function(content) {
+        app.panel.show();
+        app.state.panel.content = content;
+        app.panel.draw.getDrawContentElement.innerHTML = content;
+      },
       finishDrawing: function() {
         app.panel.moveRight();
         var html = '<div class="panel-content">' +
@@ -218,7 +224,7 @@ app.panel = {
                       '<button class="btn" onclick="app.panel.draw.acceptDrawing()">No</button>' +
                       '<button class="btn" onclick="app.panel.draw.restart()">Restart</button>' +
                     '</div>';
-        app.panel.setContent(html);
+        app.panel.draw.setContent(html);
       },
       restart: function() {
         app.map.draw.source.clear(true);
@@ -230,7 +236,7 @@ app.panel = {
                       '<p>Click on the map to start drawing your new treatment area.</p>' +
                       '<button class="btn" onclick="app.panel.draw.cancelDrawing()">Cancel</button>' +
                     '</div>';
-        app.panel.setContent(html);
+        app.panel.draw.setContent(html);
       },
       cancelDrawing: function() {
         app.map.draw.disable();
@@ -242,7 +248,7 @@ app.panel = {
                       '<button class="btn" onclick="app.panel.draw.saveDrawing()">Yes</button>' +
                       '<button class="btn" onclick="app.panel.draw.finishDrawing()">No</button>' +
                     '</div>';
-        app.panel.setContent(html);
+        app.panel.draw.setContent(html);
       },
       saveDrawing: function() {
         var drawFeatures = app.map.draw.source.getFeatures();
@@ -257,6 +263,9 @@ app.panel = {
           alert('Your treatment area is too large (' + areaInAcres.toFixed(0) + ' acres). Please keep it below ' + app.map.draw.maxAcres.toString() + ' acres');
           app.panel.draw.acceptDrawing();
         }
+      },
+      get getDrawContentElement() {
+        return document.getElementById('draw_form');
       }
     },
     element: function() { // returns a function. to edit dom element don't forget to invoke: element()
@@ -334,7 +343,7 @@ app.nav = {
     },
     stepActions: {
       reset: function() {
-        app.panel.getPanelContentElement.innerHTML = '<div id="scenarios"></div><div id="scenario_form"></div><div id="results"></div>';
+        app.panel.getPanelContentElement.innerHTML = '<div id="scenarios"></div><div id="scenario_form"></div><div id="draw_form"></div><div id="results"></div>';
         app.panel.moveRight();
       },
       select: [
@@ -591,7 +600,7 @@ app.request = {
           });
           app.map.draw.disable();
           app.map.addScenario(vectors);
-          app.panel.results.init();
+          app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
         },
         error: function(response, status) {
           console.log(`%cfail @ save drawing: %o`, 'color: red', response);
