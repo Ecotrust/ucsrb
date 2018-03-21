@@ -39,11 +39,6 @@ $(document).ready(function() {
             .then(function() {
                 document.getElementById('load-saved-list').addEventListener('click', function(event) {
                     app.panel.results.init(event.target.dataset.id);
-                    var sid = 'ucsrb_treatmentscenario_' + event.target.dataset.id;
-                    app.viewModel.scenarios.addScenarioToMap(null, {
-                        uid: sid,
-                        // zoomTo: true,
-                    });
                     app.map.clearLayers();
                     $('#load-saved').modal('hide');
                     $('.method-nav button').each(function() {

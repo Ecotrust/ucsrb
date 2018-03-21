@@ -138,6 +138,11 @@ app.panel = {
             }
             if (!id) {
                 id = app.viewModel.scenarios.scenarioList()[0].uid;
+            } else if (!id.includes('ucsrb')) {
+                sid = 'ucsrb_treatmentscenario_' + id;
+                app.viewModel.scenarios.addScenarioToMap(null, {
+                    uid: sid
+                });
             }
             app.request.get_results(id)
                 .then(function(response) {
