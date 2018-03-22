@@ -361,6 +361,86 @@ main {
     width: 4vh;
 }
 
+/* group */
+.layer-switcher .panel > ul {
+    padding-left: .75rem;
+}
+
+/* group list */
+.layer-switcher .panel > ul > li {
+}
+
+/* group title */
+.layer-switcher .panel > ul > li > label {
+    font-size: .75rem;
+    line-height: 3;
+    margin-bottom: 1rem;
+}
+
+/* group layers list */
+.layer-switcher .panel > ul > li > ul {
+    padding-left: 0;
+}
+
+/* group layer */
+.layer-switcher .panel > ul > li > ul > li {
+    border-bottom: 1px solid #cccccc;
+    display: block;
+    margin-bottom: .25rem;
+    padding-bottom: .25rem;
+    position: relative;
+}
+
+/* group layer label */
+.layer-switcher .panel > ul > li > ul > li > label {
+    font-size: .8375em;
+    line-height: 2rem;
+    padding-left: 2.5rem;
+}
+
+.layer-switcher input[type="checkbox"],
+.layer-switcher input[type="radio"] {
+    bottom: 0;
+    left: 0;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.layer-switcher .layer label {
+    cursor: pointer;
+    display: inline-block;
+    font-weight: 700 !important;
+    position: relative;
+}
+
+    .layer-switcher .layer label:before {
+        background-repeat: no-repeat;
+        background-size: 45% auto;
+        background-position: 50%;
+        content: "";
+        display: inline-block;
+        height: 2rem;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 2rem;
+    }
+
+    /* show grey icon */
+    .layer-switcher .layer input[type="checkbox"] + label:before,
+    .layer-switcher .layer input[type="radio"] + label:before {
+        background-image: url('/static/ucsrb/img/icon/i_invisible.svg');
+    }
+
+    /* show light green icon */
+    .layer-switcher .layer input[type="checkbox"]:checked + label:before,
+    .layer-switcher .layer input[type="radio"]:checked + label:before {
+        background-image: url('/static/ucsrb/img/icon/i_visible_light.svg');
+    }
+
+
 /**
  * =========================================================================
     Panel
