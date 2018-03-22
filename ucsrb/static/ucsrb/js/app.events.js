@@ -29,13 +29,12 @@ $(document).ready(function() {
         }
         app.request.get_user_scenarios()
             .then(function(response) {
-                console.log(response);
-                html = '<ul id="load-saved-list">';
+                var html = '<ul id="load-saved-list">'
                 for (scenario in response) {
-                    html += `<li><button data-id="${response[scenario].id}">${response[scenario].name}</button> ${response[scenario].description}</li>`;
+                    html += `<li><button data-id="${response[scenario].id}" class="scenario-name btn btn-link">${response[scenario].name} <span class="description">${response[scenario].description}</span></button></li>`;
                 }
                 html += '</ul>';
-                modal.find('.modal-body').html(html);
+                modal.find('.load-saved-wrap').append(html);
             })
             .then(function() {
                 document.getElementById('load-saved-list').addEventListener('click', function(event) {

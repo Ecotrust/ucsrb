@@ -8,20 +8,18 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="scenario-list">
+        <div class="saved-scenario-list" id="saved-scenario-list">
             {% if user.is_authenticated %}
-            
+                <div id="load-saved-wrap" class="load-saved-wrap"></div>
             {% else %}
                 {% include 'ucsrb/blocks/login.html' %}
                 <hr />
                 <h2>Register</h2>
-                
                 {% include 'ucsrb/blocks/registration_form.html' %}
             {% endif %}
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Save changes</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>

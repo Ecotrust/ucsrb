@@ -443,6 +443,65 @@ main {
 
 /**
  * =========================================================================
+    Modal
+ ===========================================================================
+ */
+
+.modal-content {
+    background: #3a5675;
+    border: none;
+    border-radius: 0;
+    color: #fff;
+}
+
+.modal .close {
+    color: #fff;
+}
+
+#load-saved-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#load-saved-list li {
+    border-bottom: 1px solid #efefef;
+    margin-bottom: .25rem;
+    padding-bottom: .25rem;
+}
+
+#load-saved-list li span {
+    display: inline-block;
+    font-size: .75em;
+    margin-left: 3rem;
+    vertical-align: middle;
+}
+
+#load-saved-list .btn-link {
+    color: #fff;
+    font-size: 1em;
+    font-weight: 500;
+    position: relative;
+    padding-right: 4rem;
+    text-align: left;
+    width: 100%;
+}
+    #load-saved-list .btn-link:after {
+        background: url('/static/ucsrb/img/icon/i_expand_white.svg');
+        background-position: 50%;
+        background-size: 50% auto;
+        background-repeat: no-repeat;
+        content: '';
+        height: 1rem;
+        position: absolute;
+        right: .5rem;
+        top: 50%;
+        transform: translate(0,-.5rem);
+        width: 1rem;
+    }
+
+/**
+ * =========================================================================
     Panel
  ===========================================================================
  */
