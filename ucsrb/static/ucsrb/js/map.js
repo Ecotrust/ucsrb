@@ -404,39 +404,12 @@ app.map.layer = {
       selectAction: focusAreaSelectAction
     },
     scenarios: {
-        counter: 0, // so layer is only added once
         layer: mapSettings.getInitFilterResultsLayer('scenarios', false),
         source: function() {
             return app.map.layer.scenarios.layer.getSource();
-        },
-        init: function(data) {
-            if (app.map.layer.scenarios.counter < 1) {
-                // app.map.addLayer(app.map.layer.scenarios.layer);
-                app.request.get_scenarios()
-                // TODO stop this from blocking fitering
-                    .then(function(response) {
-                        var html = `<div class="dropdown">
-                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="savedScenarioDropdownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Saved Treatment</button>
-                                        <div class="dropdown-menu" aria-labelledby="savedScenarioDropdownBtn">`;
-                        response.forEach(function(scenario,i,arr) {
-                            var scenario_name = scenario.name;
-                            if (scenario.name == '') {
-                                scenario_name = `Scenario ${scenario.id}`;
-                            }
-                            var scenario_link = `/features/treatmentscenario/ucsrb_treatmentscenario/${scenario.id}`;
-                            html += `<a class="dropdown-item" href="${scenario_link}/">${scenario_name}</a>`;
-                        });
-                        html += "</div>"
-                        $('#scenarios').html(html);
-                    });
-                app.map.layer.scenarios.counter++;
-            } else {
-                console.log('%cscenarios layer already added', 'color: orange');
-            }
         }
     },
     planningUnits: {
-        counter: 0,
         layer: mapSettings.getInitFilterResultsLayer('planning units', app.map.styles['Polygon']),
         source: function() {
             return app.map.layer.planningUnits.layer.getSource();
@@ -446,14 +419,6 @@ app.map.layer = {
                 app.map.layer.planningUnits.layer.addWKTFeatures(el);
             });
         },
-        init: function() {
-            if (app.map.layer.planningUnits.counter < 1) {
-                app.map.layer.planningUnits.counter++;
-                console.log('%cplanning unit layer added', 'color: green');
-            } else {
-                console.log('%cplanning unit layer already added', 'color: orange');
-            }
-        }
     },
 };
 
@@ -473,8 +438,6 @@ if (app.map.overlays) {
   app.map.overlays.getLayers().push(app.map.layer.huc10.layer);
   app.map.overlays.getLayers().push(app.map.layer.streams.layer);
   app.map.overlays.getLayers().push(app.map.layer.pourpoints.layer);
-  // app.map.overlays.getLayers().push(app.map.layer.planningUnits.layer);
-  app.map.overlays.getLayers().push(app.map.layer.scenarios.layer);
 }
 
 app.map.layerSwitcher = new ol.control.LayerSwitcher({

@@ -126,8 +126,6 @@ app.panel = {
     form: {
         init: function() {
             app.panel.moveRight();
-            app.map.layer.planningUnits.init();
-            app.map.layer.scenarios.init();
             app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
             initFiltering();
         },

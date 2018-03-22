@@ -1272,7 +1272,7 @@ function scenariosModel(options) {
                 if ( ! self.filterLayer() && app.viewModel.modernBrowser() ) {
                     self.loadLeaseblockLayer();
                 }
-                window.dispatchEvent(new Event('resize'));
+                // window.dispatchEvent(new Event('resize'));
             },
             error: function (result) {
                 console.log('failure at scenarios.js "createNewScenario".');

@@ -312,20 +312,53 @@ main {
  */
 
 #map .ol-control {
+    padding: 0;
     z-index: 1;
 }
 
 #map .ol-zoom {
+    background-color: transparent;
     left: auto;
-    right: .5em;
+    right: 1rem;
+    top: 2.25vh;
 }
 
 #map .ol-zoom button {
-    font-size: 1em;
+    background-color: rgba(58,86,117,1);
+    cursor: pointer;
+    display: inline-block;
+    font-size: 1.5em;
+    height: 4vh;
+    width: 4vh;
 }
+
+    #map .ol-zoom button:active,
+    #map .ol-zoom button:hover {
+        background-color: rgba(58,86,117,0.66);
+    }
 
 #map .ol-rotate {
     top: 4em;
+}
+
+#map .layer-switcher {
+    background-color: transparent;
+    left: 1rem;
+    top: 2.25vh;
+}
+
+#map .layer-switcher.shown {
+    bottom: auto;
+}
+
+.layer-switcher button {
+    background-size: auto 60%;
+    background-position: 50% 50%;
+    background-color: rgba(58,86,117,1);
+    background-image: url('/static/ucsrb/img/icon/i_layers.svg');
+    cursor: pointer;
+    height: 4vh;
+    width: 4vh;
 }
 
 /**
