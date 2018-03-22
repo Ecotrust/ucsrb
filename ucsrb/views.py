@@ -488,7 +488,21 @@ def save_drawing(request):
         polys = []
         for feature in json.loads(featJson)['features']:
             polys.append(GEOSGeometry(json.dumps(feature['geometry'])))
-        geometry = MultiPolygon(polys)
+
+        if polys[0].geom_type == 'MultiPolygon' and len(polys) == 1:
+            geometry = polys[0]
+        else:
+            try:
+                geometry = MultiPolygon(polys)
+            except TypeError:
+                for poly in polys:
+                    if poly.geom_type == 'MultiPolygon':
+                        poly = poly.union(poly) #RDH: in tests this seems to
+                                # result in a Polygon - I'm not sure that this
+                                # is always true, but I don't know that this
+                                # is a real use case anyway...
+                geometry = MultiPolygon(polys)
+                print('ucsrb.views.save drawing: List of polygons may contain an illegal multipolygon.')
         layer = 'Drawing'
         focus_area = FocusArea.objects.create(unit_type=layer, geometry=geometry)
         focus_area.save()
@@ -1172,6 +1186,7 @@ def run_filter_query(filters):
 
     return (query, notes)
 
+
 '''
 '''
 @cache_page(60 * 60) # 1 hour of caching
@@ -1227,8 +1242,9 @@ def get_planningunits(request):
         })
     return HttpResponse(dumps(json))
 
-from scenarios.views import get_scenarios as scenarios_get_scenarios
+
 def get_scenarios(request, scenario_model='treatmentscenario'):
+    from scenarios.views import get_scenarios as scenarios_get_scenarios
     return scenarios_get_scenarios(request, scenario_model, 'ucsrb')
 
 def demo(request, template='ucsrb/demo.html'):
