@@ -12,6 +12,7 @@ $(document).ready(function() {
                 $(this).removeClass('active');
             })
             event.target.classList.add('active');
+            app.nav.showStartOver();
         }, 900);
     });
     // app.map.layer.otm = new ol.layer.Tile({
@@ -45,6 +46,7 @@ $(document).ready(function() {
                         $(this).removeClass('active');
                     });
                     $('.method-nav button[data-method="aggregate"]').addClass('active');
+                    app.nav.showStartOver();
                 });
             });
     });

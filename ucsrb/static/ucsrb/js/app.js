@@ -308,6 +308,9 @@ app.nav = {
         document.getElementById('results-nav').classList.add('d-none');
         document.getElementById('process-nav').classList.remove('d-none');
     },
+    showStartOver: function() {
+        document.getElementById('nav-start-over').classList.remove('d-none');
+    },
     short: function() {
         // style nav
         $('.nav-wrap').addClass('icons-only');

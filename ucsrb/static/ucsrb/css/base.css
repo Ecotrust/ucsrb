@@ -59,13 +59,15 @@ p {
     margin: 0 0 1.5rem;
 }
 
-a {
+a,
+.button-modal {
     color: #67b8c6;
     opacity: 1;
     transition: 0.1s all ease-in;
 }
 
-a:hover {
+a:hover,
+.button-modal:hover {
     color: #3a5675;
     cursor: pointer;
     text-decoration: none;

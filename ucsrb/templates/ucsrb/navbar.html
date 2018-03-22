@@ -24,18 +24,11 @@
                 <button data-method="aggregate"><img src="{% static 'ucsrb/img/icon/i_forest.svg' %}" alt="forest management summary" /><h3>Forest Management Summary</h3></button>
             </li>
         </ul>
-        <nav id="file-nav" class="col-3 nav justify-content-center flex-column">
-            <div class="dropdown">
-                <button class="btn btn-light dropdown-toggle" type="button" id="fileNavButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Options
-                </button>
-                <div class="dropdown-menu" aria-labelledby="fileNavButton">
-                    <!-- <a href="" id="nav-back" class="dropdown-item"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_back.svg' %}" /></i> back</a> -->
-                    <button id="nav-load-save" type="button" class="dropdown-item" data-toggle="modal" data-target="#load-saved"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_folder.svg' %}" /></i> load saved</button>
-                    <a href="" id="nav-load-save" class="dropdown-item"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_reset.svg' %}" /></i> start over</a>
-                    <a href="" id="nav-load-save" class="dropdown-item"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_download.svg' %}" /></i> save</a>
-                </div>
-            </div>
+        <nav id="file-nav" class="col-3 nav justify-content-center flex-row align-items-center">
+            <!-- <a href="" id="nav-back" class="dropdown-item"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_back.svg' %}" /></i> back</a> -->
+            <button id="nav-load-save" type="button" class="nav-item button-modal btn btn-link" data-toggle="modal" data-target="#load-saved"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_folder.svg' %}" /></i> load saved</button>
+            <a href="/app" id="nav-start-over" class="nav-item d-none"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_reset.svg' %}" /></i> start over</a>
+            <!-- <button id="nav-save" type="button" class="nav-item button-modal btn btn-link  d-none" data-toggle="modal" data-target="#save-modal" ><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_download.svg' %}" /></i> save</button> -->
         </nav>
     </div>
 </div>

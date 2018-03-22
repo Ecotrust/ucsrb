@@ -165,11 +165,27 @@ nav .navbar-toggler .navbar-toggler-icon {
 }
 
 #file-nav {
-    background: #e6e7e8;
+    background: #edefed;
     font-size: 1em;
     font-weight: 600;
-    padding-left: 4rem;
     transition: 0.25s padding linear 0.35s;
+}
+
+#file-nav a,
+#file-nav .button-modal {
+    display: inline-block;
+    font-size: .9375em;
+    font-weight: 600;
+    line-height: .9375em;
+    padding: .25rem 1em;
+    text-align: left;
+}
+
+#file-nav a i.svg_icon,
+#file-nav .button-modal i.svg_icon {
+    max-height: .9375rem;
+    vertical-align: text-top;
+    max-width: 1.25rem;
 }
 
 .icons-only {
@@ -197,10 +213,6 @@ nav .navbar-toggler .navbar-toggler-icon {
 
 .icons-only .method-nav li:after {
     height: 80%;
-}
-
-.icons-only #file-nav {
-    font-size: .9375em;
 }
 
 /**
