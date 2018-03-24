@@ -79,9 +79,9 @@ class ClimateData(models.Model):
     ppt_id = models.IntegerField()
     datetime = models.DateTimeField(auto_now=False,auto_now_add=False)
     temp = models.IntegerField(verbose_name='temperature')
-    pcp = models.IntegerField(verbose_name='precipitation')
+    pcp = models.FloatField(verbose_name='precipitation')
     albedo = models.FloatField()
-    wind = models.IntegerField()
+    wind = models.FloatField()
     rh = models.FloatField(verbose_name='relative humidity')
 
     def __str__(self):
