@@ -45,7 +45,7 @@ Then go [here](http://localhost:8111/visualize)
 
 ### ~Production Installation
 
-#### Bootstrap [MarinePlanner](httpshttps://github.com/Ecotrust/marineplanner-core/blob/master/README.md#stageproduction-installation-ubuntu-lts)
+#### Bootstrap [MarinePlanner](https://github.com/Ecotrust/marineplanner-core/blob/master/README.md#stageproduction-installation-ubuntu-lts)
 
 #### Clone UCSRB and Components
 ```bash
@@ -136,5 +136,28 @@ sudo cp /usr/local/apps/marineplanner-core/deployment/rc.local /etc/rc.local
 ```
 
 #### Install and Configure Email
+`sudo apt-get install postfix `
+configuration:  
+     Internet Site 
+System mail name : 
+     <default> 
+
+Then set Django settings to look something like this:
+```
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = False
+DEFAULT_FROM_EMAIL = 'MarinePlanner<marineplanner@your.domain>'
+```
+Configure DNS for secure delivery (see internal documentation)
+
+#### Configure ReCaptcha and Registration
+**NOTE: This does not seem required for the signup popup, only if user finds /account/** 
+* pip install django-recaptcha
+* Install with [these directions]https://github.com/praekelt/django-recaptcha#installation
+* Use the 'NOCAPTCHA' setting (True)
 
 #### Install and Configure Munin
