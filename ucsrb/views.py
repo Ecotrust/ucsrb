@@ -76,6 +76,12 @@ def register(request):
         user = User.objects.create_user(username, email, password)
         user_auth = authenticate(request, username=username, password=password)
         if user_auth is not None:
+            try:
+                from accounts.models import UserData
+                (created, userData) = UserData.objects.get_or_create(user=user, real_name=user.username)
+            except:
+                # The above should work just fine. If not we need a test case to know what to do with it.
+                pass
             login(request, user)
             context['success'] = True
             context['username'] = username
