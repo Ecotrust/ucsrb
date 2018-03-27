@@ -17,7 +17,7 @@ VAGRANT_CORE=\\/usr\\/local\\/apps\\/$PROJECT_NAME
 APP_NAME=$1
 
 # "DEFAULT" installs the basic marineplanner modules. You can take more control below
-MODULES="DEFAULT"
+MODULES="ucsrb"
 
 # If you know where you want your django app folder, uncomment and set the line below
 #PROJ_FOLDER=Set_This_Yourself_To_Override
@@ -41,10 +41,20 @@ cd $CORE/apps
     if [ ! -d mp-data-manager ]; then git clone https://github.com/Ecotrust/mp-data-manager.git; fi
     if [ ! -d p97-nursery ]; then git clone https://github.com/Ecotrust/p97-nursery.git; fi
   fi
-  # if [ ! -d madrona-analysistools ]; then git clone https://github.com/Ecotrust/madrona-analysistools.git; fi
+  if [ $MODULES == "ucsrb" ]; then
+    if [ ! -d madrona-features ]; then git clone https://github.com/Ecotrust/madrona-features.git; fi
+    if [ ! -d madrona-manipulators ]; then git clone https://github.com/Ecotrust/madrona-manipulators.git; fi
+    if [ ! -d mp-drawing ]; then git clone https://github.com/Ecotrust/mp-drawing.git; fi
+    if [ ! -d mp-accounts ]; then git clone https://github.com/Ecotrust/mp-accounts.git; fi
+    if [ ! -d mp-visualize ]; then git clone https://github.com/Ecotrust/mp-visualize.git; fi
+    if [ ! -d mp-data-manager ]; then git clone https://github.com/Ecotrust/mp-data-manager.git; fi
+    if [ ! -d p97-nursery ]; then git clone https://github.com/Ecotrust/p97-nursery.git; fi
+    if [ ! -d madrona-analysistools ]; then git clone https://github.com/Ecotrust/madrona-analysistools.git; fi
+    if [ ! -d madrona-scenarios ]; then git clone https://github.com/Ecotrust/madrona-scenarios.git; fi
+    if [ ! -d mp-filter ]; then git clone https://github.com/Ecotrust/mp-filter.git; fi
+  fi
   # if [ ! -d madrona-features ]; then git clone https://github.com/Ecotrust/madrona-features.git; fi
   # if [ ! -d madrona-forms ]; then git clone https://github.com/Ecotrust/madrona-forms.git; fi
-  # if [ ! -d madrona-scenarios ]; then git clone https://github.com/Ecotrust/madrona-scenarios.git; fi
   # if [ ! -d madrona-manipulators ]; then git clone https://github.com/Ecotrust/madrona-manipulators.git; fi
   # if [ ! -d mp-clipping ]; then git clone https://github.com/Ecotrust/mp-clipping.git; fi
   # if [ ! -d mp-drawing ]; then git clone https://github.com/Ecotrust/mp-drawing.git; fi
