@@ -183,3 +183,40 @@ Then restart NGINX
 sudo service nginx restart
 ```
 
+#### Automatic (Unattended) Security Updates
+From the document [Using the "unattended-upgrades" package](https://help.ubuntu.com/community/AutomaticSecurityUpdates#Using_the_.22unattended-upgrades.22_package)
+
+Install the unattended-upgrades package if it isn't already installed:
+```
+sudo apt-get install unattended-upgrades
+```
+
+To enable it, do:
+```
+sudo dpkg-reconfigure --priority=low unattended-upgrades
+```
+(it's an interactive dialog) which will create `/etc/apt/apt.conf.d/20auto-upgrades` with the following contents:
+```
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+```
+To have the server automatically reboot when necessary to install security upddates:
+1. install the package `update-notifier-common`
+```
+sudo apt-get install update-notifier-common
+```
+1. edit the file `/etc/apt/apt.conf.d/50unattended-upgrades` near the bottom you will find the line
+```
+//Unattended-Upgrade::Automatic-Reboot "false";
+```
+uncomment it and set value to true:
+```
+Unattended-Upgrade::Automatic-Reboot "true";
+```
+To tell the server what time is most safe to reboot (when needed), uncomment the line
+```
+//Unattended-Upgrade::Automatic-Reboot-Time "02:00";
+```
+And set the time to your desired restart time.
+
+Read the source document for more details.
