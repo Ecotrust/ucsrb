@@ -161,3 +161,25 @@ Configure DNS for secure delivery (see internal documentation)
 * Use the 'NOCAPTCHA' setting (True)
 
 #### Install and Configure Munin
+```
+sudo apt-get install munin munin-node
+sudo vim /etc/nginx/sites-enabled/marineplanner
+```
+
+Between the `error_log` line and the `location /static ` line add:
+```
+location /munin/static/ {
+        alias /etc/munin/static/;
+}
+
+location /munin {
+        alias /var/cache/munin/www;
+}
+```
+
+Then restart NGINX
+
+```
+sudo service nginx restart
+```
+
