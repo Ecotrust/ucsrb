@@ -515,13 +515,21 @@ def save_drawing(request):
                 response.status_code = 401
                 return response
 
-        scenario = TreatmentScenario.objects.create(
-            user=user,
-            name=scenario_name,
-            description=None,
-            focus_area=True,
-            focus_area_input=focus_area
-        )
+        try:
+            scenario = TreatmentScenario.objects.create(
+                user=user,
+                name=scenario_name,
+                description=None,
+                focus_area=True,
+                focus_area_input=focus_area
+            )
+        except:
+            # Technically we're testing for psycopg2's InternalError GEOSIntersects TopologyException
+            context['success'] = False
+            context['error_msg'] = 'Drawings overlap. Please start over.'
+            response = JsonResponse(context)
+            response.status_code = 500
+            return response
 
         if not scenario.geometry_dissolved:
             context['success'] = False
