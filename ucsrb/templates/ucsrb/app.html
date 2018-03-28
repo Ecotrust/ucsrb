@@ -26,6 +26,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
 {% endblock js_head %}
 
+{% block header %}
+    {{ block.super }}
+    {% include 'ucsrb/navbar.html' %}
+{% endblock header %}
+
 {% block content %}
 <section class="map-wrap">
     <div class="overlay">

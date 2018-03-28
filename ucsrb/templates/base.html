@@ -41,7 +41,9 @@
     {% block header_wrap %}
         <header>
             {% block header %}
-                {% include 'ucsrb/navbar.html' %}
+                <div class="nav-wrap top-nav-wrap">
+                    {% include 'ucsrb/blocks/nav.html' %}
+                </div>
             {% endblock header %}
         </header>
     {% endblock header_wrap %}

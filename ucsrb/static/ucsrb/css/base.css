@@ -111,6 +111,44 @@ h5 {
     font-weight: 500;
 }
 
+/**
+ * =========================================================================
+   Profile
+ ===========================================================================
+ */
+
+.profile-wrap p,
+.profile-wrap h1 {
+    color: #333;
+    margin-bottom: 0;
+}
+
+.profile-wrap p:not(:empty),
+.profile-wrap h1:not(:empty) {
+    margin-bottom: 1.5em;
+}
+
+.profile-wrap h1:not(:empty) {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    vertical-align: middle;
+}
+
+.profile-img:not(:empty) {
+    border-radius: 50%;
+    display: inline-block;
+    height: 3rem;
+    margin-bottom: 1.5rem;
+    vertical-align: middle;
+    width: 3rem;
+}
+
+/**
+ * =========================================================================
+   Footer
+ ===========================================================================
+ */
+
 footer {
     padding: 3rem 0;
 }
@@ -129,5 +167,6 @@ footer .pad-left {
 }
 
 footer .footer-logo {
-    max-width: 84%;
+    max-width: 94%;
+    max-height: 10rem;
 }

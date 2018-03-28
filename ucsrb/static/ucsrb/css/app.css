@@ -316,20 +316,30 @@ main {
     z-index: 1;
 }
 
+#map .ol-zoom,
+.ol-geo-search,
+#map .layer-switcher {
+    top: 2.25vh;
+}
+
+#map .ol-zoom button,
+.ol-geo-search button,
+.layer-switcher button {
+    cursor: pointer;
+    height: 4vh;
+    width: 4vh;
+}
+
 #map .ol-zoom {
     background-color: transparent;
     left: auto;
     right: 1rem;
-    top: 2.25vh;
 }
 
 #map .ol-zoom button {
     background-color: rgba(58,86,117,1);
-    cursor: pointer;
     display: inline-block;
     font-size: 1.5em;
-    height: 4vh;
-    width: 4vh;
 }
 
     #map .ol-zoom button:active,
@@ -344,21 +354,38 @@ main {
 #map .layer-switcher {
     background-color: transparent;
     left: 1rem;
-    top: 2.25vh;
 }
 
 #map .layer-switcher.shown {
     bottom: auto;
 }
 
-.layer-switcher button {
+.ol-geo-search {
+    position: absolute;
+    right: 11vh;
+}
+
+.ol-geo-search button {
+    background: url('/static/ucsrb/img/icon/i_search.svg') rgba(255,255,255,0.8) 50% 50% no-repeat;
     background-size: auto 60%;
-    background-position: 50% 50%;
-    background-color: rgba(58,86,117,1);
-    background-image: url('/static/ucsrb/img/icon/i_layers.svg');
-    cursor: pointer;
-    height: 4vh;
-    width: 4vh;
+    display: inline-block;
+}
+
+.ol-geo-search input:not(.d-none) {
+    margin-left: .25rem;
+}
+
+.ol-geo-search input + #autocomplete-results {
+    width: 0;
+}
+
+.ol-geo-search input:not(.d-none) + #autocomplete-results {
+    width: 100%;
+}
+
+.layer-switcher button {
+    background: url('/static/ucsrb/img/icon/i_layers.svg') rgba(58,86,117,1) 50% no-repeat;
+    background-size: auto 60%;
 }
 
 /* group */
