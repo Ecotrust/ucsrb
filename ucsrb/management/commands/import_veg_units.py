@@ -85,11 +85,12 @@ class Command(BaseCommand):
             sys.exit()
 
         if is_zipfile:
-            shape = shapefile.Reader(
-                    shp=BytesIO(zipshape.read(shapefiles[0])),
-                    shx=BytesIO(zipshape.read(shxfiles[0])),
-                    dbf=BytesIO(zipshape.read(dbffiles[0]))
-            )
+            with zipfile.ZipFile(in_file_name, 'r', zip_format) as zipshape:
+                shape = shapefile.Reader(
+                        shp=BytesIO(zipshape.read(shapefiles[0])),
+                        shx=BytesIO(zipshape.read(shxfiles[0])),
+                        dbf=BytesIO(zipshape.read(dbffiles[0]))
+                )
         else:
             shape = shapefile.Reader('%s%s' % (in_file_name, shapefiles[0].split('.')[0]))
             #         shp='%s%s' % (in_file_name, shapefiles[0]),

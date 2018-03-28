@@ -78,6 +78,12 @@ def register(request):
         user = User.objects.create_user(username, email, password)
         user_auth = authenticate(request, username=username, password=password)
         if user_auth is not None:
+            try:
+                from accounts.models import UserData
+                (created, userData) = UserData.objects.get_or_create(user=user, real_name=user.username)
+            except:
+                # The above should work just fine. If not we need a test case to know what to do with it.
+                pass
             login(request, user)
             context['success'] = True
             context['username'] = username
@@ -523,13 +529,21 @@ def save_drawing(request):
                 response.status_code = 401
                 return response
 
-        scenario = TreatmentScenario.objects.create(
-            user=user,
-            name=scenario_name,
-            description=None,
-            focus_area=True,
-            focus_area_input=focus_area
-        )
+        try:
+            scenario = TreatmentScenario.objects.create(
+                user=user,
+                name=scenario_name,
+                description=None,
+                focus_area=True,
+                focus_area_input=focus_area
+            )
+        except:
+            # Technically we're testing for psycopg2's InternalError GEOSIntersects TopologyException
+            context['success'] = False
+            context['error_msg'] = 'Drawings overlap. Please start over.'
+            response = JsonResponse(context)
+            response.status_code = 500
+            return response
 
         if not scenario.geometry_dissolved:
             context['success'] = False

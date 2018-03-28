@@ -70,10 +70,26 @@ class PourPointBasin(models.Model):
     dwnst_ppt = models.IntegerField(null=True, blank=True, default=None, verbose_name='Downstream Pourpoint ID')
 
     def __str__(self):
-        return 'Pour Point Basin %s' % (self.ppt_I)
+        return 'Pour Point Basin %s' % (self.ppt_ID)
 
     def __unicode__(self):
-        return 'Pour Point Basin %s' % (self.ppt_I)
+        return 'Pour Point Basin %s' % (self.ppt_ID)
+
+class ClimateData(models.Model):
+    ppt_id = models.IntegerField()
+    datetime = models.DateTimeField(auto_now=False,auto_now_add=False)
+    temp = models.IntegerField(verbose_name='temperature')
+    pcp = models.FloatField(verbose_name='precipitation')
+    albedo = models.FloatField()
+    wind = models.FloatField()
+    rh = models.FloatField(verbose_name='relative humidity')
+
+    def __str__(self):
+        return 'Climate for %s at %s' % (self.ppt_id, str(self.datetime))
+
+    def __unicode__(self):
+        return 'Climate for %s at %s' % (self.ppt_id, str(self.datetime))
+
 
 class ScenarioState(models.Model):
     name = models.CharField(max_length=255)
