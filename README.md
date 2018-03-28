@@ -107,10 +107,27 @@ python manage.py import_focus_areas HUC10 /usr/local/apps/marineplanner-core/dat
 python manage.py import_focus_areas HUC12 /usr/local/apps/marineplanner-core/data/__YOUR_HUC_12_FILE__
 python manage.py import_focus_area RMU /usr/local/apps/marineplanner-core/data/__YOUR_RMU_FILE
 python manage.py import_pourpoints /usr/local/apps/marineplanner-core/data/__YOUR_POUR_POINT_BASIN_FILE__
-python manage.py {CLIMATE DATA COMING SOON! ~RDH}
+python manage.py import_climate_data /usr/local/apps/marineplanner-core/data/__YOUR_CLIMATE_DATA_FILE__
 
 python manage.py createsuperuser
 
+```
+
+#### Enable Anonymous User
+Use your admin user to create an anonymous user (this assumes port 8000 is open)
+```
+python manage.py runserver 0:8000
+```
+Navigate to your site's port 8000 and log in to your sites `/admin/` page.
+Create a new user (let's call her 'Anonymous').
+Note the ID created for the user 
+* this can be found in the URL which might look something like `/adminauth/user/2/change/`
+   * The `2` would be the id in this case (it will be numeric)
+   
+Update your local settings with something like:
+```
+ALLOW_ANONYMOUS_DRAW = True
+ANONYMOUS_USER_PK = 2
 ```
 
 #### Install and Configure NGINX and UWSGI
