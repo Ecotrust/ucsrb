@@ -247,6 +247,9 @@ ANONYMOUS_USER_PK = 1
 
 MIN_TREATMENT_ACRES = 100
 
+USE_TZ = False
+
+
 try:
     ### START MODULE SETTINGS IMPORT ###
     from features.settings import *
@@ -257,6 +260,9 @@ try:
     ### END MODULE SETTINGS IMPORT ###
 except ImportError:
     pass
+
+ADMIN_URL = '/admin/'
+CMS_ADMIN_BUTTON = False
 
 MAX_SCENARIO_RESULTS = 25000
 MAPBOX_ACCESS_TOKEN = 'set_in_local_settings'
