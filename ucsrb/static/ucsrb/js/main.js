@@ -26,7 +26,7 @@ var main = {
     auth: {
         signIn: function(event, form) {
             var formData = $(form).serialize();
-            var url = 'sign_in/'; // default form action url
+            var url = '/account/login_async/'; // default form action url
             // check if a different action should be used for url
             if (event.target.action.length > 0) {
                 url = event.target.action;
@@ -78,4 +78,9 @@ var main = {
             $('#login-modal').modal('hide');
         }
     },
-}
+};
+
+main.utils = {
+    arrayToHtmlList: (arr, listID) =>
+      arr.map(item => (document.querySelector('#' + listID).innerHTML += `<li>${item}</li>`))
+};
