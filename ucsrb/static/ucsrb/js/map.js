@@ -215,11 +215,14 @@ confirmSelection = function(feat, markup, vector) {
     setFilter(features[0], layer.layer);
   }
   app.map.popupLock = true;
-  var element = app.map.popup.getElement();
-  $(element).popover('dispose');
+  if (app.map.hasOwnProperty('popup')) {
+    var element = app.map.popup.getElement();
+    $(element).popover('dispose');
+  }
   app.map.popup = new ol.Overlay({
     element: document.getElementById('popup')
   });
+  var element = app.map.popup.getElement();
   app.map.addOverlay(app.map.popup);
   extent = feat.getExtent();
   coordinate = [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2];
