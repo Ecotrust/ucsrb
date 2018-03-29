@@ -44,6 +44,7 @@ setInit = function() {
   app.map.clearLayers();
   app.state.step = 0;
   app.map.draw.disable();
+  app.map.layer.draw.layer.getSource().clear();
 };
 
 app.init = {
@@ -266,7 +267,9 @@ app.panel = {
         app.panel.draw.setContent(html);
       },
       restart: function() {
-        app.map.draw.source.clear(true);
+        app.map.draw.source.clear();
+        app.map.draw.disable();
+        app.map.draw.enable();
         app.panel.hide();
       },
       addTreatmentArea: function() {
