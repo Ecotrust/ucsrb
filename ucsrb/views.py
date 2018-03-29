@@ -9,6 +9,7 @@ import json
 from ucsrb.models import TreatmentScenario
 from django.conf import settings
 from django.views.decorators.cache import cache_page
+from accounts.forms import LogInForm
 
 def index(request):
     template = loader.get_template('ucsrb/index.html')
@@ -16,7 +17,10 @@ def index(request):
         'title': 'UCSRB FSTAT',
         'self': {
             'title': 'UCSRB Snowpack Treatment'
-        }
+        },
+        'form': LogInForm(),
+        'login_title': 'Login',
+        'login_intro': 'welcome back',
     }
     return HttpResponse(template.render(context, request))
 
@@ -26,7 +30,10 @@ def home(request):
         'title': 'UCSRB',
         'self': {
             'title': 'UCSRB'
-        }
+        },
+        'form': LogInForm(),
+        'login_title': 'Login',
+        'login_intro': 'welcome back',
     }
     return HttpResponse(template.render(context, request))
 

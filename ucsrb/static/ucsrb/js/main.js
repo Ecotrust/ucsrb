@@ -1,14 +1,20 @@
 window.addEventListener("load", function () {
     // Sign in
-    document.getElementById('sign-in').addEventListener('submit', function(event) {
-        event.preventDefault();
-        main.auth.signIn(event, this);
-    });
+    var signInBtn = document.querySelector('.login-btn');
+    if (signInBtn) {
+        signInBtn.addEventListener('submit', function(event) {
+            event.preventDefault();
+            main.auth.signIn(event, this);
+        });
+    }
     // Register
-    document.getElementById('sign-up').addEventListener('submit', function(event) {
-        event.preventDefault();
-        main.auth.signUp(event, this);
-    });
+    var signUpBtn = document.querySelector('.sign-up');
+    if (signUpBtn) {
+        signUpBtn.addEventListener('submit', function(event) {
+            event.preventDefault();
+            main.auth.signUp(event, this);
+        });
+    }
     // Sign out
     document.getElementById('menu').addEventListener('click', function(event) {
         if (event.target.nodeName == 'BUTTON') {
@@ -69,12 +75,6 @@ var main = {
             })
         },
         success: function() {
-            var saveState = app.request.saveState();
-            if (saveState == 'success') {
-                document.location.reload();
-            } else {
-                document.location.reload();
-            }
             $('#login-modal').modal('hide');
         }
     },

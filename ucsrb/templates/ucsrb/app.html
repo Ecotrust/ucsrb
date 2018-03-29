@@ -34,41 +34,40 @@
 {% endblock header %}
 
 {% block content %}
-<section class="map-wrap">
-    <div class="overlay">
-        <div class="instructions d-flex justify-content-center">
-            <h2 class="mx-auto w-50 text-center">Start by deciding how you want to interact with the map.</h2>
-            <div class="d-flex hvh">&nbsp;</div>
-            <div id="instruction" class="d-flex align-self-center justify-content-center"></div>
+    <section class="map-wrap">
+        <div class="overlay">
+            <div class="instructions d-flex justify-content-center">
+                <h2 class="mx-auto w-50 text-center">Start by deciding how you want to interact with the map.</h2>
+                <div class="d-flex hvh">&nbsp;</div>
+                <div id="instruction" class="d-flex align-self-center justify-content-center"></div>
+            </div>
         </div>
-    </div>
-    <div id="map"></div>
-    <div id="popup" class="ol-popup">
-      <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-      <div id="popup-content"></div>
-    </div>
-    <div id="panel" class="panel">
-        <div id="panel-content" class="panel-content panel_inner">
-          <div id="draw_form"></div>
-          <div id="scenarios"></div>
-          <div id="scenario_form"></div>
-          <div id="results"></div>
+        <div id="map"></div>
+        <div id="popup" class="ol-popup">
+          <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+          <div id="popup-content"></div>
         </div>
-    </div>
-</section>
+        <div id="panel" class="panel">
+            <div id="panel-content" class="panel-content panel_inner">
+              <div id="draw_form"></div>
+              <div id="scenarios"></div>
+              <div id="scenario_form"></div>
+              <div id="results"></div>
+            </div>
+        </div>
+    </section>
 
-{% include 'ucsrb/blocks/load_saved.html' %}
+    {% include 'ucsrb/blocks/load_saved.html' %}
 
-<div id="loading-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Loading</h5>
+    <div id="loading-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Loading</h5>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
 {% endblock %}
 
 {% block footer_wrap %}{% endblock %}
