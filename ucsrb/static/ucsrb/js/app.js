@@ -61,6 +61,7 @@ app.init = {
     },
     'draw': function() {
       setInit();
+      app.map.enableLayer('huc10');
       app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
       scenario_type_selection_made('draw');
     },
