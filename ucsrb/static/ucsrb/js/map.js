@@ -250,6 +250,7 @@ closeConfirmSelection = function(accepted) {
     app.map.popupLock = false;
     removeFilter();
   }
+  app.map.selection.select.getFeatures().clear();
 }
 
 generateFilterPopup = function(content) {
