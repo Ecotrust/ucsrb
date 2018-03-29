@@ -52,7 +52,7 @@ app.map.styles = {
     }),
     'Polygon': new ol.style.Style({
         stroke: new ol.style.Stroke({
-            color: 'rgba(93, 116, 82, 0.9)',
+            color: 'rgba(0, 0, 0, 0)',
             // lineDash: [12],
             lineCap: 'cap',
             lineJoin: 'miter',
