@@ -7473,7 +7473,10 @@ ol.events.unlisten = function(target, type, listener, opt_this) {
  */
 ol.events.unlistenByKey = function(key) {
   if (key && key.target) {
-    key.target.removeEventListener(key.type, key.boundListener);
+    try {
+      key.target.removeEventListener(key.type, key.boundListener);
+    }
+    catch (err) {}
     var listeners = ol.events.getListeners(key.target, key.type);
     if (listeners) {
       var i = 'deleteIndex' in key ? key.deleteIndex : listeners.indexOf(key);

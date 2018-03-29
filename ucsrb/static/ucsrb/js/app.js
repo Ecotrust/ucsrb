@@ -571,7 +571,7 @@ app.request = {
        * This is sloppy, but I don't know how to get the geometry from a VectorTile feature.
        * @todo {Priority low} find try and set geometry from vector tile
        */
-      point = feature.b;
+      point = feature.getFlatCoordinates();
       return $.ajax({
           url: '/ucsrb/get_focus_area_at',
           data: {
@@ -596,6 +596,7 @@ app.request = {
      */
     get_basin: function(feature, callback) {
       var pp_id = feature.getProperties().OBJECTID;
+      app.map.selectedFeature = feature;
       return $.ajax({
         url: '/ucsrb/get_basin',
         data: {
@@ -611,7 +612,7 @@ app.request = {
         error: function(response, status) {
           console.log(`%cfail @ get basin: %o`, 'color: red', response);
           // we don't have the ppt basins yet, just get a HUC12 for now.
-          app.request.get_focus_area_at(feature, 'HUC12', function(feature, hucFeat) {
+          app.request.get_focus_area_at(app.map.selectedFeature, 'HUC12', function(feature, hucFeat) {
             vectors = (new ol.format.GeoJSON()).readFeatures(hucFeat.geojson, {
                 dataProjection: 'EPSG:3857',
               featureProjection: 'EPSG:3857'
