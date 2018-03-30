@@ -44,6 +44,7 @@ setInit = function() {
   app.map.clearLayers();
   app.state.step = 0;
   app.map.draw.disable();
+  app.map.layer.draw.layer.getSource().clear();
 };
 
 app.init = {
@@ -61,6 +62,7 @@ app.init = {
     },
     'draw': function() {
       setInit();
+      app.map.enableLayer('huc10');
       app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
       scenario_type_selection_made('draw');
     },
@@ -265,7 +267,9 @@ app.panel = {
         app.panel.draw.setContent(html);
       },
       restart: function() {
-        app.map.draw.source.clear(true);
+        app.map.draw.source.clear();
+        app.map.draw.disable();
+        app.map.draw.enable();
         app.panel.hide();
       },
       addTreatmentArea: function() {
@@ -571,7 +575,7 @@ app.request = {
        * This is sloppy, but I don't know how to get the geometry from a VectorTile feature.
        * @todo {Priority low} find try and set geometry from vector tile
        */
-      point = feature.b;
+      point = feature.getFlatCoordinates();
       return $.ajax({
           url: '/ucsrb/get_focus_area_at',
           data: {
@@ -596,6 +600,7 @@ app.request = {
      */
     get_basin: function(feature, callback) {
       var pp_id = feature.getProperties().OBJECTID;
+      app.map.selectedFeature = feature;
       return $.ajax({
         url: '/ucsrb/get_basin',
         data: {
@@ -611,7 +616,7 @@ app.request = {
         error: function(response, status) {
           console.log(`%cfail @ get basin: %o`, 'color: red', response);
           // we don't have the ppt basins yet, just get a HUC12 for now.
-          app.request.get_focus_area_at(feature, 'HUC12', function(feature, hucFeat) {
+          app.request.get_focus_area_at(app.map.selectedFeature, 'HUC12', function(feature, hucFeat) {
             vectors = (new ol.format.GeoJSON()).readFeatures(hucFeat.geojson, {
                 dataProjection: 'EPSG:3857',
               featureProjection: 'EPSG:3857'

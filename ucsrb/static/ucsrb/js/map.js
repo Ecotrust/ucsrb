@@ -52,7 +52,7 @@ app.map.styles = {
     }),
     'Polygon': new ol.style.Style({
         stroke: new ol.style.Stroke({
-            color: 'rgba(93, 116, 82, 0.9)',
+            color: 'rgba(0, 0, 0, 0)',
             // lineDash: [12],
             lineCap: 'cap',
             lineJoin: 'miter',
@@ -215,11 +215,14 @@ confirmSelection = function(feat, markup, vector) {
     setFilter(features[0], layer.layer);
   }
   app.map.popupLock = true;
-  var element = app.map.popup.getElement();
-  $(element).popover('dispose');
+  if (app.map.hasOwnProperty('popup')) {
+    var element = app.map.popup.getElement();
+    $(element).popover('dispose');
+  }
   app.map.popup = new ol.Overlay({
     element: document.getElementById('popup')
   });
+  var element = app.map.popup.getElement();
   app.map.addOverlay(app.map.popup);
   extent = feat.getExtent();
   coordinate = [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2];
@@ -247,6 +250,7 @@ closeConfirmSelection = function(accepted) {
     app.map.popupLock = false;
     removeFilter();
   }
+  app.map.selection.select.getFeatures().clear();
 }
 
 generateFilterPopup = function(content) {
