@@ -34,7 +34,7 @@ $(document).ready(function() {
                     html += `<li><button data-id="${response[scenario].id}" class="scenario-name btn btn-link">${response[scenario].name} <span class="description">${response[scenario].description}</span></button></li>`;
                 }
                 html += '</ul>';
-                modal.find('.load-saved-wrap').append(html);
+                modal.find('.load-saved-wrap').html(html);
             })
             .then(function() {
                 document.getElementById('load-saved-list').addEventListener('click', function(event) {
