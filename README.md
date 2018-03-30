@@ -157,7 +157,7 @@ sudo cp /usr/local/apps/marineplanner-core/deployment/rc.local /etc/rc.local
 configuration:  
      Internet Site 
 System mail name : 
-     <default> 
+     enter the domain name you plan to use, i.e.: s2f.ucsrb.org 
 
 Then set Django settings to look something like this:
 ```
