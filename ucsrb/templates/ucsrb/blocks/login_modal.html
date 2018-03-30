@@ -4,18 +4,21 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Login</h5>
+          <h5 class="modal-title">Access</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
             {% include 'accounts/login_form.html' %}
-        </div>
-        <div class="modal-body">
-            <h5 class="modal-title">Register</h5>
-            {% include 'accounts/registration_form.html' %}
-            <!-- {% include 'ucsrb/blocks/registration_form.html' %} -->
+
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#register-collapse" aria-expanded="false" aria-controls="register-collapse">Create account</button>
+
+            <div class="collapse" id="register-collapse">
+              <div class="card card-body bg-dark">
+                {% include 'accounts/registration_form.html' %}
+              </div>
+            </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

@@ -11,103 +11,34 @@ from django.conf import settings
 from django.views.decorators.cache import cache_page
 from accounts.forms import LogInForm, SignUpForm
 
-def index(request):
-    template = loader.get_template('ucsrb/index.html')
+def accounts_context():
     context = {
-        'title': 'UCSRB FSTAT',
-        'self': {
-            'title': 'UCSRB Snowpack Treatment'
-        },
         'form': LogInForm(),
         'login_title': 'Login',
-        'login_intro': 'welcome back',
+        'login_intro': 'Access your account',
+        'registration_form': SignUpForm(),
     }
+    return context
+
+def index(request):
+    template = loader.get_template('ucsrb/index.html')
+    context = accounts_context()
+    context['title'] = 'UCSRB FSTAT'
     return HttpResponse(template.render(context, request))
 
 def home(request):
     template = loader.get_template('ucsrb/home.html')
-    context = {
-        'title': 'UCSRB',
-        'self': {
-            'title': 'UCSRB'
-        },
-        'form': LogInForm(),
-        'login_title': 'Login',
-        'login_intro': 'welcome back',
-        'registration_form': SignUpForm(),
-    }
+    context = accounts_context()
+    context['title'] = 'UCSRB'
     return HttpResponse(template.render(context, request))
 
 def app(request):
     template = loader.get_template('ucsrb/app.html')
-    # user_scenario_list = get_user_scenario_list(request)
-    context = {
-        'MAPBOX_TOKEN': settings.MAPBOX_ACCESS_TOKEN,
-        # 'user_scenario_list': user_scenario_list,
-        'login_form': LogInForm(),
-        'login_title': 'Login',
-        'login_intro': 'welcome back',
-        'registration_form': SignUpForm(),
-    }
+    context = accounts_context()
+    context['title'] = 'UCSRB'
+    context['MAPBOX_TOKEN'] = settings.MAPBOX_ACCESS_TOKEN
     context['MAP_TECH'] = 'ol4'
     return HttpResponse(template.render(context, request))
-
-def sign_in(request):
-    context = {}
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(request, username=username, password=password)
-    if user is not None:
-        login(request, user)
-        context['success'] = True
-        context['username'] = username
-        context['user_id'] = user.id
-        # allow user to save, load, or continue
-        return JsonResponse(context)
-    else:
-        context['success'] = False
-        context['error_msg'] = 'Invalid username/password.'
-        # Return an 'invalid login' error message.
-        return JsonResponse(context)
-
-def sign_out(request):
-    logout(request)
-    # Redirect to a success page or success message
-    # no error thrown by logout
-    return HttpResponse('logout successful')
-
-def register(request):
-    context = {}
-    username = request.POST['username']
-    email = request.POST['email']
-    password = request.POST['password']
-    password_confirm = request.POST['password_confirm']
-    if password != password_confirm:
-        context['success'] = False
-        context['error_msg'] = 'Password does not match the confirm password.'
-        return JsonResponse(context)
-    try:
-        user = User.objects.create_user(username, email, password)
-        user_auth = authenticate(request, username=username, password=password)
-        if user_auth is not None:
-            try:
-                from accounts.models import UserData
-                (created, userData) = UserData.objects.get_or_create(user=user, real_name=user.username)
-            except:
-                # The above should work just fine. If not we need a test case to know what to do with it.
-                pass
-            login(request, user)
-            context['success'] = True
-            context['username'] = username
-            return JsonResponse(context)
-        else:
-            context['success'] = False
-            context['error_msg'] = 'Invalid username/password.'
-            return JsonResponse(context)
-    except:
-        context['success'] = False
-        context['error_msg'] = 'User already exists.'
-        return JsonResponse(context)
 
 def get_user_scenario_list(request):
     user_scenarios_list = []

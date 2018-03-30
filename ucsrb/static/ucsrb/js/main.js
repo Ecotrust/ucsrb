@@ -9,10 +9,11 @@ window.addEventListener("load", function () {
         });
     }
     // Register
-    var signUpBtn = document.querySelector('.sign-up');
+    var signUpBtn = document.querySelector('#register-form');
     if (signUpBtn) {
         signUpBtn.addEventListener('submit', function(event) {
             event.preventDefault();
+            console.log('clicked');
             main.auth.signUp(event, this);
         });
     }
@@ -47,7 +48,7 @@ var main = {
         },
         signOut: function(event) {
             $.ajax({
-                url: 'sign_out/',
+                url: '/account/logout/',
                 success: function (data) {
                     document.location.href = '/';
                 }
@@ -55,19 +56,15 @@ var main = {
         },
         signUp: function(event, form) {
             var formData = $(form).serialize();
-            var url = 'sign_up/'; // default form action url
-            // check if a different action should be used for url
-            if (event.target.action.length > 0) {
-                url = event.target.action;
-            }
+            var url = '/account/register_async/';
             $.ajax({
                 url: url,
                 type: 'POST',
                 data: formData,
                 dataType: 'json',
                 success: function (data) {
-                    main.auth.success();
                     console.log(data);
+                    main.auth.success();
                 }
             })
         },

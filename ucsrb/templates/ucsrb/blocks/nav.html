@@ -12,7 +12,7 @@
                 <a href="/account/" class="list-group-item list-group-item-action">{{ user.username }}</a>
                 <button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>
             {% else %}
-                {% if '/account' not in request.path %}
+                {% if 'account' not in request.path %}
                     <button id="sign-in-modal" data-action="sign-in-modal" class="list-group-item list-group-item-action">Sign in</button>
                 {% endif %}
             {% endif %}
