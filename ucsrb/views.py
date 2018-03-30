@@ -9,7 +9,7 @@ import json
 from ucsrb.models import TreatmentScenario
 from django.conf import settings
 from django.views.decorators.cache import cache_page
-from accounts.forms import LogInForm
+from accounts.forms import LogInForm, SignUpForm
 
 def index(request):
     template = loader.get_template('ucsrb/index.html')
@@ -34,6 +34,7 @@ def home(request):
         'form': LogInForm(),
         'login_title': 'Login',
         'login_intro': 'welcome back',
+        'registration_form': SignUpForm(),
     }
     return HttpResponse(template.render(context, request))
 
@@ -43,9 +44,10 @@ def app(request):
     context = {
         'MAPBOX_TOKEN': settings.MAPBOX_ACCESS_TOKEN,
         # 'user_scenario_list': user_scenario_list,
-        'form': LogInForm(),
+        'login_form': LogInForm(),
         'login_title': 'Login',
         'login_intro': 'welcome back',
+        'registration_form': SignUpForm(),
     }
     context['MAP_TECH'] = 'ol4'
     return HttpResponse(template.render(context, request))
