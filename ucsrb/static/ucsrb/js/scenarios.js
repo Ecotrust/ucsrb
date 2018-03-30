@@ -1585,7 +1585,12 @@ function scenariosModel(options) {
                             i--;
                         }
                     }
-                    app.map.addLayer(scenario.layer);
+                    if (app.map.hasOwnProperty('scenarioLayer')){
+                      app.map.scenarioLayer.removeAllFeatures();
+                      app.map.removeLayer(app.map.scenarioLayer);
+                    }
+                    app.map.scenarioLayer = scenario.layer;
+                    app.map.addLayer(app.map.scenarioLayer);
                     //add scenario to Active tab
                     app.viewModel.activeLayers.remove(function(item) { return item.uid === scenario.uid; } );
                     // app.viewModel.activeLayers.unshift(scenario);
