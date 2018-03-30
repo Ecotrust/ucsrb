@@ -43,6 +43,9 @@ def app(request):
     context = {
         'MAPBOX_TOKEN': settings.MAPBOX_ACCESS_TOKEN,
         # 'user_scenario_list': user_scenario_list,
+        'form': LogInForm(),
+        'login_title': 'Login',
+        'login_intro': 'welcome back',
     }
     context['MAP_TECH'] = 'ol4'
     return HttpResponse(template.render(context, request))

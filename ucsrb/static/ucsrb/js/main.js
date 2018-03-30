@@ -1,9 +1,10 @@
 window.addEventListener("load", function () {
     // Sign in
-    var signInBtn = document.querySelector('.login-btn');
+    var signInBtn = document.querySelector('.sign-in');
     if (signInBtn) {
         signInBtn.addEventListener('submit', function(event) {
             event.preventDefault();
+            console.log('clicked');
             main.auth.signIn(event, this);
         });
     }
@@ -33,10 +34,6 @@ var main = {
         signIn: function(event, form) {
             var formData = $(form).serialize();
             var url = '/account/login_async/'; // default form action url
-            // check if a different action should be used for url
-            if (event.target.action.length > 0) {
-                url = event.target.action;
-            }
             $.ajax({
                 url: url,
                 type: 'POST',
