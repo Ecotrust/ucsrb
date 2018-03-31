@@ -1,28 +1,41 @@
 window.addEventListener("load", function () {
     // Sign in
     var signInBtn = document.querySelector('.sign-in');
-    if (signInBtn) {
-        signInBtn.addEventListener('submit', function(event) {
-            event.preventDefault();
-            console.log('clicked');
-            main.auth.signIn(event, this);
-        });
-    }
     // Register
-    var signUpBtn = document.querySelector('#register-form');
-    if (signUpBtn) {
-        signUpBtn.addEventListener('submit', function(event) {
-            event.preventDefault();
-            console.log('clicked');
-            main.auth.signUp(event, this);
-        });
-    }
+    var registerBtn = document.querySelector('#register-form');
+
+    $('#login-modal').on('shown.bs.modal', function(event) {
+        if (signInBtn) {
+            signInBtn.addEventListener('submit', function(event) {
+                event.preventDefault();
+                console.log('clicked');
+                main.auth.signIn(event, this);
+            });
+        }
+        if (registerBtn) {
+            registerBtn.addEventListener('submit', function(event) {
+                event.preventDefault();
+                console.log('clicked');
+                main.auth.register(event, this);
+            });
+        }
+    });
+
+    $('#login-modal').on('hidden.bs.modal', function(event) {
+        if (signInBtn) {
+            signInBtn.removeEventListener('submit');
+        }
+        if (registerBtn) {
+            registerBtn.removeEventListener('submit');
+        }
+    });
+
     // Sign out
     document.getElementById('menu').addEventListener('click', function(event) {
         if (event.target.nodeName == 'BUTTON') {
             event.preventDefault();
             if (event.target.dataset.action == 'sign-out') {
-                main.auth.signOut();
+                main.auth.logOut();
             } else if (event.target.dataset.action == 'sign-in-modal') {
                 $('#login-modal').modal('show');
             }
@@ -46,7 +59,7 @@ var main = {
                 }
             })
         },
-        signOut: function(event) {
+        logOut: function(event) {
             $.ajax({
                 url: '/account/logout/',
                 success: function (data) {
@@ -54,7 +67,7 @@ var main = {
                 }
             })
         },
-        signUp: function(event, form) {
+        register: function(event, form) {
             var formData = $(form).serialize();
             var url = '/account/register_async/';
             $.ajax({
@@ -64,7 +77,11 @@ var main = {
                 dataType: 'json',
                 success: function (data) {
                     console.log(data);
-                    main.auth.success();
+                    if (data.success === true) {
+                        main.auth.success();
+                    } else {
+                        document.querySelector('#registration-error').innerHTML = `${data.error}. Please update then submit`;
+                    }
                 }
             })
         },
