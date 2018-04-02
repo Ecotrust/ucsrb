@@ -498,6 +498,7 @@ app.map.addScenario = function(vectors) {
   * @constructor
   * @extends {ol.control.Control}
   * @param {Object=} opt_options Control options.
+  * Geosearch | geocode | reverse geocode
   */
 app.geoSearch = function(opt_options) {
     var options = opt_options || {};
@@ -544,39 +545,51 @@ app.geoSearch = function(opt_options) {
     });
 };
 
-app.geoSearch.geojson = function(callback) {
-    return function(callback) {
-        $.ajax("/static/ucsrb/data/gnis_3857.geojson", callback);
-    }
-}
+app.geoSearch.geojson;
+
+/**
+ * Geosearch geojson object to run qeuries against
+ * @return {[json]} [FeatureCollection]
+ * Immediately Invoked Function Expression (IIFE)
+ * self-executing function
+ * might as well grab all the options async upfront
+ */
+app.geoSearch.requestJSON = (function() {
+    return $.ajax({
+        url: '/static/ucsrb/data/gnis_3857.geojson',
+        success: function(response) {
+            console.log('%csuccessful returned parsed geosearch data: %o', 'color: green', JSON.parse(response));
+            app.geoSearch.geojson = JSON.parse(response);
+        },
+        error: function(response) {
+            console.log('%cError during geosearch: %o', 'color: red;', response);
+        }
+    });
+})();
 
 app.geoSearch.autoCompleteLookup = function() {
     var input = document.querySelector('#geo-search-input');
     var resultsList = document.getElementById("autocomplete-results");
-    input.onkeyup = function(e) {
-        var input_val = this.value;
-        if (input_val.length > 2) {
+    input.addEventListener('keyup', function(event) {
+        var val = this.value;
+        if (val.length > 2) {
             resultsList.innerHTML = '';
-            options = app.geoSearch.autoCompleteResults(input_val);
-
-            for (var option in options) {
+            var options = app.geoSearch.autoCompleteResults(val);
+            console.log(options);
+            options.map(function(option) {
                 resultsList.innerHTML += `<li>${option}</li>`;
-            }
+            })
             resultsList.style.display = 'block';
         } else {
             resultsList.innerHTML = '';
         }
-    }
+    })
 }
 
 app.geoSearch.autoCompleteResults = function(val) {
     var options = [];
-    var geojson = app.geoSearch.geojson(function(response) {
-        console.log('%csuccessfully return geosearch json', 'color: green');
-        var json = JSON.parse(response);
-        return json;
-    });
-    for (var feature in geojson.features) {
+    console.log(app.geoSearch.geojson.features);
+    for (var feature of app.geoSearch.geojson.features) {
         if (val === feature['properties']['F_NAME'].slice(0, val.length)) {
             options.push(feature['properties']['F_NAME']);
         }

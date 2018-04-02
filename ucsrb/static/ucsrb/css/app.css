@@ -365,6 +365,11 @@ main {
     right: 11vh;
 }
 
+.ol-geo-search #autocomplete-results {
+    margin: 0;
+    padding: 0;
+}
+
 .ol-geo-search button {
     background: url('/static/ucsrb/img/icon/i_search.svg') rgba(255,255,255,0.8) 50% 50% no-repeat;
     background-size: auto 60%;
