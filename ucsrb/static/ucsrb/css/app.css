@@ -361,14 +361,25 @@ main {
 }
 
 .ol-geo-search {
+    background: transparent;
     position: absolute;
     right: 11vh;
 }
 
-.ol-geo-search button {
-    background: url('/static/ucsrb/img/icon/i_search.svg') rgba(255,255,255,0.8) 50% 50% no-repeat;
+.ol-geo-search #autocomplete-results {
+    background-color: rgba(255,255,255,1);
+    font-size: .875em;
+}
+
+.ol-geo-search > .ol-geo-search-wrap > button {
+    background: url('/static/ucsrb/img/icon/i_search.svg') rgba(255,255,255,0.66) 50% 50% no-repeat;
     background-size: auto 60%;
     display: inline-block;
+    vertical-align: middle;
+}
+
+.ol-geo-search > .ol-geo-search-wrap > button:active {
+    background: rgba(255,255,255,0.66);
 }
 
 .ol-geo-search input:not(.d-none) {
