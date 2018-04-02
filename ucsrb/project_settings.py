@@ -181,6 +181,8 @@ INSTALLED_APPS = [
     'compressor',
     'captcha',
     'import_export',
+    'social.apps.django_app.default',
+    'social_django',
     ### BEGIN INSERTED INSTALLED APPS ###
     'features',
     'manipulators',
