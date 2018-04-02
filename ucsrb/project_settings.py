@@ -251,6 +251,13 @@ MIN_TREATMENT_ACRES = 100
 
 USE_TZ = False
 
+EMAIL_HOST_USER = 'noreply@s2fdemo.ecotrust.org'
+DEFAULT_FROM_EMAIL = 'noreply@s2fdemo.ecotrust.org'
+SERVER_EMAIL = 'noreply@s2fdemo.ecotrust.org'
+
+FORGOT_EMAIL_SUBJECT = 'Snow2Flow Password Reset Request'
+
+
 
 try:
     ### START MODULE SETTINGS IMPORT ###
