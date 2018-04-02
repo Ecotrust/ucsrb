@@ -114,7 +114,7 @@ app.map.geoSearch.autoCompleteLookup = function() {
 app.map.geoSearch.autoCompleteResults = function(val) {
     var options = [];
     for (var feature of app.map.geoSearch.geojson.features) {
-        if (val === feature['properties']['F_NAME'].slice(0, val.length)) {
+        if (val.toLowerCase() === feature['properties']['F_NAME'].slice(0, val.length).toLowerCase()) {
             options.push(feature);
         }
     }
