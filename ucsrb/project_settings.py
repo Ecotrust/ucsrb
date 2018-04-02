@@ -251,14 +251,6 @@ MIN_TREATMENT_ACRES = 100
 
 USE_TZ = False
 
-EMAIL_HOST_USER = 'noreply@s2fdemo.ecotrust.org'
-DEFAULT_FROM_EMAIL = 'noreply@s2fdemo.ecotrust.org'
-SERVER_EMAIL = 'noreply@s2fdemo.ecotrust.org'
-
-FORGOT_EMAIL_SUBJECT = 'Snow2Flow Password Reset Request'
-
-
-
 try:
     ### START MODULE SETTINGS IMPORT ###
     from features.settings import *
@@ -275,6 +267,14 @@ CMS_ADMIN_BUTTON = False
 
 MAX_SCENARIO_RESULTS = 25000
 MAPBOX_ACCESS_TOKEN = 'set_in_local_settings'
+
+EMAIL_HOST_USER = 'noreply@s2fdemo.ecotrust.org'
+DEFAULT_FROM_EMAIL = 'noreply@s2fdemo.ecotrust.org'
+SERVER_EMAIL = 'noreply@s2fdemo.ecotrust.org'
+PROJECT_SITE = 'http://s2fdemo.ecotrust.org'
+PROJECT_NAME = 'Snow2Flow'
+
+FORGOT_EMAIL_SUBJECT = 'Snow2Flow Password Reset Request'
 
 try:
     # Local settings should probably be collected to project folder instead.
