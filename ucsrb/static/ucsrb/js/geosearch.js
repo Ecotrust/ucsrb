@@ -18,30 +18,13 @@ app.map.geoSearch = function(opt_options) {
 
     var resultsList = document.createElement('div');
     resultsList.setAttribute('id', 'autocomplete-results');
-    resultsList.className = 'dropdown-menu';
-    var heading = document.createElement('h6');
-    heading.className = 'dropdown-header';
-    heading.innerHTML = 'matches';
-    resultsList.appendChild(heading);
 
-    var toggleSearchBox = function() {
-        var input = document.querySelector('#geo-search-input');
-        var resultsList = document.getElementById("autocomplete-results");
-        if (input.classList.contains('d-none')) {
-            input.classList.remove('d-none');
-            app.map.geoSearch.autoCompleteLookup();
-        } else {
-            input.value = '';
-            input.classList.add('d-none');
-        }
-    };
-
-    button.addEventListener('click', toggleSearchBox, false);
+    button.addEventListener('click', app.map.geoSearch.toggleSearchBox, false);
 
     var element = document.createElement('div');
     element.className = 'ol-geo-search ol-unselectable ol-control geo-search form-inline';
     var wrap = document.createElement('div');
-    wrap.className = 'ol-geo-search-wrap';
+    wrap.className = 'ol-geo-search-wrap dropdown';
     element.appendChild(wrap);
     wrap.appendChild(button);
     wrap.appendChild(input);
@@ -53,6 +36,18 @@ app.map.geoSearch = function(opt_options) {
     });
 };
 
+app.map.geoSearch.toggleSearchBox = function() {
+    var resultsList = document.getElementById("autocomplete-results");
+    resultsList.innerHTML = '';
+    var input = document.querySelector('#geo-search-input');
+    if (input.classList.contains('d-none')) {
+        input.classList.remove('d-none');
+        app.map.geoSearch.autoCompleteLookup();
+    } else {
+        input.value = '';
+        input.classList.add('d-none');
+    }
+};
 /**
  * var to assign geojson returned from geoSearch.requestJSON
  * @type {[Object]}
@@ -94,11 +89,11 @@ app.map.geoSearch.autoCompleteLookup = function() {
             options.map(function(option) {
                 resultsList.innerHTML += `<a data-coords="${option.geometry.coordinates}" class="geosearch-result dropdown-item">${option.properties.F_NAME}</a>`;
             })
-            resultsList.style.display = 'block';
             resultsList.addEventListener('click', function(event) {
                 var x = event.target.dataset.coords.split(',');
                 var y = [parseFloat(x[0]), parseFloat(x[1])];
                 app.map.getView().animate({center: y, zoom: 14});
+                resultsList.innerHTML = '';
             });
         } else {
             resultsList.innerHTML = '';
