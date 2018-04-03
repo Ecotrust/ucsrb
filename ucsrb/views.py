@@ -17,6 +17,9 @@ def accounts_context():
         'login_title': 'Login',
         'login_intro': 'Access your account',
         'registration_form': SignUpForm(),
+        'forgot_password_link': 'Forgot Password?',
+        'register_link': ' ', # space is needed &nbsp;
+        'help_link': ' ', # space is needed &nbsp;
     }
     return context
 
