@@ -326,6 +326,7 @@ app.panel = {
 
 enableDrawing = function() {
   app.map.draw.enable();
+  app.map.geoSearch.openSearchBox();
 }
 
 app.nav = {
@@ -387,6 +388,7 @@ app.nav = {
       reset: function() {
         app.panel.getPanelContentElement.innerHTML = '<div id="scenarios"></div><div id="scenario_form"></div><div id="draw_form"></div><div id="results"></div>';
         app.panel.moveRight();
+        app.map.geoSearch.closeSearchBox();
       },
       select: [
         false,

@@ -48,6 +48,28 @@ app.map.geoSearch.toggleSearchBox = function() {
         input.classList.add('d-none');
     }
 };
+
+/**
+ * If seachbox is closed, use the built in logic of toggleSearchBox to open it.
+ */
+app.map.geoSearch.openSearchBox = function() {
+  var input = document.querySelector('#geo-search-input');
+  if (input.classList.contains('d-none')) {
+    app.map.geoSearch.toggleSearchBox();
+  }
+}
+
+/**
+ * If seachbox is open, use the built in logic of toggleSearchBox to close it.
+ */
+app.map.geoSearch.closeSearchBox = function() {
+  var input = document.querySelector('#geo-search-input');
+  if (!input.classList.contains('d-none')) {
+    app.map.geoSearch.toggleSearchBox();
+  }
+}
+
+
 /**
  * var to assign geojson returned from geoSearch.requestJSON
  * @type {[Object]}
