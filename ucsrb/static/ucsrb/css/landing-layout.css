@@ -28,8 +28,7 @@
 }
 
 .home .top-nav-wrap h1 {
-    visibility: hidden;
-    width: 0;
+    display: none;
 }
 
 .home .top-nav-wrap .navbar-toggler {
