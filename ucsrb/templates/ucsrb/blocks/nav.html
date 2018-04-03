@@ -9,13 +9,18 @@
             <a href="" class="list-group-item list-group-item-action">Terms Defined</a>
             <a href="" class="list-group-item list-group-item-action">Tutorial</a>
             {% if user.is_authenticated %}
-                <a href="/account/" class="list-group-item list-group-item-action">{{ user.username }}</a>
-                <button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>
+                <div class="auth-nav-wrap is-authenticated">
+                    <a href="/account/" class="list-group-item list-group-item-action">{{ user.username }}</a>
+                    <button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>
+                </div>
             {% else %}
                 {% if 'account' not in request.path %}
-                    <button id="sign-in-modal" data-action="sign-in-modal" class="list-group-item list-group-item-action">Sign in</button>
+                    <div class="auth-nav-wrap not-authenticated">
+                        <button id="sign-in-modal" data-action="sign-in-modal" class="list-group-item list-group-item-action">Sign in</button>
+                    </div>
                 {% endif %}
             {% endif %}
+            </div>
         </div>
     </div>
 </nav>

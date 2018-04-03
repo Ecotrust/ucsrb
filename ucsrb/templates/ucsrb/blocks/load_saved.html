@@ -12,10 +12,9 @@
             {% if user.is_authenticated %}
                 <div id="load-saved-wrap" class="load-saved-wrap"></div>
             {% else %}
-                {% include 'ucsrb/blocks/login.html' %}
-                <hr />
-                <h2>Register</h2>
-                {% include 'ucsrb/blocks/registration_form.html' %}
+                {% if 'account' not in request.path %}
+                    <button data-action="sign-in-modal" class="btn">Sign in</button>
+                {% endif %}
             {% endif %}
         </div>
       </div>

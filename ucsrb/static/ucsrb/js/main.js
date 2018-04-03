@@ -54,8 +54,7 @@ var main = {
                 data: formData,
                 dataType: 'json',
                 success: function (data) {
-                    console.log(data);
-                    main.auth.success();
+                    main.auth.success(data);
                 }
             })
         },
@@ -85,8 +84,13 @@ var main = {
                 }
             })
         },
-        success: function() {
+        success: function(data) {
+            console.log(data);
             $('#login-modal').modal('hide');
+            // Update the nav
+            var $signInBtn = $('button#sign-in-modal');
+            $signInBtn.before(`<a href="/account/" class="list-group-item list-group-item-action">${data.username}</a><button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>`);
+            $signInBtn.css('display', 'none');
         }
     },
 };
