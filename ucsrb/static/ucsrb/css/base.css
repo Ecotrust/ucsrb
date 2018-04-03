@@ -122,6 +122,13 @@ h5 {
     display: flex;
 }
 
+.navbar-toggler:not(.collapsed) .navbar-toggler-icon {
+    background-image: url('/static/ucsrb/img/icon/i_close.png');
+    background-size: 60% auto;
+    background-position: 50%;
+    background-repeat: no-repeat;
+}
+
 /**
  * =========================================================================
    Profile
@@ -166,8 +173,57 @@ h5 {
     max-width: 100%;
 }
 
+#login-modal input[type=submit] {
+    background-color: #3a5675;
+    text-transform: uppercase;
+    font-size: .9375em;
+    font-weight: 700;
+    margin: .5rem 0;
+    padding: .5rem 1.25rem .4375rem;
+    opacity: 1;
+    transition: 0.2s opacity ease-in-out;
+}
+    #login-modal input[type=submit]:hover {
+        opacity: 0.8;
+    }
+
 #login-modal .left-inner-addon {
     margin-bottom: 1rem;
+}
+
+#login-modal form > div > label {
+    font-size: .675em;
+}
+
+
+#login-modal .btn-link {
+    color: #67b8c6;
+    font-weight: 500;
+}
+
+#login-modal hr {
+    height: 3px;
+}
+
+.login-intro-wrap h2 {
+    font-size: 1.375em;
+    text-align: center;
+}
+
+.login-intro-wrap p {
+    display: none;
+}
+
+.login-form-wrap {
+    margin-bottom: 1rem;
+}
+
+.login-help-wrap a {
+    font-size: .875em;
+}
+
+#register-form input[type=submit] {
+    margin-top: 1.5rem;
 }
 
 /**

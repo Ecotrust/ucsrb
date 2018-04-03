@@ -17,9 +17,10 @@ def accounts_context():
         'login_title': 'Login',
         'login_intro': 'Access your account',
         'registration_form': SignUpForm(),
+        'registration_title': ' ', # space is needed to hide the defualt and insert a &nbsp; space
         'forgot_password_link': 'Forgot Password?',
-        'register_link': ' ', # space is needed &nbsp;
-        'help_link': ' ', # space is needed &nbsp;
+        'register_link': ' ', # space is needed to hide the defualt and insert a &nbsp; space
+        'help_link': ' ', # space is needed to hide the defualt and insert a &nbsp; space
     }
     return context
 
