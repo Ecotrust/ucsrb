@@ -1,33 +1,45 @@
 /**
- * home page styles
+ * =========================================================================
+   Home Page
+ ===========================================================================
  */
+
+
+ .home header {
+     position: relative;
+     z-index: 1;
+ }
+
 .home-wrap {
     overflow: hidden;
     width: 100%;
 }
 
-/**
- *
- * home page nav
- */
-.nav-home {
-    position: absolute;
-    top: 2%;
+.home .top-nav-wrap {
+    height: 10vh;
     left: 0;
-    right: 0;
+    position: absolute;
+    top: 0;
     width: 100%;
-    z-index: 4;
 }
 
-.nav-home h1 {
-    display: none;
+.home .top-nav-wrap .navbar {
+    justify-content: flex-end;
 }
 
-.nav-home .navbar-toggler {
-    background: rgba(255,255,255,0.5);
-    left: 92%;
-    margin-top: 2vh;
-    position: relative;
+.home .top-nav-wrap h1 {
+    visibility: hidden;
+    width: 0;
+}
+
+.home .top-nav-wrap .navbar-toggler {
+    background-color: rgba(255,255,255,0.5);
+}
+
+.home .top-nav-wrap .navbar-collapse.collapse.show,
+.home .top-nav-wrap .navbar-collapse.collapsing,
+.home .top-nav-wrap .navbar-collapse.collapse {
+    justify-content: flex-end;
 }
 
 /**

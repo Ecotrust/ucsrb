@@ -22,12 +22,12 @@ window.addEventListener("load", function () {
     });
 
     $('#login-modal').on('hidden.bs.modal', function(event) {
-        if (signInBtn) {
-            signInBtn.removeEventListener('submit');
-        }
-        if (registerBtn) {
-            registerBtn.removeEventListener('submit');
-        }
+        // if (signInBtn) {
+        //     signInBtn.removeEventListener('submit');
+        // }
+        // if (registerBtn) {
+        //     registerBtn.removeEventListener('submit');
+        // }
     });
 
     // Sign out
