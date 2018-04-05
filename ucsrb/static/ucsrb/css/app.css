@@ -58,6 +58,7 @@ nav .navbar-toggler .navbar-toggler-icon {
     line-height: 9vh;
     display: block;
     margin: 0 auto;
+    width: 100%;
 }
     nav .navbar-toggler.collapsed .navbar-toggler-icon {
         background-image: url('/static/ucsrb/img/navicon.svg');
@@ -296,6 +297,7 @@ main {
 }
 
 .map-wrap .short-overlay .instructions #instruction {
+    font-size: .875em;
     margin: 0 auto;
     width: 70%;
 }
@@ -326,6 +328,14 @@ main {
     z-index: 1;
 }
 
+#map .ol-control:hover {
+    background: transparent;
+}
+
+#map .ol-touch .ol-control button {
+    font-size: 1em;
+}
+
 #map .ol-zoom,
 .ol-geo-search,
 #map .layer-switcher {
@@ -343,7 +353,8 @@ main {
 #map .ol-zoom {
     background-color: transparent;
     left: auto;
-    right: 1rem;
+    right: 2vh;
+    max-width: 9vh;
 }
 
 #map .ol-zoom button {
@@ -385,7 +396,7 @@ main {
     background: url('/static/ucsrb/img/icon/i_search.svg') rgba(255,255,255,0.66) 50% 50% no-repeat;
     background-size: auto 60%;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
 }
 
 .ol-geo-search > .ol-geo-search-wrap > button:active {
@@ -393,7 +404,11 @@ main {
 }
 
 .ol-geo-search input:not(.d-none) {
+    font-size: .75em;
+    line-height: 1.5em;
     margin-left: .25rem;
+    padding: .125em .5em;
+    vertical-align: top;
 }
 
 .ol-geo-search input + #autocomplete-results {

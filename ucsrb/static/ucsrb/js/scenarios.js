@@ -1527,12 +1527,12 @@ function scenariosModel(options) {
                         type: 'GET',
                         dataType: 'json',
                         success: function(result) {
+                            $('#loading-modal').modal('hide');
                             if (scenario) {
                               //TODO: figure out when and why this wouldn't have a scenario (on creating empty collection)
                               //    and adjust if necessary
                               scenario.scenarioAttributes(result.attributes);
                             }
-                            $('#loading-modal').modal('hide');
                         },
                         error: function (result) {
                             $('#loading-modal').modal('hide');
@@ -1602,9 +1602,9 @@ function scenariosModel(options) {
                 $('#loading-modal').modal('hide');
             },
             error: function(result) {
+                $('#loading-modal').modal('hide');
                 console.log('error in scenarios.js: addScenarioToMap (geojson scenarioId)');
                 app.viewModel.scenarios.errorMessage(result.responseText.split('\n\n')[0]);
-                $('#loading-modal').modal('hide');
             }
         });
 
@@ -1954,11 +1954,11 @@ function scenariosModel(options) {
         type: 'POST',
         dataType: 'json',
         success: function(data) {
+          $('#loading-modal').modal('hide');
           attr_list = data[0];
           report_data = data[1];
           download_link = data[2];
           app.viewModel.scenarios.showComparisonReportModal(attr_list,report_data,download_link);
-          $('#loading-modal').modal('hide');
         },
         error: function(result) {
           $('#loading-modal').modal('hide');
