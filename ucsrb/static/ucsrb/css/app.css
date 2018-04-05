@@ -133,7 +133,7 @@ nav .navbar-toggler .navbar-toggler-icon {
     }
 
     .method-nav button.active {
-        transition: 1s all ease-in 2s;
+        transition: 1s all ease-in 1s;
     }
 
     .method-nav button.active:after {
@@ -221,7 +221,7 @@ nav .navbar-toggler .navbar-toggler-icon {
     height: 80%;
 }
 
-icons-only .nav-item img {
+.icons-only .method-nav .nav-item img {
     max-height: 8vh;
 }
 
@@ -895,6 +895,7 @@ main {
    }
    100% {
        max-height: 3.5rem;
+       max-height: 8vh;
        margin-bottom: 0;
    }
  }
