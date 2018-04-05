@@ -223,6 +223,15 @@ class TreatmentScenario(Scenario):
             return super(type(self), self).run(result)
         return result
 
+    def get_report(self):
+        report_dict = {
+            'aggregate_results': {
+                'forest_types': {},
+                'landforms/topography': {}
+            },
+            'treatment_areas': [],
+            'pourpoints': []
+        }
 
     class Options:
         verbose_name = 'Treatment'

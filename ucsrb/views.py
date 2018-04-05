@@ -17,10 +17,6 @@ def accounts_context():
         'login_title': 'Login',
         'login_intro': 'Access your account',
         'registration_form': SignUpForm(),
-        'registration_title': ' ', # space is needed to hide the defualt and insert a &nbsp; space
-        'forgot_password_link': 'Forgot Password?',
-        'register_link': ' ', # space is needed to hide the defualt and insert a &nbsp; space
-        'help_link': ' ', # space is needed to hide the defualt and insert a &nbsp; space
     }
     return context
 
@@ -765,10 +761,27 @@ def filter_results(request):
     }
     return JsonResponse(return_json)
 
+
+
 def get_results_by_scenario_id(request):
+    from ucsrb.models import TreatmentScenario
     scenario_id = request.GET.get('id')
     export = request.GET.get('export')
+    context = {}
+    try:
+        treatment = TreatmentSceanario.objects.get(pk=scenario_id)
+    except:
+        context['success'] = False
+        context['error_msg'] = 'Treatment not found. Please try again.'
+        # Return an 'invalid login' error message.
+        response = JsonResponse(context)
+        response.status_code = 401
+        return response
+    # TODO: generate dictionary of results
+    report_dict = treatment.get_report();
+    
     if export:
+        # TODO: Tak dictionary of results and print to PDF template.
         print("Export %s" % export)
     else:
         # TODO: How do we create treatment areas? If this is just Veg Units then do in separate query
