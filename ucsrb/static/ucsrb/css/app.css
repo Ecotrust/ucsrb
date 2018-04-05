@@ -151,12 +151,14 @@ nav .navbar-toggler .navbar-toggler-icon {
 
 .method-nav button img {
     max-height: 5.5rem;
+    max-height: 12.5vh;
     margin-bottom: 1rem;
     pointer-events: none;
     max-width: 96%;
 }
 
 .method-nav h3 {
+    font-size: 2.8375vh;
     margin: 0 auto;
     pointer-events: none;
     transition: 0.2s all linear;
@@ -217,6 +219,10 @@ nav .navbar-toggler .navbar-toggler-icon {
 
 .icons-only .method-nav li:after {
     height: 80%;
+}
+
+icons-only .nav-item img {
+    max-height: 8vh;
 }
 
 /**
@@ -543,6 +549,7 @@ main {
     bottom: 2.5rem;
     right: .5rem;
     top: 10vh;
+    overflow: scroll;
     position: absolute;
 }
     #panel.left {
