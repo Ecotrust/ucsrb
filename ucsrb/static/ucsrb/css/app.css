@@ -167,7 +167,7 @@ nav .navbar-toggler .navbar-toggler-icon {
 #file-nav {
     background: #edefed;
     font-size: 1em;
-    font-weight: 600;
+    font-weight: 700;
     transition: 0.25s padding linear 0.35s;
 }
 
@@ -175,11 +175,15 @@ nav .navbar-toggler .navbar-toggler-icon {
 #file-nav .button-modal {
     display: inline-block;
     font-size: .9375em;
-    font-weight: 600;
+    font-weight: 700;
     line-height: .9375em;
     padding: .25rem 1em;
     text-align: left;
 }
+    #file-nav a.hide,
+    #file-nav .button-modal.hide {
+        display: none;
+    }
 
 #file-nav a i.svg_icon,
 #file-nav .button-modal i.svg_icon {
@@ -485,17 +489,6 @@ main {
  ===========================================================================
  */
 
-.modal-content {
-    background: #3a5675;
-    border: none;
-    border-radius: 0;
-    color: #fff;
-}
-
-.modal .close {
-    color: #fff;
-}
-
 #load-saved-list {
     list-style: none;
     margin: 0;
@@ -753,7 +746,7 @@ main {
 }
 
 .feature-result .lead strong {
-    font-weight: 900;
+    font-weight: 700;
 }
 
 .feature-result h4 {

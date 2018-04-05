@@ -9,13 +9,7 @@
       </div>
       <div class="modal-body">
         <div class="saved-scenario-list" id="saved-scenario-list">
-            {% if user.is_authenticated %}
-                <div id="load-saved-wrap" class="load-saved-wrap"></div>
-            {% else %}
-                {% if 'account' not in request.path %}
-                    <button data-action="sign-in-modal" class="btn">Sign in</button>
-                {% endif %}
-            {% endif %}
+            <div id="load-saved-wrap" class="load-saved-wrap"></div>
         </div>
       </div>
       <div class="modal-footer">

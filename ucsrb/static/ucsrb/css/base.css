@@ -86,12 +86,12 @@ a.btn-outline-light {
 h1 {
     font-size: 2.5em;
     color: #fff;
-    font-weight: 900;
+    font-weight: 700;
 }
 
 h2 {
     font-size: 2em;
-    font-weight: 900;
+    font-weight: 700;
 }
 
 h3 {
@@ -163,45 +163,68 @@ h5 {
 
 /**
  * =========================================================================
-   Forms
+    Modal
  ===========================================================================
  */
 
-#login-modal input,
-#login-modal input[type='text'] {
+.modal-content {
+    background: #3a5675;
+    border: none;
+    border-radius: 0;
+    color: #fff;
+}
+
+.modal-content .card {
+    background: #3a5675;
+}
+
+.modal .close {
+    color: #fff;
+}
+
+.modal-content input[type=submit] {
+    background-color: #fff;
+    border: none;
+    color: #58595b;
+    font-family: 'Cabin', 'Libre Franklin', sans-serif;
+    font-size: .9375em;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin: .5rem 0;
+    padding: .5rem 1.25rem .4375rem;
+    opacity: 1;
+    text-transform: uppercase;
+    transition: 0.2s opacity ease-in-out;
+}
+
+    .modal-content input[type=submit]:hover {
+        opacity: 0.8;
+    }
+
+.modal-content input,
+.modal-content input[type='text'] {
     font-size: 1em;
     max-width: 100%;
 }
 
-#login-modal input[type=submit] {
-    background-color: #3a5675;
-    text-transform: uppercase;
-    font-size: .9375em;
-    font-weight: 700;
-    margin: .5rem 0;
-    padding: .5rem 1.25rem .4375rem;
-    opacity: 1;
-    transition: 0.2s opacity ease-in-out;
-}
-    #login-modal input[type=submit]:hover {
-        opacity: 0.8;
-    }
-
-#login-modal .left-inner-addon {
+.modal-content .left-inner-addon {
     margin-bottom: 1rem;
 }
 
-#login-modal form > div > label {
+.modal-content form > div > label {
     font-size: .675em;
 }
 
-
-#login-modal .btn-link {
-    color: #67b8c6;
-    font-weight: 500;
+.modal-content .btn-link {
+    background: #fff;
+    color: #58595b;
+    font-family: 'Cabin', 'Libre Franklin', sans-serif;
+    font-weight: 700;
+    margin: 0 .25rem;
+    padding: .125rem .375rem;
 }
 
-#login-modal hr {
+.modal-content hr {
     height: 3px;
 }
 

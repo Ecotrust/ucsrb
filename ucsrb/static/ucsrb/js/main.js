@@ -41,6 +41,10 @@ window.addEventListener("load", function () {
             }
         }
     });
+
+    document.getElementById('subnav-sign-in-modal').addEventListener('click', function(event) {
+        $('#login-modal').modal('show');
+    });
 });
 
 var main = {
@@ -91,6 +95,8 @@ var main = {
             var $signInBtn = $('button#sign-in-modal');
             $signInBtn.before(`<a href="/account/" class="list-group-item list-group-item-action">${data.username}</a><button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>`);
             $signInBtn.css('display', 'none');
+            $('#file-nav .hide').removeClass('hide');
+            $('#subnav-sign-in-modal').addClass('hide');
         }
     },
 };
