@@ -41,6 +41,10 @@
     justify-content: flex-end;
 }
 
+.username-wrap {
+    display: none;
+}
+
 /**
  * Hero image area (top of screen)
  * @css
@@ -97,6 +101,9 @@
     font-weight: 700;
     margin: 0 0 10rem;
 }
+    .jumbotron a.btn:hover {
+        color: #58595b;
+    }
 
 /**
  * home page content under hero image
@@ -140,8 +147,63 @@
     font-weight: 700;
 }
 
+.home-intro p {
+    font-weight: 500;
+}
+
 .home-intro .row {
     margin-bottom: 2rem;
+}
+
+.home-intro .app-benefits {
+    /* text-transform: capitalize; */
+}
+
+.home-intro .app-benefits .benefit-list {
+    padding: 2rem 0 .5rem;
+}
+
+.home-intro .app-benefits .accent-color {
+    color: #e2e05e
+}
+
+.home-intro .app-benefits .primary-color {
+    color: #3a5675;
+}
+
+.home-intro .app-benefits .benefit-list div {
+    padding: .5rem 2rem;
+    position: relative;
+    text-align: center;
+}
+    .home-intro .app-benefits .benefit-list div:after {
+        background: #e2e05e;
+        content: '';
+        height: 40%;
+        position: absolute;
+        top: 30%;
+        right: -1px;
+        width: 2px;
+    }
+
+    .home-intro .app-benefits .benefit-list div:first-of-type {
+        /* text-align: right; */
+    }
+
+    .home-intro .app-benefits .benefit-list div:last-of-type {
+        /* text-align: left; */
+    }
+
+    .home-intro .app-benefits .benefit-list div:last-of-type:after {
+        width: 0;
+    }
+
+.home-intro .app-benefits .benefit-list div h4 {
+    color: #6a6b6d;
+    font-size: 1.3125em;
+    font-weight: 700;
+    line-height: 1.5;
+    margin: 0;
 }
 
 .home-about {

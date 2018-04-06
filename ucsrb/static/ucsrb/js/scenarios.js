@@ -4,7 +4,7 @@ var madrona = {
     setupForm: function($form) {
         //var submitted = false;
 
-        $form.find('.btn-submit').hide();
+        // $form.find('.btn-submit').hide();
 
         $form.find('label').each(function (i, label) {
             if ($(label).find('input[type="checkbox"]').length) {
