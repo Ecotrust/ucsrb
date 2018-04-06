@@ -32,53 +32,10 @@ header {
 .top-nav-wrap {
      background: #58595B;
      color: #fff;
-     display: block;
-     height: 9vh;
 }
 
-nav .navbar-toggler {
-    background: #67b8c6;
-    border-radius: 50%;
-    border: none;
-    height: 6vh;
-    outline: none;
-    margin: 0 .75rem;
-    text-align: center;
-    position: relative;
-    padding: 0;
-    width: 6vh;
-}
-
-nav .navbar-toggler:not(.collapsed) .navbar-toggler-icon {
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    height: 2.6125vh;
-    line-height: 9vh;
-    display: block;
-    margin: 0 auto;
-    width: 100%;
-}
-nav .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
-    background-image: url('/static/ucsrb/img/icon/i_close.svg');
-}
-nav .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
-    background-image: url('/static/ucsrb/img/navicon.svg');
-}
-
-.top-nav-wrap .navbar {
-    justify-content: flex-start;
-    padding: 0;
-}
-
-.top-nav-wrap .navbar h1 {
-    font-size: 2.25em;
-    line-height: 9vh;
-    margin: 0 1rem;
-}
-
-#menu {
-    z-index: 3;
+#menu:first-child {
+    display: none;
 }
 
 /**

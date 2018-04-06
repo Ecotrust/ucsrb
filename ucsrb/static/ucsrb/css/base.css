@@ -117,14 +117,20 @@ h5 {
  ===========================================================================
  */
 
+.top-nav-wrap {
+    display: block;
+    height: 9vh;
+}
+
 .top-nav-wrap .navbar {
-    padding-left: 2rem;
+    padding: 0 2rem;
 }
 
 nav .navbar-toggler {
     background: #67b8c6;
     border-radius: 50%;
     border: none;
+    color: #58595b;
     height: 6vh;
     outline: none;
     text-align: center;
@@ -155,11 +161,29 @@ nav .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
     background-image: url('/static/ucsrb/img/navicon.svg');
 }
 
+.top-nav-wrap .navbar h1 {
+    font-size: 2.25em;
+    line-height: 9vh;
+    margin: 0 1rem;
+}
+
 #menu {
     left: 2rem;
     padding: 0;
     z-index: 3;
 }
+
+.username-wrap .account-action {
+    font-size: .875em;
+    font-weight: 700;
+    opacity: 1;
+    transition: 0.2s opacity ease-in-out;
+    text-transform: lowercase;
+}
+    .username-wrap .account-action:hover {
+        opacity: 0.8;
+        text-decoration: none;
+    }
 
 /**
  * =========================================================================

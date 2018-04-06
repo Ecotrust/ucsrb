@@ -20,7 +20,7 @@
     </div>
     <div class="username-wrap ml-auto">
         {% if user.is_authenticated %}
-            <a href="/account/" class="d-flex">{{ user.username }}</a>
+            <a id="topnav-account-link" href="/account/" class="btn btn-link account-action">{{ user.username }}</a>
         {% else %}
             <button id="sign-in-modal-2" data-action="sign-in-modal" class="btn btn-link account-action">Login</button>
         {% endif %}
