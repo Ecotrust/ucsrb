@@ -117,16 +117,48 @@ h5 {
  ===========================================================================
  */
 
-.top-nav-wrap .navbar-collapse.collapse.show,
-.top-nav-wrap .navbar-collapse.collapsing {
-    display: flex;
+.top-nav-wrap .navbar {
+    padding-left: 2rem;
 }
 
-.navbar-toggler:not(.collapsed) .navbar-toggler-icon {
-    background-image: url('/static/ucsrb/img/icon/i_close.png');
-    background-size: 60% auto;
-    background-position: 50%;
+nav .navbar-toggler {
+    background: #67b8c6;
+    border-radius: 50%;
+    border: none;
+    height: 6vh;
+    outline: none;
+    text-align: center;
+    position: relative;
+    padding: 0;
+    width: 6vh;
+}
+
+nav .navbar-toggler:after {
+    display: none;
+}
+
+nav .navbar-toggler .navbar-toggler-icon {
+    background-size: contain;
+    background-position: center;
     background-repeat: no-repeat;
+    height: 2.6125vh;
+    line-height: 9vh;
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+}
+
+nav .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+    background-image: url('/static/ucsrb/img/icon/i_close.svg');
+}
+nav .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
+    background-image: url('/static/ucsrb/img/navicon.svg');
+}
+
+#menu {
+    left: 2rem;
+    padding: 0;
+    z-index: 3;
 }
 
 /**

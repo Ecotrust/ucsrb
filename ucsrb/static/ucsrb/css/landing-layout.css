@@ -4,7 +4,6 @@
  ===========================================================================
  */
 
-
  .home header {
      position: relative;
      z-index: 1;
@@ -16,15 +15,11 @@
 }
 
 .home .top-nav-wrap {
-    height: 10vh;
+    height: 9vh;
     left: 0;
     position: absolute;
     top: 0;
     width: 100%;
-}
-
-.home .top-nav-wrap .navbar {
-    justify-content: flex-end;
 }
 
 .home .top-nav-wrap h1 {
@@ -35,11 +30,6 @@
     background-color: rgba(255,255,255,0.7);
 }
 
-.home .top-nav-wrap .navbar-collapse.collapse.show,
-.home .top-nav-wrap .navbar-collapse.collapsing,
-.home .top-nav-wrap .navbar-collapse.collapse {
-    justify-content: flex-end;
-}
 
 .username-wrap {
     display: none;
@@ -71,7 +61,7 @@
 .hero-bg {
     background: url('/static/ucsrb/img/methow.jpg');
     background-size: cover;
-    background-position: center;
+    background-position: 50% 75%;
     bottom: 0;
     left: 0;
     right: 0;
@@ -91,18 +81,22 @@
     font-size: 3.75em;
     font-weight: 700;
     margin: 3rem 0;
+    text-shadow: 0 0 .25em #333;
 }
 
 .jumbotron a.btn {
     border: 5px solid #fff;
+    box-shadow: 0 0 .5em #555;
     color: #fff;
     letter-spacing: .05em;
     font-size: 1.6375em;
     font-weight: 700;
     margin: 0 0 10rem;
+    text-shadow: 0 0 .5em #555;
 }
     .jumbotron a.btn:hover {
         color: #58595b;
+        text-shadow: none;
     }
 
 /**

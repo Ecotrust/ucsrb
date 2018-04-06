@@ -49,8 +49,7 @@ nav .navbar-toggler {
     width: 6vh;
 }
 
-nav .navbar-toggler .navbar-toggler-icon {
-    background-image: url('/static/ucsrb/img/icon/i_close.svg');
+nav .navbar-toggler:not(.collapsed) .navbar-toggler-icon {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -60,9 +59,12 @@ nav .navbar-toggler .navbar-toggler-icon {
     margin: 0 auto;
     width: 100%;
 }
-    nav .navbar-toggler.collapsed .navbar-toggler-icon {
-        background-image: url('/static/ucsrb/img/navicon.svg');
-    }
+nav .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
+    background-image: url('/static/ucsrb/img/icon/i_close.svg');
+}
+nav .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+    background-image: url('/static/ucsrb/img/navicon.svg');
+}
 
 .top-nav-wrap .navbar {
     justify-content: flex-start;
@@ -231,7 +233,13 @@ nav .navbar-toggler .navbar-toggler-icon {
     Files Nav and Modals (load saved, save, start over/reset)
  ===========================================================================
  */
+.username-wrap {
+    flex-start: end;
+}
 
+.username-wrap .account-action {
+    color: #fff;
+}
 
 /**
  * =========================================================================

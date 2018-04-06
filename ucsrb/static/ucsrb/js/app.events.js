@@ -49,4 +49,10 @@ $(document).ready(function() {
                 });
             });
     });
+
+    $('.username-wrap').on('click', function(event) {
+        if (event.target.dataset.action === 'sign-in-modal') {
+            $('#login-modal').modal('show');
+        }
+    })
 });
