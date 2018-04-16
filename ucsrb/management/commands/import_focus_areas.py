@@ -5,8 +5,8 @@ from django.conf import settings
 class Command(BaseCommand):
     help = 'Import management boundaries. 2 arguments - a zipped shapefile in EPSG:3857 and a layer type matching one of: %s' % str(settings.FOCUS_AREA_TYPES)
     def add_arguments(self, parser):
-        parser.add_argument('file',  type=str)
         parser.add_argument('type',  type=str)
+        parser.add_argument('file',  type=str)
 
     def handle(self, *args, **options):
         import sys
@@ -25,6 +25,7 @@ class Command(BaseCommand):
         if in_type not in settings.FOCUS_AREA_TYPES:
             self.stdout.write('--- ERROR: Input type (2nd arg) must be one of the following: ---')
             self.stdout.write('--- %s ---' % settings.FOCUS_AREA_TYPES)
+            self.stdout.write('--- You entered: %s ---' % in_type)
             sys.exit()
         if not zipfile.is_zipfile(in_file_name):
             self.stdout.write('--- ERROR: Input shapefile (1st arg) must be a zipfile ---')
