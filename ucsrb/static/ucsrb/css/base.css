@@ -86,12 +86,12 @@ a.btn-outline-light {
 h1 {
     font-size: 2.5em;
     color: #fff;
-    font-weight: 900;
+    font-weight: 700;
 }
 
 h2 {
     font-size: 2em;
-    font-weight: 900;
+    font-weight: 700;
 }
 
 h3 {
@@ -117,17 +117,73 @@ h5 {
  ===========================================================================
  */
 
-.top-nav-wrap .navbar-collapse.collapse.show,
-.top-nav-wrap .navbar-collapse.collapsing {
-    display: flex;
+.top-nav-wrap {
+    display: block;
+    height: 9vh;
 }
 
-.navbar-toggler:not(.collapsed) .navbar-toggler-icon {
-    background-image: url('/static/ucsrb/img/icon/i_close.png');
-    background-size: 60% auto;
-    background-position: 50%;
-    background-repeat: no-repeat;
+.top-nav-wrap .navbar {
+    padding: 0 2rem;
 }
+
+nav .navbar-toggler {
+    background: #67b8c6;
+    border-radius: 50%;
+    border: none;
+    color: #58595b;
+    height: 6vh;
+    outline: none;
+    text-align: center;
+    position: relative;
+    padding: 0;
+    width: 6vh;
+}
+
+nav .navbar-toggler:after {
+    display: none;
+}
+
+nav .navbar-toggler .navbar-toggler-icon {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 2.6125vh;
+    line-height: 9vh;
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+}
+
+nav .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+    background-image: url('/static/ucsrb/img/icon/i_close.svg');
+}
+nav .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
+    background-image: url('/static/ucsrb/img/navicon.svg');
+}
+
+.top-nav-wrap .navbar h1 {
+    font-size: 2.25em;
+    line-height: 9vh;
+    margin: 0 1rem;
+}
+
+#menu {
+    left: 2rem;
+    padding: 0;
+    z-index: 3;
+}
+
+.username-wrap .account-action {
+    font-size: .875em;
+    font-weight: 700;
+    opacity: 1;
+    transition: 0.2s opacity ease-in-out;
+    text-transform: lowercase;
+}
+    .username-wrap .account-action:hover {
+        opacity: 0.8;
+        text-decoration: none;
+    }
 
 /**
  * =========================================================================
@@ -163,45 +219,68 @@ h5 {
 
 /**
  * =========================================================================
-   Forms
+    Modal
  ===========================================================================
  */
 
-#login-modal input,
-#login-modal input[type='text'] {
+.modal-content {
+    background: #3a5675;
+    border: none;
+    border-radius: 0;
+    color: #fff;
+}
+
+.modal-content .card {
+    background: #3a5675;
+}
+
+.modal .close {
+    color: #fff;
+}
+
+.modal-content input[type=submit] {
+    background-color: #fff;
+    border: none;
+    color: #58595b;
+    font-family: 'Cabin', 'Libre Franklin', sans-serif;
+    font-size: .9375em;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin: .5rem 0;
+    padding: .5rem 1.25rem .4375rem;
+    opacity: 1;
+    text-transform: uppercase;
+    transition: 0.2s opacity ease-in-out;
+}
+
+    .modal-content input[type=submit]:hover {
+        opacity: 0.8;
+    }
+
+.modal-content input,
+.modal-content input[type='text'] {
     font-size: 1em;
     max-width: 100%;
 }
 
-#login-modal input[type=submit] {
-    background-color: #3a5675;
-    text-transform: uppercase;
-    font-size: .9375em;
-    font-weight: 700;
-    margin: .5rem 0;
-    padding: .5rem 1.25rem .4375rem;
-    opacity: 1;
-    transition: 0.2s opacity ease-in-out;
-}
-    #login-modal input[type=submit]:hover {
-        opacity: 0.8;
-    }
-
-#login-modal .left-inner-addon {
+.modal-content .left-inner-addon {
     margin-bottom: 1rem;
 }
 
-#login-modal form > div > label {
+.modal-content form > div > label {
     font-size: .675em;
 }
 
-
-#login-modal .btn-link {
-    color: #67b8c6;
-    font-weight: 500;
+.modal-content .btn-link {
+    background: #fff;
+    color: #58595b;
+    font-family: 'Cabin', 'Libre Franklin', sans-serif;
+    font-weight: 700;
+    margin: 0 .25rem;
+    padding: .125rem .375rem;
 }
 
-#login-modal hr {
+.modal-content hr {
     height: 3px;
 }
 

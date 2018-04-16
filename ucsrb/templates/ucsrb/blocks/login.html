@@ -1,24 +1,28 @@
-{% include 'accounts/login_form.html' %}
-<script>
+<div class="collapse multi-collapse show" id="login-collapse">
+    {% include 'accounts/login_form.html' %}
+    <script>
     (function() {
-        var email_input = document.getElementById('id_email');
+        var email_input = document.getElementById('id_username');
         email_input.setAttribute('id', 'id_login_email');
         var password_input = document.getElementById('id_password');
         password_input.setAttribute('id', 'id_login_password');
     })();
-</script>
-<hr />
-<strong>Don't have an account?</strong>
-<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#register-collapse" aria-expanded="false" aria-controls="register-collapse">Sign Up</button>
+    </script>
+    <hr />
+    <strong>Don't have an account?</strong>
+    <button class="btn btn-link" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-controls="login-collapse register-collapse" aria-expanded="false">Sign Up</button>
+</div>
 
-<div class="collapse" id="register-collapse">
-  <div class="card">
-      <div class="card-header">
-          <span>Create Your Account</span>
-      </div>
-      <div class="card-body">
-          {% include 'accounts/registration_form.html' %}
-          <div id="registration-error"></div>
-      </div>
-  </div>
+<div class="collapse multi-collapse" id="register-collapse">
+    <strong>Already have an account?</strong><button class="btn btn-link" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-controls="login-collapse register-collapse" aria-expanded="false">Login</button>
+    <hr />
+    <div class="card">
+        <div class="card-header">
+            <span>Create Your Account</span>
+        </div>
+        <div class="card-body">
+            {% include 'accounts/registration_form.html' %}
+            <div id="registration-error"></div>
+        </div>
+    </div>
 </div>

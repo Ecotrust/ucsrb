@@ -1,22 +1,28 @@
-<nav class="navbar navbar-light pl-5">
-    <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+<nav class="navbar navbar-light">
+    <button class="navbar-toggler dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+
     <a href="/home"><h1>Snow2flow</h1></a>
-    <div class="collapse navbar-collapse" id="menu">
+
+    <div class="dropdown-menu" id="menu">
         <div class="list-group">
-            <a href="/app/" class="list-group-item list-group-item-action">Snow2flow App</a>
-            <a href="" class="list-group-item list-group-item-action">Terms Defined</a>
-            <a href="" class="list-group-item list-group-item-action">Tutorial</a>
+            <a href="/app/" class="dropdown-item list-group-item list-group-item-action">Launch App</a>
+            <a href="" class="dropdown-item list-group-item list-group-item-action">Terms Defined</a>
+            <a href="" class="dropdown-item list-group-item list-group-item-action">Tutorial</a>
             {% if user.is_authenticated %}
-                <a href="/account/" class="list-group-item list-group-item-action">{{ user.username }}</a>
-                <button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>
+                <a href="/account/" class="dropdown-item list-group-item list-group-item-action">{{ user.username }}</a>
+                <button id="sign-out" data-action="sign-out" class="dropdown-item list-group-item list-group-item-action">Sign out</button>
             {% else %}
                 {% if 'account' not in request.path %}
-                    <button id="sign-in-modal" data-action="sign-in-modal" class="list-group-item list-group-item-action">Sign in</button>
+                    <button id="sign-in-modal" data-action="sign-in-modal" class="dropdown-item list-group-item list-group-item-action">Login</button>
                 {% endif %}
             {% endif %}
-            </div>
         </div>
+    </div>
+    <div class="username-wrap ml-auto">
+        {% if user.is_authenticated %}
+            <a id="topnav-account-link" href="/account/" class="btn btn-link account-action">{{ user.username }}</a>
+        {% else %}
+            <button id="sign-in-modal-2" data-action="sign-in-modal" class="btn btn-link account-action">Login</button>
+        {% endif %}
     </div>
 </nav>

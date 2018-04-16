@@ -51,6 +51,12 @@ def get_user_scenario_list(request):
         })
     return JsonResponse(user_scenarios_list, safe=False)
 
+def get_json_error_response(error_msg="Error", status_code=500, context={}):
+    context['success'] = False
+    context['error_msg'] = error_msg
+    response = JsonResponse(context)
+    response.status_code = status_code
+    return response
 
 ###########################################################
 ###             API Calls                                 #
@@ -465,12 +471,7 @@ def save_drawing(request):
                 from django.contrib.auth.models import User
                 user = User.objects.get(pk=settings.ANONYMOUS_USER_PK)
             else:
-                context['success'] = False
-                context['error_msg'] = 'Anonymous Users Not Allowed. Please log in.'
-                # Return an 'invalid login' error message.
-                response = JsonResponse(context)
-                response.status_code = 401
-                return response
+                return get_json_error_response('Anonymous Users Not Allowed. Please log in.', 401, context)
 
         try:
             scenario = TreatmentScenario.objects.create(
@@ -482,36 +483,19 @@ def save_drawing(request):
             )
         except:
             # Technically we're testing for psycopg2's InternalError GEOSIntersects TopologyException
-            context['success'] = False
-            context['error_msg'] = 'Drawings overlap. Please start over.'
-            response = JsonResponse(context)
-            response.status_code = 500
-            return response
+            return get_json_error_response('Drawings overlap. Please start over.', 500, context)
 
         if not scenario.geometry_dissolved:
-            context['success'] = False
-            context['error_msg'] = 'Drawing does not cover any forested land in the Upper Columbia'
-            response = JsonResponse(context)
-            response.status_code = 500
-            return response
+            return get_json_error_response('Drawing does not cover any forested land in the Upper Columbia', 500, context)
         final_geometry = scenario.geometry_dissolved
         # EPSG:2163 = US National Atlas Equal Area
         final_geometry.transform(2163)
         if final_geometry.area/4046.86 < settings.MIN_TREATMENT_ACRES:
-            context['success'] = False
-            context['error_msg'] = 'Treatment does not cover enough forested land to make a difference'
-            response = JsonResponse(context)
-            response.status_code = 500
-            return response
+            return get_json_error_response('Treatment does not cover enough forested land to make a difference', 500, context)
         # return geometry to web mercator
         final_geometry.transform(3857)
         return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (scenario.pk, scenario.geometry_dissolved.geojson)))
-    context['success'] = False
-    context['error_msg'] = 'Unable to save drawing.'
-    # Return an 'invalid login' error message.
-    response = JsonResponse(context)
-    response.status_code = 500
-    return response
+    return get_json_error_response('Unable to save drawing.', 500, context)
 
 '''
 Take a point in 3857 and return the feature at that point for a given FocusArea type
@@ -764,22 +748,16 @@ def filter_results(request):
 
 
 def get_results_by_scenario_id(request):
-    from ucsrb.models import TreatmentScenario
+    # TODO: currently the request passes the madrona-style API of /module_model_id
     scenario_id = request.GET.get('id')
     export = request.GET.get('export')
-    context = {}
-    try:
-        treatment = TreatmentSceanario.objects.get(pk=scenario_id)
-    except:
-        context['success'] = False
-        context['error_msg'] = 'Treatment not found. Please try again.'
-        # Return an 'invalid login' error message.
-        response = JsonResponse(context)
-        response.status_code = 401
-        return response
-    # TODO: generate dictionary of results
-    report_dict = treatment.get_report();
-    
+    from ucsrb.models import TreatmentScenario
+    # try:
+    #     treatment = TreatmentScenario.objects.get(pk=scenario_id)
+    # except:
+    #     return get_json_error_response('Treatment with given ID does not exist', 500, {})
+    # results = treatment.get
+
     if export:
         # TODO: Tak dictionary of results and print to PDF template.
         print("Export %s" % export)

@@ -38,9 +38,9 @@ $(document).ready(function() {
             })
             .then(function() {
                 document.getElementById('load-saved-list').addEventListener('click', function(event) {
+                    $('#load-saved').modal('hide');
                     app.panel.results.init(event.target.dataset.id);
                     app.map.clearLayers();
-                    $('#load-saved').modal('hide');
                     $('.method-nav button').each(function() {
                         $(this).removeClass('active');
                     });
@@ -49,4 +49,10 @@ $(document).ready(function() {
                 });
             });
     });
+
+    $('.username-wrap').on('click', function(event) {
+        if (event.target.dataset.action === 'sign-in-modal') {
+            $('#login-modal').modal('show');
+        }
+    })
 });

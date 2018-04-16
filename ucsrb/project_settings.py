@@ -276,6 +276,8 @@ PROJECT_NAME = 'Snow2Flow'
 
 FORGOT_EMAIL_SUBJECT = 'Snow2Flow Password Reset Request'
 
+LOG_IN_WITH_EMAIL = False
+
 try:
     # Local settings should probably be collected to project folder instead.
     from marineplanner.local_settings import *

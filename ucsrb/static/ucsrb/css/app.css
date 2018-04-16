@@ -32,50 +32,10 @@ header {
 .top-nav-wrap {
      background: #58595B;
      color: #fff;
-     display: block;
-     height: 9vh;
 }
 
-nav .navbar-toggler {
-    background: #67b8c6;
-    border-radius: 50%;
-    border: none;
-    height: 6vh;
-    outline: none;
-    margin: 0 .75rem;
-    text-align: center;
-    position: relative;
-    padding: 0;
-    width: 6vh;
-}
-
-nav .navbar-toggler .navbar-toggler-icon {
-    background-image: url('/static/ucsrb/img/icon/i_close.svg');
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    height: 2.6125vh;
-    line-height: 9vh;
-    display: block;
-    margin: 0 auto;
-}
-    nav .navbar-toggler.collapsed .navbar-toggler-icon {
-        background-image: url('/static/ucsrb/img/navicon.svg');
-    }
-
-.top-nav-wrap .navbar {
-    justify-content: flex-start;
-    padding: 0;
-}
-
-.top-nav-wrap .navbar h1 {
-    font-size: 2.25em;
-    line-height: 9vh;
-    margin: 0 1rem;
-}
-
-#menu {
-    z-index: 3;
+#menu:first-child {
+    display: none;
 }
 
 /**
@@ -133,7 +93,7 @@ nav .navbar-toggler .navbar-toggler-icon {
     }
 
     .method-nav button.active {
-        transition: 1s all ease-in 2s;
+        transition: 1s all ease-in 1s;
     }
 
     .method-nav button.active:after {
@@ -151,12 +111,14 @@ nav .navbar-toggler .navbar-toggler-icon {
 
 .method-nav button img {
     max-height: 5.5rem;
+    max-height: 12.5vh;
     margin-bottom: 1rem;
     pointer-events: none;
     max-width: 96%;
 }
 
 .method-nav h3 {
+    font-size: 2.8375vh;
     margin: 0 auto;
     pointer-events: none;
     transition: 0.2s all linear;
@@ -167,7 +129,7 @@ nav .navbar-toggler .navbar-toggler-icon {
 #file-nav {
     background: #edefed;
     font-size: 1em;
-    font-weight: 600;
+    font-weight: 700;
     transition: 0.25s padding linear 0.35s;
 }
 
@@ -175,11 +137,15 @@ nav .navbar-toggler .navbar-toggler-icon {
 #file-nav .button-modal {
     display: inline-block;
     font-size: .9375em;
-    font-weight: 600;
+    font-weight: 700;
     line-height: .9375em;
     padding: .25rem 1em;
     text-align: left;
 }
+    #file-nav a.hide,
+    #file-nav .button-modal.hide {
+        display: none;
+    }
 
 #file-nav a i.svg_icon,
 #file-nav .button-modal i.svg_icon {
@@ -207,7 +173,6 @@ nav .navbar-toggler .navbar-toggler-icon {
 }
 
 .icons-only #results-nav img {
-    max-height: 3.5rem;
     margin-bottom: 0;
 }
 
@@ -215,12 +180,23 @@ nav .navbar-toggler .navbar-toggler-icon {
     height: 80%;
 }
 
+.icons-only .method-nav .nav-item img,
+.icons-only #results-nav img {
+    max-height: 8vh;
+}
+
 /**
  * =========================================================================
     Files Nav and Modals (load saved, save, start over/reset)
  ===========================================================================
  */
+.username-wrap {
+    flex-start: end;
+}
 
+.username-wrap .account-action {
+    color: #fff;
+}
 
 /**
  * =========================================================================
@@ -286,6 +262,7 @@ main {
 }
 
 .map-wrap .short-overlay .instructions #instruction {
+    font-size: .875em;
     margin: 0 auto;
     width: 70%;
 }
@@ -316,6 +293,14 @@ main {
     z-index: 1;
 }
 
+#map .ol-control:hover {
+    background: transparent;
+}
+
+#map .ol-touch .ol-control button {
+    font-size: 1em;
+}
+
 #map .ol-zoom,
 .ol-geo-search,
 #map .layer-switcher {
@@ -333,7 +318,8 @@ main {
 #map .ol-zoom {
     background-color: transparent;
     left: auto;
-    right: 1rem;
+    right: 2vh;
+    max-width: 9vh;
 }
 
 #map .ol-zoom button {
@@ -375,7 +361,7 @@ main {
     background: url('/static/ucsrb/img/icon/i_search.svg') rgba(255,255,255,0.66) 50% 50% no-repeat;
     background-size: auto 60%;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
 }
 
 .ol-geo-search > .ol-geo-search-wrap > button:active {
@@ -383,7 +369,11 @@ main {
 }
 
 .ol-geo-search input:not(.d-none) {
+    font-size: .75em;
+    line-height: 1.5em;
     margin-left: .25rem;
+    padding: .125em .5em;
+    vertical-align: top;
 }
 
 .ol-geo-search input + #autocomplete-results {
@@ -485,17 +475,6 @@ main {
  ===========================================================================
  */
 
-.modal-content {
-    background: #3a5675;
-    border: none;
-    border-radius: 0;
-    color: #fff;
-}
-
-.modal .close {
-    color: #fff;
-}
-
 #load-saved-list {
     list-style: none;
     margin: 0;
@@ -550,6 +529,7 @@ main {
     bottom: 2.5rem;
     right: .5rem;
     top: 10vh;
+    overflow: scroll;
     position: absolute;
 }
     #panel.left {
@@ -753,7 +733,7 @@ main {
 }
 
 .feature-result .lead strong {
-    font-weight: 900;
+    font-weight: 700;
 }
 
 .feature-result h4 {
@@ -895,6 +875,7 @@ main {
    }
    100% {
        max-height: 3.5rem;
+       max-height: 8vh;
        margin-bottom: 0;
    }
  }

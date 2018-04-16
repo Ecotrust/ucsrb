@@ -23,4 +23,8 @@
         width: 45vw;
         max-width: 45vw;
     }
+
+    .map-wrap .short-overlay .instructions #instruction {
+        font-size: 1em;
+    }
 }
