@@ -749,28 +749,6 @@ def filter_results(request):
     }
     return JsonResponse(return_json)
 
-# def get_results_by_pour_point_basin(request):
-#     # TODO: create DiscreteBasins model
-#     from ucsrb.models import PourPointBasin, DiscreteBasins, TreatmentScenario
-#     # TODO: Get pourpoint_id from request or API
-#     ppb = PourPointBasin.objects.get(pk=pourpoint_id)
-#     # TODO: Get treatment_id from request or API
-#     treatment = TreatmentScenario.objects.get(pk=treatment_id)
-#
-#     sub_basins = DiscreteBasins(geometry__contained_by__=ppb.geometry, geometry__intersects__=treatment.geometry)
-#     sum_delta = 0
-#     ### OR ###
-#     # sum_delta = {
-#     #   baseline: 0,
-#     #   pct_75: 0,
-#     #   pct_50: 0,
-#     #   pct_25: 0,
-#     # }
-#     for basin in sub_basins:
-#         sum_delta += basin.get_delta(treatment)
-#     return sum_delta
-
-
 def get_results_by_scenario_id(request):
     # TODO: currently the request passes the madrona-style API of /module_model_id
     scenario_id = request.GET.get('id')
