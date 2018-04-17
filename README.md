@@ -39,6 +39,7 @@ vagrant ssh
 cd /usr/local/apps/marineplanner-core/
 source env/bin/activate
 cd marineplanner
+python manage.py enable_sharing --all
 python manage.py runserver 0.0.0.0:8000
 ```
 Then go [here](http://localhost:8111/visualize)
@@ -110,6 +111,8 @@ python manage.py import_pourpoints /usr/local/apps/marineplanner-core/data/__YOU
 python manage.py import_climate_data /usr/local/apps/marineplanner-core/data/__YOUR_CLIMATE_DATA_FILE__
 
 python manage.py createsuperuser
+
+python manage.py enable_sharing --all
 
 ```
 
