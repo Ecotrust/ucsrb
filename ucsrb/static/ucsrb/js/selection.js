@@ -60,8 +60,7 @@ app.map.popupLock = false;
 */
 app.map.PointerType.prototype.handleMoveEvent = function(evt) {
   if (app.map.popup && !app.map.popupLock) {
-    var element = app.map.popup.getElement();
-    $(element).popover('dispose');
+    app.map.closePopup();
     app.map.popup=false;
   }
   if (this.cursor_) {

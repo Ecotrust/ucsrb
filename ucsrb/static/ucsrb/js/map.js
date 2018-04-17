@@ -201,6 +201,15 @@ confirmationReceived = function() {
   closeConfirmSelection(true);
 }
 
+app.map.closePopup = function() {
+  if (app.map.hasOwnProperty('popup') && app.map.popup != false) {
+    var element = app.map.popup.getElement();
+    $(element).popover('hide');
+    $(element).popover('dispose');
+  }
+  app.map.popup=false;
+}
+
 confirmSelection = function(feat, markup, vector) {
   mbLayer = app.mapbox.layers[feat.getProperties().layer];
   layer = app.map.layer[mbLayer.map_layer_id];
@@ -215,10 +224,7 @@ confirmSelection = function(feat, markup, vector) {
     setFilter(features[0], layer.layer);
   }
   app.map.popupLock = true;
-  if (app.map.hasOwnProperty('popup')) {
-    var element = app.map.popup.getElement();
-    $(element).popover('dispose');
-  }
+  app.map.closePopup();
   app.map.popup = new ol.Overlay({
     element: document.getElementById('popup')
   });
@@ -243,9 +249,7 @@ confirmSelection = function(feat, markup, vector) {
 }
 
 closeConfirmSelection = function(accepted) {
-  var element = app.map.popup.getElement();
-  $(element).popover('hide');
-  $(element).popover('dispose');
+  app.map.closePopup();
   if (!accepted) {
     app.map.popupLock = false;
     removeFilter();

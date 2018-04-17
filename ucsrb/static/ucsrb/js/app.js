@@ -40,12 +40,26 @@ scenario_type_selection_made = function(selectionType) {
   }
 }
 
-setInit = function() {
-  app.map.clearLayers();
-  app.state.step = 0;
+baseInit = function() {
+  app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
+  app.map.closePopup();
   app.map.draw.disable();
+  app.map.popupLock = false;
+  if (app.map.hasOwnProperty('mask')) {
+    app.map.mask.set('active', false);
+  }
+  app.map.clearLayers();
+}
+
+setInit = function() {
+  baseInit();
+  app.state.step = 0;
   app.map.layer.draw.layer.getSource().clear();
 };
+
+reportInit = function() {
+  baseInit();
+}
 
 app.init = {
     'select': function() {
@@ -61,15 +75,17 @@ app.init = {
         scenario_type_selection_made('filter');
     },
     'draw': function() {
-      setInit();
-      app.map.enableLayer('huc10');
-      app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
-      scenario_type_selection_made('draw');
+        setInit();
+        app.map.enableLayer('huc10');
+        app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
+        scenario_type_selection_made('draw');
     },
     'hydro': function() {
+        reportInit();
         app.panel.results.showHydro();
     },
     'aggregate': function() {
+        reportInit();
         app.panel.results.showAggregate();
     }
 }
