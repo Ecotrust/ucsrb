@@ -1527,12 +1527,13 @@ function scenariosModel(options) {
                         type: 'GET',
                         dataType: 'json',
                         success: function(result) {
-                            $('#loading-modal').modal('hide');
+                            app.setState('aggregate');
                             if (scenario) {
                               //TODO: figure out when and why this wouldn't have a scenario (on creating empty collection)
                               //    and adjust if necessary
                               scenario.scenarioAttributes(result.attributes);
                             }
+                            $('#loading-modal').modal('hide');
                         },
                         error: function (result) {
                             $('#loading-modal').modal('hide');
