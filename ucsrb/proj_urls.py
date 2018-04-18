@@ -33,7 +33,6 @@ urlpatterns = [
     url(r'^scenario/get_planningunits$', get_planningunits),
     url(r'^scenario/get_filter_count$', get_filter_count),
     url(r'^scenario/get_filter_results$', get_filter_results),
-    url(r'^scenario/demo$', demo),
     url(r'^scenario/', include('scenarios.urls')),
     # url(r'^filter/', include('filter.urls')),
     url(r'^ucsrb/', include('ucsrb.urls')),

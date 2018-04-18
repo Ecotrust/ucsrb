@@ -570,11 +570,16 @@ main {
     font-size: 1em;
 }
 
+#scenario-hidden-submit {
+  visibility: hidden;
+  display: none;
+}
+
 .panel #scenarios-form {
     border: none;
     border-radius: 0;
     height: auto;
-    margin: 0 auto;
+    margin: 0 auto 5px auto;
     overflow: auto;
     padding: 0;
     width: 100%;
@@ -617,7 +622,8 @@ main {
 }
 
 .progress-bar {
-    background: rgba(230,231,232,0.95);
+    /* background: rgba(230,231,232,0.95); */
+    background: rgba(3,122,251,1);
 }
     #step1.max4 .progress-bar {
         width: 25%;
