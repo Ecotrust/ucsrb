@@ -1533,7 +1533,9 @@ function scenariosModel(options) {
                               //    and adjust if necessary
                               scenario.scenarioAttributes(result.attributes);
                             }
-                            $('#loading-modal').modal('hide');
+                            setTimeout(function(){
+                              $('#loading-modal').modal('hide');
+                            }, 500)
                         },
                         error: function (result) {
                             $('#loading-modal').modal('hide');
