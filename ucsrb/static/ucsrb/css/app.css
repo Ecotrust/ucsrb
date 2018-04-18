@@ -553,6 +553,7 @@ main {
     }
 
 #panel #scenario_form,
+#panel #draw_form,
 #panel #scenarios,
 #panel #results,
 #panel .result-section {
@@ -563,6 +564,7 @@ main {
     width: 50vw;
 }
 #panel #scenario_form:empty,
+#panel #draw_form:empty,
 #panel #scenarios:empty,
 #panel #results:empty,
 #panel .result-section:empty {
@@ -571,12 +573,20 @@ main {
 }
 
 #panel #scenario_form:not(:empty),
+#panel #draw_form:not(:empty),
 #panel #scenarios:not(:empty) {
     padding: 1.5rem 1rem;
 }
 
-#panel #scenario_form .btn {
+#panel #scenario_form .btn,
+#panel #draw_form .btn {
     font-size: 1em;
+}
+
+.drawing-buttons {
+  background-color: #CCC;
+  padding: 10px;
+  border-radius:5px;
 }
 
 #scenario-hidden-submit {

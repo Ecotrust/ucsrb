@@ -274,11 +274,13 @@ app.panel = {
       },
       finishDrawing: function() {
         app.panel.moveRight();
-        var html = '<div class="panel-content">' +
-                      '<p><b>Do you want to add another treatment area?</b></p>' +
-                      '<button class="btn" onclick="app.panel.draw.addTreatmentArea()">Yes</button>' +
-                      '<button class="btn" onclick="app.panel.draw.acceptDrawing()">No</button>' +
-                      '<button class="btn" onclick="app.panel.draw.restart()">Restart</button>' +
+        var html = '<div class="featurepanel">' +
+                      '<h4>Do you want to add another treatment area?</h4>' +
+                      '<div class="btn-toolbar justify-content-between drawing-buttons">' +
+                        '<button class="btn btn-light" onclick="app.panel.draw.addTreatmentArea()">+ Add More</button>' +
+                        '<button class="btn btn-light" onclick="app.panel.draw.acceptDrawing()">Done</button>' +
+                        '<button class="btn btn-light" onclick="app.panel.draw.restart()">Restart</button>' +
+                      '</div>' +
                     '</div>';
         app.panel.draw.setContent(html);
       },
@@ -290,9 +292,11 @@ app.panel = {
       },
       addTreatmentArea: function() {
         app.map.draw.enable();
-        var html = '<div class="panel-content">' +
-                      '<p>Click on the map to start drawing your new treatment area.</p>' +
-                      '<button class="btn" onclick="app.panel.draw.cancelDrawing()">Cancel</button>' +
+        var html = '<div class="featurepanel">' +
+                      '<h4>Click on the map to start drawing your new treatment area.</h4>' +
+                      '<div class="btn-toolbar justify-content-between drawing-buttons">' +
+                        '<button type="button" class="btn btn-light" onclick="app.panel.draw.cancelDrawing()">Cancel</button>' +
+                      '</div>' +
                     '</div>';
         app.panel.draw.setContent(html);
       },
@@ -301,10 +305,12 @@ app.panel = {
         app.panel.draw.finishDrawing();
       },
       acceptDrawing: function() {
-        var html = '<div class="panel-content">' +
-                      '<p><b>Do you want to harvest within this treatment area?</b></p>' +
-                      '<button class="btn" onclick="app.panel.draw.saveDrawing()">Yes</button>' +
-                      '<button class="btn" onclick="app.panel.draw.finishDrawing()">No</button>' +
+        var html = '<div class="featurepanel">' +
+                      '<h4>Do you want to harvest within this treatment area?</h4>' +
+                      '<div class="btn-toolbar justify-content-between drawing-buttons">' +
+                        '<button type="button" class="btn btn-light" onclick="app.panel.draw.saveDrawing()">Yes, I\'m Done</button>' +
+                        '<button type="button" class="btn btn-light" onclick="app.panel.draw.finishDrawing()">No, Change This</button>' +
+                      '</div>' +
                     '</div>';
         app.panel.draw.setContent(html);
       },
