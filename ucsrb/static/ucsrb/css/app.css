@@ -131,6 +131,7 @@ header {
     font-size: 1em;
     font-weight: 700;
     transition: 0.25s padding linear 0.35s;
+    height: 100%;
 }
 
 #file-nav a,
@@ -158,6 +159,10 @@ header {
     box-shadow: 0 2px 4px rgba(0,0,0,0.31);
 }
 
+#process-nav {
+  height: 100%;
+}
+
 .icons-only #process-nav h3 {
     animation: shrink-height_zero-one .25s linear forwards 0.35s;
     transform: rotateX(90deg);
@@ -178,6 +183,10 @@ header {
 
 .icons-only .method-nav li:after {
     height: 80%;
+}
+
+.nav-item {
+  height: 60%;
 }
 
 .icons-only .method-nav .nav-item img,
