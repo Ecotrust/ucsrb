@@ -49,6 +49,8 @@ baseInit = function() {
     app.map.mask.set('active', false);
   }
   app.map.clearLayers();
+  app.map.enableLayer('boundary');
+  // app.map.setBoundaryLayer(app.map.layer.boundary.layer);
 }
 
 setInit = function() {
@@ -76,7 +78,7 @@ app.init = {
     },
     'draw': function() {
         setInit();
-        app.map.enableLayer('huc10');
+        // app.map.enableLayer('huc10');
         app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
         scenario_type_selection_made('draw');
     },

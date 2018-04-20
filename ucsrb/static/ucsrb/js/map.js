@@ -106,6 +106,17 @@ app.map.styles = {
             }),
         })
     }),
+    'Boundary': new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: '#000',
+        lineCap: 'cap',
+        lineJoin: 'miter',
+        width: 3
+      }),
+      fill: new ol.style.Fill({
+        color: 'rgba(0,0,0,0)'
+      })
+    }),
     'Draw': new ol.style.Style({
       fill: new ol.style.Fill({
         color: 'rgba(255, 255, 255, 0.4)'
@@ -161,8 +172,37 @@ app.mapbox.layers = {
     name: 'Pour Points',
     report_methods: ['select'],
     map_layer_id: 'pourpoints'
+  },
+  'western_uc_bnd-3eremu':{
+    id: 'ucsrbsupport.725p2eqc',
+    id_field: 'BASIN_NAME',
+    name_field: 'BASIN_NAME',
+    name: 'Upper Columbia Boundary',
+    // report_methods: [],
+    map_layer_id: 'boundary'
   }
 };
+
+app.map.setBoundaryLayer = function(layer) {
+  if (app.map.boundary) {
+    layer.removeFilter(app.map.boundary);
+  }
+  feat = false; //Get feat from layer
+  /*
+    This would require switching the boundary layer to be a vector layer (not vector tile layer)
+    Getting the feature could either be done by saving the the boundary as geojson locally, or getting
+    it from MapBox. Here's an API call to get just the feature:
+    https://www.mapbox.com/api-documentation/#retrieve-features-from-mapbox-editor-projects
+    ~ RDH 4/20/2018
+  */
+  app.map.boundary = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[0,0,0,0.6]})});
+  layer.addFilter(app.map.boundary);
+  app.map.boundary.set('active', true);
+}
+
+app.map.removeBoundary = function() {
+  app.map.boundary.set('active', false);
+}
 
 setFilter = function(feat, layer) {
   if (app.map.mask) {
@@ -345,6 +385,20 @@ app.map.layer = {
         style: app.map.styles.Draw
       })
     },
+    boundary: {
+      layer: new ol.layer.VectorTile({
+        name: 'Upper Columbia Boundary',
+        title: 'Upper Columbia Boundary',
+        id: 'boundary',
+        source: new ol.source.VectorTile({
+          attributions: 'Ecotrust',
+          format: new ol.format.MVT(),
+          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['western_uc_bnd-3eremu'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
+        }),
+        style: app.map.styles.Boundary,
+        visible: false,
+      })
+    },
     streams: {
       layer: new ol.layer.VectorTile({
         name: 'Streams',
@@ -446,6 +500,7 @@ if (app.map.overlays) {
   app.map.overlays.getLayers().push(app.map.layer.huc10.layer);
   app.map.overlays.getLayers().push(app.map.layer.streams.layer);
   app.map.overlays.getLayers().push(app.map.layer.pourpoints.layer);
+  app.map.overlays.getLayers().push(app.map.layer.boundary.layer);
 }
 
 app.map.layerSwitcher = new ol.control.LayerSwitcher({
