@@ -1,4 +1,10 @@
 $(document).ready(function() {
+    // Enable Pageguide
+    tl.pg.init({
+      /* optional preferences go here */
+      pg_caption: 'Help Guide'
+    });
+
     $('.method-nav button').click(function(event) {
         app.setState(event.currentTarget.dataset.method);
         // changing the method, so filter form needs to be cleared for new query

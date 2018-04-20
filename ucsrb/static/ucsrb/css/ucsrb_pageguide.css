@@ -1,0 +1,42 @@
+#tlyPageGuideWrapper {
+  right: 0;
+  z-index: 2;
+}
+
+#tlyPageGuideWrapper .tlypageguide_toggle {
+  z-index: 2;
+  top: 39vh;
+  position: fixed;
+  /* background: #FFF; */
+  background: rgba(247,0,119,0.5);
+  color: #fff;
+  right: -120px;
+  padding-left: 4px;
+}
+
+#tlyPageGuideWrapper .tlypageguide_toggle:hover {
+  background: #f70077;
+  text-shadow: none;
+}
+
+/* #tlyPageGuideWrapper .tlypageguide_toggle span, */
+#tlyPageGuideWrapper .tlypageguide_toggle div {
+  text-align: center;
+}
+
+#tlyPageGuideWrapper .tlypageguide_toggle #pageguide_btn {
+  /* text-align: none; */
+  position: relative;
+  border-left: none;
+  width: 50px;
+}
+
+#tlyPageGuideWrapper .tlypageguide_toggle #pageguide_btn span {
+  display: table-row;
+}
+
+#tlyPageGuideToggles .tlyPageGuideToggleActive a {
+  background: rgba(230,230,230,0.8);
+  padding-left: 10px;
+  padding-right: 10px;
+}

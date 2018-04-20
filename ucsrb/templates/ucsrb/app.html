@@ -3,6 +3,9 @@
 
 {% block site_style %}
     {{ block.super }}
+    <link rel="stylesheet" href="{% static 'ucsrb/lib/pageguide/css/pageguide.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'ucsrb/css/ucsrb_pageguide.css' %}"/>
+
     <link rel="stylesheet" href="{% static 'ucsrb/css/ol.css' %}" media="screen,projection"/>
     <link rel="stylesheet" href="{% static 'ucsrb/lib/ol-layerswitcher/src/ol-layerswitcher.css' %}"/>
     <link rel="stylesheet" href="{% static 'ucsrb/css/billboard.css' %}" />
@@ -37,7 +40,7 @@
     <section class="map-wrap">
         <div class="overlay">
             <div class="instructions d-flex justify-content-center">
-                <h2 class="mx-auto w-50 text-center">Start by deciding how you want to interact with the map.</h2>
+                <h2 class="mx-auto w-50 text-center">Start by deciding how you want <br/>to interact with the map.</h2>
                 <div class="d-flex hvh">&nbsp;</div>
                 <div id="instruction" class="d-flex align-self-center justify-content-center"></div>
             </div>
@@ -68,6 +71,113 @@
             </div>
         </div>
     </div>
+
+    <ul id="tlyPageGuide" data-tourtitle="How to use this tool">
+      <!--
+      <li class="tlypageguide_bottom" data-tourtarget="#process-nav">
+        <div>
+          This tool will walk you through identifying the forested area that you'd like to treat in three different ways:
+        </div>
+      </li>
+      -->
+      <li class="tlypageguide_left" data-tourtarget="#login-modal .modal-dialog">
+        <div>
+          Login Window: Use this window to
+          <ul>
+            <li>Register to create a new free account</li>
+            <li>Log in with an existing account</li>
+            <li>Reset a forgotten password via email</li>
+          </ul>
+        </div>
+      </li>
+      <li class="tlypageguide_top" data-tourtarget=".btn-method-select">
+        <div>
+          Select Stream Segment: Identify what part of the river system you wish to see increased streamflow in.
+        </div>
+      </li>
+      <li class="tlypageguide_top" data-tourtarget=".btn-method-filter">
+        <div>
+          Filter Forest Regions: Identify which forest area you would like to treat to improve downstream streamflow
+        </div>
+      </li>
+      <li class="tlypageguide_top" data-tourtarget=".btn-method-draw">
+        <div>
+          Draw Treatment Area: Specifically identify the exact forested areas you plan to treat.
+        </div>
+      </li>
+      <li class="tlypageguide_bottom" data-tourtarget=".navbar-toggler">
+        <div>
+          Menu: Use this to navigate the website and manage your account
+        </div>
+      </li>
+      <li class="tlypageguide_bottom" data-tourtarget="#topnav-account-link">
+        <div>
+          Account: If you are logged in, click here to manage your account,<br/>
+          Otherwise this will prompt you to log in.
+        </div>
+      </li>
+      <li class="tlypageguide_bottom" data-tourtarget="#sign-in-modal-2">
+        <div>
+          Login: This tool does not require you to log in, but if you wish to save your results, you will need to create a free account and login.
+        </div>
+      </li>
+      <li class="tlypageguide_bottom" data-tourtarget="#nav-load-save">
+        <div>
+          Load Saved Treatment Scenarios: Bring up any of your previously saved results
+        </div>
+      </li>
+      <li class="tlypageguide_bottom" data-tourtarget="#nav-start-over">
+        <div>
+          Start Over: Restart the process from the beginning. Any unsaved results will be lost.<br/>
+          NOTE: If you are not logged in, you will not be able to save your results.
+        </div>
+      </li>
+      <li class="tlypageguide_bottom" data-tourtarget="#instruction">
+        <div>
+          Instructions: At each step this will tell you what to do.
+        </div>
+      </li>
+      <li class="tlypageguide_bottom" data-tourtarget=".layer-switcher">
+        <div>
+          Layer Switcher: Switch Base Maps or turn map overlays on or off.
+        </div>
+      </li>
+      <li class="tlypageguide_bottom" data-tourtarget=".ol-geo-search">
+        <div>
+          Geo Search: Type in a place name, select a result from the drop-down and the map will zoom in on it.
+        </div>
+      </li>
+      <li class="tlypageguide_bottom" data-tourtarget=".ol-zoom">
+        <div>
+          Zoom Controls: Use these to zoom in and out of the map. You can also use your mouse's scroll wheel.
+        </div>
+      </li>
+      <li class="tlypageguide_left" data-tourtarget=".ol-attribution">
+        <div>
+          Attribution: Click here to see attribution for the sources of the map layers.
+        </div>
+      </li>
+      <li class="tlypageguide_left" data-tourtarget=".popover">
+        <div>
+          Popup Action: Popups are used to do many things, including:<br/>
+          <ul>
+            <li>Display place names</li>
+            <li>Select regions to treat</li>
+          </ul>
+        </div>
+      </li>
+      <li class="tlypageguide_left" data-tourtarget="#scenario_form">
+        <div>
+          Treatment Scenario Filter Form: Use these parameters to identify the prime locations to treat.
+        </div>
+      </li>
+      <li class="tlypageguide_left" data-tourtarget="#draw_form">
+        <div>
+          Drawing Instructions: These will guide you through drawing the specific areas you wish to evaluate for treatment
+        </div>
+      </li>
+    </ul>
+
 {% endblock %}
 
 {% block footer_wrap %}{% endblock %}
@@ -83,6 +193,8 @@
 
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="{% static 'ucsrb/js/billboard.min.js' %}"></script>
+
+    <script src="{% static 'ucsrb/lib/pageguide/js/pageguide.min.js' %}"></script>
 
     <!-- <script src="{% static 'ucsrb/js/ol.js' %}"></script> -->
     <script src="{% static 'ucsrb/js/ol-debug.js' %}"></script>
