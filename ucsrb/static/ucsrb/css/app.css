@@ -308,12 +308,17 @@ main {
  */
 
 #map .ol-control {
+    display: inline-block;
     padding: 0;
     z-index: 1;
 }
 
 #map .ol-control:hover {
     background: transparent;
+}
+
+#map .ol-control.hide {
+    display: none;
 }
 
 #map .ol-touch .ol-control button {
@@ -571,6 +576,7 @@ main {
     opacity: 1;
     position: relative;
     transition: .3s all ease-in-out;
+    display: block;
     width: 50vw;
 }
 #panel #scenario_form:empty,
@@ -579,6 +585,7 @@ main {
 #panel #results:empty,
 #panel .result-section:empty {
     opacity: 0;
+    display: none;
     width: 0;
 }
 

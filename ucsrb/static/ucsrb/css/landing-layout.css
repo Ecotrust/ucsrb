@@ -154,7 +154,7 @@
 }
 
 .home-intro .app-benefits .benefit-list {
-    padding: 2rem 0 .5rem;
+    padding: 1rem 0;
 }
 
 .home-intro .app-benefits .accent-color {
@@ -166,16 +166,17 @@
 }
 
 .home-intro .app-benefits .benefit-list div {
-    padding: .5rem 2rem;
+    margin-bottom: 0;
+    padding: .5rem 1rem;
     position: relative;
     text-align: center;
 }
     .home-intro .app-benefits .benefit-list div:after {
-        background: #e2e05e;
+        /* background: #e2e05e; */
         content: '';
-        height: 40%;
+        height: 50%;
         position: absolute;
-        top: 30%;
+        top: 25%;
         right: -1px;
         width: 2px;
     }
@@ -193,11 +194,18 @@
     }
 
 .home-intro .app-benefits .benefit-list div h4 {
-    color: #6a6b6d;
-    font-size: 1.3125em;
-    font-weight: 700;
-    line-height: 1.5;
+    /* color: #6a6b6d; */
+    font-size: 1.6375em;
+    font-weight: 400;
+    line-height: 1.75;
     margin: 0;
+}
+.home-intro .app-benefits .benefit-list div h4 strong {
+    color: #6a6b6d;
+    font-size: .4375em;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .home-about {

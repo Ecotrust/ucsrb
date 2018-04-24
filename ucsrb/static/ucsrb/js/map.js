@@ -509,6 +509,14 @@ app.map.layerSwitcher = new ol.control.LayerSwitcher({
 
 app.map.addControl(app.map.layerSwitcher);
 
+app.map.toggleMapControls = function(show) {
+    if (show) {
+        $('.ol-control').removeClass('hide');
+    } else {
+        $('.ol-control').addClass('hide');
+    }
+}
+
 app.map.layerSwitcher.overlays = {};
 overlays = $(".layer-switcher .panel .group label:contains('Overlays')").parent().children('ul').children('.layer');
 overlays.each(function() {

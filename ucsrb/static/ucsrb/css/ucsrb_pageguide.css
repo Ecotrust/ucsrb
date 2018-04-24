@@ -1,9 +1,15 @@
-#tlyPageGuideWrapper {
+#tlyPageGuideWrapper,
+.tlypageguide {
   right: 0;
   z-index: 2;
 }
 
-#tlyPageGuideWrapper .tlypageguide_toggle {
+#stepTwoPageGuide {
+    display: none;
+}
+
+#tlyPageGuideWrapper .tlypageguide_toggle,
+.tlypageguide .tlypageguide_toggle {
   z-index: 2;
   top: 39vh;
   position: fixed;
@@ -14,28 +20,33 @@
   padding-left: 4px;
 }
 
-#tlyPageGuideWrapper .tlypageguide_toggle:hover {
+#tlyPageGuideWrapper .tlypageguide_toggle:hover,
+.tlypageguide .tlypageguide_toggle:hover {
   background: #f70077;
   text-shadow: none;
 }
 
 /* #tlyPageGuideWrapper .tlypageguide_toggle span, */
-#tlyPageGuideWrapper .tlypageguide_toggle div {
+#tlyPageGuideWrapper .tlypageguide_toggle div,
+.tlypageguide .tlypageguide_toggle div {
   text-align: center;
 }
 
-#tlyPageGuideWrapper .tlypageguide_toggle #pageguide_btn {
+#tlyPageGuideWrapper .tlypageguide_toggle #pageguide_btn,
+.tlypageguide .tlypageguide_toggle #pageguide_btn {
   /* text-align: none; */
   position: relative;
   border-left: none;
   width: 50px;
 }
 
-#tlyPageGuideWrapper .tlypageguide_toggle #pageguide_btn span {
+#tlyPageGuideWrapper .tlypageguide_toggle #pageguide_btn span,
+.tlypageguide .tlypageguide_toggle #pageguide_btn span {
   display: table-row;
 }
 
-#tlyPageGuideToggles .tlyPageGuideToggleActive a {
+#tlyPageGuideToggles .tlyPageGuideToggleActive a,
+.tlypageguide .tlyPageGuideToggleActive a {
   background: rgba(230,230,230,0.8);
   padding-left: 10px;
   padding-right: 10px;

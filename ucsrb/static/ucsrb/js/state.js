@@ -44,6 +44,9 @@ app.state = {
       this.focusArea.id = focusAreaObject.id;
       this.focusArea.geometry = focusAreaObject.geojson;
     },
+    set showMapControls(show) {
+        app.map.toggleMapControls(show);
+    },
     get getMethod() {
         return this.method;
     },

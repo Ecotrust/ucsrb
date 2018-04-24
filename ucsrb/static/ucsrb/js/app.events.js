@@ -1,9 +1,12 @@
 $(document).ready(function() {
-    // Enable Pageguide
-    tl.pg.init({
-      /* optional preferences go here */
-      pg_caption: 'Help Guide'
+
+    var pageguideOne = tl.pg.init({
+        pg_caption: 'Help Guide',
+        steps_element: '#tlyPageGuide',
     });
+
+    // Set initial panel content
+    app.nav.stepActions.initial = app.panel.getPanelContentElement.innerHTML;
 
     $('.method-nav button').click(function(event) {
         app.setState(event.currentTarget.dataset.method);
@@ -20,6 +23,12 @@ $(document).ready(function() {
             event.target.classList.add('active');
             app.nav.showStartOver();
         }, 900);
+
+        // next set of page guide
+        var pageguideTwo = tl.pg.init({
+            pg_caption: 'Second Guide',
+            steps_element: '#stepTwoPageGuide',
+        });
     });
     // app.map.layer.otm = new ol.layer.Tile({
     //     source: new ol.source.XYZ({

@@ -21,46 +21,46 @@ var app = {
 }
 
 scenario_type_selection_made = function(selectionType) {
-  var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
-  extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-  if (selectionType == 'select') {
-    app.map.removeInteraction(app.map.draw.draw);
-    app.map.layer.draw.layer.setVisible(false);
-    app.map.getView().animate({zoom: 10, center: [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2]});
-    app.map.addInteraction(app.map.Pointer);
-  } else if (selectionType == 'filter'){
-    app.map.removeInteraction(app.map.draw.draw);
-    app.map.layer.draw.layer.setVisible(false);
-    app.map.addInteraction(app.map.Pointer);
-    app.map.zoomToExtent(extent);
-  } else {
-    app.map.layer.draw.layer.setVisible(true);
-    app.map.removeInteraction(app.map.Pointer);
-    app.map.zoomToExtent(extent);
-  }
+    var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
+    extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+    if (selectionType == 'select') {
+        app.map.removeInteraction(app.map.draw.draw);
+        app.map.layer.draw.layer.setVisible(false);
+        app.map.getView().animate({zoom: 10, center: [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2]});
+        app.map.addInteraction(app.map.Pointer);
+    } else if (selectionType == 'filter'){
+        app.map.removeInteraction(app.map.draw.draw);
+        app.map.layer.draw.layer.setVisible(false);
+        app.map.addInteraction(app.map.Pointer);
+        app.map.zoomToExtent(extent);
+    } else {
+        app.map.layer.draw.layer.setVisible(true);
+        app.map.removeInteraction(app.map.Pointer);
+        app.map.zoomToExtent(extent);
+    }
 }
 
 baseInit = function() {
-  app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
-  app.map.closePopup();
-  app.map.draw.disable();
-  app.map.popupLock = false;
-  if (app.map.hasOwnProperty('mask')) {
-    app.map.mask.set('active', false);
-  }
-  app.map.clearLayers();
-  app.map.enableLayer('boundary');
-  // app.map.setBoundaryLayer(app.map.layer.boundary.layer);
+    app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
+    app.map.closePopup();
+    app.map.draw.disable();
+    app.map.popupLock = false;
+    if (app.map.hasOwnProperty('mask')) {
+        app.map.mask.set('active', false);
+    }
+    app.map.clearLayers();
+    app.map.enableLayer('boundary');
+    // app.map.setBoundaryLayer(app.map.layer.boundary.layer);
 }
 
 setInit = function() {
-  baseInit();
-  app.state.step = 0;
-  app.map.layer.draw.layer.getSource().clear();
+    baseInit();
+    app.state.step = 0;
+    app.map.layer.draw.layer.getSource().clear();
 };
 
 reportInit = function() {
-  baseInit();
+    baseInit();
 }
 
 app.init = {
@@ -93,30 +93,30 @@ app.init = {
 }
 
 initFiltering = function() {
-  setTimeout(function() {
-    if ($('#focus_area_accordion').length > 0) {
-      $('#id_focus_area').prop('checked', true);
-      $('#id_focus_area_input').val(app.state.focusAreaState.id);
-      $('#focus_area_accordion').hide();
-      app.viewModel.scenarios.scenarioFormModel.toggleParameter('focus_area');
-    } else {
-      initFiltering();
-    }
-  }, 100);
+    setTimeout(function() {
+        if ($('#focus_area_accordion').length > 0) {
+            $('#id_focus_area').prop('checked', true);
+            $('#id_focus_area_input').val(app.state.focusAreaState.id);
+            $('#focus_area_accordion').hide();
+            app.viewModel.scenarios.scenarioFormModel.toggleParameter('focus_area');
+        } else {
+            initFiltering();
+        }
+    }, 100);
 };
 
 drawingIsSmallEnough = function(areaInMeters) {
-  maxAcres = app.map.draw.maxAcres;
-  metersPerAcre = 4046.86;
-  return maxAcres*metersPerAcre > areaInMeters;
+    maxAcres = app.map.draw.maxAcres;
+    metersPerAcre = 4046.86;
+    return maxAcres*metersPerAcre > areaInMeters;
 }
 
 app.panel = {
     hide: function() {
-      app.panel.element.hidden = true;
+        app.panel.element.hidden = true;
     },
     show: function() {
-      app.panel.element.hidden = false;
+        app.panel.element.hidden = false;
     },
     moveLeft: function() {
         app.panel.show();
@@ -167,12 +167,12 @@ app.panel = {
                 });
             }
             app.request.get_results(id)
-                .then(function(response) {
-                    app.panel.results.responseResultById(response);
-                })
-                .catch(function(response) {
-                    console.log('%c failed to get results: %o', 'style: salmon;', response);
-                });
+            .then(function(response) {
+                app.panel.results.responseResultById(response);
+            })
+            .catch(function(response) {
+                console.log('%c failed to get results: %o', 'style: salmon;', response);
+            });
         },
         responseResultById: function(result) {
             app.panel.results.aggPanel(result);
@@ -200,36 +200,36 @@ app.panel = {
         },
         aggPanel: function(content) {
             var html = `<section class="aggregate result-section" id="aggregate-results">`;
-                html += `<div class="media align-items-center">
-                            <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
-                            <div class="media-body">
-                                <h4 class="mt-0">Aggregate</h4>
-                            </div>
-                         </div>`;
-                html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
-                html += `<div class="overflow-gradient">
-                         <div class="result-list-wrap align-items-center">
-                            <h5>Forest Management</h5>`;
-                html += app.panel.results.styleObject(content.aggregate_results.forest_types);
-                    html += '<h5>Landforms/Topography</h5>';
-                html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
-                    html += '</div></div>';
-                html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
-             html += '</section>';
+            html += `<div class="media align-items-center">
+            <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
+            <div class="media-body">
+            <h4 class="mt-0">Aggregate</h4>
+            </div>
+            </div>`;
+            html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
+            html += `<div class="overflow-gradient">
+            <div class="result-list-wrap align-items-center">
+            <h5>Forest Management</h5>`;
+            html += app.panel.results.styleObject(content.aggregate_results.forest_types);
+            html += '<h5>Landforms/Topography</h5>';
+            html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
+            html += '</div></div>';
+            html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
+            html += '</section>';
 
-             app.panel.results.addResults(html);
+            app.panel.results.addResults(html);
         },
         hydroPanel: function(content) {
             var html = `<section class="hydro-results result-section" id="hydro-results">`;
             for (var pourpoint of content.pourpoints) {
                 html += `<div id="pp-result-${pourpoint.id}" class="pourpoint-result-wrap">
-                          <div class="media align-items-center">
-                            <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
-                            <div class="media-body">
-                                <h4 class="mt-0">${pourpoint.name}</h4>
-                            </div>
-                          </div>
-                        </div>`;
+                <div class="media align-items-center">
+                <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
+                <div class="media-body">
+                <h4 class="mt-0">${pourpoint.name}</h4>
+                </div>
+                </div>
+                </div>`;
                 html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
             }
             html += '<div id="chart"></div>'
@@ -242,7 +242,7 @@ app.panel = {
             var html = '<dl class="row">';
             for (var key in obj) {
                 html += `<dd class="col-sm-5">${obj[key]}</dd>
-                         <dt class="col-sm-7">${key}</dt>`
+                <dt class="col-sm-7">${key}</dt>`
             }
             html += '</dl>'
             return html;
@@ -269,70 +269,70 @@ app.panel = {
         }
     },
     draw: {
-      setContent: function(content) {
-        app.panel.show();
-        app.state.panel.content = content;
-        app.panel.draw.getDrawContentElement.innerHTML = content;
-      },
-      finishDrawing: function() {
-        app.panel.moveRight();
-        var html = '<div class="featurepanel">' +
-                      '<h4>Do you want to add another treatment area?</h4>' +
-                      '<div class="btn-toolbar justify-content-between drawing-buttons">' +
-                        '<button class="btn btn-light" onclick="app.panel.draw.addTreatmentArea()">+ Add More</button>' +
-                        '<button class="btn btn-light" onclick="app.panel.draw.acceptDrawing()">Done</button>' +
-                        '<button class="btn btn-light" onclick="app.panel.draw.restart()">Restart</button>' +
-                      '</div>' +
-                    '</div>';
-        app.panel.draw.setContent(html);
-      },
-      restart: function() {
-        app.map.draw.source.clear();
-        app.map.draw.disable();
-        app.map.draw.enable();
-        app.panel.hide();
-      },
-      addTreatmentArea: function() {
-        app.map.draw.enable();
-        var html = '<div class="featurepanel">' +
-                      '<h4>Click on the map to start drawing your new treatment area.</h4>' +
-                      '<div class="btn-toolbar justify-content-between drawing-buttons">' +
-                        '<button type="button" class="btn btn-light" onclick="app.panel.draw.cancelDrawing()">Cancel</button>' +
-                      '</div>' +
-                    '</div>';
-        app.panel.draw.setContent(html);
-      },
-      cancelDrawing: function() {
-        app.map.draw.disable();
-        app.panel.draw.finishDrawing();
-      },
-      acceptDrawing: function() {
-        var html = '<div class="featurepanel">' +
-                      '<h4>Do you want to harvest within this treatment area?</h4>' +
-                      '<div class="btn-toolbar justify-content-between drawing-buttons">' +
-                        '<button type="button" class="btn btn-light" onclick="app.panel.draw.saveDrawing()">Yes, I\'m Done</button>' +
-                        '<button type="button" class="btn btn-light" onclick="app.panel.draw.finishDrawing()">No, Change This</button>' +
-                      '</div>' +
-                    '</div>';
-        app.panel.draw.setContent(html);
-      },
-      saveDrawing: function() {
-        var drawFeatures = app.map.draw.source.getFeatures();
-        totalArea = 0;
-        for (var i = 0; i < drawFeatures.length; i++) {
-          totalArea += ol.Sphere.getArea(drawFeatures[i].getGeometry());
+        setContent: function(content) {
+            app.panel.show();
+            app.state.panel.content = content;
+            app.panel.draw.getDrawContentElement.innerHTML = content;
+        },
+        finishDrawing: function() {
+            app.panel.moveRight();
+            var html = '<div class="featurepanel">' +
+            '<h4>Do you want to add another treatment area?</h4>' +
+            '<div class="btn-toolbar justify-content-between drawing-buttons">' +
+            '<button class="btn btn-light" onclick="app.panel.draw.addTreatmentArea()">+ Add More</button>' +
+            '<button class="btn btn-light" onclick="app.panel.draw.acceptDrawing()">Done</button>' +
+            '<button class="btn btn-light" onclick="app.panel.draw.restart()">Restart</button>' +
+            '</div>' +
+            '</div>';
+            app.panel.draw.setContent(html);
+        },
+        restart: function() {
+            app.map.draw.source.clear();
+            app.map.draw.disable();
+            app.map.draw.enable();
+            app.panel.hide();
+        },
+        addTreatmentArea: function() {
+            app.map.draw.enable();
+            var html = '<div class="featurepanel">' +
+            '<h4>Click on the map to start drawing your new treatment area.</h4>' +
+            '<div class="btn-toolbar justify-content-between drawing-buttons">' +
+            '<button type="button" class="btn btn-light" onclick="app.panel.draw.cancelDrawing()">Cancel</button>' +
+            '</div>' +
+            '</div>';
+            app.panel.draw.setContent(html);
+        },
+        cancelDrawing: function() {
+            app.map.draw.disable();
+            app.panel.draw.finishDrawing();
+        },
+        acceptDrawing: function() {
+            var html = '<div class="featurepanel">' +
+            '<h4>Do you want to harvest within this treatment area?</h4>' +
+            '<div class="btn-toolbar justify-content-between drawing-buttons">' +
+            '<button type="button" class="btn btn-light" onclick="app.panel.draw.saveDrawing()">Yes, I\'m Done</button>' +
+            '<button type="button" class="btn btn-light" onclick="app.panel.draw.finishDrawing()">No, Change This</button>' +
+            '</div>' +
+            '</div>';
+            app.panel.draw.setContent(html);
+        },
+        saveDrawing: function() {
+            var drawFeatures = app.map.draw.source.getFeatures();
+            totalArea = 0;
+            for (var i = 0; i < drawFeatures.length; i++) {
+                totalArea += ol.Sphere.getArea(drawFeatures[i].getGeometry());
+            }
+            if (drawingIsSmallEnough(totalArea)) {
+                app.request.saveDrawing();
+            } else {
+                areaInAcres = totalArea/4046.86;
+                alert('Your treatment area is too large (' + areaInAcres.toFixed(0) + ' acres). Please keep it below ' + app.map.draw.maxAcres.toString() + ' acres');
+                app.panel.draw.acceptDrawing();
+            }
+        },
+        get getDrawContentElement() {
+            return document.getElementById('draw_form');
         }
-        if (drawingIsSmallEnough(totalArea)) {
-          app.request.saveDrawing();
-        } else {
-          areaInAcres = totalArea/4046.86;
-          alert('Your treatment area is too large (' + areaInAcres.toFixed(0) + ' acres). Please keep it below ' + app.map.draw.maxAcres.toString() + ' acres');
-          app.panel.draw.acceptDrawing();
-        }
-      },
-      get getDrawContentElement() {
-        return document.getElementById('draw_form');
-      }
     },
     element: function() { // returns a function. to edit dom element don't forget to invoke: element()
         return this.getElement;
@@ -349,8 +349,8 @@ app.panel = {
 }
 
 enableDrawing = function() {
-  app.map.draw.enable();
-  app.map.geoSearch.openSearchBox();
+    app.map.draw.enable();
+    app.map.geoSearch.openSearchBox();
 }
 
 app.nav = {
@@ -409,27 +409,28 @@ app.nav = {
         ],
     },
     stepActions: {
-      reset: function() {
-        app.panel.getPanelContentElement.innerHTML = '<div id="scenarios"></div><div id="scenario_form"></div><div id="draw_form"></div><div id="results"></div>';
-        app.panel.moveRight();
-        app.map.geoSearch.closeSearchBox();
-      },
-      select: [
-        false,
-        false,
-        app.panel.form.init
-      ],
-      filter: [
-        false,
-        app.panel.form.init
-      ],
-      draw: [
-        enableDrawing,
-        false     //TODO: ??? enable editing?
-      ],
-      results: function() {
+        initial: '<div id="scenarios"></div><div id="scenario_form"></div><div id="draw_form"></div><div id="results"></div>',
+        reset: function() {
+            app.panel.getPanelContentElement.innerHTML = app.nav.stepActions.initial;
+            app.panel.moveRight();
+            app.map.geoSearch.closeSearchBox();
+        },
+        select: [
+            false,
+            false,
+            app.panel.form.init
+        ],
+        filter: [
+            false,
+            app.panel.form.init
+        ],
+        draw: [
+            enableDrawing,
+            false     //TODO: ??? enable editing?
+        ],
+        results: function() {
 
-      }
+        }
     }
 }
 
@@ -464,29 +465,29 @@ $.ajaxSetup({
 });
 
 /**
- * Application AJAX requests object and methods
-    * {get_results} results for treatment scenario
-    * {get_segment_by_bbox} segment by bounding box
-    * {get_segment_by_id} segment by id
-    * {get_pourpoint_by_id} pourpoint by id
-    * {filter_results} filter results
+* Application AJAX requests object and methods
+* {get_results} results for treatment scenario
+* {get_segment_by_bbox} segment by bounding box
+* {get_segment_by_id} segment by id
+* {get_pourpoint_by_id} pourpoint by id
+* {filter_results} filter results
 *
 */
 app.request = {
     /**
-     * get results for treatment scenario
-     * @param  {[number]} id treatment scenario id [on scenario this is created]
-     * @return {[json]} result data
-     */
+    * get results for treatment scenario
+    * @param  {[number]} id treatment scenario id [on scenario this is created]
+    * @return {[json]} result data
+    */
     get_results: function(id) {
         return $.ajax(`/get_results_by_scenario_id/${id}`)
-            .done(function(response) {
-                console.log('%csuccessfully returned result: %o', 'color: green', response);
-                return response;
-            })
-            .fail(function(response) {
-                console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
-            });
+        .done(function(response) {
+            console.log('%csuccessfully returned result: %o', 'color: green', response);
+            return response;
+        })
+        .fail(function(response) {
+            console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
+        });
     },
     /**
     * Planning Units
@@ -495,33 +496,33 @@ app.request = {
     */
     get_planningunits: function() {
         return $.ajax('/scenario/get_planningunits')
-            .done(function(response) {
-                console.log('%csuccessfully returned planning units: %o', 'color: green', response);
-                return response;
-            })
-            .fail(function(response) {
-                console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
-            });
+        .done(function(response) {
+            console.log('%csuccessfully returned planning units: %o', 'color: green', response);
+            return response;
+        })
+        .fail(function(response) {
+            console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
+        });
     },
     get_user_scenarios: function() {
         return $.ajax('/get_user_scenario_list/')
-            .done(function(response) {
-                console.log('%csuccessfully got user scenarios: %o', 'color: green', response);
-                return response;
-            })
-            .fail(function(response) {
-                console.log(`%cfail @ get scenarios: %o`, 'color: red', response);
-            });
+        .done(function(response) {
+            console.log('%csuccessfully got user scenarios: %o', 'color: green', response);
+            return response;
+        })
+        .fail(function(response) {
+            console.log(`%cfail @ get scenarios: %o`, 'color: red', response);
+        });
     },
     get_scenarios: function() {
         return $.ajax('/ucsrb/get_scenarios/')
-            .done(function(response) {
-                console.log('%csuccessfully got scenarios: %o', 'color: green', response);
-                return response;
-            })
-            .fail(function(response) {
-                console.log(`%cfail @ get scenarios: %o`, 'color: red', response);
-            });
+        .done(function(response) {
+            console.log('%csuccessfully got scenarios: %o', 'color: green', response);
+            return response;
+        })
+        .fail(function(response) {
+            console.log(`%cfail @ get scenarios: %o`, 'color: red', response);
+        });
     },
     /**
     * get stream segments by bounding box
@@ -535,44 +536,44 @@ app.request = {
             },
             dataType: 'json'
         })
-            .done(function(response) {
-                console.log('%csuccessfully returned segments by bbox', 'color: green');
-                return response;
-            })
-            .fail(function(response) {
-                console.log(`%cfail @ get segment by bbox: %o`, 'color: red', response);
-                return false;
-            });
+        .done(function(response) {
+            console.log('%csuccessfully returned segments by bbox', 'color: green');
+            return response;
+        })
+        .fail(function(response) {
+            console.log(`%cfail @ get segment by bbox: %o`, 'color: red', response);
+            return false;
+        });
     },
     /**
-     * Request stream segement by id
-     * @param {number|int} id
-     * @returns {Object} stream segement
-     * @property segment name id geometry pourpoints[id, geometry, name]
-     */
+    * Request stream segement by id
+    * @param {number|int} id
+    * @returns {Object} stream segement
+    * @property segment name id geometry pourpoints[id, geometry, name]
+    */
     get_segment_by_id: function(id) {
         return $.ajax(`/segment/${id}`)
-            .done(function(response) {
-                return response;
-            })
-            .fail(function(response) {
-                console.log(`%cfail @ segment by id: %o`, 'color: red', response);
-            });
+        .done(function(response) {
+            return response;
+        })
+        .fail(function(response) {
+            console.log(`%cfail @ segment by id: %o`, 'color: red', response);
+        });
     },
     /**
-     * Request pourpoint by id
-     * @param {number|int} id
-     * @returns {Object} pourpoint
-     * @property name id acres point_geometry area_geometry
-     */
+    * Request pourpoint by id
+    * @param {number|int} id
+    * @returns {Object} pourpoint
+    * @property name id acres point_geometry area_geometry
+    */
     get_pourpoint_by_id: function(id) {
         return $.ajax(`pourpoint/${id}`)
-            .done(function(response) {
-                return response;
-            })
-            .fail(function(response) {
-                console.log(`%cfail @ get pourpoint id: %o`, 'color: red', response);
-            });
+        .done(function(response) {
+            return response;
+        })
+        .fail(function(response) {
+            console.log(`%cfail @ get pourpoint id: %o`, 'color: red', response);
+        });
     },
     get_focus_area: function(feature, layerName, callback) {
         props = feature.getProperties();
@@ -597,97 +598,97 @@ app.request = {
         })
     },
     get_focus_area_at: function(feature, layerName, callback) {
-      /**
-       * This is sloppy, but I don't know how to get the geometry from a VectorTile feature.
-       * @todo {Priority low} find try and set geometry from vector tile
-       */
-      point = feature.getFlatCoordinates();
-      return $.ajax({
-          url: '/ucsrb/get_focus_area_at',
-          data: {
-              point: point,
-              layer: layerName,
-          },
-          dataType: 'json',
-          success: function(response) {
-              console.log(`%csuccess: got focus area at point`, 'color: green');
-              callback(feature, response);
-          },
-          error: function(response, status) {
-              console.log(`%cfail @ get focus area at point: %o`, 'color: red', response);
-              callback(null, response);
-          }
-      })
+        /**
+        * This is sloppy, but I don't know how to get the geometry from a VectorTile feature.
+        * @todo {Priority low} find try and set geometry from vector tile
+        */
+        point = feature.getFlatCoordinates();
+        return $.ajax({
+            url: '/ucsrb/get_focus_area_at',
+            data: {
+                point: point,
+                layer: layerName,
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(`%csuccess: got focus area at point`, 'color: green');
+                callback(feature, response);
+            },
+            error: function(response, status) {
+                console.log(`%cfail @ get focus area at point: %o`, 'color: red', response);
+                callback(null, response);
+            }
+        })
     },
     /**
-     * get a pourpoint's basin
-     * @param  {number} pp_id [id]
-     * @return {[GeoJSON]} drainage basin
-     */
+    * get a pourpoint's basin
+    * @param  {number} pp_id [id]
+    * @return {[GeoJSON]} drainage basin
+    */
     get_basin: function(feature, callback) {
-      var pp_id = feature.getProperties().OBJECTID;
-      app.map.selectedFeature = feature;
-      return $.ajax({
-        url: '/ucsrb/get_basin',
-        data: {
-          pourPoint: pp_id,
-        },
-        dataType: 'json',
-        success: function(response) {
-          console.log(`%csuccess: got basin`, 'color: green');
-          app.state.setFocusArea = response;
-          callback(feature, response.geojson);
-          return response;
-        },
-        error: function(response, status) {
-          console.log(`%cfail @ get basin: %o`, 'color: red', response);
-          // we don't have the ppt basins yet, just get a HUC12 for now.
-          app.request.get_focus_area_at(app.map.selectedFeature, 'HUC12', function(feature, hucFeat) {
-            vectors = (new ol.format.GeoJSON()).readFeatures(hucFeat.geojson, {
-                dataProjection: 'EPSG:3857',
-              featureProjection: 'EPSG:3857'
-            });
-            // set property id with hucFeat.id
-            vector = vectors[0].getGeometry();
-            vector.set('layer', 'huc12_3857');
-            vector.set('HUC_12', hucFeat.id.toString());
-            app.request.get_focus_area(vector, 'HUC12', callback);
-          });
-          return status;
-        }
-      })
+        var pp_id = feature.getProperties().OBJECTID;
+        app.map.selectedFeature = feature;
+        return $.ajax({
+            url: '/ucsrb/get_basin',
+            data: {
+                pourPoint: pp_id,
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(`%csuccess: got basin`, 'color: green');
+                app.state.setFocusArea = response;
+                callback(feature, response.geojson);
+                return response;
+            },
+            error: function(response, status) {
+                console.log(`%cfail @ get basin: %o`, 'color: red', response);
+                // we don't have the ppt basins yet, just get a HUC12 for now.
+                app.request.get_focus_area_at(app.map.selectedFeature, 'HUC12', function(feature, hucFeat) {
+                    vectors = (new ol.format.GeoJSON()).readFeatures(hucFeat.geojson, {
+                        dataProjection: 'EPSG:3857',
+                        featureProjection: 'EPSG:3857'
+                    });
+                    // set property id with hucFeat.id
+                    vector = vectors[0].getGeometry();
+                    vector.set('layer', 'huc12_3857');
+                    vector.set('HUC_12', hucFeat.id.toString());
+                    app.request.get_focus_area(vector, 'HUC12', callback);
+                });
+                return status;
+            }
+        })
     },
     saveDrawing: function() {
-      var drawFeatures = app.map.draw.source.getFeatures();
-      var geojsonFormat = new ol.format.GeoJSON();
-      var featureJson = geojsonFormat.writeFeatures(drawFeatures);
+        var drawFeatures = app.map.draw.source.getFeatures();
+        var geojsonFormat = new ol.format.GeoJSON();
+        var featureJson = geojsonFormat.writeFeatures(drawFeatures);
 
-      return $.ajax({
-        url: '/ucsrb/save_drawing',
-        data: {
-          drawing: featureJson,
-          // TODO: Set name/description with form
-          name: 'foo',
-          description: null
-        },
-        dataType: 'json',
-        method: 'POST',
-        success: function(response) {
-          console.log(`%csuccess: saved drawing`, 'color: green');
-          vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
-            dataProjection: 'EPSG:3857',
-            featureProjection: 'EPSG:3857'
-          });
-          app.map.draw.disable();
-          app.map.addScenario(vectors);
-          app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
-        },
-        error: function(response, status) {
-          console.log(`%cfail @ save drawing: %o`, 'color: red', response);
-          alert(response.responseJSON.error_msg);
-          app.panel.draw.finishDrawing();
-        }
-      })
+        return $.ajax({
+            url: '/ucsrb/save_drawing',
+            data: {
+                drawing: featureJson,
+                // TODO: Set name/description with form
+                name: 'foo',
+                description: null
+            },
+            dataType: 'json',
+            method: 'POST',
+            success: function(response) {
+                console.log(`%csuccess: saved drawing`, 'color: green');
+                vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
+                    dataProjection: 'EPSG:3857',
+                    featureProjection: 'EPSG:3857'
+                });
+                app.map.draw.disable();
+                app.map.addScenario(vectors);
+                app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
+            },
+            error: function(response, status) {
+                console.log(`%cfail @ save drawing: %o`, 'color: red', response);
+                alert(response.responseJSON.error_msg);
+                app.panel.draw.finishDrawing();
+            }
+        })
     },
     filter_results: function(pourpoint) {
         $.ajax({
