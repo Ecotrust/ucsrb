@@ -367,8 +367,10 @@ app.nav = {
     },
     showStartOver: function() {
         document.getElementById('nav-start-over').classList.remove('d-none');
+        console.log('go on ');
     },
     showSave: function() {
+        console.log('go on then');
         document.getElementById('nav-anon-save').classList.remove('d-none');
     },
     short: function() {

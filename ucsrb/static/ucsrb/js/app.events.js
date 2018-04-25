@@ -21,6 +21,7 @@ $(document).ready(function() {
                 $(this).removeClass('active');
             })
             event.target.classList.add('active');
+            app.nav.showSave();
             app.nav.showStartOver();
         }, 900);
 
