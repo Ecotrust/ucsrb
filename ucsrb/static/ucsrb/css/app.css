@@ -80,7 +80,7 @@ header {
         height: 60%;
         position: absolute;
         transition: 0.3s height ease-in 0.3s;
-        top: 15%;
+        top: 20%;
         right: -5px;
     }
 
@@ -150,7 +150,7 @@ header {
     font-size: .9375em;
     font-weight: 700;
     line-height: .9375em;
-    padding: .25rem 1em;
+    /* padding: .25rem 1em; */
     text-align: left;
 }
     #file-nav a.hide,
@@ -160,9 +160,9 @@ header {
 
 #file-nav a i.svg_icon,
 #file-nav .button-modal i.svg_icon {
-    max-height: .9375rem;
+    max-height: 1.4375rem;
     vertical-align: text-top;
-    max-width: 1.25rem;
+    width: 1.4375rem;
 }
 
 .icons-only {
@@ -195,7 +195,7 @@ header {
     height: 80%;
 }
 
-.nav-item {
+.method-nav .nav-item {
   height: 60%;
 }
 

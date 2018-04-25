@@ -368,6 +368,9 @@ app.nav = {
     showStartOver: function() {
         document.getElementById('nav-start-over').classList.remove('d-none');
     },
+    showSave: function() {
+        document.getElementById('nav-anon-save').classList.remove('d-none');
+    },
     short: function() {
         // style nav
         $('.nav-wrap').addClass('icons-only');

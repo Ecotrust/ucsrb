@@ -17,7 +17,8 @@
   background: rgba(247,0,119,0.5);
   color: #fff;
   right: -120px;
-  padding-left: 4px;
+  width: 80px;
+  text-align: center;
 }
 
 #tlyPageGuideWrapper .tlypageguide_toggle:hover,

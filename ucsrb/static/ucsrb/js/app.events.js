@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
     var pageguideOne = tl.pg.init({
-        pg_caption: 'Help Guide',
+        pg_caption: '?',
         steps_element: '#tlyPageGuide',
     });
 
@@ -25,8 +25,9 @@ $(document).ready(function() {
         }, 900);
 
         // next set of page guide
+        pageguideOne.close()
         var pageguideTwo = tl.pg.init({
-            pg_caption: 'Second Guide',
+            pg_caption: '?',
             steps_element: '#stepTwoPageGuide',
         });
     });
@@ -61,6 +62,7 @@ $(document).ready(function() {
                     });
                     $('.method-nav button[data-method="aggregate"]').addClass('active');
                     app.nav.showStartOver();
+                    app.nav.showSave();
                 });
             });
     });
