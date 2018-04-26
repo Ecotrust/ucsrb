@@ -138,6 +138,7 @@ header {
 
 #file-nav {
     background: #edefed;
+    flex-flow: row;
     font-size: 1em;
     font-weight: 700;
     transition: 0.25s padding linear 0.35s;
@@ -160,9 +161,20 @@ header {
 
 #file-nav a i.svg_icon,
 #file-nav .button-modal i.svg_icon {
-    max-height: 1.4375rem;
+    height: 1rem;
+    overflow: hidden;
+    position: relative;
     vertical-align: text-top;
-    width: 1.4375rem;
+    width: 1.375rem;
+}
+
+#file-nav a i.svg_icon img,
+#file-nav .button-modal i.svg_icon img {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
 }
 
 .icons-only {
