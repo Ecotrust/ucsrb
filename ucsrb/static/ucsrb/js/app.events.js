@@ -16,14 +16,11 @@ $(document).ready(function() {
             app.state.navHeight = 'short';
             app.state.step = 0;
         }
-        setTimeout(function() {
-            $('.method-nav button').each(function() {
-                $(this).removeClass('active');
-            })
-            event.target.classList.add('active');
-            app.nav.showSave();
-            app.nav.showStartOver();
-        }, 900);
+        $('.method-nav button').each(function() {
+            $(this).removeClass('active');
+        })
+        event.target.classList.add('active');
+        app.nav.showStartOver();
 
         // next set of page guide
         pageguideOne.close()
@@ -63,7 +60,6 @@ $(document).ready(function() {
                     });
                     $('.method-nav button[data-method="aggregate"]').addClass('active');
                     app.nav.showStartOver();
-                    app.nav.showSave();
                 });
             });
     });
@@ -72,5 +68,14 @@ $(document).ready(function() {
         if (event.target.dataset.action === 'sign-in-modal') {
             $('#login-modal').modal('show');
         }
-    })
+    });
+
+    $('#nav-anon-save').on('click', function(event) {
+        var reqData = {
+            'Scenario Name': app.viewModel.scenarios.scenarioFormModel.lastChange,
+            'Scenario Type': app.state.getMethod,
+            'filters': app.viewModel.scenarios.scenarioFormModel.filters,
+        }
+        app.request.saveIntermediateScenario(reqData);
+    });
 });

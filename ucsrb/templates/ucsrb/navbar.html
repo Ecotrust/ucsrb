@@ -22,7 +22,7 @@
         </ul>
         <nav id="file-nav" class="col-3 nav justify-content-center flex-row align-items-center">
             <div class="row justify-content-center pl-4">
-                <button id="nav-anon-save" type="button" class="col nav-item button-modal btn btn-link d-none {% if not user.is_authenticated %}hide{% endif %}" data-toggle="modal" data-target="#login-modal" ><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_backup.svg' %}" /></i> save</button>
+                <button id="nav-anon-save" type="button" class="col nav-item button-modal btn btn-link d-none {% if not user.is_authenticated %}hide{% endif %}" ><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_backup.svg' %}" /></i> save</button>
                 <button id="nav-load-save" type="button" class="col nav-item button-modal btn btn-link {% if not user.is_authenticated %}hide{% endif %}" data-toggle="modal" data-target="#load-saved"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_folder.svg' %}" /></i> load saved</button>
                 <button id="subnav-sign-in-modal" type="button" class="col nav-item button-modal btn btn-link {% if user.is_authenticated %}hide{% endif %}" data-toggle="modal" data-target="#login-modal"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_user_blue.svg' %}" /></i> login</button>
                 <button id="nav-start-over" type="button" class="col nav-item button-modal btn btn-link d-none"><a href="/app"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_reset.svg' %}" /></i> start over</a></button>

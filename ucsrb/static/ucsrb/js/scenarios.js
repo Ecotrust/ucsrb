@@ -13,8 +13,8 @@ var madrona = {
         });
 
         $form.closest('.panel').on('click', '.cancel_button', function(e) {
-            app.viewModel.scenarios.reset({cancel: true});
             app.state.step = 'reset'; // starts app steps for nav, panel, and instructions
+            app.viewModel.scenarios.reset({cancel: true});
         });
 
         $form.closest('.panel').on('click', '.submit_button', function(e) {

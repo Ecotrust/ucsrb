@@ -114,6 +114,7 @@ drawingIsSmallEnough = function(areaInMeters) {
 app.panel = {
     hide: function() {
         app.panel.element.hidden = true;
+        app.nav.hideSave();
     },
     show: function() {
         app.panel.element.hidden = false;
@@ -147,6 +148,7 @@ app.panel = {
         init: function() {
             app.panel.moveRight();
             app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
+            app.nav.showSave();
             initFiltering();
         },
     },
@@ -367,11 +369,12 @@ app.nav = {
     },
     showStartOver: function() {
         document.getElementById('nav-start-over').classList.remove('d-none');
-        console.log('go on ');
     },
     showSave: function() {
-        console.log('go on then');
         document.getElementById('nav-anon-save').classList.remove('d-none');
+    },
+    hideSave: function() {
+        document.getElementById('nav-anon-save').classList.add('d-none');
     },
     short: function() {
         // style nav
@@ -399,6 +402,8 @@ app.nav = {
         }, 1000);
     },
     instructions: {
+        initial: `<h2 class="mx-auto w-50 text-center">Start by deciding how you want <br/>to interact with the map</h2>`,
+        reset: this.initial,
         select: [
             'Select the stream segment where you want to see changes in flow',
             'Select specific point along stream reach to evaluate changes in flow associated with management activity upstream',
@@ -418,7 +423,11 @@ app.nav = {
         reset: function() {
             app.panel.getPanelContentElement.innerHTML = app.nav.stepActions.initial;
             app.panel.moveRight();
+            app.nav.hideSave();
             app.map.geoSearch.closeSearchBox();
+            if (app.map.mask) {
+                app.map.mask.set('active', false);
+            }
         },
         select: [
             false,
@@ -701,6 +710,22 @@ app.request = {
             data: {
                 ppid: pourpoint
             },
+        })
+    },
+    saveIntermediateScenario: function(data) {
+        $.ajax({
+            url: '/sceanrio/treatmentscenario/save',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(response, status) {
+                console.log(`%csuccess: ${response}`, 'color: green');
+                return status;
+            },
+            error: function(response, status) {
+                console.log(`%cfailed save state: %o`, 'color: red', response);
+                return status;
+            }
         })
     },
     saveState: function() {

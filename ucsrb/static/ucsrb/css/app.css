@@ -61,11 +61,11 @@ header {
 }
 
     .secondary-nav.icons-only {
-        animation: shrink-height .3s linear forwards .6s;
+        animation: shrink-height .5s ease-in-out forwards;
     }
 
 .method-nav {
-    transition: 0.3s all linear;
+    transition: 0.5s all ease-in-out;
 }
 
 .method-nav li {
@@ -79,7 +79,7 @@ header {
         border-right: 10px solid #e6e7e8;
         height: 60%;
         position: absolute;
-        transition: 0.3s height ease-in 0.3s;
+        transition: 0.5s height ease-in;
         top: 20%;
         right: -5px;
     }
@@ -95,15 +95,11 @@ header {
     outline: none;
     padding: 0;
     position: relative;
-    transition: opacity 0.2s;
+    transition: 0.15s opacity ease-in-out;
 }
 
     .method-nav:hover button:not(:hover) {
         opacity: 0.5;
-    }
-
-    .method-nav button.active {
-        transition: 1s all ease-in 1s;
     }
 
     .method-nav button.active:after {
@@ -131,7 +127,7 @@ header {
     font-size: 2.8375vh;
     margin: 0 auto;
     pointer-events: none;
-    transition: 0.2s all linear;
+    transition: 0.5s all ease-in-out;
     transform: rotateX(0deg);
     width: 96%;
 }
@@ -141,7 +137,7 @@ header {
     flex-flow: row;
     font-size: 1em;
     font-weight: 700;
-    transition: 0.25s padding linear 0.35s;
+    transition: 0.5s padding ease-in-out;
     height: 100%;
 }
 
@@ -186,12 +182,12 @@ header {
 }
 
 .icons-only #process-nav h3 {
-    animation: shrink-height_zero-one .25s linear forwards 0.35s;
+    animation: shrink-height_zero-one 0.5s ease-in-out forwards;
     transform: rotateX(90deg);
 }
 
 .icons-only #process-nav img {
-    animation: shrink-img .25s linear forwards 0.35s;
+    animation: shrink-img 0.5s ease-in-out forwards;
 }
 
 .icons-only #results-nav h3 {
@@ -241,7 +237,7 @@ main {
 .map-wrap {
     height: 100%;
     position: relative;
-    transition: 0.3s all ease-in 0.1s;
+    /* transition: 0.2s all ease-in; */
     margin-top: -18vh;
     /* z-index: -1; */
 }
@@ -258,13 +254,14 @@ main {
     opacity: 1;
     position: absolute;
     right: 0;
-    transition: 0.4s opacity ease-in 0.5s;
+    transition: 0.2s opacity ease-in-out;
     top: 0;
     z-index: 1;
 }
     .map-wrap .overlay.fade-out {
-        background: rgba(58,86,117,0);
-        opacity: 0;
+        /* background: rgba(58,86,117,0.8); */
+        /* transition: 0.2s opacity ease-in-out; */
+        /* opacity: 0; */
     }
 
 
@@ -531,6 +528,7 @@ main {
 }
 
 #load-saved-list .btn-link {
+    background: transparent;
     color: #fff;
     font-size: 1em;
     font-weight: 500;
