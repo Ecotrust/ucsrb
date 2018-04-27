@@ -56,11 +56,23 @@ var main = {
                 data: formData,
                 dataType: 'json',
                 success: function(response) {
-                    console.log('%csuccessfully signed in user', 'color:green;');
-                    main.auth.success(response);
+                    if (response.success === true) {
+                        console.log('%csuccessfully signed in user', 'color:green;');
+                        main.auth.success(response);
+                    } else {
+                        if (response.username.length > 0) {
+                            console.log('%cerror wrong username or password: %o', 'color: red;', response);
+                            if ($('.alert').length === 0) {
+                                $('#login-collapse .login-form').prepend(`<div class="alert alert-warning fade show" role="alert" style="position: relative; display: block; font-size: .875em;"></div>`);
+                            }
+                            var $alert = $('.alert');
+                            $alert.html(`Password does not match username. Please try again.<br />You may also <a href="/account/forgot/">reset your password</a>. Reseting your password will cause your current progress to be lost.`);
+                        }
+                        console.log('%cerror with sign in credentials: %o', 'color: red;', response);
+                    }
                 },
                 error: function(response) {
-                    console.log('%cerror signing in user', 'color: red');
+                    console.log('%cerror with sign in request submission: %o', 'color: red', response);
                 }
             })
         },
