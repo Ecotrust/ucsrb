@@ -187,34 +187,31 @@ nav .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
 
 /**
  * =========================================================================
-   Profile
+   Profile / Accounts [mp-accounts]
  ===========================================================================
  */
 
+.profile-wrap {
+    background: #f1f6f8;
+    padding: 2em 4em;
+    max-width: 44em;
+}
 .profile-wrap p,
 .profile-wrap h1 {
     color: #333;
-    margin-bottom: 0;
 }
 
-.profile-wrap p:not(:empty),
-.profile-wrap h1:not(:empty) {
-    margin-bottom: 1.5em;
+.profile-wrap p:not(:empty) {
+    font-size: 1.25em;
+    margin-bottom: 1em;
 }
 
-.profile-wrap h1:not(:empty) {
-    display: inline-block;
-    margin-bottom: 1.5rem;
-    vertical-align: middle;
+.profile-wrap .reduce-text-size {
+    font-size: .6125em;
 }
 
 .profile-img:not(:empty) {
     border-radius: 50%;
-    display: inline-block;
-    height: 3rem;
-    margin-bottom: 1.5rem;
-    vertical-align: middle;
-    width: 3rem;
 }
 
 /**

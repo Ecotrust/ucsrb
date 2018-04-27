@@ -42,7 +42,7 @@ window.addEventListener("load", function () {
         }
     });
 
-    document.getElementById('subnav-sign-in-modal').addEventListener('click', function(event) {
+    document.getElementById('sign-in-modal-2').addEventListener('click', function(event) {
         $('#login-modal').modal('show');
     });
 });

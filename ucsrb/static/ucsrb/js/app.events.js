@@ -64,6 +64,10 @@ $(document).ready(function() {
             });
     });
 
+    document.getElementById('subnav-sign-in-modal').addEventListener('click', function(event) {
+        $('#login-modal').modal('show');
+    });
+
     $('.username-wrap').on('click', function(event) {
         if (event.target.dataset.action === 'sign-in-modal') {
             $('#login-modal').modal('show');
