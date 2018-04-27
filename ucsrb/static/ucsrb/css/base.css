@@ -194,7 +194,7 @@ nav .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
 .profile-wrap {
     background: #f1f6f8;
     padding: 2em 4em;
-    max-width: 44em;
+    max-width: 48em;
 }
 .profile-wrap p,
 .profile-wrap h1 {
@@ -203,7 +203,7 @@ nav .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
 
 .profile-wrap p:not(:empty) {
     font-size: 1.25em;
-    margin-bottom: 1em;
+    margin: 1em 2em;
 }
 
 .profile-wrap .reduce-text-size {
@@ -212,6 +212,19 @@ nav .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
 
 .profile-img:not(:empty) {
     border-radius: 50%;
+}
+
+.profile-buttons .btn {
+    display: inline-block;
+    margin: .5rem;
+}
+
+.profile-buttons + p:not(:empty) {
+    margin: .5rem;
+}
+
+.accounts-form-wrap {
+    border: none;
 }
 
 /**

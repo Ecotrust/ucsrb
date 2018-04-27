@@ -38,12 +38,10 @@ window.addEventListener("load", function () {
                 main.auth.logOut();
             } else if (event.target.dataset.action == 'sign-in-modal') {
                 $('#login-modal').modal('show');
+            } else if (event.target.dataset.action == 'sign-in-modal-2') {
+                $('#login-modal').modal('show');
             }
         }
-    });
-
-    document.getElementById('sign-in-modal-2').addEventListener('click', function(event) {
-        $('#login-modal').modal('show');
     });
 });
 
@@ -57,8 +55,12 @@ var main = {
                 type: 'POST',
                 data: formData,
                 dataType: 'json',
-                success: function (data) {
-                    main.auth.success(data);
+                success: function(response) {
+                    console.log('%csuccessfully signed in user', 'color:green;');
+                    main.auth.success(response);
+                },
+                error: function(response) {
+                    console.log('%cerror signing in user', 'color: red');
                 }
             })
         },
@@ -78,20 +80,27 @@ var main = {
                 type: 'POST',
                 data: formData,
                 dataType: 'json',
-                success: function (data) {
-                    console.log(data);
-                    if (data.success === true) {
+                success: function (response) {
+                    console.log('%csuccessfully registered in user', 'color:green;');
+                    if (response.success === true) {
                         main.auth.success();
                     } else {
-                        document.querySelector('#registration-error').innerHTML = `${data.error}. Please update then submit`;
+                        document.querySelector('#registration-error').innerHTML = `${response.error}. Please update then submit`;
                     }
+                },
+                error: function(response) {
+                    console.log('%error registering in user', 'color:red;');
                 }
             })
         },
         success: function(data) {
-            console.log(data);
             $('#login-modal').modal('hide');
-            // // Hide menu nav login and create account button
+            // show alert
+            $('body').prepend(`<div class="alert alert-success fade show" role="alert" style="position: fixed; top: 10px; left: 50%; transform: translate(-50%,0); min-width: 200px; z-index: 3; text-align: center; font-size: .875em;">SUCCESS</div>`);
+            window.setTimeout(function() {
+                $('.alert').alert('close');
+            }, 1500);
+            // Hide menu nav login and create account button
             var $signInBtn = $('button#sign-in-modal');
             $signInBtn.before(`<a href="/account/" class="list-group-item list-group-item-action">${data.username}</a><button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>`);
             $signInBtn.css('display', 'none');
