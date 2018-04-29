@@ -10,15 +10,16 @@
 
 #tlyPageGuideWrapper .tlypageguide_toggle,
 .tlypageguide .tlypageguide_toggle {
-  z-index: 2;
-  top: 39vh;
-  position: fixed;
-  /* background: #FFF; */
-  background: rgba(247,0,119,0.5);
-  color: #fff;
-  right: -120px;
-  width: 80px;
-  text-align: center;
+    z-index: 2;
+   top: 39vh;
+   position: fixed;
+   /* background: #FFF; */
+   background: rgba(247,0,119,0.5);
+   color: #fff;
+   right: -100px;
+   text-indent: 25px;
+   text-align: left;
+   padding-left: 4px;
 }
 
 #tlyPageGuideWrapper .tlypageguide_toggle:hover,

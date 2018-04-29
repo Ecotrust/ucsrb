@@ -82,4 +82,16 @@ $(document).ready(function() {
         }
         app.request.saveIntermediateScenario(reqData);
     });
+
+    // Check if unsaved work and ask user before it is lost
+    $('header').on('click', function(event) {
+        console.log('navigated to %o', event.target);
+        if (app.viewModel.scenarios.scenarioForm()) {
+            if (event.target.href > 0 && event.target.href[0] !== '#') {
+                if (!window.confirm("Any unsaved changes you have made will be lost")) {
+                    event.preventDefault();
+                }
+            } else if (event.target.button > 0 && event.target.button.)
+        }
+    });
 });
