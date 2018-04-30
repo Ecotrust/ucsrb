@@ -6,7 +6,9 @@
 
     <div class="dropdown-menu" id="menu">
         <div class="list-group">
-            <a href="/app/" class="dropdown-item list-group-item list-group-item-action">Launch App</a>
+            {% if 'app' not in request.path %}
+                <a href="/app/" class="dropdown-item list-group-item list-group-item-action">Launch App</a>
+            {% endif %}
             <a href="" class="dropdown-item list-group-item list-group-item-action">Terms Defined</a>
             <a href="" class="dropdown-item list-group-item list-group-item-action">Tutorial</a>
             {% if user.is_authenticated %}
