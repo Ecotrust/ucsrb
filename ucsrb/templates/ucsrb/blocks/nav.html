@@ -17,7 +17,7 @@
                 {% if 'account' not in request.path %}
                     <button id="sign-in-modal" data-action="sign-in-modal" class="dropdown-item list-group-item list-group-item-action">Login</button>
                 {% else %}
-                    <a href="{% url 'account:login' %}" class="btn btn-link account-action">Login / register</a>
+                    <a href="{% url 'account:login' %}" class="btn btn-link account-action">Register</a>
                 {% endif %}
             {% endif %}
         </div>
@@ -30,9 +30,9 @@
         {% else %}
             <!-- if account is in path then form fields are missing -->
             {% if 'account' not in request.path %}
-                <button id="sign-in-modal-2" data-action="sign-in-modal" class="btn btn-link account-action">Login / register</button>
+                <button id="sign-in-modal-2" data-action="sign-in-modal" class="btn btn-link account-action">Register</button>
             {% else %}
-                <a href="{% url 'account:login' %}" class="btn btn-link account-action">Login / register</a>
+                <a href="{% url 'account:login' %}" class="btn btn-link account-action">Register</a>
             {% endif %}
         {% endif %}
     </div>

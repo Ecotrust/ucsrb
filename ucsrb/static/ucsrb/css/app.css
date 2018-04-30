@@ -565,6 +565,7 @@ main {
     top: 10vh;
     overflow: auto;
     position: absolute;
+    z-index: 3;
 }
     #panel.left {
         background: rgba(255,255,255,1);

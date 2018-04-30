@@ -91,7 +91,9 @@ $(document).ready(function() {
                 if (!window.confirm("Any unsaved changes you have made will be lost")) {
                     event.preventDefault();
                 }
-            } else if (event.target.button > 0 && event.target.button.)
+            } else if (event.target.button > 0 && event.target.button) {
+
+            }
         }
     });
 });

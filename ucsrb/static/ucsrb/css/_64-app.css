@@ -13,7 +13,7 @@
     #panel #results:not(:empty),
     #panel .result-section:not(:empty)  {
         width: 28vw;
-        min-width: 400px;
+        min-width: 350px;
         max-width: 500px;
     }
 
