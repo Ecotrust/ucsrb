@@ -26,7 +26,11 @@ scenario_type_selection_made = function(selectionType) {
     if (selectionType == 'select') {
         app.map.removeInteraction(app.map.draw.draw);
         app.map.layer.draw.layer.setVisible(false);
-        app.map.getView().animate({zoom: 10, center: [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2]});
+        app.map.getView().animate({
+          zoom: 9.45,
+          center: [-13363592.377434019, 6154762.569701998],
+          duration: 2000
+        });
         app.map.addInteraction(app.map.Pointer);
     } else if (selectionType == 'filter'){
         app.map.removeInteraction(app.map.draw.draw);

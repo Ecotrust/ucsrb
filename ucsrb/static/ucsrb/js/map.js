@@ -1,5 +1,12 @@
 app.map = mapSettings.getInitMap();
 
+app.map.getView().setCenter([-13363904.869732492, 6108467.733218842]);
+app.map.getView().setZoom(7);
+
+app.map.zoomToExtent = function zoomToExtent(extent) {
+  ol.Map.prototype.getView.call(this).fit(extent, {duration: 2000});
+}
+
 app.map.styles = {
     'Point': new ol.style.Style({
         image: new ol.style.Circle({
