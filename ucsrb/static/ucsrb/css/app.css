@@ -266,18 +266,20 @@ main {
 
 
 .map-wrap .overlay .instructions {
-    padding-top: 50%;
-    padding-top: 36vh;
+    padding-top: 40%;
+    padding-top: 26vh;
+    flex-flow: column;
 }
     .map-wrap .overlay .instructions:before {
-        border-bottom: 20px solid #fff;
-        border-right: 24px solid transparent;
-        border-left: 24px solid transparent;
+        border-bottom: 16px solid #fff;
+        border-right: 20px solid transparent;
+        border-left: 20px solid transparent;
         content: '';
         left: 50%;
         position: absolute;
         top: 40%;
-        transform: translate(-24px,0);
+        top: 26vh;
+        transform: translate(-24px,-40px);
     }
 
 .map-wrap .overlay.short-overlay {
@@ -305,6 +307,14 @@ main {
     .map-wrap .overlay.short-overlay .instructions:before {
         display: none;
     }
+
+#collapsableHelp .card {
+  background: rgba(105,105,105,0.5);
+  display: block;
+  max-height: 30vh;
+  overflow: auto;
+  position: relative;
+}
 
 #map {
     height: 100%;

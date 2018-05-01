@@ -4,3 +4,4 @@ ucsrb.egg-info
 .idea
 ucsrb/local_settings.py
 layers/*
+ubuntu-*

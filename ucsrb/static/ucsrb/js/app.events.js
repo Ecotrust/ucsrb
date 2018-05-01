@@ -5,6 +5,10 @@ $(document).ready(function() {
         steps_element: '#tlyPageGuide',
     });
 
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    });
+
     // Set initial panel content
     app.nav.stepActions.initial = app.panel.getPanelContentElement.innerHTML;
 
@@ -28,6 +32,9 @@ $(document).ready(function() {
             pg_caption: '?',
             steps_element: '#stepTwoPageGuide',
         });
+
+        // disable tool tips for perfromance
+        $('[data-toggle="tooltip"]').tooltip('disable')
     });
     // app.map.layer.otm = new ol.layer.Tile({
     //     source: new ol.source.XYZ({

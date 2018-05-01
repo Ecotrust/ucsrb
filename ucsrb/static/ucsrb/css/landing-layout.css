@@ -77,25 +77,26 @@
 }
 
 .jumbotron h1 {
-    color: #dfdfdf;
+    color: #f8f8f8;
     font-size: 3.75em;
     font-weight: 700;
-    margin: .5rem 0 1.5rem;
+    margin: 0 0 1rem;
     text-shadow: 0 0 .25em #333;
 }
 
 .jumbotron h2 {
     color: #d1d1d1;
-    font-size: 1.75em;
+    font-size: 1.375em;
     font-weight: 400;
-    margin: 0 0 3rem;
+    line-height: 1.3125;
+    margin: 0 0 2rem;
     text-shadow: 0 0 .25em #333;
 }
 
 .jumbotron a.btn {
-    border: 4px solid #fff;
+    border: 5px solid #f8f8f8;
     box-shadow: 0 0 .5em #555;
-    color: #fff;
+    color: #f8f8f8;
     letter-spacing: .1em;
     font-size: 1.375em;
     font-weight: 700;
