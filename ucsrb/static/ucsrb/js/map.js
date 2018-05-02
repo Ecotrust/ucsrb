@@ -93,14 +93,31 @@ app.map.styles = {
             color: 'rgba(0, 0, 0, 0)'
         })
     }),
-    'Streams':new ol.style.Style({
-        stroke: new ol.style.Stroke({
-            color: 'rgba(1, 254, 136, 100)',
-            lineCap: 'cap',
-            lineJoin: 'miter',
-            width: 5,
-        })
-    }),
+    'Streams': function(feature, resolution) {
+        var width = 2.25;
+        console.log(resolution);
+        if (resolution < 3) {
+            width = 14;
+        } else if (resolution < 5) {
+            width = 11;
+        } else if (resolution < 20) {
+            width = 8;
+        } else if (resolution < 40) {
+            width = 5;
+        } else if (resolution < 90) {
+            width = 3.75;
+        } else if (resolution < 130) {
+            width = 3;
+        }
+        return new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: 'rgba(103, 184, 198, .75)',
+                lineCap: 'round',
+                lineJoin: 'round',
+                width: width,
+            })
+        });
+    },
     'PourPoint': new ol.style.Style({
         image: new ol.style.Circle({
             radius: 10,
