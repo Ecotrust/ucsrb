@@ -212,6 +212,10 @@ header {
     max-height: 8vh;
 }
 
+.icons-only .method-nav button:not(.active) {
+  opacity: 0.5;
+}
+
 /**
  * =========================================================================
     Files Nav and Modals (load saved, save, start over/reset)
@@ -285,6 +289,10 @@ main {
 .map-wrap .overlay.short-overlay {
     bottom: auto;
     height: 9vh;
+}
+
+.map-wrap .short-overlay .instructions {
+  flex-flow: row;
 }
 
 .map-wrap .short-overlay .instructions .hvh {

@@ -21,26 +21,22 @@ var app = {
 }
 
 scenario_type_selection_made = function(selectionType) {
+    var animateObj = {
+      zoom: 8,
+      center: [-13363592.377434019, 6154762.569701998],
+      duration: 2000
+    }
     var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
     extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-    if (selectionType == 'select') {
-        app.map.removeInteraction(app.map.draw.draw);
-        app.map.layer.draw.layer.setVisible(false);
-        app.map.getView().animate({
-          zoom: 9.45,
-          center: [-13363592.377434019, 6154762.569701998],
-          duration: 2000
-        });
-        app.map.addInteraction(app.map.Pointer);
-    } else if (selectionType == 'filter'){
-        app.map.removeInteraction(app.map.draw.draw);
-        app.map.layer.draw.layer.setVisible(false);
-        app.map.addInteraction(app.map.Pointer);
-        app.map.zoomToExtent(extent);
+    if (selectionType === 'draw') {
+      app.map.layer.draw.layer.setVisible(true);
+      app.map.removeInteraction(app.map.Pointer);
+      app.map.getView().animate(animateObj);
     } else {
-        app.map.layer.draw.layer.setVisible(true);
-        app.map.removeInteraction(app.map.Pointer);
-        app.map.zoomToExtent(extent);
+      app.map.removeInteraction(app.map.draw.draw);
+      app.map.layer.draw.layer.setVisible(false);
+      app.map.addInteraction(app.map.Pointer);
+      app.map.getView().animate(animateObj);
     }
 }
 
@@ -409,7 +405,7 @@ app.nav = {
         initial: `<h2 class="mx-auto w-50 text-center">Start by deciding how you want <br/>to interact with the map</h2>`,
         reset: this.initial,
         select: [
-            'Select the stream segment where you want to see changes in flow',
+            'Zoom in and select a stream segment to evaluate changes in flow',
             'Select specific point along stream reach to evaluate changes in flow associated with management activity upstream',
             'Select filters to narrow your treatment region',
         ],

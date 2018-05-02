@@ -33,8 +33,11 @@ $(document).ready(function() {
             steps_element: '#stepTwoPageGuide',
         });
 
-        // disable tool tips for perfromance
-        $('[data-toggle="tooltip"]').tooltip('disable')
+        // disable tool tips for performance
+        $('[data-toggle="tooltip"]').tooltip('dispose')
+
+        // Hide more method details collapsable
+        $('#collapsable-help-wrap').addClass('d-none');
     });
     // app.map.layer.otm = new ol.layer.Tile({
     //     source: new ol.source.XYZ({
