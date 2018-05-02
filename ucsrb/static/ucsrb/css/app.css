@@ -420,11 +420,13 @@ main {
 }
 
 .ol-geo-search input:not(.d-none) {
-    font-size: .75em;
-    line-height: 1.5em;
-    margin-left: .25rem;
-    padding: .125em .5em;
-    vertical-align: top;
+    border: none;
+    border-radius: 0;
+    font-size: .875em;
+    line-height: 4vh;
+    margin: 1px 1px 1px .25rem;
+    padding: 0 1em;
+    vertical-align: middle;
 }
 
 .ol-geo-search input + #autocomplete-results {
@@ -681,7 +683,7 @@ main {
 
 .progress {
     background: rgba(230,231,232,0.15);
-    border-radius: 0;
+    border-radius: .25rem;
     margin: .5rem 0 0;
     height: 4px;
 }
@@ -689,18 +691,19 @@ main {
 .progress-bar {
     /* background: rgba(230,231,232,0.95); */
     background: rgba(3,122,251,1);
+    border-radius: .25rem;
 }
     #step1.max4 .progress-bar {
-        width: 25%;
+        width: 0%;
     }
     #step2.max4 .progress-bar {
-        width: 50%;
+        width: 25%;
     }
     #step3.max4 .progress-bar {
-        width: 75%;
+        width: 50%;
     }
     #step4.max4 .progress-bar {
-        width: 100%;
+        width: 75%;
     }
 
 .panel form input,

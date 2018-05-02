@@ -161,11 +161,12 @@ function scenarioFormModel(options) {
       //old OL2 code - will break and let us know when we haven't overridden it.
       mapSettings.defaultStyle = new OpenLayers.Style({
           //display: 'none'
-          fillColor: '#ee9900',
+          fillColor: '#5c7352',
           fillOpacity: .5,
-          strokeColor: '#DDDDDD',
-          strokeOpacity: .6,
-          strokeWidth: 1
+          strokeColor: '#e6e7e8',
+          strokeOpacity: .9,
+          strokeWidth: 1,
+          strokeDash: [2,4]
       });
       var styleMap = new OpenLayers.StyleMap( {
           'default': mapSettings.defaultStyle
