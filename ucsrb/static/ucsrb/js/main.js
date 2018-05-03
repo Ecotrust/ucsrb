@@ -112,16 +112,17 @@ var main = {
             window.setTimeout(function() {
                 $('.alert').alert('close');
             }, 1500);
-            // Hide menu nav login and create account button
-            var $signInBtn = $('button#sign-in-modal');
-            $signInBtn.before(`<a href="/account/" class="list-group-item list-group-item-action">${data.username}</a><button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>`);
-            $signInBtn.css('display', 'none');
+            // menu navicon hide login  &
+            // add account link + sign out link
+            $('button#sign-in-modal').before(`<a href="/account/" class="list-group-item list-group-item-action">${data.username}</a><button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>`);
+            $('button#sign-in-modal').css('display', 'none');
+            // Hide top nav login and create account button
+            $('#sign-in-modal-2').before(`<a id="topnav-account-link" href="/account/" class="btn btn-link account-action">
+                <i class="svg_icon"><img src="/static/ucsrb/img/icon/i_user_blue.svg" /></i>${data.username}</a>`);
+            $('#sign-in-modal-2').css('display', 'none');
             // Hide file nav login and show open saved link
             $('#file-nav .hide').removeClass('hide');
             $('#subnav-sign-in-modal').addClass('hide');
-            // Hide top nav login and create account button
-            $('#sign-in-modal-2').before(`<a href="/account/" class="btn btn-link account-action">${data.username}</a>`);
-            $('#sign-in-modal-2').css('display', 'none');
         }
     },
 };

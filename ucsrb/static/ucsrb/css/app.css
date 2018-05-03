@@ -218,15 +218,11 @@ header {
 
 /**
  * =========================================================================
-    Files Nav and Modals (load saved, save, start over/reset)
+    Files Nav and Modals for app (load saved, save, start over/reset)
  ===========================================================================
  */
 .username-wrap {
     flex-start: end;
-}
-
-.username-wrap .account-action {
-    color: #fff;
 }
 
 /**

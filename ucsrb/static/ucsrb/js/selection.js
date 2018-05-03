@@ -136,6 +136,7 @@ app.map.Pointer = new app.map.PointerType;
 app.map.selection = {};
 // Via http://openlayers.org/en/master/examples/select-features.html?q=select
 app.map.selection.select = null;  // ref to currently selected interaction
+app.map.selection.selectTwo = null;
 // select interaction working on "singleclick"
 app.map.selection.selectNoneSingleClick = new ol.interaction.Select(
   {
@@ -146,9 +147,16 @@ app.map.selection.selectSelectSingleClick = new ol.interaction.Select(
   {
     layers: [
       app.map.layer.streams.layer,
-      app.map.layer.pourpoints.layer
     ],
     style: app.map.styles.LineStringSelected
+  }
+);
+app.map.selection.selectSelectPPSingleClick = new ol.interaction.Select(
+  {
+    layers: [
+      app.map.layer.pourpoints.layer
+    ],
+    style: app.map.styles.PointSelected
   }
 );
 app.map.selection.selectFilterSingleClick = new ol.interaction.Select(
@@ -176,5 +184,17 @@ app.map.selection.setSelect = function(selectionInteraction) {
     });
   });
 };
+
+app.map.selection.addSelect = function(selectionInteraction) {
+  app.map.selection.selectTwo = selectionInteraction;
+  app.map.addInteraction(app.map.selection.selectTwo);
+  app.map.selection.selectTwo.on('select', function(e) {
+    console.log(`selection event at ${ol.coordinate.toStringHDMS(ol.proj.transform(e.mapBrowserEvent.coordinate, 'EPSG:3857', 'EPSG:4326'))}`);
+    app.map.selection.selectTwo.getFeatures().forEach(function(feat) {
+      var layer = app.map.selection.selectTwo.getLayer(feat).get('id');
+      app.map.layer[layer].selectAction(feat);
+    });
+  });
+}
 
 app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);

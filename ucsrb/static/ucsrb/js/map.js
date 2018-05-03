@@ -19,7 +19,7 @@ app.map.styles = {
                 width: 2,
             }),
         }),
-        zIndex: 1,
+        zIndex: 2,
     }),
     'PointSelected': new ol.style.Style({
         image: new ol.style.Circle({
@@ -31,7 +31,8 @@ app.map.styles = {
                 color: '#ffffff',
                 width: 3,
             }),
-        })
+        }),
+        zIndex: 5
     }),
     'LineString': new ol.style.Style({
         stroke: new ol.style.Stroke({
@@ -39,7 +40,8 @@ app.map.styles = {
             lineCap: 'cap',
             lineJoin: 'miter',
             width: 8,
-        })
+        }),
+        zIndex: 2
     }),
     'LineStringSelected': new ol.style.Style({
         stroke: new ol.style.Stroke({
@@ -55,7 +57,8 @@ app.map.styles = {
                 color: '#3a5675',
                 width: 5,
             }),
-        })
+        }),
+        zIndex: 4
     }),
     'Polygon': new ol.style.Style({
         stroke: new ol.style.Stroke({
@@ -68,7 +71,8 @@ app.map.styles = {
         }),
         fill: new ol.style.Fill({
             color: 'rgba(0, 0, 0, 0)'   //Don't show!!!
-        })
+        }),
+        zIndex: 2
     }),
     'PolygonSelected': new ol.style.Style({
         stroke: new ol.style.Stroke({
@@ -80,7 +84,8 @@ app.map.styles = {
         }),
         fill: new ol.style.Fill({
             color: 'rgba(93, 116, 82, 0.45)'
-        })
+        }),
+        zIndex: 4
     }),
     'FocusArea': new ol.style.Style({
         stroke: new ol.style.Stroke({
@@ -91,7 +96,8 @@ app.map.styles = {
         }),
         fill: new ol.style.Fill({
             color: 'rgba(0, 0, 0, 0)'
-        })
+        }),
+        zIndex: 4
     }),
     'Streams': function(feature, resolution) {
         var width = 2.25;
@@ -115,7 +121,8 @@ app.map.styles = {
                 lineCap: 'round',
                 lineJoin: 'round',
                 width: width,
-            })
+            }),
+            zIndex: 3
         });
     },
     'PourPoint': new ol.style.Style({
@@ -128,7 +135,8 @@ app.map.styles = {
                 color: '#aaffff',
                 width: 5,
             }),
-        })
+        }),
+        zIndex: 5
     }),
     'Boundary': new ol.style.Style({
       stroke: new ol.style.Stroke({
@@ -139,7 +147,8 @@ app.map.styles = {
       }),
       fill: new ol.style.Fill({
         color: 'rgba(0,0,0,0)'
-      })
+      }),
+      zIndex: 1
     }),
     'Draw': new ol.style.Style({
       fill: new ol.style.Fill({
@@ -155,7 +164,8 @@ app.map.styles = {
         fill: new ol.style.Fill({
           color: 'rgba(255, 204, 51, 1)'
         })
-      })
+      }),
+      zIndex: 4
     })
 };
 

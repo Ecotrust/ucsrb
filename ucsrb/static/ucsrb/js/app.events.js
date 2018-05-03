@@ -104,6 +104,8 @@ $(document).ready(function() {
             } else if (event.target.button > 0 && event.target.button) {
 
             }
+        } else {
+            return;
         }
     });
 });

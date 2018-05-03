@@ -78,6 +78,10 @@ a:hover,
     text-decoration: none;
 }
 
+button:hover {
+    cursor: pointer;
+}
+
 a.btn-outline-light {
     border-width: 2px;
     border-radius: 0;
@@ -174,6 +178,7 @@ nav .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
 }
 
 .username-wrap .account-action {
+    color: #67b8c6;
     font-size: .875em;
     font-weight: 700;
     opacity: 1;

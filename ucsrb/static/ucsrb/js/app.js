@@ -66,7 +66,8 @@ reportInit = function() {
 app.init = {
     'select': function() {
         setInit();
-        app.map.selection.setSelect(app.map.selection.selectSelectSingleClick);
+        app.map.selection.setSelect(app.map.selection.selectSelectPPSingleClick);
+        app.map.selection.addSelect(app.map.selection.selectSelectSingleClick);
         app.map.enableLayer('streams');
         scenario_type_selection_made('select');
     },
