@@ -234,7 +234,11 @@
             <div class="btn-group" role="group" aria-label="steps and save">
                 <a href="#" class="button btn btn-outline-primary" onclick="this.blur(); return false;" id="button_prev"><span>&lt; Previous</span></a>
                 <a href="#" class="button btn btn-outline-primary ml-auto"  onclick="this.blur(); return false;" id="button_next"><span>Next &gt;</span></a>
-                <a href="#" class="submit_button button btn btn-primary" onclick="this.blur(); return false;"><span>Save</span></a>
+                {% if user.is_authenticated %}
+                    <a href="#" class="submit_button button btn btn-primary" onclick="this.blur(); return false;"><span>Save</span></a>
+                {% else %}
+                    <a href="#" class="submit_button button btn btn-primary" onclick="this.blur(); return false;"><span>Evaluate</span></a>
+                {% endif %}
             </div>
         </div>
     </div>
