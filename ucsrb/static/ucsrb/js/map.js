@@ -329,6 +329,7 @@ closeConfirmSelection = function(accepted) {
     removeFilter();
   }
   app.map.selection.select.getFeatures().clear();
+  app.map.selectedStream.getSource().clear();
 }
 
 generateFilterPopup = function(content) {
@@ -351,6 +352,7 @@ focusAreaSelectAction = function(feat) {
 };
 
 streamSelectAction = function(feat) {
+  app.map.addSelectedStream();
   app.map.enableLayer('pourpoints');
   app.map.zoomToExtent(feat.getExtent());
   if (app.state.stepVal < 1) {
@@ -358,9 +360,9 @@ streamSelectAction = function(feat) {
   }
 };
 
-pourPointSelectAction = function(feat) {
+pourPointSelectAction = function(feat, selectEvent) {
   app.request.get_basin(feat, function(feat, vector) {
-    if (feat){
+    if (feat) {
       markup = generateFilterPopup('<p>Find harvest locations within this basin?</p>');
       confirmSelection(feat, markup, vector);
     }
