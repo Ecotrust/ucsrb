@@ -17,6 +17,7 @@ $(document).ready(function() {
         // changing the method, so filter form needs to be cleared for new query
         if ($(this).parents('#process-nav').length > 0) {
             app.state.step = 'reset';
+            app.viewModel.scenarios.reset({cancel: true});
             app.state.navHeight = 'short';
             app.state.step = 0;
         }

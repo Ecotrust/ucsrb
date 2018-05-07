@@ -428,6 +428,7 @@ app.nav = {
             if (app.map.mask) {
                 app.map.mask.set('active', false);
             }
+            closeConfirmSelection(true,true);
         },
         select: [
             false,

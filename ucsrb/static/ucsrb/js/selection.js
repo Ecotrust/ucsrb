@@ -179,22 +179,3 @@ app.map.selection.setSelect = function(selectionInteraction) {
 };
 
 app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
-
-/**
- * [selectedStream description]
- * @type {ol}
- */
-app.map.selectedStream = new ol.layer.Vector({
-  source: new ol.source.Vector({
-    projection: 'EPSG:3857'
-  }),
-  style: app.map.styles.LineStringSelected,
-  zIndex: 1
-});
-
-app.map.addSelectedStream = function() {
-  app.map.selectedStream.getSource().clear();
-  app.map.selection.select.selectedStream = app.map.selection.select
-  app.map.selectedStream.getSource().addFeature(app.map.selection.select.getFeatures().item(0));
-  app.map.addLayer(app.map.selectedStream);
-}

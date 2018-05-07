@@ -329,7 +329,6 @@ closeConfirmSelection = function(accepted) {
     removeFilter();
   }
   app.map.selection.select.getFeatures().clear();
-  app.map.selectedStream.getSource().clear();
 }
 
 generateFilterPopup = function(content) {
@@ -352,7 +351,6 @@ focusAreaSelectAction = function(feat) {
 };
 
 streamSelectAction = function(feat) {
-  app.map.addSelectedStream();
   app.map.enableLayer('pourpoints');
   app.map.zoomToExtent(feat.getExtent());
   if (app.state.stepVal < 1) {
