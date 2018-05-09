@@ -415,6 +415,11 @@ main {
     background: rgba(255,255,255,0.66);
 }
 
+.ol-geo-search > .ol-geo-search-wrap > button.close {
+    background: url('/static/ucsrb/img/icon/i_close.svg') rgba(255,255,255,0.66) 50% 50% no-repeat;
+    background-size: 60%;
+}
+
 .ol-geo-search input:not(.d-none) {
     border: none;
     border-radius: 0;

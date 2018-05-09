@@ -40,12 +40,15 @@ app.map.geoSearch.toggleSearchBox = function() {
     var resultsList = document.getElementById("autocomplete-results");
     resultsList.innerHTML = '';
     var input = document.querySelector('#geo-search-input');
+    var btn = document.querySelector('.ol-geo-search button');
     if (input.classList.contains('d-none')) {
         input.classList.remove('d-none');
         app.map.geoSearch.autoCompleteLookup();
+        btn.classList.add('close');
     } else {
         input.value = '';
         input.classList.add('d-none');
+        btn.classList.remove('close');
     }
 };
 
