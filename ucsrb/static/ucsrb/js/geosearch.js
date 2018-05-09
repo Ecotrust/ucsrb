@@ -49,6 +49,8 @@ app.map.geoSearch.toggleSearchBox = function() {
         input.value = '';
         input.classList.add('d-none');
         btn.classList.remove('close');
+        // clear pin added to map
+        app.map.dropPin.source.clear();
     }
 };
 
@@ -111,19 +113,27 @@ app.map.geoSearch.autoCompleteLookup = function() {
         if (val.length > 2) {
             resultsList.innerHTML = '';
             var options = app.map.geoSearch.autoCompleteResults(val);
-            options.map(function(option) {
-                resultsList.innerHTML += `<a data-coords="${option.geometry.coordinates}" class="geosearch-result dropdown-item">${option.properties.F_NAME}</a>`;
-            })
-            resultsList.addEventListener('click', function(event) {
-                var x = event.target.dataset.coords.split(',');
-                var y = [parseFloat(x[0]), parseFloat(x[1])];
-                app.map.getView().animate({center: y, zoom: 14});
-                resultsList.innerHTML = '';
-            });
+            if (options.length === 0) {
+              resultsList.innerHTML += `<button tabindex="0" class="geosearch-result btn btn-link dropdown-item">No results found</button>`;
+            } else {
+              options.map(function(option, i) {
+                  resultsList.innerHTML += `<button data-coords="${option.geometry.coordinates}" tabindex="0" role="button" class="btn btn-link geosearch-result dropdown-item">${option.properties.F_NAME}</button>`;
+              });
+              resultsList.addEventListener('click', function resultSelect(event) {
+                  var x = event.target.dataset.coords.split(',');
+                  var y = [parseFloat(x[0]), parseFloat(x[1])];
+                  app.map.getView().animate({center: y, zoom: 14});
+                  resultsList.innerHTML = '';
+                  app.map.dropPin(y);
+                  console.log(this.value);
+                  console.log(event.target.innerText);
+                  input.value = event.target.innerText;
+              });
+            }
         } else {
             resultsList.innerHTML = '';
         }
-    })
+    });
 }
 
 /**

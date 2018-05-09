@@ -594,3 +594,20 @@ app.map.addScenario = function(vectors) {
   app.map.draw.source.clear(true);
   app.map.draw.source.addFeatures(vectors);
 };
+
+app.map.dropPin = function(coords) {
+  if (app.map.dropPin.source) {
+    app.map.dropPin.source.clear();
+  } else {
+    app.map.dropPin.source = new ol.source.Vector();
+    app.map.dropPin.layer = new ol.layer.Vector({
+      source: app.map.dropPin.source
+    });
+    app.map.addLayer(app.map.dropPin.layer);
+  }
+  app.map.dropPin.pin = new ol.Feature({
+    geometry: new ol.geom.Point(coords)
+  });
+  app.map.dropPin.pin.setStyle(app.map.styles.Point);
+  app.map.dropPin.source.addFeature(app.map.dropPin.pin);
+}

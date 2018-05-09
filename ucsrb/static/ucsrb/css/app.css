@@ -404,6 +404,24 @@ main {
     font-size: .875em;
 }
 
+.ol-geo-search #autocomplete-results .btn-link {
+    background: transparent;
+    border-bottom: 1px solid #ccc;
+    color: #333;
+    display: block;
+    font-size: .875em;
+    font-weight: 400;
+    height: auto;
+    line-height: 3;
+    padding: .25rem 1rem;
+    text-align: left;
+    width: 100%;
+}
+
+.ol-geo-search #autocomplete-results .btn-link:focus {
+    background: #dfdfdf;
+}
+
 .ol-geo-search > .ol-geo-search-wrap > button {
     background: url('/static/ucsrb/img/icon/i_search.svg') rgba(255,255,255,0.66) 50% 50% no-repeat;
     background-size: auto 60%;
@@ -425,7 +443,7 @@ main {
     border-radius: 0;
     font-size: .875em;
     line-height: 4vh;
-    margin: 1px 1px 1px .25rem;
+    margin: 1px 1px 0 0;
     padding: 0 1em;
     vertical-align: middle;
 }
@@ -435,6 +453,7 @@ main {
 }
 
 .ol-geo-search input:not(.d-none) + #autocomplete-results {
+    border-top: 3px solid #ccc;
     width: 100%;
 }
 
