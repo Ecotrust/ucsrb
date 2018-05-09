@@ -433,6 +433,10 @@ main {
     width: 100%;
 }
 
+#map .ol-attribution {
+    z-index: 0;
+}
+
 .layer-switcher button {
     background: url('/static/ucsrb/img/icon/i_layers.svg') rgba(58,86,117,1) 50% no-repeat;
     background-size: auto 60%;
