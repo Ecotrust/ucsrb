@@ -406,7 +406,7 @@ app.nav = {
         reset: this.initial,
         select: [
             'Zoom in and select a stream segment to evaluate changes in flow',
-            'Select specific point along stream reach to evaluate changes in flow associated with management activity upstream',
+            'select one of the highlighted pour points to evaluate changes in flow associated with management activity upstream',
             'Select filters to narrow your treatment region',
         ],
         filter: [

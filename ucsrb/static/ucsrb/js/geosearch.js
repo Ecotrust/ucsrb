@@ -50,7 +50,9 @@ app.map.geoSearch.toggleSearchBox = function() {
         input.classList.add('d-none');
         btn.classList.remove('close');
         // clear pin added to map
-        app.map.dropPin.source.clear();
+        if (app.map.dropPin.hasOwnProperty('source')) {
+            app.map.dropPin.source.clear();
+        }
     }
 };
 

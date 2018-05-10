@@ -265,7 +265,7 @@ function scenarioFormModel(options) {
     // Updating Dynamic Display
 
     self.gridCellsRemaining = ko.observable('...');
-    self.showingFilteringResults = ko.observable(false);
+    self.showingFilteringResults = ko.observable(true);
     self.inputsHaveChanged = ko.observable(true);
     self.showButtonSpinner = ko.observable(false);
     self.currentCountRequest = ko.observable(false);

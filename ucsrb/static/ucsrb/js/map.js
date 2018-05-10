@@ -152,17 +152,16 @@ app.map.styles = {
     }),
     'Draw': new ol.style.Style({
       fill: new ol.style.Fill({
-        color: 'rgba(255, 255, 255, 0.4)'
+        color: [92,115,82,0.5]
       }),
       stroke: new ol.style.Stroke({
-        // color: '#ffcc33',
-        color: 'rgba(215, 160, 11, 1)',
-        width: 4
+        color: [92,115,82,0.8],
+        width: 2
       }),
       image: new ol.style.Circle({
-        radius: 7,
+        radius: 8,
         fill: new ol.style.Fill({
-          color: 'rgba(255, 204, 51, 1)'
+          color: [92,115,82,0.5]
         })
       }),
       zIndex: 4
@@ -256,7 +255,7 @@ confirmationReceived = function() {
   if (app.state.method == 'select') {
     if (app.state.stepVal < 2 || app.state.stepVal == 'reset') {
       app.state.step = 2; // step forward in state
-    } else if (app.state.stepVal == 2) {
+    } else if (app.state.stepVal == 1) {
       // if already on step 2 then a new pourpoint has been selected
       // we need to the reset the filter form and then go back to step 2
       app.state.step = 'reset';
@@ -297,29 +296,29 @@ confirmSelection = function(feat, markup, vector) {
   } else {
     setFilter(features[0], layer.layer);
   }
-  app.map.popupLock = true;
-  app.map.closePopup();
-  app.map.popup = new ol.Overlay({
-    element: document.getElementById('popup')
-  });
-  var element = app.map.popup.getElement();
-  app.map.addOverlay(app.map.popup);
-  extent = feat.getExtent();
-  coordinate = [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2];
-  app.map.popup.setPosition(coordinate);
-  var unit_type = mbLayer.name;
-  var unit_name = feat.get(mbLayer.name_field);
-  var title = unit_type + ': ' + unit_name + '&nbsp<button class="btn btn-danger" type="button" onclick="closeConfirmSelection(false);">&times;</button>';
+  // app.map.popupLock = true;
+  // app.map.closePopup();
+  // app.map.popup = new ol.Overlay({
+    // element: document.getElementById('popup')
+  // });
+  // var element = app.map.popup.getElement();
+  // app.map.addOverlay(app.map.popup);
+  // extent = feat.getExtent();
+  // coordinate = [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2];
+  // app.map.popup.setPosition(coordinate);
+  // var unit_type = mbLayer.name;
+  // var unit_name = feat.get(mbLayer.name_field);
+  // var title = unit_type + ': ' + unit_name + '&nbsp<button class="btn btn-danger" type="button" onclick="closeConfirmSelection(false);">&times;</button>';
 
-  $(element).popover({
-    'placement': 'top',
-    'animation': false,
-    'html': true,
-    'content': markup,
-    'container': element,
-    'title': title
-  });
-  $(element).popover('show');
+  // $(element).popover({
+  //   'placement': 'top',
+  //   'animation': false,
+  //   'html': true,
+  //   'content': markup,
+  //   'container': element,
+  //   'title': title
+  // });
+  // $(element).popover('show');
 }
 
 closeConfirmSelection = function(accepted) {
@@ -346,6 +345,7 @@ focusAreaSelectAction = function(feat) {
     if (feat){
       markup = generateFilterPopup('<p>Find harvest locations within this watershed?</p>');
       confirmSelection(feat, markup, vector);
+      confirmationReceived();
     }
   });
 };
