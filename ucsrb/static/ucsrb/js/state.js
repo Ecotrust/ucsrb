@@ -29,13 +29,13 @@ app.state = {
     },
     set step(step) {
         this.stepVal = step;
-        if (app.state.getMethod.length > 0) {
-            app.state.instructions = app.nav.instructions[app.state.getMethod][step];
-        }
         if (app.nav.stepActions[step]) {
             app.nav.stepActions[step]();
         } else if (app.nav.stepActions[app.state.getMethod][step]) {
             app.nav.stepActions[app.state.getMethod][step]();
+        }
+        if (app.state.getMethod.length > 0) {
+            app.state.instructions = app.nav.instructions[app.state.getMethod][step];
         }
         //TODO: Recognize and trigger filtering/drawing steps.
     },

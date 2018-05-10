@@ -45,16 +45,17 @@ baseInit = function() {
     app.map.closePopup();
     app.map.draw.disable();
     app.map.popupLock = false;
-    if (app.map.hasOwnProperty('mask')) {
-        app.map.mask.set('active', false);
-    }
-    app.map.clearLayers();
-    app.map.enableLayer('boundary');
     // app.map.setBoundaryLayer(app.map.layer.boundary.layer);
 }
 
 setInit = function() {
     baseInit();
+    if (app.map.hasOwnProperty('mask')) {
+        app.map.mask.set('active', false);
+    }
+    app.map.clearLayers();
+    app.map.enableLayer('boundary');
+    
     app.state.step = 0;
     app.map.layer.draw.layer.getSource().clear();
 };
@@ -403,7 +404,7 @@ app.nav = {
     },
     instructions: {
         initial: `<h2 class="mx-auto w-50 text-center">Start by deciding how you want <br/>to interact with the map</h2>`,
-        reset: this.initial,
+        reset: `Decide how you want to interact with the map`,
         select: [
             'Zoom in and select a stream segment to evaluate changes in flow',
             'select one of the highlighted pour points to evaluate changes in flow associated with management activity upstream',
@@ -424,6 +425,7 @@ app.nav = {
             app.panel.getPanelContentElement.innerHTML = app.nav.stepActions.initial;
             app.panel.moveRight();
             app.nav.hideSave();
+            app.nav.instructions.reset
             app.map.geoSearch.closeSearchBox();
             if (app.map.mask) {
                 app.map.mask.set('active', false);
