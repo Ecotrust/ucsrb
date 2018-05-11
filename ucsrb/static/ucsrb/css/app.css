@@ -103,10 +103,10 @@ header {
     }
 
     .method-nav button.active:after {
-        bottom: -5vh;
+        bottom: -3vh;
         border-left: 3.5vh solid transparent;
         border-right: 3.5vh solid transparent;
-        border-top: 5vh solid #fff;
+        border-top: 3vh solid #fff;
         content: '';
         left: 50%;
         opacity: 1;
@@ -461,6 +461,13 @@ main {
     z-index: 0;
 }
 
+#map .ol-attribution button {
+    bottom: 2vh;
+    height: 3vh;
+    right: 2vh;
+    width: 3vh;
+}
+
 .layer-switcher button {
     background: url('/static/ucsrb/img/icon/i_layers.svg') rgba(58,86,117,1) 50% no-repeat;
     background-size: auto 60%;
@@ -636,9 +643,9 @@ main {
 #panel {
     background: rgba(255,255,255,0.9);
     border-radius: .5em;
-    bottom: 2.5rem;
-    right: .5rem;
-    top: 10vh;
+    bottom: 8vh;
+    max-height: 58vh;
+    right: 2vh;
     overflow: auto;
     position: absolute;
     z-index: 3;
@@ -688,9 +695,16 @@ main {
 }
 
 .drawing-buttons {
-  background-color: #CCC;
-  padding: 10px;
-  border-radius:5px;
+
+}
+
+.bb {
+    border-bottom: 3px solid #e2e05e;
+    font-size: 1.5em;
+    font-weight: 900;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
 }
 
 #scenario-hidden-submit {

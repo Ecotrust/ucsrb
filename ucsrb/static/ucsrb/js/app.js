@@ -279,21 +279,34 @@ app.panel = {
         },
         finishDrawing: function() {
             app.panel.moveRight();
-            var html = '<div class="featurepanel">' +
-            // '<h4>Do you want to add another treatment area?</h4>' +
-            '<div class="btn-toolbar justify-content-between drawing-buttons">' +
-            // '<button class="btn btn-light" onclick="app.panel.draw.addTreatmentArea()">+ Add More</button>' +
-            '<button class="btn btn-light" onclick="app.panel.draw.acceptDrawing()">Done</button>' +
-            '<button class="btn btn-light" onclick="app.panel.draw.restart()">Restart</button>' +
-            '</div>' +
-            '</div>';
-            app.panel.draw.setContent(html);
+            window.setTimeout(function() {
+                var drawingArea = app.map.draw.getDrawingArea();
+                var drawingAcres = drawingArea/4046.86;
+                console.log(drawingArea)
+                var saveDisable = 'disabled';
+                var warning = '<p><em>must be under ' + app.map.draw.maxAcres.toString() + '</em></p>';
+                if (drawingIsSmallEnough(drawingArea)) {
+                    saveDisable = '';
+                    warning = '';
+                }
+                var html = '<div class="featurepanel">' +
+                '<p class="display"><span class="bb">' + drawingAcres.toFixed(0).toString() + '</span> acres selected</p>' +
+                warning +
+                '<p><small>Re-select point to edit<br />Select drawing boundary to alter<br />Alt+Select point to delete</small></p>' +
+                '<div class="btn-toolbar justify-content-between drawing-buttons">' +
+                '<button type="button" class="btn btn-primary ' + saveDisable + '" onclick="app.panel.draw.saveDrawing()">Begin Evaluation</button>' +
+                '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
+                '</div>' +
+                '</div>';
+                app.panel.draw.setContent(html);
+            }, 300);
         },
         restart: function() {
             app.map.draw.source.clear();
             app.map.draw.disable();
             app.map.draw.enable();
             app.panel.hide();
+            app.panel.draw.finishDrawing();
         },
         addTreatmentArea: function() {
             app.map.draw.enable();

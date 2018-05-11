@@ -101,7 +101,6 @@ app.map.styles = {
     }),
     'Streams': function(feature, resolution) {
         var width = 2.25;
-        console.log(resolution);
         if (resolution < 3) {
             width = 14;
         } else if (resolution < 5) {
@@ -396,7 +395,7 @@ app.map.draw = {
     map.on('pointermove', pointerMoveHandler);
   },
   enableEdit: function() {
-    app.map.removeInteraction(drawInteraction);
+    // app.map.removeInteraction(drawInteraction);
     app.map.addInteraction(modifyInteraction);
     // app.map.addInteraction(snapInteraction);
   },
@@ -409,6 +408,14 @@ app.map.draw = {
     app.map.removeInteraction(drawInteraction);
     app.map.removeInteraction(snapInteraction);
     map.on('pointermove', pointerMoveHandler);
+  },
+  getDrawingArea: function() {
+    var drawFeatures = app.map.draw.source.getFeatures();
+    totalArea = 0;
+    for (var i = 0; i < drawFeatures.length; i++) {
+        totalArea += ol.Sphere.getArea(drawFeatures[i].getGeometry());
+    }
+    return totalArea;
   },
 };
 
@@ -432,12 +439,16 @@ app.map.draw.draw.on('drawstart', function(e) {
 app.map.draw.draw.on('drawend', function(e) {
   app.map.draw.enableEdit();
   app.panel.draw.finishDrawing();
-  ol.Observable.unByKey(app.map.draw.toolTipListener);
 });
 
 app.map.draw.measureTooltipElement;
 app.map.draw.measureTooltip;
 app.map.draw.toolTipListener;
+
+app.map.draw.modify.on('modifyend', function(e) {
+  console.log('change');
+  app.panel.draw.finishDrawing();
+});
 
 /**
  * Handle pointer move for drawing
@@ -460,7 +471,6 @@ var pointerMoveHandler = function(evt) {
  */
 var formatAreaToAcres = function(polygon) {
   var area = ol.Sphere.getArea(polygon);
-  console.log(area);
   var output = Math.round(area * 0.00024710538146717) + ' ' + 'acres';
   return output;
 };
