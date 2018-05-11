@@ -16,7 +16,6 @@ $(document).ready(function() {
         app.setState(event.currentTarget.dataset.method);
         // changing the method, so filter form needs to be cleared for new query
         if ($(this).parents('#process-nav').length > 0) {
-            console.log(true);
             app.state.step = 'reset';
             app.viewModel.scenarios.reset({cancel: true});
             app.state.navHeight = 'short';
