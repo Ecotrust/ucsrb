@@ -55,7 +55,7 @@ setInit = function() {
     }
     app.map.clearLayers();
     app.map.enableLayer('boundary');
-    
+
     app.state.step = 0;
     app.map.layer.draw.layer.getSource().clear();
 };
@@ -280,9 +280,9 @@ app.panel = {
         finishDrawing: function() {
             app.panel.moveRight();
             var html = '<div class="featurepanel">' +
-            '<h4>Do you want to add another treatment area?</h4>' +
+            // '<h4>Do you want to add another treatment area?</h4>' +
             '<div class="btn-toolbar justify-content-between drawing-buttons">' +
-            '<button class="btn btn-light" onclick="app.panel.draw.addTreatmentArea()">+ Add More</button>' +
+            // '<button class="btn btn-light" onclick="app.panel.draw.addTreatmentArea()">+ Add More</button>' +
             '<button class="btn btn-light" onclick="app.panel.draw.acceptDrawing()">Done</button>' +
             '<button class="btn btn-light" onclick="app.panel.draw.restart()">Restart</button>' +
             '</div>' +
@@ -415,7 +415,7 @@ app.nav = {
             'Select filters to narrow your treatment area',
         ],
         draw: [
-            'Click on the map to start drawing your management area',
+            'Zoom in to area of interest or use the geocoder to search for places by name.<br />Click on the map to start drawing the boundary of your management area.',
             'Add additional points then double-click to finish; Re-select point to edit'
         ],
     },

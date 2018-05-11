@@ -430,11 +430,11 @@ main {
 }
 
 .ol-geo-search > .ol-geo-search-wrap > button:active {
-    background: rgba(255,255,255,0.66);
+    background: url('/static/ucsrb/img/icon/i_close.svg') rgba(255,255,255,1) 50% 50% no-repeat;
 }
 
 .ol-geo-search > .ol-geo-search-wrap > button.close {
-    background: url('/static/ucsrb/img/icon/i_close.svg') rgba(255,255,255,0.66) 50% 50% no-repeat;
+    background: url('/static/ucsrb/img/icon/i_close.svg') rgba(255,255,255,1) 50% 50% no-repeat;
     background-size: 60%;
 }
 
@@ -545,6 +545,38 @@ main {
         background-image: url('/static/ucsrb/img/icon/i_visible_light.svg');
     }
 
+#map .tooltip {
+    position: relative;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    color: white;
+    padding: 4px 8px;
+    opacity: 0.7;
+    white-space: nowrap;
+}
+#map .tooltip-measure {
+    opacity: 1;
+    font-weight: bold;
+}
+#map .tooltip-static {
+    background-color: #ffcc33;
+    color: black;
+    border: 1px solid white;
+}
+#map .tooltip-measure:before,
+#map .tooltip-static:before {
+    border-top: 6px solid rgba(0, 0, 0, 0.5);
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    margin-left: -7px;
+    left: 50%;
+}
+#map .tooltip-static:before {
+    border-top-color: #ffcc33;
+}
 
 /**
  * =========================================================================

@@ -152,14 +152,17 @@ app.map.styles = {
     }),
     'Draw': new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [92,115,82,0.5]
+        color: [92,115,82,0.4]
       }),
       stroke: new ol.style.Stroke({
-        color: [92,115,82,0.8],
+        color: [92,115,82,0.7],
         width: 2
       }),
       image: new ol.style.Circle({
         radius: 8,
+        stroke: new ol.style.Stroke({
+          color: 'rgba(0, 0, 0, 0.7)'
+        }),
         fill: new ol.style.Fill({
           color: [92,115,82,0.5]
         })
@@ -389,6 +392,8 @@ app.map.draw = {
   enable: function() {
     app.map.addInteraction(drawInteraction);
     app.map.addInteraction(snapInteraction);
+    createMeasureTooltip();
+    map.on('pointermove', pointerMoveHandler);
   },
   enableEdit: function() {
     app.map.removeInteraction(drawInteraction);
@@ -403,19 +408,79 @@ app.map.draw = {
     app.map.removeInteraction(modifyInteraction);
     app.map.removeInteraction(drawInteraction);
     app.map.removeInteraction(snapInteraction);
-  }
+    map.on('pointermove', pointerMoveHandler);
+  },
 };
 
 app.map.draw.draw.on('drawstart', function(e) {
   if (app.state.stepVal == 0) {
     app.state.step = 1;
   }
+
+  /** @type {ol.Coordinate|undefined} */
+  var tooltipCoord = e.coordinate;
+
+  app.map.draw.toolTipListener = e.feature.getGeometry().on('change', function(evt) {
+    var geom = evt.target;
+    var output = formatAreaToAcres(geom);
+    var tooltipCoord = geom.getInteriorPoint().getCoordinates();
+    app.map.draw.measureTooltipElement.innerHTML = output;
+    app.map.draw.measureTooltip.setPosition(tooltipCoord);
+  });
 });
 
 app.map.draw.draw.on('drawend', function(e) {
   app.map.draw.enableEdit();
   app.panel.draw.finishDrawing();
+  ol.Observable.unByKey(app.map.draw.toolTipListener);
 });
+
+app.map.draw.measureTooltipElement;
+app.map.draw.measureTooltip;
+app.map.draw.toolTipListener;
+
+/**
+ * Handle pointer move for drawing
+ * @param {ol.MapBrowserEvent} evt The event.
+ */
+var pointerMoveHandler = function(evt) {
+  if (evt.dragging) {
+    return;
+  }
+  var drawFeatures = app.map.draw.source.getFeatures();
+  if (drawFeatures.length > 0) {
+    var geom = (drawFeatures[0].getGeometry());
+  }
+};
+
+/**
+ * Format area output.
+ * @param {ol.geom.Polygon} polygon The polygon.
+ * @return {string} Formatted area.
+ */
+var formatAreaToAcres = function(polygon) {
+  var area = ol.Sphere.getArea(polygon);
+  console.log(area);
+  var output = Math.round(area * 0.00024710538146717) + ' ' + 'acres';
+  return output;
+};
+
+/**
+ * Creates a new measure tooltip
+ */
+function createMeasureTooltip() {
+  if (app.map.draw.measureTooltipElement) {
+    app.map.draw.measureTooltipElement.parentNode.removeChild(app.map.draw.measureTooltipElement);
+  }
+  app.map.draw.measureTooltipElement = document.createElement('div');
+  app.map.draw.measureTooltipElement.className = 'tooltip tooltip-measure';
+  app.map.draw.measureTooltip = new ol.Overlay({
+    element: app.map.draw.measureTooltipElement,
+    offset: [0, -15],
+    positioning: 'bottom-center'
+  });
+  app.map.addOverlay(app.map.draw.measureTooltip);
+}
 
 app.map.layer = {
     draw: {
