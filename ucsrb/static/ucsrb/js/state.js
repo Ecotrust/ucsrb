@@ -12,7 +12,7 @@ app.state = {
         id: null
     },
     nav: 'tall',
-    stepVal: null,
+    stepVal: 0,
     set setMethod(method) {
         this.method = method;
     },

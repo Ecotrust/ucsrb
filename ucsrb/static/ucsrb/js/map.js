@@ -355,7 +355,11 @@ focusAreaSelectAction = function(feat) {
 };
 
 streamSelectAction = function(feat) {
-  console.log(feat);
+  if (app.scenarioInProgress()) {
+    app.map.mask.set('active', false);
+    app.viewModel.scenarios.reset({cancel: true});
+    app.state.step = 0; // go back to step one
+  }
   app.map.enableLayer('pourpoints');
   app.map.zoomToExtent(feat.getExtent());
   if (app.state.stepVal < 1) {
@@ -364,7 +368,6 @@ streamSelectAction = function(feat) {
 };
 
 pourPointSelectAction = function(feat, selectEvent) {
-  console.log(feat);
   app.request.get_basin(feat, function(feat, vector) {
     if (feat) {
       markup = generateFilterPopup('<p>Find harvest locations within this basin?</p>');

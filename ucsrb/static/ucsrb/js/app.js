@@ -9,7 +9,7 @@ var app = {
         app.init[method]();
     },
     scenarioInProgress: function() {
-        if (app.state.step === 0 || app.state.method === 'reset') {
+        if (app.state.stepVal === 0 || app.state.method === 'reset') {
             return false;
         } else {
             return true;
@@ -311,7 +311,7 @@ app.panel = {
         addTreatmentArea: function() {
             app.map.draw.enable();
             var html = '<div class="featurepanel">' +
-            '<h4>Click on the map to start drawing your new treatment area.</h4>' +
+            '<h4>Click on the map to start drawing your new forest management scenario.</h4>' +
             '<div class="btn-toolbar justify-content-between drawing-buttons">' +
             '<button type="button" class="btn btn-light" onclick="app.panel.draw.cancelDrawing()">Cancel</button>' +
             '</div>' +
