@@ -74,7 +74,7 @@ app.init = {
     'filter': function() {
         setInit();
         app.map.selection.setSelect(app.map.selection.selectFilterSingleClick);
-        app.map.enableLayer('huc12');
+        // app.map.enableLayer('huc12');
         scenario_type_selection_made('filter');
     },
     'draw': function() {
@@ -369,6 +369,10 @@ enableDrawing = function() {
     app.map.geoSearch.openSearchBox();
 }
 
+app.forestUnitSelection = function() {
+
+}
+
 app.nav = {
     setState: function(height) {
         app.state.navHeight = height;
@@ -424,6 +428,16 @@ app.nav = {
             'Select filters to narrow your treatment region',
         ],
         filter: [
+            `<div class="text-center">Select area to manage based on:
+                <div class="dropdown show">
+                    <button class="btn btn-sm dropdown-toggle" type="button" id="forestUnit" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select unit</button>
+                    <div class="dropdown-menu show" aria-labelledby="forestUnit">
+                        <button class="dropdown-item" type="button">HUC 10</button>
+                        <button class="dropdown-item" type="button">HUC 12</button>
+                        <button class="dropdown-item" type="button">RMU</button>
+                    </div>
+                </div>
+            </div>`,
             'Select forest unit to filter',
             'Select filters to narrow your treatment area',
         ],
@@ -451,6 +465,7 @@ app.nav = {
             app.panel.form.init
         ],
         filter: [
+            app.forestUnitSelection,
             false,
             app.panel.form.init
         ],

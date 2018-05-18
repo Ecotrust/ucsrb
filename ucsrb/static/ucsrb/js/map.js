@@ -648,6 +648,9 @@ overlays.each(function() {
   };
 });
 
+app.map.forestFilterOverlays = {}
+
+
 app.map.enableLayer = function(layerName) {
   app.map.layer[layerName].layer.setVisible(true);
   $('#'+ app.map.layerSwitcher.overlays[layerName].checkboxId).prop('checked', true);
