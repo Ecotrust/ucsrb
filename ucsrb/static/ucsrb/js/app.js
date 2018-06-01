@@ -376,10 +376,16 @@ app.nav = {
     showResultsNav: function() {
         document.getElementById('results-nav').classList.remove('d-none');
         document.getElementById('process-nav').classList.add('d-none');
+        document.querySelectorAll('#file-nav .results-nav-item').forEach(function(i, arr) {
+          i.classList.remove('d-none')
+        });
     },
     hideResultsNav: function() {
         document.getElementById('results-nav').classList.add('d-none');
         document.getElementById('process-nav').classList.remove('d-none');
+        document.querySelectorAll('#file-nav .results-nav-item').forEach(function(i, arr) {
+          i.classList.add('d-none')
+        });
     },
     showStartOver: function() {
         document.getElementById('nav-start-over').classList.remove('d-none');

@@ -86,7 +86,7 @@ var main = {
         },
         register: function(event, form) {
             var formData = $(form).serialize();
-            var url = '/account/register_async/';
+            var url = '/account/register_login_async/';
             $.ajax({
                 url: url,
                 type: 'POST',
@@ -95,7 +95,7 @@ var main = {
                 success: function (response) {
                     console.log('%csuccessfully registered in user', 'color:green;');
                     if (response.success === true) {
-                        main.auth.success();
+                        main.auth.success(response);
                     } else {
                         document.querySelector('#registration-error').innerHTML = `${response.error}. Please update then submit`;
                     }
@@ -114,15 +114,12 @@ var main = {
             }, 1500);
             // menu navicon hide login  &
             // add account link + sign out link
-            $('button#sign-in-modal').before(`<a href="/account/" class="list-group-item list-group-item-action">${data.username}</a><button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>`);
-            $('button#sign-in-modal').css('display', 'none');
+            $('#menu #sign-in-modal').before(`<a href="/account/" class="list-group-item list-group-item-action">${data.username}</a><button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>`);
+            $('#menu #sign-in-modal').css('display', 'none');
             // Hide top nav login and create account button
-            $('#sign-in-modal-2').before(`<a id="topnav-account-link" href="/account/" class="btn btn-link account-action">
+            $('.username-wrap #sign-in-modal-2').before(`<a id="topnav-account-link" href="/account/" class="btn btn-link account-action">
                 <i class="svg_icon"><img src="/static/ucsrb/img/icon/i_user_blue.svg" /></i>${data.username}</a>`);
-            $('#sign-in-modal-2').css('display', 'none');
-            // Hide file nav login and show open saved link
-            $('#file-nav .hide').removeClass('hide');
-            $('#subnav-sign-in-modal').addClass('hide');
+            $('.username-wrap #sign-in-modal-2').css('display', 'none');
         }
     },
 };
