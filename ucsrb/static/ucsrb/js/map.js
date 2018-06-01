@@ -254,26 +254,15 @@ removeFilter = function() {
 }
 
 confirmationReceived = function() {
-  if (app.state.method == 'select') {
-    if (app.state.stepVal < 1 || app.state.stepVal == 'reset') {
-      app.state.step = 1;
-    } else if (app.state.stepVal == 2) {
-      // if already on step 2 then a new pourpoint has been selected
-      // we need to the reset the filter form and then go back to step 2
-      app.state.step = 'reset';
-      app.state.step = 2;
-    } else {
-      app.state.step = 2;
-    }
+  if (app.state.stepVal < 1 || app.state.stepVal == 'reset') {
+    app.state.step = 1;
+  } else if (app.state.stepVal == 2) {
+    // if already on step 2 then a new pourpoint has been selected
+    // we need to the reset the filter form and then go back to step 2
+    app.state.step = 'reset';
+    app.state.step = 2;
   } else {
-    if (app.state.stepVal < 1 || app.state.stepVal == 'reset') {
-      app.state.step = 1; // step forward in state
-    } else if (app.state.stepVal == 1) {
-      // if already on step 2 then a new forest unit has been selected
-      // we need to the reset the filter form and then go back to step 1
-      app.state.step = 'reset';
-      app.state.step = 1;
-    }
+    app.state.step = 2;
   }
   closeConfirmSelection(true);
 }
@@ -344,6 +333,9 @@ generateFilterPopup = function(content) {
 }
 
 focusAreaSelectAction = function(feat) {
+  if (app.state.stepVal < 1) {
+    app.state.step = 1; // step forward in state
+  }
   var layer = app.map.selection.select.getLayer(feat).get('id');
   app.request.get_focus_area(feat, layer, function(feat, vector) {
     if (feat){

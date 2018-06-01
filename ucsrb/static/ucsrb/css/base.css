@@ -228,7 +228,7 @@ nav .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
     margin: .5rem;
 }
 
-.accounts-form-wrap {
+#login-modal .accounts-form-wrap {
     border: none;
 }
 

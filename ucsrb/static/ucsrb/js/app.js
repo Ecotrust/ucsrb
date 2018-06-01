@@ -369,10 +369,6 @@ enableDrawing = function() {
     app.map.geoSearch.openSearchBox();
 }
 
-app.forestUnitSelection = function() {
-
-}
-
 app.nav = {
     setState: function(height) {
         app.state.navHeight = height;
@@ -431,9 +427,9 @@ app.nav = {
             `<div class="text-center">Select area to manage based on:
                 <div class="dropdown show">
                     <button class="btn btn-sm dropdown-toggle" type="button" id="forestUnit" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select unit</button>
-                    <div class="dropdown-menu show" aria-labelledby="forestUnit">
-                        <button class="dropdown-item" type="button">HUC 10</button>
-                        <button class="dropdown-item" type="button">HUC 12</button>
+                    <div class="dropdown-menu show forest-unit-dropdown" aria-labelledby="forestUnit">
+                        <button class="dropdown-item" type="button" onclick="app.map.toggleLayer('huc10')">HUC 10</button>
+                        <button class="dropdown-item" type="button" onclick="app.map.toggleLayer('huc12')">HUC 12</button>
                         <button class="dropdown-item" type="button">RMU</button>
                     </div>
                 </div>
