@@ -120,6 +120,8 @@ var main = {
             $('.username-wrap #sign-in-modal-2').before(`<a id="topnav-account-link" href="/account/" class="btn btn-link account-action">
                 <i class="svg_icon"><img src="/static/ucsrb/img/icon/i_user_blue.svg" /></i>${data.username}</a>`);
             $('.username-wrap #sign-in-modal-2').css('display', 'none');
+            // hide submenu login
+            $('#subnav-sign-in-modal').addClass('d-none');
         }
     },
 };
