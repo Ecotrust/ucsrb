@@ -13,6 +13,7 @@ app.state = {
     },
     nav: 'tall',
     stepVal: 0,
+    formModel: null,
     set setMethod(method) {
         this.method = method;
     },
@@ -56,12 +57,15 @@ app.state = {
     get focusAreaState() {
         return this.focusArea;
     },
+    get getFormModel() {
+        return this.formModel;
+    },
     get saveState() {
         return {
             method: this.method,
-            focusArea: this.focusAreaState,
+            focusArea: this.focusArea,
             nav: this.nav,
-            step: this.step,
+            step: this.stepVal,
         }
     }
 }

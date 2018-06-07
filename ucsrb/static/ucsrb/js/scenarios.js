@@ -43,23 +43,23 @@ var madrona = {
         });
         */
         submitForm = function($form) {
-            //var $form = $(this).closest('.panel').find('form'),
+            // var $form = $(this).closest('.panel').find('form'),
             var url = $form.attr('action'),
-                $bar = $form.closest('.tab-pane').find('.bar'),
-                data = new FormData(),
-                barTimer;
+                // $bar = $form.closest('.tab-pane').find('.bar'),
+                data = new FormData();
+                // barTimer;
 
             //progress bar
-            barTimer = setInterval(function () {
-                var width = parseInt($bar.css('width').replace('px', ''), 10) + 5,
-                    barWidth = parseInt($bar.parent().css('width').replace('px',''), 10);
-
-                if (width < barWidth) {
-                    $bar.css('width', width + "px");
-                } else {
-                    clearInterval(barTimer);
-                }
-            }, 500);
+            // barTimer = setInterval(function () {
+            //     var width = parseInt($bar.css('width').replace('px', ''), 10) + 5,
+            //         barWidth = parseInt($bar.parent().css('width').replace('px',''), 10);
+            //
+            //     if (width < barWidth) {
+            //         $bar.css('width', width + "px");
+            //     } else {
+            //         clearInterval(barTimer);
+            //     }
+            // }, 500);
 
             app.checkboxes = {};
             $form.find('input,select,textarea').each( function(index, input) {
@@ -96,7 +96,7 @@ var madrona = {
             app.viewModel.scenarios.scenarioForm(false);
             app.viewModel.scenarios.loadingMessage("Creating Design");
 
-            $.ajax( {
+            $.ajax({
                 url: url,
                 data: data,
                 cache: false,
@@ -109,13 +109,13 @@ var madrona = {
                     app.panel.results.init(result['X-Madrona-Show']);
                     app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
                     app.viewModel.scenarios.loadingMessage(false);
-                    clearInterval(barTimer);
+                    // clearInterval(barTimer);
                     // app.viewModel.scenarios.loadCollectionsFromServer();
                     console.log(`%c form submitted: %o`, 'color: green;', result);
                 },
                 error: function(result) {
                     app.viewModel.scenarios.loadingMessage(null);
-                    clearInterval(barTimer);
+                    // clearInterval(barTimer);
                     if (result.status === 400) {
                         $('#'+app.viewModel.currentTocId()+'-scenario-form > div').append(result.responseText);
                         app.viewModel.scenarios.scenarioForm(true);
@@ -1264,6 +1264,7 @@ function scenariosModel(options) {
                 self.scenarioFormModel = new scenarioFormModel;
                 app.viewModel.scenarios.scenarioFormModel = new scenarioFormModel();
                 var model = app.viewModel.scenarios.scenarioFormModel;
+                app.state.formModel = model;
                 try {
                   var form_id = app.viewModel.currentTocId()+'-scenario-form';
                   ko.applyBindings(self.scenarioFormModel, document.getElementById(form_id).children[0]);
@@ -1535,9 +1536,6 @@ function scenariosModel(options) {
                               //    and adjust if necessary
                               scenario.scenarioAttributes(result.attributes);
                             }
-                            setTimeout(function(){
-                              $('#loading-modal').modal('hide');
-                            }, 500)
                         },
                         error: function (result) {
                             $('#loading-modal').modal('hide');
@@ -1604,7 +1602,9 @@ function scenariosModel(options) {
                         self.zoomToScenario(scenario);
                     }
                 }
-                $('#loading-modal').modal('hide');
+                setTimeout(function(){
+                  $('#loading-modal').modal('hide');
+                }, 1500)
             },
             error: function(result) {
                 $('#loading-modal').modal('hide');
@@ -1613,7 +1613,6 @@ function scenariosModel(options) {
             }
         });
 
-        $('#loading-modal').modal('hide');
     }; // end addScenarioToMap
 
     self.alphabetizeByName = function(a, b) {

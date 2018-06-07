@@ -228,6 +228,11 @@
 
     <div class="wizard_nav">
         <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+            {% if user.is_authenticated %}
+                <div class="alert alert-danger" role="alert">
+                    <button id="subnav-sign-in-modal" type="button" class="results-nav-item col nav-item button-modal btn btn-link red {% if user.is_authenticated %}hide{% endif %}" data-toggle="modal" data-target="#login-modal"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_user_grey.svg' %}" /></i> create account first to save evaluation</button>
+                </div>
+            {% endif %}
             <div class="btn-group" role="group" aria-label="cancel">
                 <a href="#" class="cancel_button btn btn-light"><span>Cancel</span></a>
             </div>
@@ -235,7 +240,7 @@
                 <a href="#" class="button btn btn-outline-primary" onclick="this.blur(); return false;" id="button_prev"><span>&lt; Previous</span></a>
                 <a href="#" class="button btn btn-outline-primary ml-auto"  onclick="this.blur(); return false;" id="button_next"><span>Next &gt;</span></a>
                 {% if user.is_authenticated %}
-                    <a href="#" class="submit_button button btn btn-primary" onclick="this.blur(); return false;"><span>Evaluate</span></a>
+                  <a href="#" class="submit_button button btn btn-primary" onclick="this.blur(); return false;"><span>Evaluate</span></a>
                 {% else %}
                     <a href="#" class="submit_button button btn btn-primary" onclick="this.blur(); return false;"><span>Save</span></a>
                 {% endif %}

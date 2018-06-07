@@ -393,6 +393,12 @@ app.nav = {
     showSave: function() {
         document.getElementById('nav-anon-save').classList.remove('d-none');
     },
+    saveElement: function() {
+        return document.getElementById('nav-anon-save');
+    },
+    showAnonSave: function() {
+        document.getElementById('subnav-sign-in-modal').classList.remove('d-none');
+    },
     hideSave: function() {
         document.getElementById('nav-anon-save').classList.add('d-none');
     },

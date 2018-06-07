@@ -380,7 +380,7 @@ var snapInteraction = new ol.interaction.Snap({source: drawSource});
 var modifyInteraction = new ol.interaction.Modify({source: drawSource});
 
 app.map.draw = {
-  maxAcres: 5000,
+  maxAcres: 100000,
   source: drawSource,
   draw: drawInteraction,
   snap: snapInteraction,
@@ -529,8 +529,8 @@ app.map.layer = {
     },
     pourpoints: {
       layer: new ol.layer.VectorTile({
-        name: 'PourPoints',
-        title: 'PourPoints',
+        name: 'Gauging Station',
+        title: 'Gauging Station',
         id: 'pourpoints',
         source: new ol.source.VectorTile({
           attributions: 'Ecotrust',

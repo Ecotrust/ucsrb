@@ -634,6 +634,10 @@ main {
         width: 1rem;
     }
 
+#loading-modal .modal-header {
+    justify-content: space-around;
+}
+
 /**
  * =========================================================================
     Panel

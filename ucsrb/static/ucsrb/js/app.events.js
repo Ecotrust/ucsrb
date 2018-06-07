@@ -26,6 +26,7 @@ $(document).ready(function() {
         })
         event.target.classList.add('active');
         app.nav.showStartOver();
+        app.nav.showAnonSave();
 
         // next set of page guide
         pageguideOne.close()
@@ -83,9 +84,9 @@ $(document).ready(function() {
 
     $('#nav-anon-save').on('click', function(event) {
         var reqData = {
-            'Scenario Name': app.viewModel.scenarios.scenarioFormModel.lastChange,
+            'Scenario Name': app.state.formModel.lastChange,
             'Scenario Type': app.state.getMethod,
-            'filters': app.viewModel.scenarios.scenarioFormModel.filters,
+            'filters': app.state.formModel.filters,
         }
         app.request.saveIntermediateScenario(reqData);
     });
