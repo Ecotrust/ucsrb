@@ -179,3 +179,9 @@ app.map.selection.setSelect = function(selectionInteraction) {
 };
 
 app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
+
+app.forestUnitSelection = function() {
+  $('.forest-unit-dropdown').on('click', function() {
+    console.log('yo');
+  });
+};

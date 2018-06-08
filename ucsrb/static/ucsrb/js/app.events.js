@@ -82,6 +82,12 @@ $(document).ready(function() {
         }
     });
 
+    /**
+     * [description]
+     * @method
+     * @param  {[type]} event [description]
+     * @return {[type]}       [description]
+     */
     $('#nav-anon-save').on('click', function(event) {
         var reqData = {
             'Scenario Name': app.state.formModel.lastChange,
@@ -91,7 +97,12 @@ $(document).ready(function() {
         app.request.saveIntermediateScenario(reqData);
     });
 
-    // Check if unsaved work and ask user before it is lost
+    /**
+     * [Check if unsaved work and ask user before it is lost]
+     * @method
+     * @param  {[type]} event [description]
+     * @return {[type]}       [description]
+     */
     $('header').on('click', function(event) {
         console.log('navigated to %o', event.target);
         if (app.viewModel.scenarios.scenarioForm()) {

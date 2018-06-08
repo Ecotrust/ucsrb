@@ -74,6 +74,7 @@ app.init = {
     'filter': function() {
         setInit();
         app.map.selection.setSelect(app.map.selection.selectFilterSingleClick);
+        app.forestUnitSelection();
         // app.map.enableLayer('huc12');
         scenario_type_selection_made('filter');
     },
@@ -440,12 +441,27 @@ app.nav = {
                 <div class="dropdown show">
                     <button class="btn btn-sm dropdown-toggle" type="button" id="forestUnit" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select unit</button>
                     <div class="dropdown-menu show forest-unit-dropdown" aria-labelledby="forestUnit">
-                        <button class="dropdown-item" type="button" onclick="app.map.toggleLayer('huc10')">HUC 10</button>
-                        <button class="dropdown-item" type="button" onclick="app.map.toggleLayer('huc12')">HUC 12</button>
-                        <button class="dropdown-item" type="button">RMU</button>
+                        <div id="forest-listener">
+                            <button class="dropdown-item" type="button" data-layer="huc10">HUC 10</button>
+                            <button class="dropdown-item" type="button" data-layer="huc12">HUC 12</button>
+                        </div>
                     </div>
                 </div>
-            </div>`,
+            </div>
+            <script>
+                (function() {
+                    $('#forest-listener button').click(function(event) {
+                        event.preventDefault();
+                        $('#forest-listener').children().each(function(i) {
+                            if ($(this)[0].dataset.layer !== event.target.dataset.layer) {
+                                app.map.disableLayer($(this)[0].dataset.layer);
+                            }
+                        });
+                        var eventLayer = event.target.dataset.layer;
+                        app.map.toggleLayer(eventLayer);
+                    });
+                })();
+            </script>`,
             'Select forest unit to filter',
             'Select filters to narrow your treatment area',
         ],
