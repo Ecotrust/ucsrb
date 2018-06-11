@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block site_style %}
+ {{ block.super }}
+ <link rel="stylesheet" href="{% static 'ucsrb/css/landing-layout.css' %}"/>
+ <link rel="stylesheet" href="{% static 'ucsrb/css/landing-mq.css' %}"/>
+{% endblock site_style %}
+
+{% block body_class %}page{% endblock body_class %}
+
+{% block content %}
+
+
+<section class="page">
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col"></div>
+            <div class="col"></div>
+        </div>
+        <div class="row">
+            Methods
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block outer_content %}
+
+{% endblock outer_content %}

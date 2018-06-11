@@ -139,9 +139,7 @@ app.map.styles = {
     }),
     'Boundary': new ol.style.Style({
       stroke: new ol.style.Stroke({
-        color: 'rgba(120,120,120,0.5)',
-        lineCap: 'cap',
-        lineJoin: 'miter',
+        color: 'rgba(58,86,117,0.75)',
         width: 1
       }),
       fill: new ol.style.Fill({
@@ -234,7 +232,7 @@ app.map.setBoundaryLayer = function(layer) {
   app.map.boundary = new ol.filter.Mask({
     feature: layer.getSource().getFeatureById('bound'),
     inner: false,
-    fill: new ol.style.Fill({color:[46, 48, 47,0.28]})
+    fill: new ol.style.Fill({color:[58,86,117,0.35]})
   });
   layer.addFilter(app.map.boundary);
   app.map.boundary.set('active', true);

@@ -36,6 +36,18 @@ def home(request):
     context['title'] = 'UCSRB'
     return HttpResponse(template.render(context, request))
 
+def help(request):
+    template = loader.get_template('ucsrb/help.html')
+    context = accounts_context()
+    context['title'] = 'UCSRB Terms Defined'
+    return HttpResponse(template.render(context, request))
+
+def methods(request):
+    template = loader.get_template('ucsrb/methods.html')
+    context = accounts_context()
+    context['title'] = 'UCSRB Methods'
+    return HttpResponse(template.render(context, request))
+
 def app(request):
     template = loader.get_template('ucsrb/app.html')
     context = accounts_context()

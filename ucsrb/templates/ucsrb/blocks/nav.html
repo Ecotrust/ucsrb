@@ -9,8 +9,8 @@
             {% if 'app' not in request.path %}
                 <a href="/app/" class="dropdown-item list-group-item list-group-item-action">Launch App</a>
             {% endif %}
-            <a href="" class="dropdown-item list-group-item list-group-item-action">Terms Defined</a>
-            <a href="" class="dropdown-item list-group-item list-group-item-action">Tutorial</a>
+            <a href="{% url 'help' %}" class="dropdown-item list-group-item list-group-item-action">Help</a>
+            <a href="{% url 'methods' %}" class="dropdown-item list-group-item list-group-item-action">Methods</a>
             {% if user.is_authenticated %}
                 <a href="/account/" class="dropdown-item list-group-item list-group-item-action">Manage Account</a>
                 <button id="sign-out" data-action="sign-out" class="dropdown-item list-group-item list-group-item-action">Sign out</button>

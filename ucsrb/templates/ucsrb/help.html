@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block site_style %}
+ {{ block.super }}
+ <link rel="stylesheet" href="{% static 'ucsrb/css/landing-layout.css' %}"/>
+ <link rel="stylesheet" href="{% static 'ucsrb/css/landing-mq.css' %}"/>
+{% endblock site_style %}
+
+{% block body_class %}page{% endblock body_class %}
+
+{% block content %}
+
+
+<section class="page">
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col"></div>
+            <div class="col"></div>
+        </div>
+        <div class="row">
+            Information icon gives you overlay on how the results were determined (below).
+            Menu allows you to switch data views.
+            Startover takes you to Frame 2 (prompt to save first).
+            Region info reduced and available only as overlay when region is selected.
+            “Download” prompts you to save pdf of full results.
+            Select region or pour point for more data.
+            Forest Types
+                Dry Forests: Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna Dry Forests: Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna
+                Dry Forests: Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna Forest TypesDry Forests: Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna
+                Dry Forests: Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna Dry Forests: Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block outer_content %}
+
+{% endblock outer_content %}
