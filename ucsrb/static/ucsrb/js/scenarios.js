@@ -1,6 +1,11 @@
 
 var madrona = {
     onShow: function(callback) { callback(); },
+    resetState: function() {
+        app.state.step = 'reset'; // starts app steps for nav, panel, and instructions
+        app.viewModel.scenarios.reset({cancel: true});
+        app.state.step = 0; // go back to step zero
+    },
     setupForm: function($form) {
         //var submitted = false;
 
@@ -13,9 +18,7 @@ var madrona = {
         });
 
         $form.closest('.panel').on('click', '.cancel_button', function(e) {
-            app.state.step = 'reset'; // starts app steps for nav, panel, and instructions
-            app.viewModel.scenarios.reset({cancel: true});
-            app.state.step = 0; // go back to step zero
+            madrona.resetState();
         });
 
         $form.closest('.panel').on('click', '.submit_button', function(e) {

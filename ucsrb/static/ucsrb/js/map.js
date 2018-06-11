@@ -139,10 +139,10 @@ app.map.styles = {
     }),
     'Boundary': new ol.style.Style({
       stroke: new ol.style.Stroke({
-        color: '#000',
+        color: 'rgba(120,120,120,0.5)',
         lineCap: 'cap',
         lineJoin: 'miter',
-        width: 3
+        width: 1
       }),
       fill: new ol.style.Fill({
         color: 'rgba(0,0,0,0)'
@@ -222,7 +222,7 @@ app.map.setBoundaryLayer = function(layer) {
   if (app.map.boundary) {
     layer.removeFilter(app.map.boundary);
   }
-  feat = false; //Get feat from layer
+  // feat = layer.getSource().getFeatureById('bound'); //Get feat from layer
   /*
     This would require switching the boundary layer to be a vector layer (not vector tile layer)
     Getting the feature could either be done by saving the the boundary as geojson locally, or getting
@@ -230,13 +230,14 @@ app.map.setBoundaryLayer = function(layer) {
     https://www.mapbox.com/api-documentation/#retrieve-features-from-mapbox-editor-projects
     ~ RDH 4/20/2018
   */
-  app.map.boundary = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[0,0,0,0.6]})});
+
+  app.map.boundary = new ol.filter.Mask({
+    feature: layer.getSource().getFeatureById('bound'),
+    inner: false,
+    fill: new ol.style.Fill({color:[46, 48, 47,0.28]})
+  });
   layer.addFilter(app.map.boundary);
   app.map.boundary.set('active', true);
-}
-
-app.map.removeBoundary = function() {
-  app.map.boundary.set('active', false);
 }
 
 setFilter = function(feat, layer) {
@@ -497,17 +498,23 @@ app.map.layer = {
       })
     },
     boundary: {
-      layer: new ol.layer.VectorTile({
+      // layer: new ol.layer.VectorTile({
+      layer: new ol.layer.Vector({
         name: 'Upper Columbia Boundary',
         title: 'Upper Columbia Boundary',
         id: 'boundary',
-        source: new ol.source.VectorTile({
+        // source: new ol.source.VectorTile({
+        source: new ol.source.Vector({
           attributions: 'Ecotrust',
-          format: new ol.format.MVT(),
-          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['western_uc_bnd-3eremu'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
+          // format: new ol.format.MVT(),
+          // url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['western_uc_bnd-3eremu'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
+          format: new ol.format.GeoJSON({
+            dataProjection: 'EPSG:4326',
+            featureProjection: 'EPSG:4326'
+          }),
+          url: '/static/ucsrb/data/ucsrb_bounds.geojson',
         }),
         style: app.map.styles.Boundary,
-        visible: false,
       })
     },
     streams: {
@@ -641,7 +648,6 @@ overlays.each(function() {
 });
 
 app.map.forestFilterOverlays = {}
-
 
 app.map.enableLayer = function(layerName) {
   app.map.layer[layerName].layer.setVisible(true);

@@ -45,7 +45,7 @@ baseInit = function() {
     app.map.closePopup();
     app.map.draw.disable();
     app.map.popupLock = false;
-    // app.map.setBoundaryLayer(app.map.layer.boundary.layer);
+    app.map.setBoundaryLayer(app.map.layer.boundary.layer);
 }
 
 setInit = function() {
@@ -74,7 +74,6 @@ app.init = {
     'filter': function() {
         setInit();
         app.map.selection.setSelect(app.map.selection.selectFilterSingleClick);
-        app.forestUnitSelection();
         // app.map.enableLayer('huc12');
         scenario_type_selection_made('filter');
     },

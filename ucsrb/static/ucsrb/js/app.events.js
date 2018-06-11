@@ -9,6 +9,11 @@ $(document).ready(function() {
       $('[data-toggle="tooltip"]').tooltip()
     });
 
+    // set init mask of watershed
+    window.setTimeout(function() {
+      app.map.setBoundaryLayer(app.map.layer.boundary.layer)
+  }, 100);
+
     // Set initial panel content
     app.nav.stepActions.initial = app.panel.getPanelContentElement.innerHTML;
 
