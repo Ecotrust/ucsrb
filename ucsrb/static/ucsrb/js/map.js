@@ -124,19 +124,27 @@ app.map.styles = {
             zIndex: 3
         });
     },
-    'PourPoint': new ol.style.Style({
+    'PourPoint': function(feature, resolution) {
+      var radius = 10;
+      if (resolution < 5) {
+          radius = 14;
+      } else if (resolution < 40) {
+          radius = 12;
+      }
+      return new ol.style.Style({
         image: new ol.style.Circle({
-            radius: 10,
+            radius: radius,
             fill:  new ol.style.Fill({
                 color: '#ffffff'
             }),
             stroke: new ol.style.Stroke({
                 color: '#aaffff',
-                width: 5,
+                width: 3,
             }),
         }),
-        zIndex: 5
-    }),
+        zIndex: 6
+      });
+    },
     'Boundary': new ol.style.Style({
       stroke: new ol.style.Stroke({
         color: 'rgba(58,86,117,0.75)',
@@ -168,16 +176,21 @@ app.map.styles = {
     })
 };
 
-
 /**
-* Map - Layers, Sources, Features
-*/
-
+ * [Map - Layers, Sources, Features]
+ * @type {Object}
+ */
 app.mapbox.layers = {
-  'demo_routed_streams-12s94p': {
-    id: 'ucsrbsupport.5t2cnpoc',
+  /**
+   * [layers from mapbox]
+   * @type {String} [use layer name from mapbox. layer name used in confirmSelection() to find layer]
+   */
+  'strm_sgmnts_all6-11-0i3yy4': {
+    id: 'ucsrbsupport.ba73w0bq',
     id_field: 'EtID',
     name_field: 'Name',
+    ppt_ID: 'ppt_ID',
+    NEAR_FID: 'NEAR_FID',
     name: 'Streams',
     report_methods: ['select'],
     map_layer_id: 'streams'
@@ -198,10 +211,10 @@ app.mapbox.layers = {
     report_methods: ['filter'],
     map_layer_id: 'huc12'
   },
-  'Pour_points_3857-83a1zv': {
-    id: 'ucsrbsupport.7cqwgmiz',
-    id_field: 'OBJECTID',
-    name_field: 'g_name',
+  'ppts_all6-11-2mwii2': {
+    id: 'ucsrbsupport.cgxp2slx',
+    id_field: 'ppt_ID',
+    // name_field: 'g_name',
     name: 'Pour Points',
     report_methods: ['select'],
     map_layer_id: 'pourpoints'
@@ -216,19 +229,16 @@ app.mapbox.layers = {
   }
 };
 
+/**
+ * [Set basin boundary]
+ * @method
+ * @param  {[type]} layer [description]
+ * @return {[type]}       [description]
+ */
 app.map.setBoundaryLayer = function(layer) {
   if (app.map.boundary) {
     layer.removeFilter(app.map.boundary);
   }
-  // feat = layer.getSource().getFeatureById('bound'); //Get feat from layer
-  /*
-    This would require switching the boundary layer to be a vector layer (not vector tile layer)
-    Getting the feature could either be done by saving the the boundary as geojson locally, or getting
-    it from MapBox. Here's an API call to get just the feature:
-    https://www.mapbox.com/api-documentation/#retrieve-features-from-mapbox-editor-projects
-    ~ RDH 4/20/2018
-  */
-
   app.map.boundary = new ol.filter.Mask({
     feature: layer.getSource().getFeatureById('bound'),
     inner: false,
@@ -238,11 +248,18 @@ app.map.setBoundaryLayer = function(layer) {
   app.map.boundary.set('active', true);
 }
 
+/**
+ * [Mask for focus area selection]
+ * @method
+ * @param  {[type]} feat  [description]
+ * @param  {[type]} layer [description]
+ * @return {[type]}       [description]
+ */
 setFilter = function(feat, layer) {
   if (app.map.mask) {
     layer.removeFilter(app.map.mask);
   }
-  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[0,0,0,0.6]})});
+  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[58,86,117,0.35]})});
   layer.addFilter(app.map.mask);
   app.map.mask.set('active', true);
   app.map.zoomToExtent(feat.getGeometry().getExtent());
@@ -253,15 +270,15 @@ removeFilter = function() {
 }
 
 confirmationReceived = function() {
-  if (app.state.stepVal < 1 || app.state.stepVal == 'reset') {
-    app.state.step = 1;
-  } else if (app.state.stepVal == 2) {
+  if (app.state.step < 1 || app.state.step == 'reset') {
+    app.state.setStep = 1;
+  } else if (app.state.step == 2) {
     // if already on step 2 then a new pourpoint has been selected
     // we need to the reset the filter form and then go back to step 2
-    app.state.step = 'reset';
-    app.state.step = 2;
+    app.state.setStep = 'reset';
+    app.state.setStep = 2;
   } else {
-    app.state.step = 2;
+    app.state.setStep = 2;
   }
   closeConfirmSelection(true);
 }
@@ -275,42 +292,22 @@ app.map.closePopup = function() {
   app.map.popup=false;
 }
 
-confirmSelection = function(feat, markup, vector) {
-  mbLayer = app.mapbox.layers[feat.getProperties().layer];
-  layer = app.map.layer[mbLayer.map_layer_id];
-  features = (new ol.format.GeoJSON()).readFeatures(vector, {
+confirmSelection = function(feat, vector) {
+  console.log(feat.getProperties());
+  var mbLayer = app.mapbox.layers[feat.getProperties().layer];
+  var layer = app.map.layer[mbLayer.map_layer_id];
+  var features = (new ol.format.GeoJSON()).readFeatures(vector, {
     dataProjection: 'EPSG:3857',
     featureProjection: 'EPSG:3857'
   });
+  console.log(features);
+  var feature = features[0];
   if (app.state.method == 'select') {
     // hack for when we have no ppt basins and default to HUC 12.
-    setFilter(features[0], app.map.layer.pourpoints.layer);
+    setFilter(feature, app.map.layer.pourpoints.layer);
   } else {
-    setFilter(features[0], layer.layer);
+    setFilter(feature, layer.layer);
   }
-  // app.map.popupLock = true;
-  // app.map.closePopup();
-  // app.map.popup = new ol.Overlay({
-    // element: document.getElementById('popup')
-  // });
-  // var element = app.map.popup.getElement();
-  // app.map.addOverlay(app.map.popup);
-  // extent = feat.getExtent();
-  // coordinate = [(extent[0]+extent[2])/2, (extent[1]+extent[3])/2];
-  // app.map.popup.setPosition(coordinate);
-  // var unit_type = mbLayer.name;
-  // var unit_name = feat.get(mbLayer.name_field);
-  // var title = unit_type + ': ' + unit_name + '&nbsp<button class="btn btn-danger" type="button" onclick="closeConfirmSelection(false);">&times;</button>';
-
-  // $(element).popover({
-  //   'placement': 'top',
-  //   'animation': false,
-  //   'html': true,
-  //   'content': markup,
-  //   'container': element,
-  //   'title': title
-  // });
-  // $(element).popover('show');
 }
 
 closeConfirmSelection = function(accepted) {
@@ -332,15 +329,14 @@ generateFilterPopup = function(content) {
 }
 
 focusAreaSelectAction = function(feat) {
-  if (app.state.stepVal < 1) {
-    app.state.step = 1; // step forward in state
+  if (app.state.step < 1) {
+    app.state.setStep = 1; // step forward in state
   }
   var layer = app.map.selection.select.getLayer(feat).get('id');
   app.request.get_focus_area(feat, layer, function(feat, vector) {
     if (feat){
-      markup = generateFilterPopup('<p>Find harvest locations within this watershed?</p>');
-      confirmSelection(feat, markup, vector);
-      confirmationReceived();
+      confirmSelection(feat, vector);
+      // confirmationReceived();
     }
   });
 };
@@ -349,23 +345,19 @@ streamSelectAction = function(feat) {
   if (app.scenarioInProgress()) {
     app.map.mask.set('active', false);
     app.viewModel.scenarios.reset({cancel: true});
-    app.state.step = 0; // go back to step one
+    app.state.setStep = 0; // go back to step one
   }
-  app.map.enableLayer('pourpoints');
-  app.map.zoomToExtent(feat.getExtent());
-  if (app.state.stepVal < 1) {
-    app.state.step = 1; // step forward in state
-  }
+  pourPointSelectAction(feat);
+  // app.map.enableLayer('pourpoints');
 };
 
 pourPointSelectAction = function(feat, selectEvent) {
   app.request.get_basin(feat, function(feat, vector) {
     if (feat) {
-      markup = generateFilterPopup('<p>Find harvest locations within this basin?</p>');
-      confirmSelection(feat, markup, vector);
+      confirmSelection(feat, vector);
     }
-    if (app.state.stepVal < 2) {
-      app.state.step = 2; // step forward in state
+    if (app.state.step < 2) {
+      app.state.setStep = 2; // step forward in state
     }
   });
 };
@@ -416,8 +408,8 @@ app.map.draw = {
 };
 
 app.map.draw.draw.on('drawstart', function(e) {
-  if (app.state.stepVal == 0) {
-    app.state.step = 1;
+  if (app.state.step == 0) {
+    app.state.setStep = 1;
   }
 
   /** @type {ol.Coordinate|undefined} */
@@ -500,7 +492,7 @@ app.map.layer = {
       layer: new ol.layer.Vector({
         name: 'Upper Columbia Boundary',
         title: 'Upper Columbia Boundary',
-        id: 'boundary',
+        id: 'boundary', // set id equal to x in app.map.layer.x
         // source: new ol.source.VectorTile({
         source: new ol.source.Vector({
           attributions: 'Ecotrust',
@@ -519,15 +511,15 @@ app.map.layer = {
       layer: new ol.layer.VectorTile({
         name: 'Streams',
         title: 'Streams',
-        id: 'streams',
+        id: 'streams', // set id equal to x in app.map.layer.x
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
           format: new ol.format.MVT(),
-          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['demo_routed_streams-12s94p'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
+          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['strm_sgmnts_all6-11-0i3yy4'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.Streams,
         visible: false,
-        renderBuffer: 500,
+        renderBuffer: 300,
         // declutter: true
       }),
       selectAction: streamSelectAction
@@ -536,16 +528,17 @@ app.map.layer = {
       layer: new ol.layer.VectorTile({
         name: 'Gauging Station',
         title: 'Gauging Station',
-        id: 'pourpoints',
+        id: 'pourpoints', // set id equal to x in app.map.layer.x
         source: new ol.source.VectorTile({
           attributions: 'Ecotrust',
-          format: new ol.format.MVT(),
-          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['Pour_points_3857-83a1zv'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
+          format: new ol.format.GeoJSON(),
+          url: '/static/ucsrb/data/ppts_all.geojson',
         }),
         style: app.map.styles.PourPoint,
         visible: false,
-        renderBuffer: 500
-        // declutter: true
+        renderBuffer: 50,
+        minResolution: 1,
+        maxResolution: 45,
       }),
       selectAction: pourPointSelectAction
     },
@@ -553,7 +546,7 @@ app.map.layer = {
       layer: new ol.layer.VectorTile({
         name: 'HUC 10',
         title: 'HUC 10',
-        id: 'huc10',
+        id: 'huc10', // set id equal to x in app.map.layer.x
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
           format: new ol.format.MVT(),
@@ -569,7 +562,7 @@ app.map.layer = {
       layer: new ol.layer.VectorTile({
         name: 'HUC 12',
         title: 'HUC 12',
-        id: 'huc12',
+        id: 'huc12', // set id equal to x in app.map.layer.x
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
           format: new ol.format.MVT(),

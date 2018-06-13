@@ -9,7 +9,7 @@ var app = {
         app.init[method]();
     },
     scenarioInProgress: function() {
-        if (app.state.stepVal === 0 || app.state.method === 'reset') {
+        if (app.state.step === 0 || app.state.method === 'reset') {
             return false;
         } else {
             return true;
@@ -56,7 +56,7 @@ setInit = function() {
     app.map.clearLayers();
     app.map.enableLayer('boundary');
 
-    app.state.step = 0;
+    app.state.setStep = 0;
     app.map.layer.draw.layer.getSource().clear();
 };
 
@@ -159,7 +159,7 @@ app.panel = {
             app.panel.moveLeft();
             if (app.state.nav !== 'short') {
                 app.state.navHeight = 'short';
-                app.state.step = 'results';
+                app.state.setStep = 'results';
             }
             if (!id) {
                 id = app.viewModel.scenarios.scenarioList()[0].uid;
@@ -694,8 +694,9 @@ app.request = {
     * @return {[GeoJSON]} drainage basin
     */
     get_basin: function(feature, callback) {
-        var pp_id = feature.getProperties().OBJECTID;
+        var pp_id = feature.getProperties().ppt_ID;
         app.map.selectedFeature = feature;
+        console.log(pp_id);
         return $.ajax({
             url: '/ucsrb/get_basin',
             data: {

@@ -12,32 +12,44 @@ app.state = {
         id: null
     },
     nav: 'tall',
-    stepVal: 0,
+    step: 0,
     formModel: null,
     set setMethod(method) {
         this.method = method;
     },
     set navHeight(height) {
+        // set state height value
         this.nav = height;
+
         if (height === 'short') {
+            // set nav to befinning height
             app.nav.short();
         } else if (height === 'tall') {
+            // set nav to use small icons and reduce height
             app.nav.short();
         }
     },
     set instructions(instruction) {
         $('#instruction').html(instruction);
     },
-    set step(step) {
-        this.stepVal = step;
-        if (app.nav.stepActions[step]) {
-            app.nav.stepActions[step]();
-        } else if (app.nav.stepActions[app.state.getMethod][step]) {
-            app.nav.stepActions[app.state.getMethod][step]();
+    set setStep(val) {
+        // set state step value
+        this.step = val;
+
+        // update navigation based on step
+        // reset, initial, ...
+        if (app.nav.stepActions[val]) {
+            app.nav.stepActions[val]();
+        // select, filter, ...
+        } else if (app.nav.stepActions[app.state.getMethod][val]) {
+            app.nav.stepActions[app.state.getMethod][val]();
         }
+
+        // update instructions content based on step
         if (app.state.getMethod.length > 0) {
-            app.state.instructions = app.nav.instructions[app.state.getMethod][step];
+            app.state.instructions = app.nav.instructions[app.state.getMethod][val];
         }
+
         //TODO: Recognize and trigger filtering/drawing steps.
     },
     set setFocusArea(focusAreaObject) {
@@ -65,7 +77,7 @@ app.state = {
             method: this.method,
             focusArea: this.focusArea,
             nav: this.nav,
-            step: this.stepVal,
+            step: this.step,
         }
     }
 }

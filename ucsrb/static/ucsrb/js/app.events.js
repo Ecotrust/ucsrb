@@ -21,10 +21,10 @@ $(document).ready(function() {
         app.setState(event.currentTarget.dataset.method);
         // changing the method, so filter form needs to be cleared for new query
         if ($(this).parents('#process-nav').length > 0) {
-            app.state.step = 'reset';
+            app.state.setStep = 'reset';
             app.viewModel.scenarios.reset({cancel: true});
             app.state.navHeight = 'short';
-            app.state.step = 0;
+            app.state.setStep = 0;
         }
         $('.method-nav button').each(function() {
             $(this).removeClass('active');

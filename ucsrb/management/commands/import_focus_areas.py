@@ -98,7 +98,7 @@ class Command(BaseCommand):
             if in_type == 'RMU':
                 id_field = None
             if in_type == 'PourPoint':
-                id_field = None
+                id_field = 'ppt_ID'
 
             if not id_field:
                 self.stdout.write('--- ERROR: ID Field unknown. Check your file type argument. ---')
@@ -136,7 +136,7 @@ class Command(BaseCommand):
                     unit_type = in_type,
                     unit_id = str(unit_id),
                     description = description,
-                    geometry = multiGeometry
+                    geometry = multiGeometry,
                 )
                 import_count += 1
 

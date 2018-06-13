@@ -2,9 +2,9 @@
 var madrona = {
     onShow: function(callback) { callback(); },
     resetState: function() {
-        app.state.step = 'reset'; // starts app steps for nav, panel, and instructions
+        app.state.setStep = 'reset'; // starts app steps for nav, panel, and instructions
         app.viewModel.scenarios.reset({cancel: true});
-        app.state.step = 0; // go back to step zero
+        app.state.setStep = 0; // go back to step zero
     },
     setupForm: function($form) {
         //var submitted = false;
