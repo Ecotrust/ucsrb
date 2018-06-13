@@ -338,7 +338,7 @@ focusAreaSelectAction = function(feat) {
   app.request.get_focus_area(feat, layer, function(feat, vector) {
     if (feat){
       confirmSelection(feat, vector);
-      // confirmationReceived();
+      confirmationReceived();
     }
   });
 };

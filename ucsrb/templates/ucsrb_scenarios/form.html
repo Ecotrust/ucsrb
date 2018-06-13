@@ -228,7 +228,7 @@
 
     <div class="wizard_nav">
         <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
-            {% if user.is_authenticated %}
+            {% if not user.is_authenticated %}
                 <div class="alert alert-danger" role="alert">
                     <button id="subnav-sign-in-modal" type="button" class="results-nav-item col nav-item button-modal btn btn-link red {% if user.is_authenticated %}hide{% endif %}" data-toggle="modal" data-target="#login-modal"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_user_grey.svg' %}" /></i> create account first to save evaluation</button>
                 </div>

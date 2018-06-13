@@ -46,7 +46,11 @@ app.state = {
         }
 
         // update instructions content based on step
-        if (app.state.getMethod.length > 0) {
+        // reset, initial, ...
+        if (app.nav.instructions[val]) {
+            app.state.instructions = app.nav.instructions[val];
+        // select, filter, ...
+        } else if (app.nav.instructions[app.state.getMethod][val]) {
             app.state.instructions = app.nav.instructions[app.state.getMethod][val];
         }
 

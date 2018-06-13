@@ -430,6 +430,7 @@ app.nav = {
     instructions: {
         initial: `<h2 class="mx-auto w-50 text-center">Start by deciding how you want <br/>to interact with the map</h2>`,
         reset: `Decide how you want to interact with the map`,
+        result: 'Explore evaluation results',
         select: [
             'Zoom in and select a stream segment to evaluate changes in flow',
             'select one of the highlighted pour points to evaluate changes in flow associated with management activity upstream',
@@ -466,7 +467,7 @@ app.nav = {
         ],
         draw: [
             'Zoom in to area of interest or use the geocoder to search for places by name.<br />Click on the map to start drawing the boundary of your management area.',
-            'Add additional points then double-click to finish; Re-select point to edit'
+            'Add additional points then double-click to finish; Re-select point to edit',
         ],
     },
     stepActions: {
@@ -475,7 +476,6 @@ app.nav = {
             app.panel.getPanelContentElement.innerHTML = app.nav.stepActions.initial;
             app.panel.moveRight();
             app.nav.hideSave();
-            app.nav.instructions.reset
             app.map.geoSearch.closeSearchBox();
             if (app.map.mask) {
                 app.map.mask.set('active', false);
@@ -737,7 +737,7 @@ app.request = {
             data: {
                 drawing: featureJson,
                 // TODO: Set name/description with form
-                name: 'foo',
+                name: 'drawing',
                 description: null
             },
             dataType: 'json',
@@ -745,6 +745,7 @@ app.request = {
             success: function(response) {
                 console.log(`%csuccess: saved drawing`, 'color: green');
                 app.map.draw.disable();
+                app.state.setStep = 'result'; // go to results
                 var vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
                     dataProjection: 'EPSG:3857',
                     featureProjection: 'EPSG:3857'
