@@ -159,10 +159,10 @@ app.map.styles = {
     }),
     'Draw': new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [92,115,82,0.4]
+        color: [103,184,198,0.4]
       }),
       stroke: new ol.style.Stroke({
-        color: [92,115,82,0.7],
+        color: [103,184,198,0.8],
         width: 2
       }),
       image: new ol.style.Circle({
@@ -174,7 +174,7 @@ app.map.styles = {
           color: [92,115,82,0.5]
         })
       }),
-      zIndex: 4
+      zIndex: 2
     })
 };
 
@@ -487,7 +487,7 @@ app.map.layer = {
     draw: {
       layer: new ol.layer.Vector({
         source: app.map.draw.source,
-        style: app.map.styles.Draw
+        style: app.map.styles.Draw,
       })
     },
     boundary: {
@@ -673,7 +673,19 @@ app.map.clearLayers = function() {
 }
 
 app.map.addScenario = function(vectors) {
-  app.map.draw.source.clear(true);
+  // app.map.draw.source.clear(true);
+  vectors.forEach(function(vector) {
+    vector.setStyle(new ol.style.Style({
+      fill: new ol.style.Fill({
+        color: [92,115,82,0.4]
+      }),
+      stroke: new ol.style.Stroke({
+        color: [92,115,82,0.8],
+        width: 2
+      }),
+      zIndex: 6
+    }))
+  });
   app.map.draw.source.addFeatures(vectors);
 };
 
