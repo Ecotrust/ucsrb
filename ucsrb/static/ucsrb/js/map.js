@@ -2,6 +2,8 @@ app.map = mapSettings.getInitMap();
 
 app.map.getView().setCenter([-13363904.869732492, 6108467.733218842]);
 app.map.getView().setZoom(7);
+app.map.getView().setMinZoom(6);
+app.map.getView().setMaxZoom(19);
 
 app.map.zoomToExtent = function zoomToExtent(extent) {
   ol.Map.prototype.getView.call(this).fit(extent, {duration: 2000});
@@ -395,7 +397,8 @@ app.map.draw = {
     app.map.removeInteraction(modifyInteraction);
     app.map.removeInteraction(drawInteraction);
     app.map.removeInteraction(snapInteraction);
-    map.on('pointermove', pointerMoveHandler);
+    app.map.removeInteraction(app.map.draw.draw);
+    // map.on('pointermove', pointerMoveHandler);
   },
   getDrawingArea: function() {
     var drawFeatures = app.map.draw.source.getFeatures();
@@ -520,6 +523,7 @@ app.map.layer = {
         style: app.map.styles.Streams,
         visible: false,
         renderBuffer: 300,
+        minResolution: 0.3470711467930046,
         // declutter: true
       }),
       selectAction: streamSelectAction
@@ -533,12 +537,13 @@ app.map.layer = {
           attributions: 'Ecotrust',
           format: new ol.format.GeoJSON(),
           url: '/static/ucsrb/data/ppts_all.geojson',
+          strategy: ol.loadingstrategy.bbox,
         }),
         style: app.map.styles.PourPoint,
         visible: false,
-        renderBuffer: 50,
-        minResolution: 1,
-        maxResolution: 45,
+        renderBuffer: 0,
+        minResolution: 2,
+        maxResolution: 200,
       }),
       selectAction: pourPointSelectAction
     },

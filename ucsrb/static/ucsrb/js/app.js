@@ -292,7 +292,7 @@ app.panel = {
                 var html = '<div class="featurepanel">' +
                 '<p class="display"><span class="bb">' + drawingAcres.toFixed(0).toString() + '</span> acres selected</p>' +
                 warning +
-                '<p><small>Re-select point to edit<br />Select drawing boundary to alter<br />Alt+Select point to delete</small></p>' +
+                '<p><small>Click the map to start a new drawing<br />Re-select point to edit<br />Select drawing boundary to alter<br />Alt+Select point to delete</small></p>' +
                 '<div class="btn-toolbar justify-content-between drawing-buttons">' +
                 '<button type="button" class="btn btn-primary ' + saveDisable + '" onclick="app.panel.draw.saveDrawing()">Begin Evaluation</button>' +
                 '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
@@ -744,11 +744,11 @@ app.request = {
             method: 'POST',
             success: function(response) {
                 console.log(`%csuccess: saved drawing`, 'color: green');
-                vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
+                app.map.draw.disable();
+                var vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
                     dataProjection: 'EPSG:3857',
                     featureProjection: 'EPSG:3857'
                 });
-                app.map.draw.disable();
                 app.map.addScenario(vectors);
                 app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
             },
