@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
+from django.contrib.flatpages import views as flat_views
 
 from . import views
 
@@ -8,8 +9,8 @@ urlpatterns = [
     url(r'^home/?$', views.home),
     url(r'^/?$', views.home),
     url(r'^app/?$', views.app, name="app"),
-    url(r'^help/?$', views.help, name="help"),
-    url(r'^methods/?$', views.methods, name="methods"),
+    url(r'^help/$', flat_views.flatpage, {'url': '/help/'}, name="help"),
+    url(r'^methods/$', flat_views.flatpage, {'url': '/methods/'}, name='methods'),
 
     ### API urls
     url(r'^get_veg_unit_by_bbox', views.get_veg_unit_by_bbox),

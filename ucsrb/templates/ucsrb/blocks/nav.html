@@ -27,7 +27,7 @@
     <div class="username-wrap ml-auto">
         {% if user.is_authenticated %}
             <a id="topnav-account-link" href="/account/" class="btn btn-link account-action">
-                <i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_user_blue.svg' %}" /></i>{{ user.username }}
+                <i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_user_light.svg' %}" /></i>{{ user.username }}
             </a>
         {% else %}
             <!-- if account is in path then form fields are missing -->

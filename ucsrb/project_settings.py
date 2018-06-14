@@ -19,6 +19,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'assets'))
 STYLES_DIR = os.path.realpath(os.path.join(ASSETS_DIR, 'styles'))
 
+SITE_ID = 1
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
@@ -176,6 +178,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.gis',
+    'django.contrib.flatpages',
     'marineplanner',
     'core',
     'compressor',

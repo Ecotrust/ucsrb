@@ -1,16 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block site_style %}
- {{ block.super }}
- <link rel="stylesheet" href="{% static 'ucsrb/css/landing-layout.css' %}"/>
- <link rel="stylesheet" href="{% static 'ucsrb/css/landing-mq.css' %}"/>
-{% endblock site_style %}
-
-{% block body_class %}page{% endblock body_class %}
-
 {% block content %}
-
 
 <section class="page">
     <div class="container">

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body_class %}flatpage{% endblock body_class %}
+
+{% block content %}
+
+<section class="page-content">
+    <div class="container">
+        <div class="row">
+            <div class="col"><h2>{{ flatpage.title }}</h2></div>
+        </div>
+        <div class="row">
+          <div class="col">{{ flatpage.content }}</div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block outer_content %}
+
+{% endblock outer_content %}
