@@ -97,7 +97,11 @@ class Command(BaseCommand):
                 desc_field = 'HU_12_NAME'
             if in_type == 'RMU':
                 id_field = None
-            if in_type == 'PourPoint':
+            # if in_type == 'PourPoint':
+            #     id_field = 'ppt_ID'
+            if in_type == 'PourPointOverlap':
+                id_field = 'ppt_ID'
+            if in_type == 'PourPointDiscrete':
                 id_field = 'ppt_ID'
 
             if not id_field:

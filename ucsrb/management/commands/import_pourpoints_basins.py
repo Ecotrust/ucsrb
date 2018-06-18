@@ -110,7 +110,7 @@ class Command(BaseCommand):
             fc_25Idx = fieldsArray.index('fc_25')-1
             dwnst_pptIdx = fieldsArray.index('dwnst_ppt')-1
 
-            in_type = 'PourPoint'
+            in_type = 'PourPointDiscrete'
             id_field = 'ppt_ID'
             desc_field = None
 
