@@ -38,6 +38,18 @@ class FocusArea(models.Model):
         else:
             return u'%s: %s' % (self.unit_type, self.unit_id)
 
+class PourPoint(models.Model):
+    id = models.IntegerField(primary_key=True, verbose_name='Pour Point ID')
+    geometry = gismodels.PointField(srid=GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Pour Point")
+
+    objects = gismodels.GeoManager()
+
+    def __str__(self):
+        return 'Virtual Gauging Station Number %s' % (self.id)
+
+    def __unicode__(self):
+        return 'Virtual Gauging Station Number %s' % (self.id)
+
 class PourPointBasin(models.Model):
     ppt_ID = models.IntegerField(primary_key=True, verbose_name='Pour Point ID')
     area = models.FloatField(null=True, blank=True, default=None, verbose_name='Area in Acres')

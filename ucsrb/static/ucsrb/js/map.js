@@ -613,7 +613,7 @@ if (app.map.overlays) {
   app.map.overlays.getLayers().push(app.map.layer.huc12.layer);
   app.map.overlays.getLayers().push(app.map.layer.huc10.layer);
   app.map.overlays.getLayers().push(app.map.layer.streams.layer);
-  app.map.overlays.getLayers().push(app.map.layer.pourpoints.layer);
+  // app.map.overlays.getLayers().push(app.map.layer.pourpoints.layer);
   app.map.overlays.getLayers().push(app.map.layer.boundary.layer);
 }
 

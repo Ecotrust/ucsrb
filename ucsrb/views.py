@@ -387,59 +387,10 @@ def get_pourpoint_by_id(request, id):
     # TODO: query for pour point basin polygon with given ID
     # TODO: calculate area (on PPBasin model? On Madrona PolygonFeature model?)
     # TODO: build context and return.
-
-    return_json = {
-        'name': 'Pour Point 1',
-        'id': 1,
-        'area': 100.0, #acres
-        'point_geometry': {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "type": "Point",
-              "coordinates": [
-                #   -120.41339635848999,
-                #   47.63433043507602
-                -13404357.965449827,
-                6046234.624586983
-              ]
-            }
-          },
-          'area_geometry': {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "type": "LineString",
-              "coordinates": [
-                [
-                    #   -120.42800903320311,
-                    #   47.63777890312004
-                    -13405984.640957793,
-                    6046804.319313334
-                ],
-                [
-                    #   -120.42350292205809,
-                    #   47.635783590864854
-                    -13405483.02295974,
-                    6046474.684628907
-                ],
-                [
-                    #   -120.41925430297852,
-                    #   47.635320898879414
-                    -13405010.068847293,
-                    6046398.247600632
-                ],
-                [
-                    #   -120.4139757156372,
-                    #   47.6343665837201
-                    -13404422.459192432,
-                    6046240.596229818
-                ]
-              ]
-            }
-          }
-    }
-    return JsonResponse(return_json)
+    if request.method == 'GET':
+        from .models import PourPoint
+        ppt = PourPoint.objects.get(id=float(id))
+    return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (ppt.pk, ppt.geometry.geojson)))
 
 def get_basin(request):
     # focus_area = {"id": None, "geojson": None}
