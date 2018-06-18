@@ -24,19 +24,19 @@ scenario_type_selection_made = function(selectionType) {
     var animateObj = {
       zoom: 8,
       center: [-13363592.377434019, 6154762.569701998],
-      duration: 2000
+      duration: 800
     }
-    var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
-    extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+    // var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
+    // extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
     if (selectionType === 'draw') {
       app.map.layer.draw.layer.setVisible(true);
       app.map.removeInteraction(app.map.Pointer);
-      app.map.getView().animate(animateObj);
+      // app.map.getView().animate(animateObj);
     } else {
       app.map.removeInteraction(app.map.draw.draw);
       app.map.layer.draw.layer.setVisible(false);
       app.map.addInteraction(app.map.Pointer);
-      app.map.getView().animate(animateObj);
+      // app.map.getView().animate(animateObj);
     }
 }
 
@@ -174,15 +174,15 @@ app.panel = {
                 app.panel.results.responseResultById(response);
             })
             .catch(function(response) {
-                console.log('%c failed to get results: %o', 'style: salmon;', response);
+                console.log('%c failed to get results: %o', 'color: salmon;', response);
             });
         },
         responseResultById: function(result) {
+            app.panel.results.showAggregate();
+            app.panel.results.expander();
+            app.nav.showResultsNav();
             app.panel.results.aggPanel(result);
             app.panel.results.hydroPanel(result);
-            app.panel.results.expander();
-            app.panel.results.showAggregate();
-            app.nav.showResultsNav();
         },
         addResults: function(content) {
             app.state.panel.content = content;
@@ -255,7 +255,8 @@ app.panel = {
                 // Script
                 var chart = bb.generate({
                   data: {
-                    x: "x",
+                    x: "datetime",
+                    xFormat: "%Y-%m-%d %H:%M:%S",
                     columns: [
                         ["datetime",
                             "2013-01-01 03:00:00",
@@ -265,7 +266,7 @@ app.panel = {
                             "2013-01-01 15:00:00",
                             "2013-01-01 18:00:00"
                         ],
-                        ["ppt 1",
+                        ["ppt1",
                             [150, 140, 110],
                             [155, 130, 115],
                             [160, 135, 120],
@@ -273,7 +274,7 @@ app.panel = {
                             [180, 150, 130],
                             [199, 160, 125]
                         ],
-                        ["ppt 2",
+                        ["ppt2",
                             [160, 130, 100],
                             [165, 120, 105],
                             [170, 135, 100],
@@ -282,13 +283,11 @@ app.panel = {
                             [200, 170, 105]
                         ],
                     ],
-                    types: {
-                      data: "area-line-range"
-                    }
                   },
                   axis: {
                     x: {
                       type: "timeseries",
+                      localtime: false,
                       tick: {
                         format: "%Y-%m-%d %H:%M:%S"
                       }
@@ -547,6 +546,14 @@ app.nav = {
     }
 }
 
+app.loadingAnimation = {
+    show: function() {
+        $('#loading-modal').modal('show');
+    },
+    hide: function() {
+        $('#loading-modal').modal('hide');
+    }
+}
 // using jQuery to get CSRF Token
 function getCookie(name) {
     var cookieValue = null;

@@ -1,12 +1,12 @@
 app.map = mapSettings.getInitMap();
 
-app.map.getView().setCenter([-13363904.869732492, 6108467.733218842]);
-app.map.getView().setZoom(7);
-app.map.getView().setMinZoom(6);
+app.map.getView().setCenter([-13363592.377434019, 6154762.569701998]);
+app.map.getView().setZoom(8);
+app.map.getView().setMinZoom(7);
 app.map.getView().setMaxZoom(19);
 
 app.map.zoomToExtent = function zoomToExtent(extent) {
-  ol.Map.prototype.getView.call(this).fit(extent, {duration: 2000});
+  ol.Map.prototype.getView.call(this).fit(extent, {duration: 1600});
 }
 
 app.map.styles = {

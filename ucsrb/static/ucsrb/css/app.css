@@ -58,14 +58,16 @@ header {
     background: #fff;
     height: 14rem;
     height: 30vh;
+    transition: .4s all ease-in-out .3125s;
 }
 
     .secondary-nav.icons-only {
-        animation: shrink-height .5s ease-in-out forwards;
+        height: 6.25rem;
+        height: 12vh;
     }
 
 .method-nav {
-    transition: 0.5s all ease-in-out;
+    transition: 1s all ease-in-out;
 }
 
 .method-nav li {
@@ -79,7 +81,7 @@ header {
         border-right: 10px solid #e6e7e8;
         height: 60%;
         position: absolute;
-        transition: 0.5s height ease-in;
+        transition: 0.25s height ease-in-out;
         top: 20%;
         right: -5px;
     }
@@ -120,14 +122,15 @@ header {
     max-height: 12.5vh;
     margin-bottom: 1rem;
     pointer-events: none;
+    transition: .5s all ease-in-out;
     max-width: 96%;
 }
 
 .method-nav h3 {
     font-size: 2.8375vh;
+    height: 2rem;
     margin: 0 auto;
     pointer-events: none;
-    transition: 0.5s all ease-in-out;
     transform: rotateX(0deg);
     width: 96%;
 }
@@ -137,7 +140,6 @@ header {
     flex-flow: row;
     font-size: 1em;
     font-weight: 700;
-    transition: 0.5s padding ease-in-out;
     height: 100%;
 }
 
@@ -182,12 +184,14 @@ header {
 }
 
 .icons-only #process-nav h3 {
-    animation: shrink-height_zero-one 0.5s ease-in-out forwards;
+    height: 0;
     transform: rotateX(90deg);
 }
 
 .icons-only #process-nav img {
-    animation: shrink-img 0.5s ease-in-out forwards;
+    max-height: 3.5rem;
+    max-height: 8vh;
+    margin-bottom: 0;
 }
 
 .icons-only #results-nav h3 {
@@ -234,11 +238,13 @@ header {
 main {
     height: 79vh;
 }
+
 .map-wrap {
     height: 100%;
     position: relative;
     /* transition: 0.2s all ease-in; */
     margin-top: -18vh;
+    transition: .4s margin-top ease-in-out .5s;
     /* z-index: -1; */
 }
     .map-wrap.short-nav {
@@ -995,38 +1001,6 @@ main {
     CSS Animations
  ===========================================================================
  */
-
-@keyframes shrink-height {
-    from {
-        height: 14rem;
-        height: 30vh;
-    }
-    to {
-        height: 5rem;
-        height: 12vh;
-    }
-}
-
-@keyframes shrink-height_zero-one {
-    0% {
-       height: 2rem;
-    }
-    100% {
-       height: 0;
-    }
-}
-
- @keyframes shrink-img {
-   0% {
-       max-height: 5.5rem;
-       margin-bottom: 1rem;
-   }
-   100% {
-       max-height: 3.5rem;
-       max-height: 8vh;
-       margin-bottom: 0;
-   }
- }
 
  @keyframes fadeInRight {
   from {
