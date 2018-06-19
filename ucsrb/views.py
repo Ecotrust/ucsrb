@@ -712,27 +712,54 @@ def filter_results(request):
     }
     return JsonResponse(return_json)
 
-# def get_results_by_pour_point_basin(request):
-#     # TODO: create DiscreteBasins model
-#     from ucsrb.models import PourPointBasin, DiscreteBasins, TreatmentScenario
-#     # TODO: Get pourpoint_id from request or API
-#     ppb = PourPointBasin.objects.get(pk=pourpoint_id)
-#     # TODO: Get treatment_id from request or API
-#     treatment = TreatmentScenario.objects.get(pk=treatment_id)
-#
-#     sub_basins = DiscreteBasins(geometry__contained_by__=ppb.geometry, geometry__intersects__=treatment.geometry)
-#     sum_delta = 0
-#     ### OR ###
-#     # sum_delta = {
-#     #   baseline: 0,
-#     #   pct_75: 0,
-#     #   pct_50: 0,
-#     #   pct_25: 0,
-#     # }
-#     for basin in sub_basins:
-#         sum_delta += basin.get_delta(treatment)
-#     return sum_delta
+# NEEDS:
+#   pourpoint_id
+def get_downstream_pour_points(request):
+    from ucsrb.models import PourPoint, FocusArea
+    pourpoint_id = request.GET.get('pourpoint_id')
 
+    downstream_ids = []
+    # TODO: get topology lookup strategy
+
+    downstream_ppts = []
+    for id in downstream_ids:
+        ppt_dict = {}
+        ppt = PourPoint.objects.get(pk=id)
+        focus_area = FocusArea.objects.get(unit_id=id, unit_type='PourPointDiscrete')
+        ppt_dict = {
+            'name': focus_area.description,
+            'id': id,
+            'geometry': ppt.geometry.json
+        }
+        downstream_ppts.append(ppt_dict)
+    return JsonResponse(downstream_ppts)
+
+
+# NEEDS:
+#   pourpoint_id
+#   treatment_id
+def get_hydro_results_by_pour_point_id(request):
+    from ucsrb.models import PourPointBasin, TreatmentScenario, FocusArea
+    # Get pourpoint_id from request or API
+    pourpoint_id = request.GET.get('pourpoint_id')
+    ppb_d_data = PourPointBasin.objects.get(pk=pourpoint_id)
+    ppb_d = FocusArea.objects.get(unit_id=pourpoint_id, unit_type='PourPointDiscrete')
+    ppb_o = FocusArea.objects.get(unit_id=pourpoint_id, unit_type='PourPointOverlap')
+    # Get treatment_id from request or API
+    treatment_id = request.GET.get('treatment_id')
+    treatment = TreatmentScenario.objects.get(pk=treatment_id)
+
+    # TODO: Filter out basins not upstream of given pourpoint
+    sub_basins = PourPointBasins(geometry__intersects__=treatment.geometry)
+    for basin in sub_basins:
+        # TODO:
+        # gather input data for Bill's R script
+        #   All Treatment Types
+        #   All impacted basins
+        # run Bill's R script
+        # Interpret script output and format for API handoff
+        results = {}
+    return JsonResponse(results)
 
 def get_results_by_scenario_id(request):
     # TODO: currently the request passes the madrona-style API of /module_model_id

@@ -20,6 +20,8 @@ urlpatterns = [
     url(r'^pourpoint/(?P<id>[\w_]+)', views.get_pourpoint_by_id),
     url(r'^filter_results', views.filter_results),
     url(r'^get_results_by_scenario_id', views.get_results_by_scenario_id),
+    url(r'^get_downstream_pour_points', views.get_downstream_pour_points),
+    url(r'^get_hydro_results_by_pour_point_id', views.get_hydro_results_by_pour_point_id),
     url(r'^get_results_by_state', views.get_results_by_state),
     url(r'^get_focus_area_at', views.get_focus_area_at),
     url(r'^get_focus_area', views.get_focus_area),
