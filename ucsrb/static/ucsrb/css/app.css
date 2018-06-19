@@ -641,8 +641,124 @@ main {
     }
 
 #loading-modal .modal-header {
+    border-bottom: 0;
     justify-content: space-around;
 }
+
+#loading-modal .modal-content {
+    background: transparent;
+}
+
+#loading-modal .animation * {
+	box-sizing: border-box;
+}
+
+#loading-modal .animation {
+	position: absolute;
+	left: 50%;
+	width: 84px;
+	height: 84px;
+	margin-top: -42px;
+	margin-left: -42px;
+	transform-type: preserve-3d;
+ }
+
+#loading-modal .animation .cssload-dot {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 15px;
+	height: 15px;
+	margin-top: -15px;
+	margin-left: -15px;
+	border-radius: 50%;
+	border: 15px outset rgb(0,183,250);
+	background-color: transparent;
+	transform-type: preserve-3d;
+    transform-origin: 50%;
+	animation: cssload-dot1 2050ms cubic-bezier(.49,.06,.43,.85) infinite;
+}
+
+#loading-modal .animation .cssload-dot:nth-child(2) {
+	width: 60px;
+	height: 60px;
+	margin-top: -30px;
+	margin-left: -30px;
+	border-width: 18px;
+	border-color: rgb(0,183,250);
+	animation-name: cssload-dot2;
+	animation-delay: 153.75ms;
+	box-shadow: inset 0 0 6px 0 rgba(0,183,250,0.1);
+}
+
+#loading-modal .animation .cssload-dot:nth-child(3) {
+	width: 60px;
+	height: 60px;
+	margin-top: -30px;
+	margin-left: -30px;
+	border-width: 8px;
+	border-color: rgb(0,183,250);
+	animation-name: cssload-dot3;
+	animation-delay: 307.5ms;
+	box-shadow: inset 0 0 6px 0 rgba(0,183,250,0.1);
+}
+
+@keyframes cssload-dot1 {
+	0% {
+		border-color: rgb(0,183,250);
+        box-shadow: inset 0 0 12px 0 rgba(0,183,250,0.5);
+		transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-11px);
+	}
+	50% {
+		border-color: rgb(0,183,250);
+        box-shadow: inset 0 0 6px 0 rgba(0,183,250,0.5);
+		transform: rotateX(0deg) rotateY(0deg) rotateZ(50deg) translateZ(0px);
+	}
+	100% {
+		border-color: rgb(0,183,250);
+        box-shadow: inset 0 0 12px 0 rgba(0,183,250,0.5);
+		transform: rotateX(0deg) rotateY(00deg) rotateZ(0deg) translateZ(-11px);
+	}
+}
+
+
+@keyframes cssload-dot2 {
+	0% {
+		border-color: rgb(0,183,250);
+		box-shadow: inset 0 0 6px 0 rgba(0,183,250,0.2);
+		transform: rotateX(0deg) rotateY(00deg) rotateZ(0deg) translateZ(-11px);
+	}
+	50% {
+		border-color: rgb(0,183,250);
+		box-shadow: inset 0 0 18px 0 rgba(0,183,250,0.5);
+		transform: rotateX(0deg) rotateY(0deg) rotateZ(50deg) translateZ(0px);
+	}
+	100% {
+		border-color: rgb(0,183,250);
+		box-shadow: inset 0 0 6px 0 rgba(0,183,250,0.2);
+		transform: rotateX(0deg) rotateY(00deg) rotateZ(0deg) translateZ(-11px);
+	}
+}
+
+
+@keyframes cssload-dot3 {
+	0% {
+		border-color: rgb(0,183,250);
+		box-shadow: inset 0 0 6px 0 rgba(0,183,250,0.1);
+		transform: rotateX(0deg) rotateY(00deg) rotateZ(0deg) translateZ(-11px);
+	}
+	50% {
+		border-color: rgb(0,183,250);
+		box-shadow: inset 0 0 12px 0 rgba(0, 183, 250, 0.5);
+		transform: rotateX(0deg) rotateY(0deg) rotateZ(50deg) translateZ(0px);
+	}
+	100% {
+		border-color: rgb(0,183,250);
+		box-shadow: inset 0 0 6px 0 rgba(0, 183, 250, 0.1);
+		transform: rotateX(0deg) rotateY(00deg) rotateZ(0deg) translateZ(-11px);
+	}
+}
+
 
 /**
  * =========================================================================

@@ -1343,6 +1343,8 @@ function scenariosModel(options) {
             scenarioId = options.uid;
         }
 
+        app.state.scenarioId = scenarioId.slice(scenarioId.lastIndexOf('_') + 1)
+
         var isDrawingModel = false,
             isScenarioModel = false;
         if (scenarioId.indexOf('drawing') !== -1) {

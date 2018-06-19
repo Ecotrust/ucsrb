@@ -169,7 +169,7 @@ app.panel = {
                     uid: sid
                 });
             }
-            app.request.get_results(id)
+            app.request.get_results(id,false)
             .then(function(response) {
                 app.panel.results.responseResultById(response);
             })
@@ -182,6 +182,8 @@ app.panel = {
             app.panel.results.expander();
             app.nav.showResultsNav();
             app.panel.results.aggPanel(result);
+        },
+        loadHydroResult: function() {
             app.panel.results.hydroPanel(result);
         },
         addResults: function(content) {
@@ -252,36 +254,23 @@ app.panel = {
         },
         chart: {
             init: function() {
-                // Script
                 var chart = bb.generate({
                   data: {
-                    x: "datetime",
+                    x: "timestep",
                     xFormat: "%Y-%m-%d %H:%M:%S",
-                    columns: [
-                        ["datetime",
-                            "2013-01-01 03:00:00",
-                            "2013-01-01 06:00:00",
-                            "2013-01-01 09:00:00",
-                            "2013-01-01 12:00:00",
-                            "2013-01-01 15:00:00",
-                            "2013-01-01 18:00:00"
-                        ],
-                        ["ppt1",
-                            [150, 140, 110],
-                            [155, 130, 115],
-                            [160, 135, 120],
-                            [135, 120, 110],
-                            [180, 150, 130],
-                            [199, 160, 125]
-                        ],
-                        ["ppt2",
-                            [160, 130, 100],
-                            [165, 120, 105],
-                            [170, 135, 100],
-                            [185, 130, 100],
-                            [190, 160, 100],
-                            [200, 170, 105]
-                        ],
+                    json: [
+                        {
+                            pptId: 0,
+                            rx: null,
+                            timestep: "2013-01-01 03:00:00",
+                            totalFlow: null
+                        },
+                        {
+                            pptId: 0,
+                            rx: null,
+                            timestep: "2013-01-01 06:00:00",
+                            totalFlow: null
+                        }
                     ],
                   },
                   axis: {
@@ -295,17 +284,6 @@ app.panel = {
                   },
                   bindto: "#chart",
                 });
-
-                setTimeout(function() {
-                    chart.load({
-                        columns: [
-                            ["ppt 3", [220, 215, 205], [240, 225, 215], [260, 235, 225], [280, 245, 235], [270, 255, 225], [240, 225, 215]],
-                        ],
-                        types: {
-                            data3: "area-spline-range"
-                        }
-                    });
-                }, 1000);
             }
         },
         panelResultsElement: function() {
@@ -599,14 +577,46 @@ app.request = {
     * @param  {[number]} id treatment scenario id [on scenario this is created]
     * @return {[json]} result data
     */
-    get_results: function(id) {
-        return $.ajax(`/get_results_by_scenario_id/${id}`)
-        .done(function(response) {
-            console.log('%csuccessfully returned result: %o', 'color: green', response);
-            return response;
+    get_results: function(id,exportResults) {
+        if (!id) {
+            id = app.map.selectedFeature.getProperties().ppt_ID;
+        }
+        if (!exportResults) {
+            exportResults = false;
+        }
+        return $.ajax({
+            url: `/get_results_by_scenario_id`,
+            data: {
+                id: id,
+                export: exportResults
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log('%csuccessfully returned result: %o', 'color: green', response);
+                return response;
+            },
+            error: function(response) {
+                console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
+            }
         })
-        .fail(function(response) {
-            console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
+    },
+    get_hydro_results_by_pour_point_id: function(feature, scenarioId) {
+        var pp_id = feature.getProperties().ppt_ID;
+        app.map.selectedFeature = feature;
+        if (!scenarioId) {
+            treatmentId = app.state.scenarioId;
+        }
+        return $.ajax({
+            url: '/get_hydro_results_by_pour_point_id',
+            data: {
+                pourpoint_id: pp_id,
+                treatment_id: treatmentId,
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(`%csuccess: got hydro results for pourpoint`, 'color: green');
+                return response;
+            },
         });
     },
     /**
@@ -804,6 +814,7 @@ app.request = {
                 });
                 app.map.addScenario(vectors);
                 app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
+                app.state.scenarioId = response.id;
             },
             error: function(response, status) {
                 console.log(`%cfail @ save drawing: %o`, 'color: red', response);
