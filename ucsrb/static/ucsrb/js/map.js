@@ -261,7 +261,7 @@ setFilter = function(feat, layer) {
   if (app.map.mask) {
     layer.removeFilter(app.map.mask);
   }
-  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[58,86,117,0.15]})});
+  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[58,86,117,0.2]})});
   layer.addFilter(app.map.mask);
   app.map.mask.set('active', true);
   app.map.zoomToExtent(feat.getGeometry().getExtent());
@@ -607,6 +607,14 @@ app.map.layer = {
         source: new ol.source.Vector(),
         style: app.map.styles.LineStringSelected
       })
+    },
+    resultPoints: {
+      layer: new ol.layer.Vector({
+        name: 'result points',
+        title: 'result points',
+        source: new ol.source.Vector(),
+        style: app.map.styles.Point
+      })
     }
 };
 
@@ -635,6 +643,7 @@ app.map.layerSwitcher = new ol.control.LayerSwitcher({
 
 app.map.addControl(app.map.layerSwitcher);
 app.map.addLayer(app.map.layer.selectedFeature.layer);
+app.map.addLayer(app.map.layer.resultPoints.layer);
 
 app.map.toggleMapControls = function(show) {
     if (show) {
@@ -717,4 +726,18 @@ app.map.dropPin = function(coords) {
   });
   app.map.dropPin.pin.setStyle(app.map.styles.Point);
   app.map.dropPin.source.addFeature(app.map.dropPin.pin);
+}
+
+app.map.addDownstreamPptsToMap = function(pptsArray) {
+  var features = [];
+  pptsArray.forEach(function(element, i) {
+    var feat = new ol.Feature({
+      geometry: new ol.geom.Point(element.geometry.geometry),
+      name: element.name
+    });
+    features.push(feat);
+  });
+  app.map.layer.resultPoints.layer.getSource().clear();
+  app.map.layer.resultPoints.layer.getSource().addFeatures(features);
+  app.map.layer.resultPoints.layer.setVisible(true);
 }

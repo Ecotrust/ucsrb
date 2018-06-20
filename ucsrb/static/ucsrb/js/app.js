@@ -106,18 +106,14 @@ app.resultsInit = function(id) {
     }
     app.request.get_results(id,false)
         .then(function(response) {
+            console.log(response.pourpoints);
             app.panel.results.responseResultById(response);
             app.nav.showResultsNav();
+            app.map.addDownstreamPptsToMap(response.pourpoints);
         })
         .catch(function(response) {
             console.log('%c failed to get results: %o', 'color: salmon;', response);
         });
-    app.request.get_downstream_pour_points(id)
-        .then(function(response) {
-            console.log(response);
-        })
-
-    // TODO Add pourpoint listeners here
 }
 
 initFiltering = function() {
