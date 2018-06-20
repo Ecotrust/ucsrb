@@ -397,7 +397,7 @@ def get_basin(request):
     if request.method == 'GET':
         from .models import FocusArea
         unit_id = request.GET['pourPoint']
-        layer = 'PourPoint'
+        layer = 'PourPointOverlap'
         focus_area = FocusArea.objects.get(unit_type=layer, unit_id=unit_id)
     return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (focus_area.pk, focus_area.geometry.geojson)))
 
