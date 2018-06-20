@@ -261,7 +261,7 @@ setFilter = function(feat, layer) {
   if (app.map.mask) {
     layer.removeFilter(app.map.mask);
   }
-  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[58,86,117,0.35]})});
+  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[58,86,117,0.15]})});
   layer.addFilter(app.map.mask);
   app.map.mask.set('active', true);
   app.map.zoomToExtent(feat.getGeometry().getExtent());
