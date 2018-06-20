@@ -240,11 +240,12 @@ main {
 }
 
 .map-wrap {
+    box-shadow: 0px 15px 90px #bbb;
     height: 100%;
     position: relative;
     /* transition: 0.2s all ease-in; */
     margin-top: -18vh;
-    transition: .4s margin-top ease-in-out .5s;
+    transition: .5s margin-top ease-out .5s;
     /* z-index: -1; */
 }
     .map-wrap.short-nav {
@@ -957,7 +958,7 @@ main {
 }
 
 .result-list-wrap {
-    height: 38.5vh;
+    height: 32.5vh;
     overflow: scroll;
 }
 
@@ -1052,7 +1053,10 @@ main {
  ===========================================================================
  */
 
-.result-chart {
+.bb {
+    display: block;
+    height: 30vh;
+    position: relative;
     width: 100%;
 }
 

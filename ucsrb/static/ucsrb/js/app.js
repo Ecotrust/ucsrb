@@ -22,21 +22,21 @@ var app = {
 
 scenario_type_selection_made = function(selectionType) {
     var animateObj = {
-      zoom: 8,
-      center: [-13363592.377434019, 6154762.569701998],
-      duration: 800
+        zoom: 8,
+        center: [-13363592.377434019, 6154762.569701998],
+        duration: 800
     }
     // var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
     // extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
     if (selectionType === 'draw') {
-      app.map.layer.draw.layer.setVisible(true);
-      app.map.removeInteraction(app.map.Pointer);
-      // app.map.getView().animate(animateObj);
+        app.map.layer.draw.layer.setVisible(true);
+        app.map.removeInteraction(app.map.Pointer);
+        // app.map.getView().animate(animateObj);
     } else {
-      app.map.removeInteraction(app.map.draw.draw);
-      app.map.layer.draw.layer.setVisible(false);
-      app.map.addInteraction(app.map.Pointer);
-      // app.map.getView().animate(animateObj);
+        app.map.removeInteraction(app.map.draw.draw);
+        app.map.layer.draw.layer.setVisible(false);
+        app.map.addInteraction(app.map.Pointer);
+        // app.map.getView().animate(animateObj);
     }
 }
 
@@ -182,6 +182,8 @@ app.panel = {
             app.panel.results.expander();
             app.nav.showResultsNav();
             app.panel.results.aggPanel(result);
+
+            app.panel.results.hydroPanel(result);
         },
         loadHydroResult: function() {
             app.panel.results.hydroPanel(result);
@@ -238,6 +240,7 @@ app.panel = {
                 html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
             }
             html += '<div id="chart"></div>'
+            html += '<div id="daily-chart"></div>'
             html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
             app.panel.results.addResults(html);
@@ -255,34 +258,59 @@ app.panel = {
         chart: {
             init: function() {
                 var chart = bb.generate({
-                  data: {
-                    x: "timestep",
-                    xFormat: "%Y-%m-%d %H:%M:%S",
-                    json: [
-                        {
-                            pptId: 0,
-                            rx: null,
-                            timestep: "2013-01-01 03:00:00",
-                            totalFlow: null
-                        },
-                        {
-                            pptId: 0,
-                            rx: null,
-                            timestep: "2013-01-01 06:00:00",
-                            totalFlow: null
+                    data: {
+                        rows: [
+                            ['timestep','pptId','rx','totalFlow'],
+                            ['2013-01-01 03:00:00',1,2,100],
+                            ['2013-01-01 06:00:00',1,2,200],
+                            ['2013-01-01 09:00:00',1,2,50],
+                            ['2013-01-01 12:00:00',1,2,160],
+                        ],
+                        x: 'timestep',
+                        xFormat: "%Y-%m-%d %H:%M:%S",
+                        types: {
+                            data1: "area-line-range"
                         }
-                    ],
-                  },
-                  axis: {
-                    x: {
-                      type: "timeseries",
-                      localtime: false,
-                      tick: {
-                        format: "%Y-%m-%d %H:%M:%S"
-                      }
-                    }
-                  },
-                  bindto: "#chart",
+                    },
+                    axis: {
+                        x: {
+                            type: "timeseries",
+                            tick: {
+                                format: "%Y-%m-%d %H:%M:%S",
+                            }
+                        },
+                    },
+                    bindto: '#chart',
+                });
+                var dailyChart = bb.generate({
+                    data: {
+                        rows: [
+                            ['timestep','pptId','rx','totalFlow'],
+                            ['2013-01-01 03:00:00',1,2,[100,150,200]],
+                            ['2013-01-01 06:00:00',1,2,[200,300,300]],
+                            ['2013-01-01 09:00:00',1,2,[50,23,90]],
+                        ],
+                        x: 'timestep',
+                        xFormat: "%Y-%m-%d %H:%M:%S",
+                        types: {
+                            totalFlow: "area-spline-range"
+                        }
+                    },
+                    axis: {
+                        x: {
+                            type: "timeseries",
+                            tick: {
+                                format: "%Y-%m-%d %H:%M:%S",
+                            }
+                        },
+                    },
+                    zoom: {
+                        enabled: true
+                    },
+                    subchart: {
+                        show: true
+                    },
+                    bindto: '#daily-chart',
                 });
             }
         },
@@ -373,17 +401,17 @@ app.panel = {
         }
     },
     element: function() { // returns a function. to edit dom element don't forget to invoke: element()
-        return this.getElement;
-    },
-    panelContentElement: function() { // returns a function. to edit dom element don't forget to invoke: panelContentElement()
-        return this.getPanelContentElement;
-    },
-    get getElement() {
-        return document.getElementById('panel');
-    },
-    get getPanelContentElement() {
-        return document.getElementById('panel-content');
-    }
+    return this.getElement;
+},
+panelContentElement: function() { // returns a function. to edit dom element don't forget to invoke: panelContentElement()
+return this.getPanelContentElement;
+},
+get getElement() {
+    return document.getElementById('panel');
+},
+get getPanelContentElement() {
+    return document.getElementById('panel-content');
+}
 }
 
 enableDrawing = function() {
@@ -399,14 +427,14 @@ app.nav = {
         document.getElementById('results-nav').classList.remove('d-none');
         document.getElementById('process-nav').classList.add('d-none');
         document.querySelectorAll('#file-nav .results-nav-item').forEach(function(i, arr) {
-          i.classList.remove('d-none')
+            i.classList.remove('d-none')
         });
     },
     hideResultsNav: function() {
         document.getElementById('results-nav').classList.add('d-none');
         document.getElementById('process-nav').classList.remove('d-none');
         document.querySelectorAll('#file-nav .results-nav-item').forEach(function(i, arr) {
-          i.classList.add('d-none')
+            i.classList.add('d-none')
         });
     },
     showStartOver: function() {
@@ -460,29 +488,29 @@ app.nav = {
         ],
         filter: [
             `<div class="text-center">Select area to manage based on:
-                <div class="dropdown show">
-                    <button class="btn btn-sm dropdown-toggle" type="button" id="forestUnit" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select unit</button>
-                    <div class="dropdown-menu show forest-unit-dropdown" aria-labelledby="forestUnit">
-                        <div id="forest-listener">
-                            <button class="dropdown-item" type="button" data-layer="huc10">HUC 10</button>
-                            <button class="dropdown-item" type="button" data-layer="huc12">HUC 12</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="dropdown show">
+            <button class="btn btn-sm dropdown-toggle" type="button" id="forestUnit" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select unit</button>
+            <div class="dropdown-menu show forest-unit-dropdown" aria-labelledby="forestUnit">
+            <div id="forest-listener">
+            <button class="dropdown-item" type="button" data-layer="huc10">HUC 10</button>
+            <button class="dropdown-item" type="button" data-layer="huc12">HUC 12</button>
+            </div>
+            </div>
+            </div>
             </div>
             <script>
-                (function() {
-                    $('#forest-listener button').click(function(event) {
-                        event.preventDefault();
-                        $('#forest-listener').children().each(function(i) {
-                            if ($(this)[0].dataset.layer !== event.target.dataset.layer) {
-                                app.map.disableLayer($(this)[0].dataset.layer);
-                            }
-                        });
-                        var eventLayer = event.target.dataset.layer;
-                        app.map.toggleLayer(eventLayer);
+            (function() {
+                $('#forest-listener button').click(function(event) {
+                    event.preventDefault();
+                    $('#forest-listener').children().each(function(i) {
+                        if ($(this)[0].dataset.layer !== event.target.dataset.layer) {
+                            app.map.disableLayer($(this)[0].dataset.layer);
+                        }
                     });
-                })();
+                    var eventLayer = event.target.dataset.layer;
+                    app.map.toggleLayer(eventLayer);
+                });
+            })();
             </script>`,
             'Select forest unit to filter',
             'Select filters to narrow your treatment area',
@@ -581,14 +609,11 @@ app.request = {
         if (!id) {
             id = app.map.selectedFeature.getProperties().ppt_ID;
         }
-        if (!exportResults) {
-            exportResults = false;
-        }
         return $.ajax({
             url: `/get_results_by_scenario_id`,
             data: {
                 id: id,
-                export: exportResults
+                // export: exportResults
             },
             dataType: 'json',
             success: function(response) {
