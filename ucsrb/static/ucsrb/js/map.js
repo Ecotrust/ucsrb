@@ -306,7 +306,7 @@ confirmSelection = function(feat, vector) {
   var feature = features[0];
   if (app.state.method == 'select') {
     // hack for when we have no ppt basins and default to HUC 12.
-    setFilter(feature, app.map.layer.pourpoints.layer);
+    setFilter(feature, app.map.layer.streams.layer);
   } else {
     setFilter(feature, layer.layer);
   }

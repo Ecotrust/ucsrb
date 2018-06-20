@@ -270,7 +270,7 @@ app.panel = {
                         xFormat: "%Y-%m-%d %H:%M:%S",
                         types: {
                             data1: "area-line-range"
-                        }
+                        },
                     },
                     axis: {
                         x: {
