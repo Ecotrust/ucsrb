@@ -304,6 +304,7 @@ confirmSelection = function(feat, vector) {
   });
 
   // add features for use later in results
+  app.map.layer.selectedFeature.layer.getSource().clear();
   app.map.layer.selectedFeature.layer.getSource().addFeature(feat);
   app.map.layer.selectedFeature.layer.setVisible(true);
 
@@ -633,6 +634,7 @@ app.map.layerSwitcher = new ol.control.LayerSwitcher({
 });
 
 app.map.addControl(app.map.layerSwitcher);
+app.map.addLayer(app.map.layer.selectedFeature.layer);
 
 app.map.toggleMapControls = function(show) {
     if (show) {
