@@ -732,7 +732,7 @@ def get_downstream_pour_points(request):
             'geometry': ppt.geometry.json
         }
         downstream_ppts.append(ppt_dict)
-    return JsonResponse(downstream_ppts)
+    return JsonResponse(downstream_ppts, safe=False)
 
 
 # NEEDS:

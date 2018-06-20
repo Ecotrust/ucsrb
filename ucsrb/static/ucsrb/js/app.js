@@ -112,6 +112,10 @@ app.resultsInit = function(id) {
         .catch(function(response) {
             console.log('%c failed to get results: %o', 'color: salmon;', response);
         });
+    app.request.get_downstream_pour_points(id)
+        .then(function(response) {
+            console.log(response);
+        })
 
     // TODO Add pourpoint listeners here
 }
@@ -629,6 +633,25 @@ app.request = {
             },
             error: function(response) {
                 console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
+            }
+        })
+    },
+    get_downstream_pour_points: function(id) {
+        if (!id) {
+            id = app.map.selectedFeature.getProperties().ppt_ID;
+        }
+        return $.ajax({
+            url: `/get_downstream_pour_points`,
+            data: {
+                pourpoint_id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log('%csuccessfully returned downstream pourpoints: %o', 'color: green', response);
+                return response;
+            },
+            error: function(response) {
+                console.log(`%cfail @ get downstream pourpoints: %o`, 'color: red', response);
             }
         })
     },
