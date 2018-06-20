@@ -714,6 +714,10 @@ def filter_results(request):
 
 # NEEDS:
 #   pourpoint_id
+### RDH - actually, we need to determine this from a given treatment scenario
+### --- get all discrete ppt basins that intersect the treatment
+### --- for each, get all downstream ppts
+### --- consolidate all lists (including initial ppts) into a single unique list
 def get_downstream_pour_points(request):
     from ucsrb.models import PourPoint, FocusArea
     pourpoint_id = request.GET.get('pourpoint_id')
@@ -750,6 +754,16 @@ def get_hydro_results_by_pour_point_id(request):
     treatment = TreatmentScenario.objects.get(pk=treatment_id)
 
     # TODO: Filter out basins not upstream of given pourpoint
+    # - Get OL basin
+    # - Get all encompassed discrete basins
+    # - For each d_basin that intersects treatent scenario:
+    #     Get total_condensed area of each THC
+    #     Get total condenced area of each THC w/in treatment
+    #     For each treatment:
+    #         calculate new condensed area of each THC
+    #         Calculate diff with treatment area baseline
+    #     apply each diff to create rows in input sheet
+
     sub_basins = PourPointBasins(geometry__intersects__=treatment.geometry)
     for basin in sub_basins:
         # TODO:
