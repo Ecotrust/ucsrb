@@ -295,14 +295,18 @@ app.map.closePopup = function() {
 }
 
 confirmSelection = function(feat, vector) {
-  console.log(feat.getProperties());
+  console.log(feat);
   var mbLayer = app.mapbox.layers[feat.getProperties().layer];
   var layer = app.map.layer[mbLayer.map_layer_id];
   var features = (new ol.format.GeoJSON()).readFeatures(vector, {
     dataProjection: 'EPSG:3857',
     featureProjection: 'EPSG:3857'
   });
-  console.log(features);
+
+  // add features for use later in results
+  app.map.layer.selectedFeature.layer.getSource().addFeature(feat);
+  app.map.layer.selectedFeature.layer.setVisible(true);
+
   var feature = features[0];
   if (app.state.method == 'select') {
     // hack for when we have no ppt basins and default to HUC 12.
@@ -350,7 +354,6 @@ streamSelectAction = function(feat) {
     app.state.setStep = 0; // go back to step one
   }
   pourPointSelectAction(feat);
-  // app.map.enableLayer('pourpoints');
 };
 
 pourPointSelectAction = function(feat, selectEvent) {
@@ -517,7 +520,9 @@ app.map.layer = {
         id: 'streams', // set id equal to x in app.map.layer.x
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
-          format: new ol.format.MVT(),
+          format: new ol.format.MVT({
+            featureClass: ol.Feature
+          }),
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['strm_sgmnts_all6-11-0i3yy4'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.Streams,
@@ -596,6 +601,12 @@ app.map.layer = {
             });
         },
     },
+    selectedFeature: {
+      layer: new ol.layer.Vector({
+        source: new ol.source.Vector(),
+        style: app.map.styles.LineStringSelected
+      })
+    }
 };
 
 app.map.layer.scenarios.layer.set('id','scenarios');

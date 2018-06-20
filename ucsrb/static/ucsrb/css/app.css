@@ -30,7 +30,7 @@ body {
 
 header {
     position: relative;
-    z-index: 2;
+    z-index: 6;
 }
 
 /**
@@ -359,6 +359,10 @@ main {
 .ol-geo-search,
 #map .layer-switcher {
     top: 2.25vh;
+}
+
+#map .layer-switcher {
+  z-index: 4;
 }
 
 #map .ol-zoom button,
@@ -1052,6 +1056,11 @@ main {
    Charting
  ===========================================================================
  */
+
+.chart-wrap {
+    display: block;
+    margin: 0 auto;
+}
 
 .bb {
     display: block;

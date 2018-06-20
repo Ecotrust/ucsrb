@@ -93,6 +93,29 @@ app.init = {
     }
 }
 
+app.resultsInit = function(id) {
+    app.nav.stepActions.results();
+    app.map.geoSearch.closeSearchBox();
+    if (!id) {
+        id = app.viewModel.scenarios.scenarioList()[0].uid;
+    } else if (!id.includes('ucsrb')) {
+        sid = 'ucsrb_treatmentscenario_' + id;
+        app.viewModel.scenarios.addScenarioToMap(null, {
+            uid: sid
+        });
+    }
+    app.request.get_results(id,false)
+        .then(function(response) {
+            app.panel.results.responseResultById(response);
+            app.nav.showResultsNav();
+        })
+        .catch(function(response) {
+            console.log('%c failed to get results: %o', 'color: salmon;', response);
+        });
+
+    // TODO Add pourpoint listeners here
+}
+
 initFiltering = function() {
     setTimeout(function() {
         if ($('#focus_area_accordion').length > 0) {
@@ -155,35 +178,13 @@ app.panel = {
     },
     results: {
         init: function(id) {
-            app.nav.stepActions.reset();
+            app.panel.getPanelContentElement.innerHTML = app.nav.stepActions.initial;
             app.panel.moveLeft();
-            if (app.state.nav !== 'short') {
-                app.state.navHeight = 'short';
-                app.state.setStep = 'results';
-            }
-            if (!id) {
-                id = app.viewModel.scenarios.scenarioList()[0].uid;
-            } else if (!id.includes('ucsrb')) {
-                sid = 'ucsrb_treatmentscenario_' + id;
-                app.viewModel.scenarios.addScenarioToMap(null, {
-                    uid: sid
-                });
-            }
-            app.request.get_results(id,false)
-            .then(function(response) {
-                app.panel.results.responseResultById(response);
-            })
-            .catch(function(response) {
-                console.log('%c failed to get results: %o', 'color: salmon;', response);
-            });
         },
         responseResultById: function(result) {
             app.panel.results.showAggregate();
             app.panel.results.expander();
-            app.nav.showResultsNav();
             app.panel.results.aggPanel(result);
-
-            app.panel.results.hydroPanel(result);
         },
         loadHydroResult: function() {
             app.panel.results.hydroPanel(result);
@@ -239,8 +240,8 @@ app.panel = {
                 </div>`;
                 html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
             }
-            html += '<div id="chart"></div>'
-            html += '<div id="daily-chart"></div>'
+            html += '<div class="chart-wrap container"><div id="chart"></div></div>'
+            html += '<div class="chart-wrap container"><div id="daily-chart"></div></div>'
             html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
             app.panel.results.addResults(html);
@@ -547,7 +548,12 @@ app.nav = {
             false     //TODO: ??? enable editing?
         ],
         results: function() {
-
+            app.nav.hideSave();
+            closeConfirmSelection(true,true);
+            if (app.state.nav !== 'short') {
+                app.state.navHeight = 'short';
+                app.state.setStep = 'results';
+            }
         }
     }
 }
@@ -627,7 +633,7 @@ app.request = {
     },
     get_hydro_results_by_pour_point_id: function(feature, scenarioId) {
         var pp_id = feature.getProperties().ppt_ID;
-        app.map.selectedFeature = feature;
+        app.map.selectedPourPoint = feature;
         if (!scenarioId) {
             treatmentId = app.state.scenarioId;
         }
@@ -839,6 +845,7 @@ app.request = {
                 });
                 app.map.addScenario(vectors);
                 app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
+                app.results.init('ucsrb_treatmentscenario_' + response.id);
                 app.state.scenarioId = response.id;
             },
             error: function(response, status) {
