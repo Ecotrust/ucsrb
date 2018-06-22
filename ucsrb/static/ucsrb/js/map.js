@@ -610,9 +610,9 @@ app.map.layer = {
     },
     resultPoints: {
       layer: new ol.layer.Vector({
-        name: 'result points',
-        title: 'result points',
-        source: new ol.source.Vector(),
+        source: new ol.source.Vector({
+          format: new ol.format.GeoJSON()
+        }),
         style: app.map.styles.Point
       })
     }
@@ -729,15 +729,13 @@ app.map.dropPin = function(coords) {
 }
 
 app.map.addDownstreamPptsToMap = function(pptsArray) {
-  var features = [];
+  app.map.layer.resultPoints.layer.setVisible(true);
   pptsArray.forEach(function(element, i) {
     var feat = new ol.Feature({
-      geometry: new ol.geom.Point(element.geometry.geometry),
+      geometry: new ol.geom.Point(element.geometry.geometry.coordinates),
       name: element.name
     });
-    features.push(feat);
+    feat.setStyle(app.map.styles.PourPoint)
+    app.map.layer.resultPoints.layer.getSource().addFeature(feat);
   });
-  app.map.layer.resultPoints.layer.getSource().clear();
-  app.map.layer.resultPoints.layer.getSource().addFeatures(features);
-  app.map.layer.resultPoints.layer.setVisible(true);
 }
