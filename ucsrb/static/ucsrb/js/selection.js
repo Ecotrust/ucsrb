@@ -180,7 +180,6 @@ app.map.selection.setSelect = function(selectionInteraction) {
     )));
     // var lastSelected = event.target.getFeatures().item(event.target.getFeatures().getLength() - 1);
     app.map.selection.select.getFeatures().forEach(function(feat) {
-      selectedFeature = feat;
         var layer = app.map.selection.select.getLayer(feat).get('id');
         app.map.layer[layer].selectAction(feat);
     });

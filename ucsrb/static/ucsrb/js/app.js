@@ -61,7 +61,7 @@ setInit = function() {
 };
 
 reportInit = function() {
-    baseInit();
+
 }
 
 app.init = {
@@ -105,7 +105,7 @@ app.resultsInit = function(id) {
         });
     }
     app.request.get_results(id,false)
-        .then(function(response) {
+        .done(function(response) {
             console.log(response.pourpoints);
             app.panel.results.responseResultById(response);
             app.nav.showResultsNav();
@@ -857,7 +857,7 @@ app.request = {
             success: function(response) {
                 console.log(`%csuccess: saved drawing`, 'color: green');
                 app.map.draw.disable();
-                app.state.setStep = 'result'; // go to results
+                app.state.setStep = 'results'; // go to results
                 var vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
                     dataProjection: 'EPSG:3857',
                     featureProjection: 'EPSG:3857'

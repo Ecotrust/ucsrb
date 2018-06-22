@@ -760,14 +760,13 @@ app.map.dropPin = function(coords) {
 
 app.map.addDownstreamPptsToMap = function(pptsArray) {
   app.map.addLayer(app.map.layer.resultPoints.layer);
-  pptsArray.forEach(function(element, i) {
-    console.log(element);
+  for (var i = 0; i < pptsArray.length; i++) {
     let feature = new ol.Feature({
-      geometry: new ol.geom.Point(element.geometry.geometry.coordinates)
+      geometry: new ol.geom.Point(pptsArray[i].geometry.geometry.coordinates)
     });
     feature.setStyle(app.map.styles.PourPoint);
     app.map.layer.resultPoints.layer.getSource().addFeature(feature);
-  });
+  }
   app.map.layer.resultPoints.layer.setVisible(true);
   app.map.selection.setSelect(app.map.selection.selectResultsPourPoint);
 }
