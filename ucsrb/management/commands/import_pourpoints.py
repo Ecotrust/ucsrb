@@ -92,7 +92,7 @@ class Command(BaseCommand):
 
             PourPoint.objects.all().delete()
 
-            self.stdout.write('Writing new pour points and focus areas...')
+            self.stdout.write('Writing new pour points...')
             for shapeRecord in shape.shapeRecords():
                 if desc_field:
                     description = str(shapeRecord.record[unit_desc_index])
