@@ -106,14 +106,14 @@ app.resultsInit = function(id) {
     }
     app.request.get_results(id,false)
         .then(function(response) {
+            console.log(response.pourpoints);
             app.panel.results.responseResultById(response);
             app.nav.showResultsNav();
+            app.map.addDownstreamPptsToMap(response.pourpoints);
         })
         .catch(function(response) {
             console.log('%c failed to get results: %o', 'color: salmon;', response);
         });
-
-    // TODO Add pourpoint listeners here
 }
 
 initFiltering = function() {
@@ -185,10 +185,9 @@ app.panel = {
             app.panel.results.showAggregate();
             app.panel.results.expander();
             app.panel.results.aggPanel(result);
-            app.panel.results.hydroPanel(result);
         },
-        loadHydroResult: function() {
-
+        loadHydroResult: function(result) {
+            app.panel.results.hydroPanel(result);
         },
         addResults: function(content) {
             app.state.panel.content = content;
@@ -629,6 +628,25 @@ app.request = {
             },
             error: function(response) {
                 console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
+            }
+        })
+    },
+    get_downstream_pour_points: function(id) {
+        if (!id) {
+            id = app.map.selectedFeature.getProperties().ppt_ID;
+        }
+        return $.ajax({
+            url: `/get_downstream_pour_points`,
+            data: {
+                pourpoint_id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log('%csuccessfully returned downstream pourpoints: %o', 'color: green', response);
+                return response;
+            },
+            error: function(response) {
+                console.log(`%cfail @ get downstream pourpoints: %o`, 'color: red', response);
             }
         })
     },

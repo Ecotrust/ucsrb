@@ -147,6 +147,27 @@ app.map.styles = {
         zIndex: 6
       });
     },
+    'PourPointSelected': function(feature, resolution) {
+      var radius = 15;
+      if (resolution < 5) {
+          radius = 20;
+      } else if (resolution < 40) {
+          radius = 18;
+      }
+      return new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: radius,
+            fill:  new ol.style.Fill({
+                color: '#4D4D4D',
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#ffffff',
+                width: 5,
+            }),
+        }),
+        zIndex: 7
+      });
+    },
     'Boundary': new ol.style.Style({
       stroke: new ol.style.Stroke({
         color: 'rgba(58,86,117,0.75)',
@@ -261,7 +282,7 @@ setFilter = function(feat, layer) {
   if (app.map.mask) {
     layer.removeFilter(app.map.mask);
   }
-  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[58,86,117,0.15]})});
+  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[58,86,117,0.2]})});
   layer.addFilter(app.map.mask);
   app.map.mask.set('active', true);
   app.map.zoomToExtent(feat.getGeometry().getExtent());
@@ -367,6 +388,13 @@ pourPointSelectAction = function(feat, selectEvent) {
     }
   });
 };
+
+pourPointResultSelection = function(feat) {
+  app.request.get_hydro_results_by_pour_point_id(feat)
+    .then(function(response) {
+      console.log(response);
+    })
+}
 
 var drawSource = new ol.source.Vector();
 var drawInteraction = new ol.interaction.Draw({
@@ -607,6 +635,16 @@ app.map.layer = {
         source: new ol.source.Vector(),
         style: app.map.styles.LineStringSelected
       })
+    },
+    resultPoints: {
+      layer: new ol.layer.Vector({
+        source: new ol.source.Vector({
+          format: new ol.format.GeoJSON()
+        }),
+        style: app.map.styles.Point
+      }),
+      id: 'pourpointsresults',
+      selectAction: pourPointResultSelection
     }
 };
 
@@ -635,6 +673,7 @@ app.map.layerSwitcher = new ol.control.LayerSwitcher({
 
 app.map.addControl(app.map.layerSwitcher);
 app.map.addLayer(app.map.layer.selectedFeature.layer);
+app.map.addLayer(app.map.layer.resultPoints.layer);
 
 app.map.toggleMapControls = function(show) {
     if (show) {
@@ -717,4 +756,17 @@ app.map.dropPin = function(coords) {
   });
   app.map.dropPin.pin.setStyle(app.map.styles.Point);
   app.map.dropPin.source.addFeature(app.map.dropPin.pin);
+}
+
+app.map.addDownstreamPptsToMap = function(pptsArray) {
+  app.map.layer.resultPoints.layer.setVisible(true);
+  pptsArray.forEach(function(element, i) {
+    var feat = new ol.Feature({
+      geometry: new ol.geom.Point(element.geometry.geometry.coordinates),
+      name: element.name
+    });
+    feat.setStyle(app.map.styles.PourPoint)
+    app.map.layer.resultPoints.layer.getSource().addFeature(feat);
+  });
+  app.map.selection.addResultsPourPointSelection();
 }

@@ -179,3 +179,21 @@ app.map.selection.setSelect = function(selectionInteraction) {
 };
 
 app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
+
+// create new selection object after the layer has been added
+app.map.selection.addResultsPourPointSelection = function() {
+  app.map.selection.selectResultsPourPoint = new ol.interaction.Select(
+    {
+      layers: [
+        app.map.layer.resultPoints.layer
+      ],
+      style: app.map.styles.PourPointSelected
+    }
+  );
+  app.map.addInteraction(app.map.selection.selectResultsPourPoint);
+  app.map.selection.selectResultsPourPoint.on('select', function(event) {
+    console.log(`selection event at ${ol.coordinate.toStringHDMS(ol.proj.transform(event.mapBrowserEvent.coordinate, 'EPSG:3857', 'EPSG:4326'))}`);
+    console.log(event.target.getFeatures());
+    event.target.getFeatures();
+  });
+}

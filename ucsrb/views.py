@@ -732,7 +732,7 @@ def get_downstream_pour_points(request):
             'geometry': ppt.geometry.json
         }
         downstream_ppts.append(ppt_dict)
-    return JsonResponse(downstream_ppts)
+    return JsonResponse(downstream_ppts, safe=False)
 
 def parse_flow_results(input_csv, ppt_id, init_year=None, init_month=None, init_day=None, init_hour=None):
     if not init_year and not init_month and not init_day and not init_hour:
