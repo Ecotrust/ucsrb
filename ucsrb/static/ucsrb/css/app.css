@@ -731,7 +731,7 @@ main {
 	0% {
 		border-color: rgba(0,183,250,0.9);
 		box-shadow: inset 0 0 6px 0 rgba(0,183,250,0.5);
-		transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(15px);
+		transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-15px);
 	}
 	50% {
 		border-color: rgba(0,183,250,0.9);
@@ -760,7 +760,7 @@ main {
 	100% {
 		border-color: rgba(0,183,250,0.9);
 		box-shadow: inset 0 0 6px 0 rgba(0, 183, 250, 0.5);
-		transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(15px);
+		transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-15px);
 	}
 }
 

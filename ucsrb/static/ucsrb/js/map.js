@@ -147,6 +147,27 @@ app.map.styles = {
         zIndex: 6
       });
     },
+    'PourPointSelected': function(feature, resolution) {
+      var radius = 15;
+      if (resolution < 5) {
+          radius = 20;
+      } else if (resolution < 40) {
+          radius = 18;
+      }
+      return new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: radius,
+            fill:  new ol.style.Fill({
+                color: '#4D4D4D',
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#ffffff',
+                width: 5,
+            }),
+        }),
+        zIndex: 7
+      });
+    },
     'Boundary': new ol.style.Style({
       stroke: new ol.style.Stroke({
         color: 'rgba(58,86,117,0.75)',
@@ -367,6 +388,13 @@ pourPointSelectAction = function(feat, selectEvent) {
     }
   });
 };
+
+pourPointResultSelection = function(feat) {
+  app.request.get_hydro_results_by_pour_point_id(feat)
+    .then(function(response) {
+      console.log(response);
+    })
+}
 
 var drawSource = new ol.source.Vector();
 var drawInteraction = new ol.interaction.Draw({
@@ -614,7 +642,9 @@ app.map.layer = {
           format: new ol.format.GeoJSON()
         }),
         style: app.map.styles.Point
-      })
+      }),
+      id: 'pourpointsresults',
+      selectAction: pourPointResultSelection
     }
 };
 
@@ -738,4 +768,5 @@ app.map.addDownstreamPptsToMap = function(pptsArray) {
     feat.setStyle(app.map.styles.PourPoint)
     app.map.layer.resultPoints.layer.getSource().addFeature(feat);
   });
+  app.map.selection.addResultsPourPointSelection();
 }

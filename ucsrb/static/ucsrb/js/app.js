@@ -185,10 +185,9 @@ app.panel = {
             app.panel.results.showAggregate();
             app.panel.results.expander();
             app.panel.results.aggPanel(result);
-            app.panel.results.hydroPanel(result);
         },
-        loadHydroResult: function() {
-
+        loadHydroResult: function(result) {
+            app.panel.results.hydroPanel(result);
         },
         addResults: function(content) {
             app.state.panel.content = content;
