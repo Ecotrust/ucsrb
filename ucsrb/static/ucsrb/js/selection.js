@@ -160,6 +160,14 @@ app.map.selection.selectFilterSingleClick = new ol.interaction.Select(
     style: app.map.styles.Polygon
   }
 );
+app.map.selection.selectResultsPourPoint = new ol.interaction.Select(
+  {
+    layers: [
+      app.map.layer.resultPoints.layer
+    ],
+    style: app.map.styles.PourPointSelected
+  }
+);
 
 app.map.selection.setSelect = function(selectionInteraction) {
   //Is this line necessary?
@@ -172,28 +180,9 @@ app.map.selection.setSelect = function(selectionInteraction) {
     )));
     // var lastSelected = event.target.getFeatures().item(event.target.getFeatures().getLength() - 1);
     app.map.selection.select.getFeatures().forEach(function(feat) {
+      selectedFeature = feat;
         var layer = app.map.selection.select.getLayer(feat).get('id');
         app.map.layer[layer].selectAction(feat);
     });
   });
 };
-
-app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
-
-// create new selection object after the layer has been added
-app.map.selection.addResultsPourPointSelection = function() {
-  app.map.selection.selectResultsPourPoint = new ol.interaction.Select(
-    {
-      layers: [
-        app.map.layer.resultPoints.layer
-      ],
-      style: app.map.styles.PourPointSelected
-    }
-  );
-  app.map.addInteraction(app.map.selection.selectResultsPourPoint);
-  app.map.selection.selectResultsPourPoint.on('select', function(event) {
-    console.log(`selection event at ${ol.coordinate.toStringHDMS(ol.proj.transform(event.mapBrowserEvent.coordinate, 'EPSG:3857', 'EPSG:4326'))}`);
-    console.log(event.target.getFeatures());
-    event.target.getFeatures();
-  });
-}

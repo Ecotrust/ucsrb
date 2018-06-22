@@ -265,7 +265,7 @@ app.map.setBoundaryLayer = function(layer) {
   app.map.boundary = new ol.filter.Mask({
     feature: layer.getSource().getFeatureById('bound'),
     inner: false,
-    fill: new ol.style.Fill({color:[58,86,117,0.35]})
+    fill: new ol.style.Fill({color:[58,86,117,0.45]})
   });
   layer.addFilter(app.map.boundary);
   app.map.boundary.set('active', true);
@@ -282,7 +282,7 @@ setFilter = function(feat, layer) {
   if (app.map.mask) {
     layer.removeFilter(app.map.mask);
   }
-  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[58,86,117,0.2]})});
+  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[58,86,117,0.3]})});
   layer.addFilter(app.map.mask);
   app.map.mask.set('active', true);
   app.map.zoomToExtent(feat.getGeometry().getExtent());
@@ -390,6 +390,7 @@ pourPointSelectAction = function(feat, selectEvent) {
 };
 
 pourPointResultSelection = function(feat) {
+  console.log(feat);
   app.request.get_hydro_results_by_pour_point_id(feat)
     .then(function(response) {
       console.log(response);
@@ -641,10 +642,10 @@ app.map.layer = {
         source: new ol.source.Vector({
           format: new ol.format.GeoJSON()
         }),
-        style: app.map.styles.Point
+        id: 'resultPoints',
+        style: app.map.styles.PourPoint,
       }),
-      id: 'pourpointsresults',
-      selectAction: pourPointResultSelection
+      selectAction: pourPointResultSelection,
     }
 };
 
@@ -673,7 +674,6 @@ app.map.layerSwitcher = new ol.control.LayerSwitcher({
 
 app.map.addControl(app.map.layerSwitcher);
 app.map.addLayer(app.map.layer.selectedFeature.layer);
-app.map.addLayer(app.map.layer.resultPoints.layer);
 
 app.map.toggleMapControls = function(show) {
     if (show) {
@@ -759,14 +759,15 @@ app.map.dropPin = function(coords) {
 }
 
 app.map.addDownstreamPptsToMap = function(pptsArray) {
-  app.map.layer.resultPoints.layer.setVisible(true);
+  app.map.addLayer(app.map.layer.resultPoints.layer);
   pptsArray.forEach(function(element, i) {
-    var feat = new ol.Feature({
-      geometry: new ol.geom.Point(element.geometry.geometry.coordinates),
-      name: element.name
+    console.log(element);
+    let feature = new ol.Feature({
+      geometry: new ol.geom.Point(element.geometry.geometry.coordinates)
     });
-    feat.setStyle(app.map.styles.PourPoint)
-    app.map.layer.resultPoints.layer.getSource().addFeature(feat);
+    feature.setStyle(app.map.styles.PourPoint);
+    app.map.layer.resultPoints.layer.getSource().addFeature(feature);
   });
-  app.map.selection.addResultsPourPointSelection();
+  app.map.layer.resultPoints.layer.setVisible(true);
+  app.map.selection.setSelect(app.map.selection.selectResultsPourPoint);
 }
