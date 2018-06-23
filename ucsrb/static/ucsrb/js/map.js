@@ -761,7 +761,7 @@ app.map.addDownstreamPptsToMap = function(pptsArray) {
   app.map.addLayer(app.map.layer.resultPoints.layer);
   for (var i = 0; i < pptsArray.length; i++) {
     let feature = new ol.Feature({
-      geometry: new ol.geom.Point(pptsArray[i].geometry.geometry.coordinates),
+      geometry: new ol.geom.Point(pptsArray[i].geometry.coordinates),
       id: pptsArray[i].id
     });
     feature.setStyle(app.map.styles.PourPoint);
