@@ -22,21 +22,21 @@ var app = {
 
 scenario_type_selection_made = function(selectionType) {
     var animateObj = {
-      zoom: 8,
-      center: [-13363592.377434019, 6154762.569701998],
-      duration: 2000
+        zoom: 8,
+        center: [-13363592.377434019, 6154762.569701998],
+        duration: 800
     }
-    var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
-    extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+    // var extent = new ol.extent.boundingExtent([[-121.1, 47], [-119, 49]]);
+    // extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
     if (selectionType === 'draw') {
-      app.map.layer.draw.layer.setVisible(true);
-      app.map.removeInteraction(app.map.Pointer);
-      app.map.getView().animate(animateObj);
+        app.map.layer.draw.layer.setVisible(true);
+        app.map.removeInteraction(app.map.Pointer);
+        // app.map.getView().animate(animateObj);
     } else {
-      app.map.removeInteraction(app.map.draw.draw);
-      app.map.layer.draw.layer.setVisible(false);
-      app.map.addInteraction(app.map.Pointer);
-      app.map.getView().animate(animateObj);
+        app.map.removeInteraction(app.map.draw.draw);
+        app.map.layer.draw.layer.setVisible(false);
+        app.map.addInteraction(app.map.Pointer);
+        // app.map.getView().animate(animateObj);
     }
 }
 
@@ -61,7 +61,7 @@ setInit = function() {
 };
 
 reportInit = function() {
-    baseInit();
+
 }
 
 app.init = {
@@ -91,6 +91,29 @@ app.init = {
         reportInit();
         app.panel.results.showAggregate();
     }
+}
+
+app.resultsInit = function(id) {
+    app.nav.stepActions.results();
+    app.map.geoSearch.closeSearchBox();
+    if (!id) {
+        id = app.viewModel.scenarios.scenarioList()[0].uid;
+    } else if (!id.includes('ucsrb')) {
+        sid = 'ucsrb_treatmentscenario_' + id;
+        app.viewModel.scenarios.addScenarioToMap(null, {
+            uid: sid
+        });
+    }
+    app.request.get_results(id,false)
+        .done(function(response) {
+            console.log(response.pourpoints);
+            app.panel.results.responseResultById(response);
+            app.nav.showResultsNav();
+            app.map.addDownstreamPptsToMap(response.pourpoints);
+        })
+        .catch(function(response) {
+            console.log('%c failed to get results: %o', 'color: salmon;', response);
+        });
 }
 
 initFiltering = function() {
@@ -155,34 +178,16 @@ app.panel = {
     },
     results: {
         init: function(id) {
-            app.nav.stepActions.reset();
+            app.panel.getPanelContentElement.innerHTML = app.nav.stepActions.initial;
             app.panel.moveLeft();
-            if (app.state.nav !== 'short') {
-                app.state.navHeight = 'short';
-                app.state.setStep = 'results';
-            }
-            if (!id) {
-                id = app.viewModel.scenarios.scenarioList()[0].uid;
-            } else if (!id.includes('ucsrb')) {
-                sid = 'ucsrb_treatmentscenario_' + id;
-                app.viewModel.scenarios.addScenarioToMap(null, {
-                    uid: sid
-                });
-            }
-            app.request.get_results(id)
-            .then(function(response) {
-                app.panel.results.responseResultById(response);
-            })
-            .catch(function(response) {
-                console.log('%c failed to get results: %o', 'style: salmon;', response);
-            });
         },
         responseResultById: function(result) {
-            app.panel.results.aggPanel(result);
-            app.panel.results.hydroPanel(result);
-            app.panel.results.expander();
             app.panel.results.showAggregate();
-            app.nav.showResultsNav();
+            app.panel.results.expander();
+            app.panel.results.aggPanel(result);
+        },
+        loadHydroResult: function(result) {
+            app.panel.results.hydroPanel(result);
         },
         addResults: function(content) {
             app.state.panel.content = content;
@@ -235,7 +240,8 @@ app.panel = {
                 </div>`;
                 html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
             }
-            html += '<div id="chart"></div>'
+            html += '<div class="chart-wrap container"><div id="chart"></div></div>'
+            html += '<div class="chart-wrap container"><div id="daily-chart"></div></div>'
             html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
             app.panel.results.addResults(html);
@@ -252,61 +258,61 @@ app.panel = {
         },
         chart: {
             init: function() {
-                // Script
                 var chart = bb.generate({
-                  data: {
-                    x: "x",
-                    columns: [
-                        ["datetime",
-                            "2013-01-01 03:00:00",
-                            "2013-01-01 06:00:00",
-                            "2013-01-01 09:00:00",
-                            "2013-01-01 12:00:00",
-                            "2013-01-01 15:00:00",
-                            "2013-01-01 18:00:00"
+                    data: {
+                        rows: [
+                            ['timestep','pptId','rx','totalFlow'],
+                            ['2013-01-01 03:00:00',1,2,100],
+                            ['2013-01-01 06:00:00',1,2,200],
+                            ['2013-01-01 09:00:00',1,2,50],
+                            ['2013-01-01 12:00:00',1,2,160],
                         ],
-                        ["ppt 1",
-                            [150, 140, 110],
-                            [155, 130, 115],
-                            [160, 135, 120],
-                            [135, 120, 110],
-                            [180, 150, 130],
-                            [199, 160, 125]
-                        ],
-                        ["ppt 2",
-                            [160, 130, 100],
-                            [165, 120, 105],
-                            [170, 135, 100],
-                            [185, 130, 100],
-                            [190, 160, 100],
-                            [200, 170, 105]
-                        ],
-                    ],
-                    types: {
-                      data: "area-line-range"
-                    }
-                  },
-                  axis: {
-                    x: {
-                      type: "timeseries",
-                      tick: {
-                        format: "%Y-%m-%d %H:%M:%S"
-                      }
-                    }
-                  },
-                  bindto: "#chart",
-                });
-
-                setTimeout(function() {
-                    chart.load({
-                        columns: [
-                            ["ppt 3", [220, 215, 205], [240, 225, 215], [260, 235, 225], [280, 245, 235], [270, 255, 225], [240, 225, 215]],
-                        ],
+                        x: 'timestep',
+                        xFormat: "%Y-%m-%d %H:%M:%S",
                         types: {
-                            data3: "area-spline-range"
+                            data1: "area-line-range"
+                        },
+                    },
+                    axis: {
+                        x: {
+                            type: "timeseries",
+                            tick: {
+                                format: "%Y-%m-%d %H:%M:%S",
+                            }
+                        },
+                    },
+                    bindto: '#chart',
+                });
+                var dailyChart = bb.generate({
+                    data: {
+                        rows: [
+                            ['timestep','pptId','rx','totalFlow'],
+                            ['2013-01-01 03:00:00',1,2,[100,150,200]],
+                            ['2013-01-01 06:00:00',1,2,[200,300,300]],
+                            ['2013-01-01 09:00:00',1,2,[50,23,90]],
+                        ],
+                        x: 'timestep',
+                        xFormat: "%Y-%m-%d %H:%M:%S",
+                        types: {
+                            totalFlow: "area-spline-range"
                         }
-                    });
-                }, 1000);
+                    },
+                    axis: {
+                        x: {
+                            type: "timeseries",
+                            tick: {
+                                format: "%Y-%m-%d %H:%M:%S",
+                            }
+                        },
+                    },
+                    zoom: {
+                        enabled: true
+                    },
+                    subchart: {
+                        show: true
+                    },
+                    bindto: '#daily-chart',
+                });
             }
         },
         panelResultsElement: function() {
@@ -396,17 +402,17 @@ app.panel = {
         }
     },
     element: function() { // returns a function. to edit dom element don't forget to invoke: element()
-        return this.getElement;
-    },
-    panelContentElement: function() { // returns a function. to edit dom element don't forget to invoke: panelContentElement()
-        return this.getPanelContentElement;
-    },
-    get getElement() {
-        return document.getElementById('panel');
-    },
-    get getPanelContentElement() {
-        return document.getElementById('panel-content');
-    }
+    return this.getElement;
+},
+panelContentElement: function() { // returns a function. to edit dom element don't forget to invoke: panelContentElement()
+return this.getPanelContentElement;
+},
+get getElement() {
+    return document.getElementById('panel');
+},
+get getPanelContentElement() {
+    return document.getElementById('panel-content');
+}
 }
 
 enableDrawing = function() {
@@ -422,14 +428,14 @@ app.nav = {
         document.getElementById('results-nav').classList.remove('d-none');
         document.getElementById('process-nav').classList.add('d-none');
         document.querySelectorAll('#file-nav .results-nav-item').forEach(function(i, arr) {
-          i.classList.remove('d-none')
+            i.classList.remove('d-none')
         });
     },
     hideResultsNav: function() {
         document.getElementById('results-nav').classList.add('d-none');
         document.getElementById('process-nav').classList.remove('d-none');
         document.querySelectorAll('#file-nav .results-nav-item').forEach(function(i, arr) {
-          i.classList.add('d-none')
+            i.classList.add('d-none')
         });
     },
     showStartOver: function() {
@@ -483,29 +489,29 @@ app.nav = {
         ],
         filter: [
             `<div class="text-center">Select area to manage based on:
-                <div class="dropdown show">
-                    <button class="btn btn-sm dropdown-toggle" type="button" id="forestUnit" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select unit</button>
-                    <div class="dropdown-menu show forest-unit-dropdown" aria-labelledby="forestUnit">
-                        <div id="forest-listener">
-                            <button class="dropdown-item" type="button" data-layer="huc10">HUC 10</button>
-                            <button class="dropdown-item" type="button" data-layer="huc12">HUC 12</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="dropdown show">
+            <button class="btn btn-sm dropdown-toggle" type="button" id="forestUnit" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select unit</button>
+            <div class="dropdown-menu show forest-unit-dropdown" aria-labelledby="forestUnit">
+            <div id="forest-listener">
+            <button class="dropdown-item" type="button" data-layer="huc10">HUC 10</button>
+            <button class="dropdown-item" type="button" data-layer="huc12">HUC 12</button>
+            </div>
+            </div>
+            </div>
             </div>
             <script>
-                (function() {
-                    $('#forest-listener button').click(function(event) {
-                        event.preventDefault();
-                        $('#forest-listener').children().each(function(i) {
-                            if ($(this)[0].dataset.layer !== event.target.dataset.layer) {
-                                app.map.disableLayer($(this)[0].dataset.layer);
-                            }
-                        });
-                        var eventLayer = event.target.dataset.layer;
-                        app.map.toggleLayer(eventLayer);
+            (function() {
+                $('#forest-listener button').click(function(event) {
+                    event.preventDefault();
+                    $('#forest-listener').children().each(function(i) {
+                        if ($(this)[0].dataset.layer !== event.target.dataset.layer) {
+                            app.map.disableLayer($(this)[0].dataset.layer);
+                        }
                     });
-                })();
+                    var eventLayer = event.target.dataset.layer;
+                    app.map.toggleLayer(eventLayer);
+                });
+            })();
             </script>`,
             'Select forest unit to filter',
             'Select filters to narrow your treatment area',
@@ -542,11 +548,24 @@ app.nav = {
             false     //TODO: ??? enable editing?
         ],
         results: function() {
-
+            app.nav.hideSave();
+            closeConfirmSelection(true,true);
+            if (app.state.nav !== 'short') {
+                app.state.navHeight = 'short';
+                app.state.setStep = 'results';
+            }
         }
     }
 }
 
+app.loadingAnimation = {
+    show: function() {
+        $('#loading-modal').modal('show');
+    },
+    hide: function() {
+        $('#loading-modal').modal('hide');
+    }
+}
 // using jQuery to get CSRF Token
 function getCookie(name) {
     var cookieValue = null;
@@ -592,14 +611,68 @@ app.request = {
     * @param  {[number]} id treatment scenario id [on scenario this is created]
     * @return {[json]} result data
     */
-    get_results: function(id) {
-        return $.ajax(`/get_results_by_scenario_id/${id}`)
-        .done(function(response) {
-            console.log('%csuccessfully returned result: %o', 'color: green', response);
-            return response;
+    get_results: function(id,exportResults) {
+        if (!id) {
+            id = app.map.selectedFeature.getProperties().ppt_ID;
+        }
+        return $.ajax({
+            url: `/get_results_by_scenario_id`,
+            data: {
+                id: id,
+                // export: exportResults
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log('%csuccessfully returned result: %o', 'color: green', response);
+                return response;
+            },
+            error: function(response) {
+                console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
+            }
         })
-        .fail(function(response) {
-            console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
+    },
+    get_downstream_pour_points: function(id) {
+        if (!id) {
+            id = app.map.selectedFeature.getProperties().ppt_ID;
+        }
+        return $.ajax({
+            url: `/get_downstream_pour_points`,
+            data: {
+                pourpoint_id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log('%csuccessfully returned downstream pourpoints: %o', 'color: green', response);
+                return response;
+            },
+            error: function(response) {
+                console.log(`%cfail @ get downstream pourpoints: %o`, 'color: red', response);
+            }
+        })
+    },
+    get_hydro_results_by_pour_point_id: function(feature, scenarioId) {
+        if (feature.getProperties().ppt_ID) {
+            var pp_id = feature.getProperties().ppt_ID;
+        } else if (feature.getProperties().id) {
+            var pp_id = feature.getProperties().id;
+        } else {
+            var pp_id = feature.getProperties().ppt_id
+        }
+        app.map.selectedPourPoint = feature;
+        if (!scenarioId) {
+            treatmentId = app.state.scenarioId;
+        }
+        return $.ajax({
+            url: '/get_hydro_results_by_pour_point_id',
+            data: {
+                pourpoint_id: pp_id,
+                treatment_id: treatmentId,
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(`%csuccess: got hydro results for pourpoint`, 'color: green');
+                return response;
+            },
         });
     },
     /**
@@ -790,13 +863,15 @@ app.request = {
             success: function(response) {
                 console.log(`%csuccess: saved drawing`, 'color: green');
                 app.map.draw.disable();
-                app.state.setStep = 'result'; // go to results
+                app.state.setStep = 'results'; // go to results
                 var vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
                     dataProjection: 'EPSG:3857',
                     featureProjection: 'EPSG:3857'
                 });
                 app.map.addScenario(vectors);
                 app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
+                app.results.init('ucsrb_treatmentscenario_' + response.id);
+                app.state.scenarioId = response.id;
             },
             error: function(response, status) {
                 console.log(`%cfail @ save drawing: %o`, 'color: red', response);

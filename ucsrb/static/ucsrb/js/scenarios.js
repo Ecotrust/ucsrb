@@ -109,8 +109,9 @@ var madrona = {
                 traditional: true,
                 dataType: 'json',
                 success: function(result) {
-                    app.state.setStep = 'result'; // go to results
+                    app.state.setStep = 'results'; // go to results
                     app.panel.results.init(result['X-Madrona-Show']);
+                    app.resultsInit(result['X-Madrona-Show']);
                     app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
                     app.viewModel.scenarios.loadingMessage(false);
                     // clearInterval(barTimer);
@@ -1260,6 +1261,7 @@ function scenariosModel(options) {
         if (!form_url) {
           form_url = '/features/scenario/form/';
         }
+        app.loadingAnimation.show();
         return $.ajax({
             url: form_url,
             success: function(data) {
@@ -1279,10 +1281,12 @@ function scenariosModel(options) {
                 if ( ! self.filterLayer() && app.viewModel.modernBrowser() ) {
                     self.loadLeaseblockLayer();
                 }
+                app.loadingAnimation.hide();
                 // window.dispatchEvent(new Event('resize'));
             },
             error: function (result) {
                 console.log('failure at scenarios.js "createNewScenario".');
+                app.loadingAnimation.hide();
             }
         });
     };
@@ -1340,6 +1344,8 @@ function scenariosModel(options) {
             scenarioId = options.uid;
         }
 
+        app.state.scenarioId = scenarioId.slice(scenarioId.lastIndexOf('_') + 1)
+
         var isDrawingModel = false,
             isScenarioModel = false;
         if (scenarioId.indexOf('drawing') !== -1) {
@@ -1348,7 +1354,7 @@ function scenariosModel(options) {
             isScenarioModel = true;
         }
 
-        $('#loading-modal').modal('show');
+        app.loadingAnimation.show();
         //perhaps much of this is not necessary once a scenario has been added to app.map.layers initially...?
         //(add check for scenario.layer, reset the style and move on?)
         $.ajax( {
@@ -1542,7 +1548,7 @@ function scenariosModel(options) {
                             }
                         },
                         error: function (result) {
-                            $('#loading-modal').modal('hide');
+                            app.loadingAnimation.hide();
                             console.log('error in scenarios.js: addScenarioToMap (get_attributes scenarioId)');
                         }
 
@@ -1607,11 +1613,11 @@ function scenariosModel(options) {
                     }
                 }
                 setTimeout(function(){
-                  $('#loading-modal').modal('hide');
+                  app.loadingAnimation.hide();
                 }, 1500)
             },
             error: function(result) {
-                $('#loading-modal').modal('hide');
+                app.loadingAnimation.hide();
                 console.log('error in scenarios.js: addScenarioToMap (geojson scenarioId)');
                 app.viewModel.scenarios.errorMessage(result.responseText.split('\n\n')[0]);
             }
@@ -1955,21 +1961,21 @@ function scenariosModel(options) {
         'scenario': self.comparisonCollection().uid,
         'collections': self.comparisonCollection().selectedScenarios()
       };
-      $('#loading-modal').modal('show');
+      app.loadingAnimation.show();
       $.ajax( {
         url: '/scenario/compare_scenario',
         data: data,
         type: 'POST',
         dataType: 'json',
         success: function(data) {
-          $('#loading-modal').modal('hide');
+          app.loadingAnimation.hide();
           attr_list = data[0];
           report_data = data[1];
           download_link = data[2];
           app.viewModel.scenarios.showComparisonReportModal(attr_list,report_data,download_link);
         },
         error: function(result) {
-          $('#loading-modal').modal('hide');
+          app.loadingAnimation.hide();
           console.log('error in scenarios.js: submitCompare');
           window.alert(result.responseText);
         }

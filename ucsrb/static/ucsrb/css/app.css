@@ -1,8 +1,8 @@
 @supports(--var: 'value') {
     /**
-     * Setting some variables mainly for reference because
-     * no support for css vars in IE  (╯°□°)╯
-     */
+    * Setting some variables mainly for reference because
+    * no support for css vars in IE  (╯°□°)╯
+    */
     :root {
         --top-nav-height: 15vh;
         --tall: 30vh; // 14rem
@@ -13,35 +13,35 @@
 }
 
 /**
- * =========================================================================
-   Body
- ===========================================================================
- */
+* =========================================================================
+Body
+===========================================================================
+*/
 
 body {
     overflow: hidden;
 }
 
 /**
- * =========================================================================
-   Header
- ===========================================================================
- */
+* =========================================================================
+Header
+===========================================================================
+*/
 
 header {
     position: relative;
-    z-index: 2;
+    z-index: 6;
 }
 
 /**
- * =========================================================================
-   Navbar
- ===========================================================================
- */
+* =========================================================================
+Navbar
+===========================================================================
+*/
 
 .top-nav-wrap {
-     background: #58595B;
-     color: #fff;
+    background: #58595B;
+    color: #fff;
 }
 
 #menu:first-child {
@@ -49,23 +49,25 @@ header {
 }
 
 /**
- * =========================================================================
-   Nav with scenario options (select, filter, draw)
- ===========================================================================
- */
+* =========================================================================
+Nav with scenario options (select, filter, draw)
+===========================================================================
+*/
 
 .secondary-nav {
     background: #fff;
     height: 14rem;
     height: 30vh;
+    transition: .4s all ease-in-out .3125s;
 }
 
-    .secondary-nav.icons-only {
-        animation: shrink-height .5s ease-in-out forwards;
-    }
+.secondary-nav.icons-only {
+    height: 6.25rem;
+    height: 12vh;
+}
 
 .method-nav {
-    transition: 0.5s all ease-in-out;
+    transition: 1s all ease-in-out;
 }
 
 .method-nav li {
@@ -74,19 +76,19 @@ header {
     text-align: center;
 }
 
-    .method-nav li:after {
-        content: '';
-        border-right: 10px solid #e6e7e8;
-        height: 60%;
-        position: absolute;
-        transition: 0.5s height ease-in;
-        top: 20%;
-        right: -5px;
-    }
+.method-nav li:after {
+    content: '';
+    border-right: 10px solid #e6e7e8;
+    height: 60%;
+    position: absolute;
+    transition: 0.25s height ease-in-out;
+    top: 20%;
+    right: -5px;
+}
 
-    .method-nav li:last-of-type:after {
-        border-right: none;
-    }
+.method-nav li:last-of-type:after {
+    border-right: none;
+}
 
 .method-nav button {
     border: none;
@@ -98,36 +100,37 @@ header {
     transition: 0.15s opacity ease-in-out;
 }
 
-    .method-nav:hover button:not(:hover) {
-        opacity: 0.5;
-    }
+.method-nav:hover button:not(:hover) {
+    opacity: 0.5;
+}
 
-    .method-nav button.active:after {
-        bottom: -3vh;
-        border-left: 3.5vh solid transparent;
-        border-right: 3.5vh solid transparent;
-        border-top: 3vh solid #fff;
-        content: '';
-        left: 50%;
-        opacity: 1;
-        position: absolute;
-        transform: translate(-3.5vh,0);
-        z-index: 0;
-    }
+.method-nav button.active:after {
+    bottom: -3vh;
+    border-left: 3.5vh solid transparent;
+    border-right: 3.5vh solid transparent;
+    border-top: 3vh solid #fff;
+    content: '';
+    left: 50%;
+    opacity: 1;
+    position: absolute;
+    transform: translate(-3.5vh,0);
+    z-index: 0;
+}
 
 .method-nav button img {
     max-height: 5.5rem;
     max-height: 12.5vh;
     margin-bottom: 1rem;
     pointer-events: none;
+    transition: .5s all ease-in-out;
     max-width: 96%;
 }
 
 .method-nav h3 {
     font-size: 2.8375vh;
+    height: 2rem;
     margin: 0 auto;
     pointer-events: none;
-    transition: 0.5s all ease-in-out;
     transform: rotateX(0deg);
     width: 96%;
 }
@@ -137,7 +140,6 @@ header {
     flex-flow: row;
     font-size: 1em;
     font-weight: 700;
-    transition: 0.5s padding ease-in-out;
     height: 100%;
 }
 
@@ -150,10 +152,10 @@ header {
     /* padding: .25rem 1em; */
     text-align: left;
 }
-    #file-nav a.hide,
-    #file-nav .button-modal.hide {
-        display: none;
-    }
+#file-nav a.hide,
+#file-nav .button-modal.hide {
+    display: none;
+}
 
 #file-nav a i.svg_icon,
 #file-nav .button-modal i.svg_icon {
@@ -178,16 +180,18 @@ header {
 }
 
 #process-nav {
-  height: 100%;
+    height: 100%;
 }
 
 .icons-only #process-nav h3 {
-    animation: shrink-height_zero-one 0.5s ease-in-out forwards;
+    height: 0;
     transform: rotateX(90deg);
 }
 
 .icons-only #process-nav img {
-    animation: shrink-img 0.5s ease-in-out forwards;
+    max-height: 3.5rem;
+    max-height: 8vh;
+    margin-bottom: 0;
 }
 
 .icons-only #results-nav h3 {
@@ -204,7 +208,7 @@ header {
 }
 
 .method-nav .nav-item {
-  height: 60%;
+    height: 60%;
 }
 
 .icons-only .method-nav .nav-item img,
@@ -213,38 +217,41 @@ header {
 }
 
 .icons-only .method-nav button:not(.active) {
-  opacity: 0.5;
+    opacity: 0.5;
 }
 
 /**
- * =========================================================================
-    Files Nav and Modals for app (load saved, save, start over/reset)
- ===========================================================================
- */
+* =========================================================================
+Files Nav and Modals for app (load saved, save, start over/reset)
+===========================================================================
+*/
 .username-wrap {
     flex-start: end;
 }
 
 /**
- * =========================================================================
-    Map
- ===========================================================================
- */
+* =========================================================================
+Map
+===========================================================================
+*/
 
 main {
     height: 79vh;
 }
+
 .map-wrap {
+    box-shadow: 0px 15px 90px #bbb;
     height: 100%;
     position: relative;
     /* transition: 0.2s all ease-in; */
     margin-top: -18vh;
+    transition: .5s margin-top ease-out .5s;
     /* z-index: -1; */
 }
-    .map-wrap.short-nav {
-        /* z-index: 0; */
-        margin-top: 0;
-    }
+.map-wrap.short-nav {
+    /* z-index: 0; */
+    margin-top: 0;
+}
 
 .map-wrap .overlay {
     background: rgba(58,86,117,0.8);
@@ -258,11 +265,11 @@ main {
     top: 0;
     z-index: 1;
 }
-    .map-wrap .overlay.fade-out {
-        /* background: rgba(58,86,117,0.8); */
-        /* transition: 0.2s opacity ease-in-out; */
-        /* opacity: 0; */
-    }
+.map-wrap .overlay.fade-out {
+    /* background: rgba(58,86,117,0.8); */
+    /* transition: 0.2s opacity ease-in-out; */
+    /* opacity: 0; */
+}
 
 
 .map-wrap .overlay .instructions {
@@ -270,17 +277,17 @@ main {
     padding-top: 26vh;
     flex-flow: column;
 }
-    .map-wrap .overlay .instructions:before {
-        border-bottom: 16px solid #fff;
-        border-right: 20px solid transparent;
-        border-left: 20px solid transparent;
-        content: '';
-        left: 50%;
-        position: absolute;
-        top: 40%;
-        top: 26vh;
-        transform: translate(-24px,-40px);
-    }
+.map-wrap .overlay .instructions:before {
+    border-bottom: 16px solid #fff;
+    border-right: 20px solid transparent;
+    border-left: 20px solid transparent;
+    content: '';
+    left: 50%;
+    position: absolute;
+    top: 40%;
+    top: 26vh;
+    transform: translate(-24px,-40px);
+}
 
 .map-wrap .overlay.short-overlay {
     bottom: auto;
@@ -288,7 +295,7 @@ main {
 }
 
 .map-wrap .short-overlay .instructions {
-  flex-flow: row;
+    flex-flow: row;
 }
 
 .map-wrap .short-overlay .instructions .hvh {
@@ -308,16 +315,16 @@ main {
 .map-wrap .overlay.short-overlay .instructions {
     padding-top: 0;
 }
-    .map-wrap .overlay.short-overlay .instructions:before {
-        display: none;
-    }
+.map-wrap .overlay.short-overlay .instructions:before {
+    display: none;
+}
 
 #collapsableHelp .card {
-  background: rgba(105,105,105,0.5);
-  display: block;
-  max-height: 30vh;
-  overflow: auto;
-  position: relative;
+    background: rgba(105,105,105,0.5);
+    display: block;
+    max-height: 30vh;
+    overflow: auto;
+    position: relative;
 }
 
 #map {
@@ -325,10 +332,10 @@ main {
 }
 
 /**
- * =========================================================================
-    Map controls
- ===========================================================================
- */
+* =========================================================================
+Map controls
+===========================================================================
+*/
 
 #map .ol-control {
     display: inline-block;
@@ -354,6 +361,10 @@ main {
     top: 2.25vh;
 }
 
+#map .layer-switcher {
+    z-index: 4;
+}
+
 #map .ol-zoom button,
 .ol-geo-search button,
 .layer-switcher button {
@@ -375,10 +386,10 @@ main {
     font-size: 1.5em;
 }
 
-    #map .ol-zoom button:active,
-    #map .ol-zoom button:hover {
-        background-color: rgba(58,86,117,0.66);
-    }
+#map .ol-zoom button:active,
+#map .ol-zoom button:hover {
+    background-color: rgba(58,86,117,0.66);
+}
 
 #map .ol-rotate {
     top: 4em;
@@ -527,30 +538,30 @@ main {
     position: relative;
 }
 
-    .layer-switcher .layer label:before {
-        background-repeat: no-repeat;
-        background-size: 45% auto;
-        background-position: 50%;
-        content: "";
-        display: inline-block;
-        height: 2rem;
-        left: 0;
-        position: absolute;
-        top: 0;
-        width: 2rem;
-    }
+.layer-switcher .layer label:before {
+    background-repeat: no-repeat;
+    background-size: 45% auto;
+    background-position: 50%;
+    content: "";
+    display: inline-block;
+    height: 2rem;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 2rem;
+}
 
-    /* show grey icon */
-    .layer-switcher .layer input[type="checkbox"] + label:before,
-    .layer-switcher .layer input[type="radio"] + label:before {
-        background-image: url('/static/ucsrb/img/icon/i_invisible.svg');
-    }
+/* show grey icon */
+.layer-switcher .layer input[type="checkbox"] + label:before,
+.layer-switcher .layer input[type="radio"] + label:before {
+    background-image: url('/static/ucsrb/img/icon/i_invisible.svg');
+}
 
-    /* show light green icon */
-    .layer-switcher .layer input[type="checkbox"]:checked + label:before,
-    .layer-switcher .layer input[type="radio"]:checked + label:before {
-        background-image: url('/static/ucsrb/img/icon/i_visible_light.svg');
-    }
+/* show light green icon */
+.layer-switcher .layer input[type="checkbox"]:checked + label:before,
+.layer-switcher .layer input[type="radio"]:checked + label:before {
+    background-image: url('/static/ucsrb/img/icon/i_visible_light.svg');
+}
 
 #map .tooltip {
     position: relative;
@@ -586,10 +597,10 @@ main {
 }
 
 /**
- * =========================================================================
-    Modal
- ===========================================================================
- */
+* =========================================================================
+Modal
+===========================================================================
+*/
 
 #load-saved-list {
     list-style: none;
@@ -620,29 +631,84 @@ main {
     text-align: left;
     width: 100%;
 }
-    #load-saved-list .btn-link:after {
-        background: url('/static/ucsrb/img/icon/i_expand_white.svg');
-        background-position: 50%;
-        background-size: 50% auto;
-        background-repeat: no-repeat;
-        content: '';
-        height: 1rem;
-        position: absolute;
-        right: .5rem;
-        top: 50%;
-        transform: translate(0,-.5rem);
-        width: 1rem;
-    }
+#load-saved-list .btn-link:after {
+    background: url('/static/ucsrb/img/icon/i_expand_white.svg');
+    background-position: 50%;
+    background-size: 50% auto;
+    background-repeat: no-repeat;
+    content: '';
+    height: 1rem;
+    position: absolute;
+    right: .5rem;
+    top: 50%;
+    transform: translate(0,-.5rem);
+    width: 1rem;
+}
 
 #loading-modal .modal-header {
+    border-bottom: 0;
     justify-content: space-around;
 }
 
+#loading-modal .modal-content {
+    background: transparent;
+}
+
+#loading-modal .animation * {
+    box-sizing: border-box;
+}
+
+#loading-modal .animation {
+    position: relative;
+	height: 1px;
+	width: 40em;
+	margin: 0 auto;
+	border-bottom: 1px solid #00cfff;
+	padding-top: 49px;
+	margin-top: 49px;
+	overflow: hidden;
+}
+
+#loading-modal .animation .cssload-dot {
+
+}
+
+#loading-modal .animation .cssload-dot:nth-child(2) {
+    position: absolute;
+	top: 29px;
+	right: 34px;
+	font-size:16px;
+	text-transform: uppercase;
+	color: rgb(255,255,255);
+	font-family: helvetica, sans-serif;
+	font-weight: bold;
+}
+
+#loading-modal .animation .cssload-dot:nth-child(3) {
+    position: absolute;
+	top: 29px;
+	margin-left: -50px;
+	height: 58px;
+	width: 58px;
+	left: 0;
+	background: rgb(0,200,255);
+	border-radius: 30%;
+	animation: water-move 8s infinite;
+}
+
+@keyframes water-move {
+    0% {left: 0;}
+	50% {left: 100%; transform: rotate(450deg); width: 146px; height: 146px;}
+	60% {left: 100%; transform: rotate(450deg); width: 146px; height: 146px;}
+	100 {right: 100%;}
+}
+
+
 /**
- * =========================================================================
-    Panel
- ===========================================================================
- */
+* =========================================================================
+Panel
+===========================================================================
+*/
 
 #panel {
     background: rgba(255,255,255,0.9);
@@ -654,16 +720,16 @@ main {
     position: absolute;
     z-index: 3;
 }
-    #panel.left {
-        background: rgba(255,255,255,1);
-        left: .5rem;
-        right: auto;
-    }
-    #panel.right {
-        background: rgba(255,255,255,0.9);
-        left: auto;
-        right: .5rem;
-    }
+#panel.left {
+    background: rgba(255,255,255,1);
+    left: .5rem;
+    right: auto;
+}
+#panel.right {
+    background: rgba(255,255,255,0.9);
+    left: auto;
+    right: .5rem;
+}
 
 #panel #scenario_form,
 #panel #draw_form,
@@ -712,8 +778,8 @@ main {
 }
 
 #scenario-hidden-submit {
-  visibility: hidden;
-  display: none;
+    visibility: hidden;
+    display: none;
 }
 
 .panel #scenarios-form {
@@ -767,18 +833,18 @@ main {
     background: rgba(3,122,251,1);
     border-radius: .25rem;
 }
-    #step1.max4 .progress-bar {
-        width: 0%;
-    }
-    #step2.max4 .progress-bar {
-        width: 25%;
-    }
-    #step3.max4 .progress-bar {
-        width: 50%;
-    }
-    #step4.max4 .progress-bar {
-        width: 75%;
-    }
+#step1.max4 .progress-bar {
+    width: 0%;
+}
+#step2.max4 .progress-bar {
+    width: 25%;
+}
+#step3.max4 .progress-bar {
+    width: 50%;
+}
+#step4.max4 .progress-bar {
+    width: 75%;
+}
 
 .panel form input,
 .panel form textarea {
@@ -792,56 +858,56 @@ main {
 
 .panel .wizard_nav {}
 
-.panel .wizard_nav .row {
-    margin: 0 auto 1.5rem;
-}
+    .panel .wizard_nav .row {
+        margin: 0 auto 1.5rem;
+    }
 
-.panel #scenarios-form .accordion-heading .accordion-toggle {
-    margin-bottom: 0;
-    padding: 0 15px;
-}
+    .panel #scenarios-form .accordion-heading .accordion-toggle {
+        margin-bottom: 0;
+        padding: 0 15px;
+    }
 
-.panel #scenarios-form .accordion-toggle i.check,
-.panel #scenarios-form .accordion-toggle i.icon-check-empty {
-    left: 12px;
-    font-size: .9375em;
-    top: 1px;
-}
+    .panel #scenarios-form .accordion-toggle i.check,
+    .panel #scenarios-form .accordion-toggle i.icon-check-empty {
+        left: 12px;
+        font-size: .9375em;
+        top: 1px;
+    }
 
-.panel #scenarios-form .accordion-heading .accordion-toggle .parameter-label {
-    font-size: 1em;
-}
+    .panel #scenarios-form .accordion-heading .accordion-toggle .parameter-label {
+        font-size: 1em;
+    }
 
-/**
- * =========================================================================
+    /**
+    * =========================================================================
     Results
- ===========================================================================
- */
+    ===========================================================================
+    */
 
-#results {
-    height: 100%;
-}
+    #results {
+        height: 100%;
+    }
 
-.result-section {
-    display: none;
-}
+    .result-section {
+        display: none;
+    }
     .result-section.show {
         display: block;
     }
 
-.result-section:not(:empty) .media,
-.result-section:not(:empty) .result-list-wrap {
-    padding: 1.5rem;
-}
+    .result-section:not(:empty) .media,
+    .result-section:not(:empty) .result-list-wrap {
+        padding: 1.5rem;
+    }
 
-.result-list-wrap {
-    height: 38.5vh;
-    overflow: scroll;
-}
+    .result-list-wrap {
+        height: 32.5vh;
+        overflow: scroll;
+    }
 
-.overflow-gradient {
-    position: relative;
-}
+    .overflow-gradient {
+        position: relative;
+    }
     .overflow-gradient:after {
         background: linear-gradient( rgba(255, 255, 255, 0.1), rgba(255,255,255,0.98));
         bottom: 0;
@@ -853,189 +919,165 @@ main {
         right: 0;
     }
 
-.result-section .media {
-    height: 10vh;
-}
+    .result-section .media {
+        height: 10vh;
+    }
 
-.result-section .media img {
-    max-width: 56px;
-    max-height: 6vh;
-}
+    .result-section .media img {
+        max-width: 56px;
+        max-height: 6vh;
+    }
 
-.result-section .media h4 {
-    margin-bottom: 0;
-}
+    .result-section .media h4 {
+        margin-bottom: 0;
+    }
 
-.feature-result {
-    border-bottom: 2px solid #e6e7e8;
-    border-top: 2px solid #e6e7e8;
-    font-size: 2vh;
-    line-height: 5vh;
-    height: 5vh;
-    padding: 0 1.5rem;
-}
+    .feature-result {
+        border-bottom: 2px solid #e6e7e8;
+        border-top: 2px solid #e6e7e8;
+        font-size: 2vh;
+        line-height: 5vh;
+        height: 5vh;
+        padding: 0 1.5rem;
+    }
 
-.feature-result .lead {
-    font-size: 3vh;
-    font-weight: 500;
-}
+    .feature-result .lead {
+        font-size: 3vh;
+        font-weight: 500;
+    }
 
-.feature-result .lead strong {
-    font-weight: 700;
-}
+    .feature-result .lead strong {
+        font-weight: 700;
+    }
 
-.feature-result h4 {
-    margin-bottom: 0;
-}
+    .feature-result h4 {
+        margin-bottom: 0;
+    }
 
-.result-section {
-    height: 100%;
-}
+    .result-section {
+        height: 100%;
+    }
 
-.result-section .download-wrap {
-    bottom: 0;
-    border-top: 2px solid #e6e7e8;
-    border-radius: 0 0 .5em .5em;
-    height: 10vh;
-    left: 0;
-    padding: 2.25vh 1.5rem;
-    right: 0;
-}
+    .result-section .download-wrap {
+        bottom: 0;
+        border-top: 2px solid #e6e7e8;
+        border-radius: 0 0 .5em .5em;
+        height: 10vh;
+        left: 0;
+        padding: 2.25vh 1.5rem;
+        right: 0;
+    }
 
-.result-section .download-wrap .btn {
-    line-height: 5.5vh;
-    padding: 0 2.5vh;
-}
+    .result-section .download-wrap .btn {
+        line-height: 5.5vh;
+        padding: 0 2.5vh;
+    }
 
-#panel #expand {
-    height: 2vh;
-    position: absolute;
-    right: 1.5rem;
-    top: 1.5rem;
-    width: 2vh;
-    z-index: 2;
-}
+    #panel #expand {
+        height: 2vh;
+        position: absolute;
+        right: 1.5rem;
+        top: 1.5rem;
+        width: 2vh;
+        z-index: 2;
+    }
 
-#panel #expand img {
-    width: 100%;
-}
+    #panel #expand img {
+        width: 100%;
+    }
 
-#panel.expanded #expand {
-    transform: rotate(180deg);
-}
+    #panel.expanded #expand {
+        transform: rotate(180deg);
+    }
 
-/**
- * =========================================================================
-   Charting
- ===========================================================================
- */
+    /**
+    * =========================================================================
+    Charting
+    ===========================================================================
+    */
 
-.result-chart {
-    width: 100%;
-}
+    .chart-wrap {
+        display: block;
+        margin: 0 auto;
+    }
 
-.result-section dl {
-    font-weight: 500;
-    font-size: .75em;
-    line-height: 2;
-    padding-left: 1.5rem;
-}
-
-.result-section dt {
-    color: #68B8C6;
-    font-weight: 500;
-}
-
-.result-section dd {
-    margin-bottom: 0;
-}
-
-/**
- * =========================================================================
-    Popup
- ===========================================================================
- */
-
-.fadeInRight {
-  animation-name: fadeInRight;
-}
-
-.bs-popover-auto[x-placement^=top], .bs-popover-top {
-    margin-bottom: 1rem;
-}
-
-.popover {
-  z-index: 1;
-  min-width: 250px;
-}
-
-.popover-header {
-  padding-right: 33px;
-}
-
-.popover-header button {
-  right: 5px;
-  top: 5px;
-  position: absolute;
-  height: 24px;
-  width: 24px;
-  padding: 0;
-
-}
-
-
-.popover-bottom-confirm-buttons button {
-  margin-left: 15px;
-  margin-right: 15px;
-}
-
-
-/**
- * =========================================================================
-    CSS Animations
- ===========================================================================
- */
-
-@keyframes shrink-height {
-    from {
-        height: 14rem;
+    .bb {
+        display: block;
         height: 30vh;
+        position: relative;
+        width: 100%;
     }
-    to {
-        height: 5rem;
-        height: 12vh;
+
+    .result-section dl {
+        font-weight: 500;
+        font-size: .75em;
+        line-height: 2;
+        padding-left: 1.5rem;
     }
-}
 
-@keyframes shrink-height_zero-one {
-    0% {
-       height: 2rem;
+    .result-section dt {
+        color: #68B8C6;
+        font-weight: 500;
     }
-    100% {
-       height: 0;
+
+    .result-section dd {
+        margin-bottom: 0;
     }
-}
 
- @keyframes shrink-img {
-   0% {
-       max-height: 5.5rem;
-       margin-bottom: 1rem;
-   }
-   100% {
-       max-height: 3.5rem;
-       max-height: 8vh;
-       margin-bottom: 0;
-   }
- }
+    /**
+    * =========================================================================
+    Popup
+    ===========================================================================
+    */
 
- @keyframes fadeInRight {
-  from {
-    opacity: 0;
-    transform: translate3d(100%, 0, 0);
-  }
+    .fadeInRight {
+        animation-name: fadeInRight;
+    }
 
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
+    .bs-popover-auto[x-placement^=top], .bs-popover-top {
+        margin-bottom: 1rem;
+    }
+
+    .popover {
+        z-index: 1;
+        min-width: 250px;
+    }
+
+    .popover-header {
+        padding-right: 33px;
+    }
+
+    .popover-header button {
+        right: 5px;
+        top: 5px;
+        position: absolute;
+        height: 24px;
+        width: 24px;
+        padding: 0;
+
+    }
+
+
+    .popover-bottom-confirm-buttons button {
+        margin-left: 15px;
+        margin-right: 15px;
+    }
+
+
+    /**
+    * =========================================================================
+    CSS Animations
+    ===========================================================================
+    */
+
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translate3d(100%, 0, 0);
+        }
+
+        to {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+    }

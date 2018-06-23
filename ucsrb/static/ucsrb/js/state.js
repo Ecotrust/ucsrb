@@ -1,5 +1,6 @@
 app.state = {
     method: '',
+    scenarioId: null,
     panel: {
         content: '',
         position: '',

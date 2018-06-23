@@ -397,7 +397,7 @@ def get_basin(request):
     if request.method == 'GET':
         from .models import FocusArea
         unit_id = request.GET['pourPoint']
-        layer = 'PourPoint'
+        layer = 'PourPointOverlap'
         focus_area = FocusArea.objects.get(unit_type=layer, unit_id=unit_id)
     return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (focus_area.pk, focus_area.geometry.geojson)))
 
@@ -736,7 +736,60 @@ def get_downstream_pour_points(request):
             'geometry': ppt.geometry.json
         }
         downstream_ppts.append(ppt_dict)
-    return JsonResponse(downstream_ppts)
+    return JsonResponse(downstream_ppts, safe=False)
+
+def parse_flow_results(input_csv, ppt_id, init_year=None, init_month=None, init_day=None, init_hour=None):
+    if not init_year and not init_month and not init_day and not init_hour:
+        start_found=True
+        init_set=False
+    else:
+        start_found=False
+    if init_year and init_month and init_day and init_hour:
+        init_set = True
+
+    output = []
+
+    import csv
+    with open(input_csv) as csvfile:
+        csvReader = csv.reader(csvfile, delimiter=',')
+        for i, row in enumerate(csvReader):
+            if i==0:
+                header = row
+                time_idx = header.index('TIMESTAMP')
+                month_idx = header.index('MONTH')
+                day_idx = header.index('DAY')
+                year_idx = header.index('YEAR')
+                hour_idx = header.index('HOUR')
+                ppt_idx = header.index('STREAMMAPID')
+                flow_idx = header.index('C')
+            else:
+                if int(row[ppt_idx]) == int(ppt_id):
+                    if not start_found:
+                        if (not init_year or int(init_year) == int(row[year_idx])) and (not init_month or int(init_month) == int(row[month_idx])) and (not init_day or int(init_day) == int(row[day_idx])) and (not init_hour or int(init_hour) == int(row[hour_idx])):
+                            start_found == True
+                            init_year == row[year_idx]
+                            init_month == row[month_idx]
+                            init_day == row[day_idx]
+                            init_hour == row[hour_idx]
+                            init_set = True
+                    if start_found:
+                        if not init_set:
+                            # none were set by default.
+                            init_year = row[year_idx]
+                            init_month = row[month_idx]
+                            init_day = row[day_idx]
+                            init_hour = row[hour_idx]
+                            init_set = True
+                        if int(row[year_idx]) == int(init_year)+1 and int(row[month_idx]) == int(init_month) and int(row[day_idx]) == int(init_day) and int(row[hour_idx]) == int(init_hour):
+                            break
+                        output.append({
+                            'pptId': ppt_id,
+                            'rx': 'baseline',
+                            'timestep': row[time_idx],   # or instead 'MM-DD-YYYY HH:00:00'
+                            'flow': float(row[flow_idx])/3/60/60  # value is total volume over 3 hour timestep, we want cubic meters/second
+                        })
+    return output
+
 
 
 # NEEDS:

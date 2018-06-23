@@ -1,12 +1,12 @@
 app.map = mapSettings.getInitMap();
 
-app.map.getView().setCenter([-13363904.869732492, 6108467.733218842]);
-app.map.getView().setZoom(7);
-app.map.getView().setMinZoom(6);
+app.map.getView().setCenter([-13363592.377434019, 6154762.569701998]);
+app.map.getView().setZoom(8);
+app.map.getView().setMinZoom(7);
 app.map.getView().setMaxZoom(19);
 
 app.map.zoomToExtent = function zoomToExtent(extent) {
-  ol.Map.prototype.getView.call(this).fit(extent, {duration: 2000});
+  ol.Map.prototype.getView.call(this).fit(extent, {duration: 1600});
 }
 
 app.map.styles = {
@@ -147,6 +147,27 @@ app.map.styles = {
         zIndex: 6
       });
     },
+    'PourPointSelected': function(feature, resolution) {
+      var radius = 15;
+      if (resolution < 5) {
+          radius = 20;
+      } else if (resolution < 40) {
+          radius = 18;
+      }
+      return new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: radius,
+            fill:  new ol.style.Fill({
+                color: '#4D4D4D',
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#ffffff',
+                width: 5,
+            }),
+        }),
+        zIndex: 7
+      });
+    },
     'Boundary': new ol.style.Style({
       stroke: new ol.style.Stroke({
         color: 'rgba(58,86,117,0.75)',
@@ -244,7 +265,7 @@ app.map.setBoundaryLayer = function(layer) {
   app.map.boundary = new ol.filter.Mask({
     feature: layer.getSource().getFeatureById('bound'),
     inner: false,
-    fill: new ol.style.Fill({color:[58,86,117,0.35]})
+    fill: new ol.style.Fill({color:[58,86,117,0.45]})
   });
   layer.addFilter(app.map.boundary);
   app.map.boundary.set('active', true);
@@ -261,7 +282,7 @@ setFilter = function(feat, layer) {
   if (app.map.mask) {
     layer.removeFilter(app.map.mask);
   }
-  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[58,86,117,0.35]})});
+  app.map.mask = new ol.filter.Mask({feature: feat, inner: false, fill: new ol.style.Fill({color:[58,86,117,0.3]})});
   layer.addFilter(app.map.mask);
   app.map.mask.set('active', true);
   app.map.zoomToExtent(feat.getGeometry().getExtent());
@@ -295,18 +316,23 @@ app.map.closePopup = function() {
 }
 
 confirmSelection = function(feat, vector) {
-  console.log(feat.getProperties());
+  console.log(feat);
   var mbLayer = app.mapbox.layers[feat.getProperties().layer];
   var layer = app.map.layer[mbLayer.map_layer_id];
   var features = (new ol.format.GeoJSON()).readFeatures(vector, {
     dataProjection: 'EPSG:3857',
     featureProjection: 'EPSG:3857'
   });
-  console.log(features);
+
+  // add features for use later in results
+  app.map.layer.selectedFeature.layer.getSource().clear();
+  app.map.layer.selectedFeature.layer.getSource().addFeature(feat);
+  app.map.layer.selectedFeature.layer.setVisible(true);
+
   var feature = features[0];
   if (app.state.method == 'select') {
     // hack for when we have no ppt basins and default to HUC 12.
-    setFilter(feature, app.map.layer.pourpoints.layer);
+    setFilter(feature, app.map.layer.streams.layer);
   } else {
     setFilter(feature, layer.layer);
   }
@@ -350,7 +376,6 @@ streamSelectAction = function(feat) {
     app.state.setStep = 0; // go back to step one
   }
   pourPointSelectAction(feat);
-  // app.map.enableLayer('pourpoints');
 };
 
 pourPointSelectAction = function(feat, selectEvent) {
@@ -363,6 +388,13 @@ pourPointSelectAction = function(feat, selectEvent) {
     }
   });
 };
+
+pourPointResultSelection = function(feat) {
+  app.request.get_hydro_results_by_pour_point_id(feat)
+    .done(function(response) {
+      app.panel.results.loadHydroResult(response);
+    })
+}
 
 var drawSource = new ol.source.Vector();
 var drawInteraction = new ol.interaction.Draw({
@@ -517,7 +549,9 @@ app.map.layer = {
         id: 'streams', // set id equal to x in app.map.layer.x
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
-          format: new ol.format.MVT(),
+          format: new ol.format.MVT({
+            featureClass: ol.Feature
+          }),
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['strm_sgmnts_all6-11-0i3yy4'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.Streams,
@@ -596,6 +630,22 @@ app.map.layer = {
             });
         },
     },
+    selectedFeature: {
+      layer: new ol.layer.Vector({
+        source: new ol.source.Vector(),
+        style: app.map.styles.LineStringSelected
+      })
+    },
+    resultPoints: {
+      layer: new ol.layer.Vector({
+        source: new ol.source.Vector({
+          format: new ol.format.GeoJSON()
+        }),
+        id: 'resultPoints',
+        style: app.map.styles.PourPoint,
+      }),
+      selectAction: pourPointResultSelection,
+    }
 };
 
 app.map.layer.scenarios.layer.set('id','scenarios');
@@ -622,6 +672,7 @@ app.map.layerSwitcher = new ol.control.LayerSwitcher({
 });
 
 app.map.addControl(app.map.layerSwitcher);
+app.map.addLayer(app.map.layer.selectedFeature.layer);
 
 app.map.toggleMapControls = function(show) {
     if (show) {
@@ -704,4 +755,18 @@ app.map.dropPin = function(coords) {
   });
   app.map.dropPin.pin.setStyle(app.map.styles.Point);
   app.map.dropPin.source.addFeature(app.map.dropPin.pin);
+}
+
+app.map.addDownstreamPptsToMap = function(pptsArray) {
+  app.map.addLayer(app.map.layer.resultPoints.layer);
+  for (var i = 0; i < pptsArray.length; i++) {
+    let feature = new ol.Feature({
+      geometry: new ol.geom.Point(pptsArray[i].geometry.geometry.coordinates),
+      id: pptsArray[i].id
+    });
+    feature.setStyle(app.map.styles.PourPoint);
+    app.map.layer.resultPoints.layer.getSource().addFeature(feature);
+  }
+  app.map.layer.resultPoints.layer.setVisible(true);
+  app.map.selection.setSelect(app.map.selection.selectResultsPourPoint);
 }

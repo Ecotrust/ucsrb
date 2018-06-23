@@ -100,7 +100,7 @@ class Command(BaseCommand):
             # if in_type == 'PourPoint':
             #     id_field = 'ppt_ID'
             if in_type == 'PourPointOverlap':
-                id_field = 'ppt_ID'
+                id_field = 'ppt_id'
             if in_type == 'PourPointDiscrete':
                 id_field = 'ppt_ID'
 

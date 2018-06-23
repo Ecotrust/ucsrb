@@ -160,6 +160,14 @@ app.map.selection.selectFilterSingleClick = new ol.interaction.Select(
     style: app.map.styles.Polygon
   }
 );
+app.map.selection.selectResultsPourPoint = new ol.interaction.Select(
+  {
+    layers: [
+      app.map.layer.resultPoints.layer
+    ],
+    style: app.map.styles.PourPointSelected
+  }
+);
 
 app.map.selection.setSelect = function(selectionInteraction) {
   //Is this line necessary?
@@ -177,5 +185,3 @@ app.map.selection.setSelect = function(selectionInteraction) {
     });
   });
 };
-
-app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
