@@ -651,7 +651,13 @@ app.request = {
         })
     },
     get_hydro_results_by_pour_point_id: function(feature, scenarioId) {
-        var pp_id = feature.getProperties().ppt_ID;
+        if (feature.getProperties().ppt_ID) {
+            var pp_id = feature.getProperties().ppt_ID;
+        } else if (feature.getProperties().id) {
+            var pp_id = feature.getProperties().id;
+        } else {
+            var pp_id = feature.getProperties().ppt_id
+        }
         app.map.selectedPourPoint = feature;
         if (!scenarioId) {
             treatmentId = app.state.scenarioId;

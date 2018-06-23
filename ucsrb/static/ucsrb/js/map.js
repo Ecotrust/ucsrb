@@ -390,10 +390,9 @@ pourPointSelectAction = function(feat, selectEvent) {
 };
 
 pourPointResultSelection = function(feat) {
-  console.log(feat);
   app.request.get_hydro_results_by_pour_point_id(feat)
-    .then(function(response) {
-      console.log(response);
+    .done(function(response) {
+      app.panel.results.loadHydroResult(response);
     })
 }
 
@@ -762,7 +761,8 @@ app.map.addDownstreamPptsToMap = function(pptsArray) {
   app.map.addLayer(app.map.layer.resultPoints.layer);
   for (var i = 0; i < pptsArray.length; i++) {
     let feature = new ol.Feature({
-      geometry: new ol.geom.Point(pptsArray[i].geometry.geometry.coordinates)
+      geometry: new ol.geom.Point(pptsArray[i].geometry.geometry.coordinates),
+      id: pptsArray[i].id
     });
     feature.setStyle(app.map.styles.PourPoint);
     app.map.layer.resultPoints.layer.getSource().addFeature(feature);
