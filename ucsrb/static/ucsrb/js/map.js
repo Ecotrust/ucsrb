@@ -392,6 +392,8 @@ pourPointSelectAction = function(feat, selectEvent) {
 pourPointResultSelection = function(feat) {
   app.request.get_hydro_results_by_pour_point_id(feat)
     .done(function(response) {
+      console.log(feat);
+      feat.setStyle('PourPointSelected');
       app.panel.results.loadHydroResult(response);
     })
 }
@@ -570,14 +572,9 @@ app.map.layer = {
         source: new ol.source.VectorTile({
           attributions: 'Ecotrust',
           format: new ol.format.GeoJSON(),
-          url: '/static/ucsrb/data/ppts_all.geojson',
-          strategy: ol.loadingstrategy.bbox,
         }),
         style: app.map.styles.PourPoint,
         visible: false,
-        renderBuffer: 0,
-        minResolution: 2,
-        maxResolution: 200,
       }),
       selectAction: pourPointSelectAction
     },
@@ -639,10 +636,10 @@ app.map.layer = {
     resultPoints: {
       layer: new ol.layer.Vector({
         source: new ol.source.Vector({
-          format: new ol.format.GeoJSON()
+          format: new ol.format.GeoJSON(),
+          style: app.map.styles.PourPoint
         }),
         id: 'resultPoints',
-        style: app.map.styles.PourPoint,
       }),
       selectAction: pourPointResultSelection,
     }
