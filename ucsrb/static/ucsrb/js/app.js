@@ -99,9 +99,9 @@ app.resultsInit = function(id) {
     if (!id) {
         id = app.viewModel.scenarios.scenarioList()[0].uid;
     } else if (!id.includes('ucsrb')) {
-        sid = 'ucsrb_treatmentscenario_' + id;
+        id = 'ucsrb_treatmentscenario_' + id;
         app.viewModel.scenarios.addScenarioToMap(null, {
-            uid: sid
+            uid: id
         });
     }
     app.request.get_results(id,false)
