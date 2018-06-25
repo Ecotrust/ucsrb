@@ -673,6 +673,9 @@ app.request = {
                 console.log(`%csuccess: got hydro results for pourpoint`, 'color: green');
                 return response;
             },
+            error: function(response) {
+                console.log(`%cfail @ get hydro results for pourpoint: %o`, 'color: red', response);
+            }
         });
     },
     /**
