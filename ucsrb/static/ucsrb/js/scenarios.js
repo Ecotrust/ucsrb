@@ -1540,7 +1540,6 @@ function scenariosModel(options) {
                         type: 'GET',
                         dataType: 'json',
                         success: function(result) {
-                            app.setState('aggregate');
                             if (scenario) {
                               //TODO: figure out when and why this wouldn't have a scenario (on creating empty collection)
                               //    and adjust if necessary
