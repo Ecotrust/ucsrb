@@ -88,10 +88,10 @@ def get_veg_unit_by_bbox(request):
     bbox, bboxCenter = build_bbox(minX, minY, maxX, maxY)
     # Get all veg units that intersect bbox (planning units)
     from .models import VegPlanningUnit
-    vegUnits = VegPlanningUnit.objects.filter(geometry__intersects=bbox)
+    vegUnits = VegPlanningUnit.objects.filter(geometry__coveredby=bbox)
     # Select center-most veg unit (handle 0)
     if vegUnits.count() > 1:
-        centerVegUnit = VegPlanningUnit.objects.filter(geometry__intersects=bboxCenter)
+        centerVegUnit = VegPlanningUnit.objects.filter(geometry__coveredby=bboxCenter)
         if centerVegUnit.count() == 1:
             retVegUnit = centerVegUnit[0].geometry.geojson
         else:
@@ -738,7 +738,7 @@ def get_downstream_pour_points(request):
         downstream_ppts.append(ppt_dict)
     return JsonResponse(downstream_ppts, safe=False)
 
-def parse_flow_results(input_csv, ppt_id, init_year=None, init_month=None, init_day=None, init_hour=None):
+def parse_flow_results(input_csv, ppt_id, rx='baseline', init_year=None, init_month=None, init_day=None, init_hour=None):
     if not init_year and not init_month and not init_day and not init_hour:
         start_found=True
         init_set=False
@@ -760,7 +760,10 @@ def parse_flow_results(input_csv, ppt_id, init_year=None, init_month=None, init_
                 day_idx = header.index('DAY')
                 year_idx = header.index('YEAR')
                 hour_idx = header.index('HOUR')
-                ppt_idx = header.index('STREAMMAPID')
+                try:
+                    ppt_idx = header.index('STREAMMAPID')
+                except:
+                    ppt_idx = header.index('STREAMMAPI')
                 flow_idx = header.index('C')
             else:
                 if int(row[ppt_idx]) == int(ppt_id):
@@ -784,13 +787,19 @@ def parse_flow_results(input_csv, ppt_id, init_year=None, init_month=None, init_
                             break
                         output.append({
                             'pptId': ppt_id,
-                            'rx': 'baseline',
+                            # 'rx': rx,
                             'timestep': row[time_idx],   # or instead 'MM-DD-YYYY HH:00:00'
                             'flow': float(row[flow_idx])/3/60/60  # value is total volume over 3 hour timestep, we want cubic meters/second
                         })
     return output
 
+def run_hydro_model(in_csv):
 
+    # TODO: Run Bill's R script
+
+    # placeholder
+    out_csv = in_csv
+    return out_csv
 
 # NEEDS:
 #   pourpoint_id
@@ -806,6 +815,7 @@ def get_hydro_results_by_pour_point_id(request):
     treatment_id = request.GET.get('treatment_id')
     treatment = TreatmentScenario.objects.get(pk=treatment_id)
 
+
     # TODO: Filter out basins not upstream of given pourpoint
     # - Get OL basin
     # - Get all encompassed discrete basins
@@ -816,15 +826,77 @@ def get_hydro_results_by_pour_point_id(request):
     #         calculate new condensed area of each THC
     #         Calculate diff with treatment area baseline
     #     apply each diff to create rows in input sheet
-    sub_basins = PourPointBasin.objects.filter(geometry__intersects__=treatment.geometry)
-    for basin in sub_basins:
-        # TODO:
-        # gather input data for Bill's R script
-        #   All Treatment Types
-        #   All impacted basins
-        # run Bill's R script
+
+    sub_basins = FocusArea.objects.filter(unit_type="PourPointDiscrete",geometry__intersects=treatment.geometry_dissolved)
+
+    dummy_run = False
+
+    results = {}
+    # results = []
+    flow_output = {}
+
+    ###############################################################
+    # Dummy Work
+    ###############################################################
+
+    from ucsrb import project_settings as ucsrb_settings
+    import csv
+    lookup_dict = {}
+    dummy_result_location_base = '%s/docs/dummy_Data/' % ucsrb_settings.BASE_DIR
+    input_csv = '%sppt_stmmap_rx.csv' % dummy_result_location_base
+    with open(input_csv) as csvfile:
+        csvReader = csv.reader(csvfile, delimiter=',')
+        for i, row in enumerate(csvReader):
+            if i==0:
+                header = row
+                ppt_idx = header.index('ppt_id')
+                stream_idx = header.index('strmap_id')
+                baseline_idx = header.index('RxBase')
+                r50_idx = header.index('Rx50')
+                r30_idx = header.index('Rx30')
+                r0_idx = header.index('Rx0')
+            else:
+                if int(row[ppt_idx]) == int(pourpoint_id):
+                    lookup_dict = {
+                        'stream': row[stream_idx],
+                        'baseline': row[baseline_idx],
+                        'rx50': row[r50_idx],
+                        'rx30': row[r30_idx],
+                        'rx0': row[r0_idx]
+                    }
+                    break
+
+    if len(lookup_dict.keys()) > 0:
+        dummy_run = True
+        pourpoint_id = int(lookup_dict['stream'])
+        for (rx, scenario) in [('baseline', 'baseline'), ('mechanical', 'rx50'), ('rx_burn', 'rx30'), ('catastrophic_fire','rx0')]:
+            # Get output csv
+            results_csv = '%svegmet%s.txt' % (dummy_result_location_base, lookup_dict[scenario])
+            flow_output[rx] = results_csv
+
+    ###############################################################
+    # END Dummy Work
+    ###############################################################
+
+
+    if not dummy_run:
+        sub_basin_results = {}
+        for basin in sub_basins:
+            input_csv = ''
+            # TODO:
+            # gather input data for Bill's R script
+            #   All Treatment Types
+            #   All impacted basins
+            # run Bill's R script
+            flow_output = run_hydro_model(input_csv)
+            # TODO: aggregate stream-flow diff and calculate downstream value for full basin
+
+    for rx in flow_output.keys():
+>>>>>>> master
         # Interpret script output and format for API handoff
-        results = {}
+        results[rx] = parse_flow_results(flow_output[rx], pourpoint_id, rx)
+        # results.extend(parse_flow_results(flow_output[rx], pourpoint_id, rx))
+
     return JsonResponse(results)
 
 def get_results_by_scenario_id(request):
@@ -838,7 +910,10 @@ def get_results_by_scenario_id(request):
         return get_json_error_response('Treatment with given ID (%s) does not exist' % scenario_id, 500, {})
 
     # get smallest overlapping pourpoint basin that contains entire treatment
-    containing_overlap_basin = sorted(FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__contains=treatment.geometry_dissolved), key=lambda x: x.geometry.area)[0]
+    try:
+        containing_overlap_basin = sorted(FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__contains=treatment.geometry_dissolved), key=lambda x: x.geometry.area)[0]
+    except:
+        containing_overlap_basin = sorted(FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__intersects=treatment.geometry_dissolved), key=lambda x: x.geometry.area)[-1]
     # get all discrete pourpoint basins that are impacted by the treatment
     treated_basin_ids = [x.unit_id for x in FocusArea.objects.filter(unit_type='PourPointDiscrete', geometry__intersects=treatment.geometry_dissolved)]
     impacted_pourpoint_ids = []
@@ -1015,7 +1090,7 @@ def run_filter_query(filters):
 
     if 'focus_area' in filters.keys() and 'focus_area_input' in filters.keys() and filters['focus_area']:
         focus_area = FocusArea.objects.get(pk=filters['focus_area_input']).geometry;
-        query = VegPlanningUnit.objects.filter(geometry__intersects=focus_area)
+        query = VegPlanningUnit.objects.filter(geometry__coveredby=focus_area)
     else:
         notes = ['Please Filter By Focus Area']
         query = VegPlanningUnit.objects.filter(pk=None)
