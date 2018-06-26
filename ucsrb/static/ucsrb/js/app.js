@@ -241,7 +241,8 @@ app.panel = {
                     <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
                   </ol>
                   <div class="carousel-inner">`;
-              results.hydro_results.forEach(function(element) {
+            console.log(results);
+              results.forEach(function(element) {
                   html += `<div class="carousel-item" id="${results.id}">
                       <div class="chart-wrap container"><div id="chart-${element.title}"></div></div>
                   </div>`
@@ -274,24 +275,41 @@ app.panel = {
             init: function(element, results) {
                 var chart = bb.generate({
                     data: {
-            			json: [
+                        json: [
                             results
                         ]
-            		},
-                    x: 'timestep',
-                    xFormat: "%Y-%m-%d %H:%M:%S",
-                    types: {
-                        data1: "area-line-range"
                     },
+                    keys: {
+                        x: 'timestep',
+                        value: ['flow']
+                    },
+                    xFormat: '%m.%d.%Y-%H:%M:%S',
+                    names: {
+                        flow: 'FPS'
+                    },
+                    type: 'spline',
                     axis: {
                         x: {
-                            type: "timeseries",
+                            type: 'timeseries',
                             tick: {
-                                format: "%Y-%m-%d %H:%M:%S",
+                                fit: true
                             }
-                        },
+                        }
                     },
-                    bindto: '#chart',
+                    zoom: {
+                        enabled: true,
+                        rescale: true,
+                    },
+                    grid: {
+                        y: {
+                            lines: [
+                                {
+                                    value: 12,
+                                    text: "Baseline"
+                                }
+                            ]
+                        }
+                    },
                 });
                 var dailyChart = bb.generate({
                     data: {
