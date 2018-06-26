@@ -908,30 +908,18 @@ def get_results_by_scenario_id(request):
     except:
         return get_json_error_response('Treatment with given ID (%s) does not exist' % scenario_id, 500, {})
 
+    containing_overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__intersects=treatment.geometry_dissolved)
+    # TODO: return the smallest overlapping ppt basin to contain treatment so screen can zoom to it.
     # get smallest overlapping pourpoint basin that contains entire treatment
-    try:
-        containing_overlap_basin = sorted(FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__contains=treatment.geometry_dissolved), key=lambda x: x.geometry.area)[0]
-    except:
-        containing_overlap_basin = sorted(FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__intersects=treatment.geometry_dissolved), key=lambda x: x.geometry.area)[-1]
+    # try:
+    #     containing_overlap_basin = sorted(FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__contains=treatment.geometry_dissolved), key=lambda x: x.geometry.area)[0]
+    # except:
+    #     containing_overlap_basin = sorted(FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__intersects=treatment.geometry_dissolved), key=lambda x: x.geometry.area)[-1]
     # get all discrete pourpoint basins that are impacted by the treatment
     treated_basin_ids = [x.unit_id for x in FocusArea.objects.filter(unit_type='PourPointDiscrete', geometry__intersects=treatment.geometry_dissolved)]
     impacted_pourpoint_ids = []
-    # TODO: Find a better way of calculating and looping through downstream network
-    for ppt_id in treated_basin_ids:
-        # for each treated pourpoint basin
-        treated_basin = PourPointBasin.objects.get(pk=ppt_id)
-        if ppt_id not in impacted_pourpoint_ids:
-            impacted_pourpoint_ids.append(ppt_id)
-        downstream_ppt_id = treated_basin.dwnst_ppt
-        while not downstream_ppt_id == 9999:
-            # for each downstream pourpoint basin
-            try:
-                downstream_basin = PourPointBasin.objects.get(pk=downstream_ppt_id)
-                if downstream_basin.pk not in impacted_pourpoint_ids:
-                    impacted_pourpoint_ids.append(downstream_basin.unit_id)
-                downstream_ppt_id = downstream_basin.dwnst_ppt
-            except:
-                downstream_ppt_id = 9999
+
+    impacted_pourpoint_ids = [x.unit_id for x in containing_overlap_basins]
     downstream_ppts = PourPoint.objects.filter(id__in=impacted_pourpoint_ids)
 
     if export:
