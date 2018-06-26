@@ -94,8 +94,8 @@ app.init = {
 }
 
 app.resultsInit = function(id) {
-    // app.nav.stepActions.results();
     app.map.geoSearch.closeSearchBox();
+    app.panel.results.init();
     if (!id) {
         id = app.viewModel.scenarios.scenarioList()[0].uid;
     } else if (!id.includes('ucsrb')) {
@@ -127,7 +127,7 @@ initFiltering = function() {
         } else {
             initFiltering();
         }
-    }, 100);
+    }, 300);
 };
 
 drawingIsSmallEnough = function(areaInMeters) {
@@ -178,11 +178,11 @@ app.panel = {
         },
     },
     results: {
-        init: function(id) {
+        init: function() {
             app.panel.getPanelContentElement.innerHTML = app.nav.stepActions.initial;
             app.panel.moveLeft();
-            if (app.state.nav !== 'tall') {
-                app.state.navHeight = 'tall';
+            if (app.state.nav === 'tall') {
+                app.state.navHeight = 'short';
             }
         },
         responseResultById: function(result) {

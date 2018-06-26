@@ -59,7 +59,7 @@ $(document).ready(function() {
             app.promptToSave();
         }
         app.request.get_user_scenarios()
-            .then(function(response) {
+            .done(function(response) {
                 var html = '<ul id="load-saved-list">'
                 for (scenario in response) {
                     html += `<li><button data-id="${response[scenario].id}" class="scenario-name btn btn-link">${response[scenario].name} <span class="description">${response[scenario].description}</span></button></li>`;
@@ -70,7 +70,7 @@ $(document).ready(function() {
             .then(function() {
                 document.getElementById('load-saved-list').addEventListener('click', function(event) {
                     $('#load-saved').modal('hide');
-                    app.panel.results.init(event.target.dataset.id);
+                    app.resultsInit(event.target.dataset.id);
                     app.map.clearLayers();
                     $('.method-nav button').each(function() {
                         $(this).removeClass('active');
