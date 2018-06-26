@@ -790,7 +790,13 @@ def parse_flow_results(input_csv, ppt_id, init_year=None, init_month=None, init_
                         })
     return output
 
+def run_hydro_model(in_csv):
 
+    # TODO: Run Bill's R script
+
+    # placeholder
+    out_csv = in_csv
+    return out_csv
 
 # NEEDS:
 #   pourpoint_id
@@ -806,6 +812,44 @@ def get_hydro_results_by_pour_point_id(request):
     treatment_id = request.GET.get('treatment_id')
     treatment = TreatmentScenario.objects.get(pk=treatment_id)
 
+    ###############################################################
+    # Dummy Work
+    ###############################################################
+
+    import csv
+    lookup_dict = {}
+    input_csv = '/usr/local/apps/UCSRB/marineplanner-core/apps/ucsrb/docs/dummy_Data/ppt_stmmap_rx.csv'
+    with open(input_csv) as csvfile:
+        csvReader = csv.reader(csvfile, delimiter=',')
+        for i, row in enumerate(csvReader):
+            if i==0:
+                header = row
+                ppt_idx = header.index('ppt_id')
+                stream_idx = header.index('strmap_id')
+                baseline_idx = header.index('RxBase')
+                r50_idx = header.index('Rx50')
+                r30_idx = header.index('Rx30')
+                r0_idx = header.index('Rx0')
+            else:
+                if int(row[ppt_idx]) == int(pourpoint_id):
+                    lookup_dict[str(row[ppt_idx])] = {
+                        'stream': row[stream_idx],
+                        'baseline': row[baseline_idx],
+                        'rx50': row[r50_idx],
+                        'rx30': row[r30_idx],
+                        'rx0': row[r0_idx]
+                    }
+                    break
+
+    if len(lookup_dict.keys()) > 0:
+
+
+
+
+    ###############################################################
+    # END Dummy Work
+    ###############################################################
+
     # TODO: Filter out basins not upstream of given pourpoint
     # - Get OL basin
     # - Get all encompassed discrete basins
@@ -819,12 +863,15 @@ def get_hydro_results_by_pour_point_id(request):
 
     sub_basins = PourPointBasins(geometry__intersects__=treatment.geometry)
     for basin in sub_basins:
+        input_csv = ''
         # TODO:
         # gather input data for Bill's R script
         #   All Treatment Types
         #   All impacted basins
         # run Bill's R script
+        flow_output = run_hydro_model(input_csv)
         # Interpret script output and format for API handoff
+        parse_flow_results(flow_output)
         results = {}
     return JsonResponse(results)
 
@@ -993,156 +1040,8 @@ def get_results_by_scenario_id(request):
                     }
                 },
             ],
-            'pourpoints': [ {'id': x.pk, 'name': '', 'geometry': x.geometry.json } for x in downstream_ppts ]
-            #     {
-            #         'id': 1,
-            #         'name': 'Pour Point 1',
-            #         'geometry': {
-            #             "type": "Feature",
-            #             "properties": {},
-            #             "geometry": {
-            #               "type": "Point",
-            #               "coordinates": [
-            #                 #   -120.41339635848999,
-            #                 #   47.63433043507602
-            #                 -13404357.965449827,
-            #                 6046234.624586983
-            #               ]
-            #             }
-            #         },
-            #         'hydro_results': {
-            #             '7_day_low_flow':{
-            #                 'title': '7-day low flow',
-            #                 'chart_title': 'Streamflow: Cubic Feet per Second',
-            #                 'fc_50': {
-            #                     'label': '50% Fractional Coverage',
-            #                     'data': [          # diff from baseline (? these numbers would be a 'total')
-            #                         ('Jan', 300),
-            #                         ('Feb', 280),
-            #                         ('Mar', 320),
-            #                         ('Apr', 840),
-            #                         ('May', 1500),
-            #                         ('Jun', 1500),
-            #                         ('Jul', 400),
-            #                         ('Aug', 100),
-            #                         ('Sep', 100),
-            #                         ('Oct', 200),
-            #                         ('Nov', 400),
-            #                         ('Dec', 300),
-            #                     ]
-            #                 },
-            #                 'fc_30': {
-            #                     'label': '30% Fractional Coverage',
-            #                     'data': [          # 30% fractional coverage results
-            #                         ('Jan', 300),
-            #                         ('Feb', 200),
-            #                         ('Mar', 320),
-            #                         ('Apr', 700),
-            #                         ('May', 1000),
-            #                         ('Jun', 1000),
-            #                         ('Jul', 800),
-            #                         ('Aug', 600),
-            #                         ('Sep', 400),
-            #                         ('Oct', 240),
-            #                         ('Nov', 400),
-            #                         ('Dec', 300),
-            #                     ]
-            #                 },
-            #                 'fc_0': {
-            #                     'label': '0% Fractional Coverage',
-            #                     'data': [          # 0% fractional coverage results
-            #                         ('Jan', 200),
-            #                         ('Feb', 200),
-            #                         ('Mar', 300),
-            #                         ('Apr', 700),
-            #                         ('May', 800),
-            #                         ('Jun', 800),
-            #                         ('Jul', 800),
-            #                         ('Aug', 800),
-            #                         ('Sep', 600),
-            #                         ('Oct', 360),
-            #                         ('Nov', 400),
-            #                         ('Dec', 300),
-            #                     ],
-            #                 }
-            #             }
-            #         },
-            #     },
-            #     {
-            #         'id': 2,
-            #         'name': 'Pour Point 2',
-            #         'geometry': {
-            #             "type": "Feature",
-            #             "properties": {},
-            #             "geometry": {
-            #               "type": "Point",
-            #               "coordinates": [
-            #                 # -120.4241681098938,
-            #                 # 47.635913722247565
-            #                 -13405557.071330884,
-            #                 6046496.182543105
-            #               ]
-            #             }
-            #         },
-            #         'hydro_results': {
-            #             '7_day_low_flow':{
-            #                 'title': '7-day low flow',
-            #                 'chart_title': 'Streamflow: Cubic Feet per Second',
-            #                 'fc_50': {
-            #                     'label': '50% Fractional Coverage',
-            #                     'data': [          # diff from baseline (? these numbers would be a 'total')
-            #                         ('Jan', 300),
-            #                         ('Feb', 280),
-            #                         ('Mar', 320),
-            #                         ('Apr', 840),
-            #                         ('May', 1500),
-            #                         ('Jun', 1500),
-            #                         ('Jul', 400),
-            #                         ('Aug', 100),
-            #                         ('Sep', 100),
-            #                         ('Oct', 200),
-            #                         ('Nov', 400),
-            #                         ('Dec', 300),
-            #                     ]
-            #                 },
-            #                 'fc_30': {
-            #                     'label': '30% Fractional Coverage',
-            #                     'data': [          # 30% fractional coverage results
-            #                         ('Jan', 300),
-            #                         ('Feb', 200),
-            #                         ('Mar', 320),
-            #                         ('Apr', 700),
-            #                         ('May', 1000),
-            #                         ('Jun', 1000),
-            #                         ('Jul', 800),
-            #                         ('Aug', 600),
-            #                         ('Sep', 400),
-            #                         ('Oct', 240),
-            #                         ('Nov', 400),
-            #                         ('Dec', 300),
-            #                     ]
-            #                 },
-            #                 'fc_0': {
-            #                     'label': '0% Fractional Coverage',
-            #                     'data': [          # 0% fractional coverage results
-            #                         ('Jan', 200),
-            #                         ('Feb', 200),
-            #                         ('Mar', 300),
-            #                         ('Apr', 700),
-            #                         ('May', 800),
-            #                         ('Jun', 800),
-            #                         ('Jul', 800),
-            #                         ('Aug', 800),
-            #                         ('Sep', 600),
-            #                         ('Oct', 360),
-            #                         ('Nov', 400),
-            #                         ('Dec', 300),
-            #                     ],
-            #                 }
-            #             }
-            #         },
-            #     },
-            # ]
+            'pourpoints': [ {'id': x.pk, 'name': '', 'geometry': json.loads(x.geometry.json) } for x in downstream_ppts ]
+
         }
         return JsonResponse(return_json)
 
