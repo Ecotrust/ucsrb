@@ -275,25 +275,13 @@ app.panel = {
                 var chart = bb.generate({
                     data: {
             			json: [
-                            timestep: results.timestep,
-                            totalflow: results.totalflow
-            			],
-            			keys: {
-            				// x: "name", // it's possible to specify "x" when category axis
-            				value: ["upload", "download"],
-            			}
+                            results
+                        ]
             		},
-            		axis: {
-            			x: {
-            				// type: "category"
-            			}
-            		}
-                        ],
-                        x: 'timestep',
-                        xFormat: "%Y-%m-%d %H:%M:%S",
-                        types: {
-                            data1: "area-line-range"
-                        },
+                    x: 'timestep',
+                    xFormat: "%Y-%m-%d %H:%M:%S",
+                    types: {
+                        data1: "area-line-range"
                     },
                     axis: {
                         x: {
