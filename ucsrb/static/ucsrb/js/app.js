@@ -227,25 +227,18 @@ app.panel = {
 
             app.panel.results.addResults(html);
         },
-        hydroPanel: function(content) {
+        hydroPanel: function(results) {
             var html = `<section class="hydro-results result-section" id="hydro-results">`;
-            for (var pourpoint of content.pourpoints) {
-                html += `<div id="pp-result-${pourpoint.id}" class="pourpoint-result-wrap">
-                <div class="media align-items-center">
-                <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
-                <div class="media-body">
-                <h4 class="mt-0">${pourpoint.name}</h4>
-                </div>
-                </div>
-                </div>`;
-                html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
-            }
-            html += '<div class="chart-wrap container"><div id="chart"></div></div>'
-            html += '<div class="chart-wrap container"><div id="daily-chart"></div></div>'
+            html += `<div id="pp-result-${results.id}" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">${results.name}</h4></div></div></div>`;
+            html += `<div class="charts-slider">`;
+            results.hydro_results.forEach(function(element) {
+                html += `<div class="chart-wrap container"><div id="chart-${element.title}"></div></div>`
+                app.panel.results.chart.init(element);
+            });
+            html += `</div>`;
             html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
             app.panel.results.addResults(html);
-            app.panel.results.chart.init();
         },
         styleObject: function(obj) {
             var html = '<dl class="row">';

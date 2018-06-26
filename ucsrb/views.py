@@ -861,7 +861,7 @@ def get_hydro_results_by_pour_point_id(request):
     #         Calculate diff with treatment area baseline
     #     apply each diff to create rows in input sheet
 
-    sub_basins = PourPointBasins(geometry__intersects__=treatment.geometry)
+    sub_basins = PourPointBasin.objects.filter(geometry__intersects__=treatment.geometry)
     for basin in sub_basins:
         input_csv = ''
         # TODO:
