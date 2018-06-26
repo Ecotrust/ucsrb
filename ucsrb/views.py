@@ -892,7 +892,6 @@ def get_hydro_results_by_pour_point_id(request):
             # TODO: aggregate stream-flow diff and calculate downstream value for full basin
 
     for rx in flow_output.keys():
->>>>>>> master
         # Interpret script output and format for API handoff
         results[rx] = parse_flow_results(flow_output[rx], pourpoint_id, rx)
         # results.extend(parse_flow_results(flow_output[rx], pourpoint_id, rx))
