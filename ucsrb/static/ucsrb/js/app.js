@@ -225,13 +225,15 @@ app.panel = {
             <h4 class="mt-0">Eagle Creek</h4>
             </div>
             </div>`;
-            html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
+            html += `<div class="feature-result"><span class="lead">${content.aggregate_results['Fractional Coverage']['Total']}</span> acres</div>`;
             html += `<div class="overflow-gradient">
             <div class="result-list-wrap align-items-center">
-            <h5>Forest Management</h5>`;
-            html += app.panel.results.styleObject(content.aggregate_results.forest_types);
-            html += '<h5>Landforms/Topography</h5>';
-            html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
+            <h5>Fractional Coverage</h5>`;
+            html += app.panel.results.styleObject(content.aggregate_results['Fractional Coverage']);
+            html += '<h5>Landforms</h5>';
+            html += app.panel.results.styleObject(content.aggregate_results['Landforms']);
+            html += '<h5>Habitat Chracteristics</h5>';
+            html += app.panel.results.styleObject(content.aggregate_results['Habitat Chracteristics']);
             html += '</div></div>';
             // html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
