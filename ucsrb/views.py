@@ -928,25 +928,27 @@ def get_results_by_scenario_id(request):
         # TODO: How do we create treatment areas? If this is just Veg Units then do in separate query
         return_json = {
             'aggregate_results': {
-                'forest_types': {
-                    'acres_dry': 30,
-                    'pct_dry': 60,
-                    'forest_totals': 60,        #This is in the comps - I don't know what it means.
-                    'acres_wet': 30,
-                    'pct_wet': 30,
-                    'acres_cool': 30,
-                    'pct_cool': 60,
-                    'acres_moist': 30,
-                    'pct_moist': 60,
-                    'pct_deciduous': 50
+                'Fractional Coverage': {
+                    '0-20': 126,
+                    '20-40': 58,
+                    '40-60': 56,
+                    '60-80': 101,
+                    '>80': 10,
+                    'Total': 351
                 },
-                'landforms/topography': {
-                    'acres_north': 20,
-                    'acres_south': 10,
-                    'acres_bottom': 10,
-                    'acres_top': 5,
-                    'avg_slope': 30,
-                    'pct_cover_reduction': 5
+                'Landforms': {
+                    'Ridgetips': 62,
+                    'Valley Bottoms': 86,
+                    'North Facing Slopes': 94,
+                    'South Facing Slopes': 89,
+                    'East or West Facing Slopes': 20
+                },
+                'Habitat Chracteristics': {
+                    'Riparian Area (acres)': 68,
+                    'Wetlands (acres)': 42,
+                    'Critical Habitat (acres)': 148,
+                    'Salmon-Bearing Streams (miles)': 13,
+                    'Roadless Areas (acres)': 221
                 }
             },
 
@@ -1206,7 +1208,11 @@ def get_planningunits(request):
             'road_distance': p_unit.road_distance,
             'percent_fractional_coverage': p_unit.percent_fractional_coverage,
             'percent_high_fire_risk_area': p_unit.percent_high_fire_risk_area,
-            # TODO: add new values, remove obsolete values
+            'mgmt_alloc_code': p_unit.mgmt_alloc_code,
+            'mgmt_description': p_unit.mgmt_description,
+            'mgmt_unit_id': p_unit.mgmt_unit_id,
+            'dwnstream_ppt_id': p_unit.dwnstream_ppt_id,
+            'topo_height_class_majority': p_unit.topo_height_class_majority
         })
     return HttpResponse(dumps(json))
 
