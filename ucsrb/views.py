@@ -1206,6 +1206,7 @@ def get_planningunits(request):
             'road_distance': p_unit.road_distance,
             'percent_fractional_coverage': p_unit.percent_fractional_coverage,
             'percent_high_fire_risk_area': p_unit.percent_high_fire_risk_area,
+            # TODO: add new values, remove obsolete values
         })
     return HttpResponse(dumps(json))
 

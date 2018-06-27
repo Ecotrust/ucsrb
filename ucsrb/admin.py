@@ -6,7 +6,7 @@ from django.contrib.gis import admin as geoadmin
 from django.contrib.gis.admin import GeoModelAdmin, OSMGeoAdmin
 
 class VegPlanningUnitAdmin(OSMGeoAdmin):
-    list_display = ('pk', 'pub_priv_own', 'vegetation_type', 'forest_class')
+    list_display = ('pk', 'pub_priv_own', 'topo_height_class_majority')
 
 class TreatmentScenarioAdmin(OSMGeoAdmin):
     list_display = ('name', 'user', 'description')
