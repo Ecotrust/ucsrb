@@ -777,6 +777,7 @@ app.request = {
     },
     get_focus_area: function(feature, layerName, callback) {
         props = feature.getProperties();
+        props.layer = props.layer.split('.shp')[0] //bug where mapbox started adding .shp to layer name
         id = props[app.mapbox.layers[props.layer].id_field];
         return $.ajax({
             url: '/ucsrb/get_focus_area',
