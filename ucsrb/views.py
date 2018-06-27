@@ -1206,6 +1206,11 @@ def get_planningunits(request):
             'road_distance': p_unit.road_distance,
             'percent_fractional_coverage': p_unit.percent_fractional_coverage,
             'percent_high_fire_risk_area': p_unit.percent_high_fire_risk_area,
+            'mgmt_alloc_code': p_unit.mgmt_alloc_code,
+            'mgmt_description': p_unit.mgmt_description,
+            'mgmt_unit_id': p_unit.mgmt_unit_id,
+            'dwnstream_ppt_id': p_unit.dwnstream_ppt_id,
+            'topo_height_class_majority': p_unit.topo_height_class_majority
         })
     return HttpResponse(dumps(json))
 

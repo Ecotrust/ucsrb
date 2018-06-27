@@ -168,6 +168,9 @@ app.panel = {
         } else {
             appPanel.classList.add('expanded');
         }
+        if (app.panel.results.chart.obj) {
+            app.panel.results.chart.resize();
+        }
     },
     form: {
         init: function() {
@@ -189,12 +192,17 @@ app.panel = {
             app.panel.results.showAggregate();
             app.panel.results.expander();
             app.panel.results.aggPanel(result);
+            app.panel.results.hydroPanel('Select a gauging station to see hydro results.');
         },
         loadHydroResult: function(result) {
             app.panel.results.hydroPanel(result);
+            app.panel.results.showHydro();
         },
-        addResults: function(content) {
+        addResults: function(content, callback) {
             app.panel.results.getPanelResultsElement.innerHTML += content;
+            if (callback) {
+                callback();
+            }
         },
         showAggregate: function() {
             $('.result-section').removeClass('show');
@@ -214,7 +222,7 @@ app.panel = {
             html += `<div class="media align-items-center">
             <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
             <div class="media-body">
-            <h4 class="mt-0">Aggregate</h4>
+            <h4 class="mt-0">Eagle Creek</h4>
             </div>
             </div>`;
             html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
@@ -225,42 +233,19 @@ app.panel = {
             html += '<h5>Landforms/Topography</h5>';
             html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
             html += '</div></div>';
-            html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
+            // html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
-
             app.panel.results.addResults(html);
         },
         hydroPanel: function(results) {
             var html = `<section class="hydro-results result-section" id="hydro-results">`;
-            html += `<div id="pp-result-${results.id}" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">${results.name}</h4></div></div></div>`;
-            html += `<div class="charts-slider">
-                <div id="charts-carousel" class="carousel slide" data-ride="carousel">
-                  <ol class="carousel-indicators">
-                    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-                    <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-                    <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
-                  </ol>
-                  <div class="carousel-inner">`;
-            console.log(results);
-              results.forEach(function(element) {
-                  html += `<div class="carousel-item" id="${results.id}">
-                      <div class="chart-wrap container"><div id="chart-${element.title}"></div></div>
-                  </div>`
-                  app.panel.results.chart.init(element, results);
-              });
-              html += `</div></div> <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                 <span class="sr-only">Previous</span>
-               </a>
-               <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                 <span class="sr-only">Next</span>
-               </a>
-             </div>`
-            html += `</div>`;
-            html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
+            html += `<div id="pp-result" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">Gauging Station </h4></div></div></div>`;
+            html += `<div id="chartResult"></div>`
+            // html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
-            app.panel.results.addResults(html);
+            app.panel.results.addResults(html, function() {
+                app.panel.results.chart.init(results);
+            });
         },
         styleObject: function(obj) {
             var html = '<dl class="row">';
@@ -272,76 +257,64 @@ app.panel = {
             return html;
         },
         chart: {
-            init: function(element, results) {
-                var chart = bb.generate({
+            init: function(results) {
+                if (typeof(results) === 'string') {
+                    $('#chartResult').html(`<h3>${results}</h3>`);
+                    return;
+                }
+                var chartJSON = {};
+                for (var chart in results) {
+                    var resultsArray = [];
+                    chartJSON[chart] = [];
+                    chartJSON.timestep = [];
+                    for (var i = 0; i < results[chart].length; i++) {
+                        chartJSON[chart].push(results[chart][i].flow);
+                        chartJSON.timestep.push(results[chart][i].timestep);
+                    }
+                }
+                app.panel.results.chart.obj = bb.generate({
                     data: {
-                        json: [
-                            results
-                        ]
-                    },
-                    keys: {
+                        json: chartJSON,
                         x: 'timestep',
-                        value: ['flow']
+                        xFormat: '%m.%d.%Y-%H:%M:%S',
+                        names: {
+                            flow: 'CFPS'
+                        },
+                        type: 'spline',
                     },
-                    xFormat: '%m.%d.%Y-%H:%M:%S',
-                    names: {
-                        flow: 'FPS'
-                    },
-                    type: 'spline',
                     axis: {
                         x: {
                             type: 'timeseries',
                             tick: {
-                                fit: true
-                            }
+                                fit: true,
+                                count: 12,
+                                rotate: 80,
+                                format: "%B",
+                                culling: {
+                                    max: 12
+                                }
+                            },
+                            "rotated": true
                         }
                     },
                     zoom: {
                         enabled: true,
                         rescale: true,
                     },
-                    grid: {
-                        y: {
-                            lines: [
-                                {
-                                    value: 12,
-                                    text: "Baseline"
-                                }
-                            ]
-                        }
+                    point: {
+                        show: false,
                     },
-                });
-                var dailyChart = bb.generate({
-                    data: {
-                        rows: [
-                            ['timestep','pptId','rx','totalFlow'],
-                            ['2013-01-01 03:00:00',1,2,[100,150,200]],
-                            ['2013-01-01 06:00:00',1,2,[200,300,300]],
-                            ['2013-01-01 09:00:00',1,2,[50,23,90]],
-                        ],
-                        x: 'timestep',
-                        xFormat: "%Y-%m-%d %H:%M:%S",
-                        types: {
-                            totalFlow: "area-spline-range"
-                        }
+                    legend: {
+                        position: 'inset'
                     },
-                    axis: {
-                        x: {
-                            type: "timeseries",
-                            tick: {
-                                format: "%Y-%m-%d %H:%M:%S",
-                            }
-                        },
-                    },
-                    zoom: {
-                        enabled: true
-                    },
-                    subchart: {
-                        show: true
-                    },
-                    bindto: '#daily-chart',
+                    bindto: '#chartResult'
                 });
             },
+            resize: function() {
+                window.setTimeout(function() {
+                    app.panel.results.chart.obj.resize()
+                }, 3000);
+            }
         },
         panelResultsElement: function() {
             return this.getPanelResultsElement;

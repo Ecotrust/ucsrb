@@ -113,22 +113,24 @@ class Command(BaseCommand):
         huc_12_id_index = fieldsArray.index('HUC_12') - 1
         pub_priv_own_index = fieldsArray.index('PubPrivOwn') - 1
         lsr_percent_index = fieldsArray.index('LSRpct') - 1
-        has_critical_habitat_index = fieldsArray.index('CritHabLn') - 1
-        percent_critical_habitat_index = fieldsArray.index('CritHabPly') - 1
+        has_critical_habitat_index = fieldsArray.index('CritHabLn') - 1     #streams presence/absence (not % or proportion)
+        percent_critical_habitat_index = fieldsArray.index('CritHabPly') - 1    #proportion of crit hab in veg unit
         percent_roadless_index = fieldsArray.index('IRApct') - 1
         percent_wetland_index = fieldsArray.index('NWIwetpct') - 1
         percent_riparian_index = fieldsArray.index('NWIrippct') - 1
         slope_index = fieldsArray.index('SlopeMean') - 1
         road_distance_index = fieldsArray.index('RdDstEucMn') - 1
-        # percent_fractional_coverage_index = fieldsArray.index('FrctCvg') - 1
-        percent_fractional_coverage_index = fieldsArray.index('SlopeMean') - 1
-        # percent_high_fire_risk_area_index = fieldsArray.index('HRFApct') - 1
-        percent_high_fire_risk_area_index = fieldsArray.index('CritHabPly') - 1
+        mean_fractional_coverage_index = fieldsArray.index('fczonmean') - 1         # actually mean fractional coverage (percent)
+        percent_high_fire_risk_area_index = fieldsArray.index('WHPhvhPCT') - 1
 
-        #TODO: get real fields for this figured out.
-        vegetation_type_index = pub_priv_own_index
-        forest_height_index = fieldsArray.index('GRIDCODE') - 1
-        forest_class_index = pub_priv_own_index
+        mgmt_allocation_code = fieldsArray.index('MgmtAlloca') - 1  # Forest Plan Land Management Allocation Code (for RMAs)
+        mgmt_description = fieldsArray.index('MgmtDescri') - 1  # Forest Plan Land Management Description (for RMAs)
+        rma_id_et = fieldsArray.index('FSmgt_etid') - 1  # Forest plan land management unique ID, created by Ecotrust
+        ppt_id = fieldsArray.index('ppt_ID') - 1    # Nearest Downstream Pour Point Basin ID
+        thc_zm = fieldsArray.index('thzonmaj') - 1  # Topo height class zonal majority
+
+        # Ignore these if possible
+        grid_id = fieldsArray.index('GRID_ID') - 1       # Hex ID for the fishnetting
 
         from django.contrib.gis.geos import GEOSGeometry, Polygon, MultiPolygon
         import json
@@ -148,6 +150,7 @@ class Command(BaseCommand):
             else:
                 self.stdout.write('--- ERROR: Features in shapefile are not all (Multi)Polygons ---')
                 sys.exit()
+
             new_unit = VegPlanningUnit.objects.create(
                 planning_unit_id = shapeRecord.record[planning_unit_id_index],
                 veg_unit_id = shapeRecord.record[veg_unit_id_index],
@@ -168,15 +171,29 @@ class Command(BaseCommand):
                 percent_riparian = shapeRecord.record[percent_riparian_index],
                 slope = shapeRecord.record[slope_index],
                 road_distance = shapeRecord.record[road_distance_index],
-                percent_fractional_coverage = shapeRecord.record[percent_fractional_coverage_index],
+                percent_fractional_coverage = shapeRecord.record[mean_fractional_coverage_index],
                 percent_high_fire_risk_area = shapeRecord.record[percent_high_fire_risk_area_index],
-                vegetation_type = shapeRecord.record[vegetation_type_index],
-                forest_height = shapeRecord.record[forest_height_index],
-                forest_class = shapeRecord.record[forest_class_index],
+
+                # Fields to add to model
+                # mgmt_alloc_code = shapeRecord.record[mgmt_allocation_code],
+                # mgmt_description = shapeRecord.record[mgmt_description],
+                # mgmt_unit_id = shapeRecord.record[rma_id_et],
+                # dwnstream_ppt_id = shapeRecord.record[ppt_id],
+                # topo_height_class_majority = shapeRecord.record[thc_zm],
+
                 geometry = multiGeometry
             )
+
+            # Stupid effing workaround:
+            new_unit.mgmt_alloc_code = shapeRecord.record[mgmt_allocation_code]
+            new_unit.mgmt_description = shapeRecord.record[mgmt_description]
+            new_unit.mgmt_unit_id = shapeRecord.record[rma_id_et]
+            new_unit.dwnstream_ppt_id = shapeRecord.record[ppt_id]
+            new_unit.topo_height_class_majority = shapeRecord.record[thc_zm]
+
             import_count += 1
             new_unit.save()
+
             if import_count % 10000 == 0:
                 self.stdout.write('%s Planning Units Added...' % str(import_count))
                 pu_count = len(VegPlanningUnit.objects.all())
