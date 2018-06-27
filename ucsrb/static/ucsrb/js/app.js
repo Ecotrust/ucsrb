@@ -85,6 +85,7 @@ app.init = {
     },
     'hydro': function() {
         reportInit();
+        app.state.setStep = 'hydro';
         app.panel.results.showHydro();
     },
     'aggregate': function() {
@@ -217,7 +218,7 @@ app.panel = {
                 app.panel.getPanelContentElement.insertAdjacentHTML('afterbegin', '<a id="expand" href="#" onclick="app.panel.toggleSize()" /><img class="align-self-middle" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>');
             }
         },
-        aggPanel: function(content) {
+        aggPanel: function(results) {
             var html = `<section class="aggregate result-section" id="aggregate-results">`;
             html += `<div class="media align-items-center">
             <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
@@ -225,13 +226,12 @@ app.panel = {
             <h4 class="mt-0">Eagle Creek</h4>
             </div>
             </div>`;
-            html += `<div class="feature-result"><span class="lead">${content.aggregate_results.forest_types.forest_totals}</span> acres</div>`;
-            html += `<div class="overflow-gradient">
-            <div class="result-list-wrap align-items-center">
-            <h5>Forest Management</h5>`;
-            html += app.panel.results.styleObject(content.aggregate_results.forest_types);
-            html += '<h5>Landforms/Topography</h5>';
-            html += app.panel.results.styleObject(content.aggregate_results['landforms/topography']);
+            console.log(results);
+            html += `<div class="feature-result"><span class="lead">379</span> acres</div><div class="overflow-gradient"><div class="result-list-wrap align-items-center">`;
+            for (var result in results.aggregate_results) {
+                html += `<h5>${result}</h5>`;
+                html += app.panel.results.styleResultsAsRows(results.aggregate_results[result]);
+            }
             html += '</div></div>';
             // html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
@@ -247,10 +247,11 @@ app.panel = {
                 app.panel.results.chart.init(results);
             });
         },
-        styleObject: function(obj) {
+        styleResultsAsRows: function(results) {
             var html = '<dl class="row">';
-            for (var key in obj) {
-                html += `<dd class="col-sm-5">${obj[key]}</dd>
+            for (var key in results) {
+                console.log(key);
+                html += `<dd class="col-sm-5">${results[key]}</dd>
                 <dt class="col-sm-7">${key}</dt>`
             }
             html += '</dl>'
@@ -566,12 +567,12 @@ app.nav = {
             app.nav.hideSave();
             if (app.state.nav !== 'short') {
                 app.state.navHeight = 'short';
-                app.state.setStep = 'results';
             }
         },
         aggregate: function() {
             // Trigger a click on navigation so arrow appears
             $('button[data-method=aggregate]').click()
+
         },
         hydro: function() {
 
