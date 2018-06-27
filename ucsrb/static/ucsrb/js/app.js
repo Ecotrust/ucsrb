@@ -239,8 +239,8 @@ app.panel = {
         },
         hydroPanel: function(results) {
             var html = `<section class="hydro-results result-section" id="hydro-results">`;
-            html += `<div id="pp-result" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">Gauging Station </h4></div></div></div>`;
-            html += `<div id="chartResult"></div>`
+            html += `<div id="pp-result" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_hydro.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0 blue">Gauging Station </h4></div></div></div>`;
+            html += `<div class="chart-wrap"><div id="chartResult"></div></div>`
             // html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
             app.panel.results.addResults(html, function() {
@@ -292,6 +292,9 @@ app.panel = {
                                     max: 12
                                 }
                             },
+                        },
+                        y: {
+                            show: true,
                         }
                     },
                     zoom: {
@@ -304,13 +307,25 @@ app.panel = {
                     legend: {
                         position: 'inset'
                     },
+                    tooltip: {
+                        format: {
+                            title: function(d) {
+                                return d;
+                            },
+                            value: function(value, ratio, id) {
+                                value = value.toFixed(4);
+                                return value;
+                            }
+                        }
+                    },
                     bindto: '#chartResult'
                 });
+                app.panel.results.chart.resize();
             },
             resize: function() {
                 window.setTimeout(function() {
-                    app.panel.results.chart.obj.resize()
-                }, 3000);
+                    app.panel.results.chart.obj.resize();
+                }, 1000);
             }
         },
         panelResultsElement: function() {
