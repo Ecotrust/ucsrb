@@ -30,12 +30,12 @@ scenario_type_selection_made = function(selectionType) {
     // extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
     if (selectionType === 'draw') {
         app.map.layer.draw.layer.setVisible(true);
-        app.map.removeInteraction(app.map.Pointer);
+        // app.map.removeInteraction(app.map.Pointer);
         // app.map.getView().animate(animateObj);
     } else {
         app.map.removeInteraction(app.map.draw.draw);
         app.map.layer.draw.layer.setVisible(false);
-        app.map.addInteraction(app.map.Pointer);
+        // app.map.addInteraction(app.map.Pointer);
         // app.map.getView().animate(animateObj);
     }
 }
@@ -85,6 +85,7 @@ app.init = {
     },
     'hydro': function() {
         reportInit();
+        app.state.setStep = 'hydro';
         app.panel.results.showHydro();
     },
     'aggregate': function() {
@@ -217,7 +218,7 @@ app.panel = {
                 app.panel.getPanelContentElement.insertAdjacentHTML('afterbegin', '<a id="expand" href="#" onclick="app.panel.toggleSize()" /><img class="align-self-middle" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>');
             }
         },
-        aggPanel: function(content) {
+        aggPanel: function(results) {
             var html = `<section class="aggregate result-section" id="aggregate-results">`;
             html += `<div class="media align-items-center">
             <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
@@ -225,15 +226,11 @@ app.panel = {
             <h4 class="mt-0">Eagle Creek</h4>
             </div>
             </div>`;
-            html += `<div class="feature-result"><span class="lead">${content.aggregate_results['Fractional Coverage']['Total']}</span> acres</div>`;
-            html += `<div class="overflow-gradient">
-            <div class="result-list-wrap align-items-center">
-            <h5>Fractional Coverage</h5>`;
-            html += app.panel.results.styleObject(content.aggregate_results['Fractional Coverage']);
-            html += '<h5>Landforms</h5>';
-            html += app.panel.results.styleObject(content.aggregate_results['Landforms']);
-            html += '<h5>Habitat Chracteristics</h5>';
-            html += app.panel.results.styleObject(content.aggregate_results['Habitat Chracteristics']);
+            html += `<div class="feature-result"><span class="lead">${results.aggregate_results['Fractional Coverage']['Total']}</span> acres</div><div class="overflow-gradient"><div class="result-list-wrap align-items-center">`;
+            for (var result in results.aggregate_results) {
+                html += `<h5>${result}</h5>`;
+                html += app.panel.results.styleResultsAsRows(results.aggregate_results[result]);
+            }
             html += '</div></div>';
             // html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
@@ -241,18 +238,19 @@ app.panel = {
         },
         hydroPanel: function(results) {
             var html = `<section class="hydro-results result-section" id="hydro-results">`;
-            html += `<div id="pp-result" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">Gauging Station </h4></div></div></div>`;
-            html += `<div id="chartResult"></div>`
+            html += `<div id="pp-result" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_hydro.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0 blue">Gauging Station </h4></div></div></div>`;
+            html += `<div class="chart-wrap"><div id="chartResult"></div></div>`
             // html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
             app.panel.results.addResults(html, function() {
                 app.panel.results.chart.init(results);
             });
         },
-        styleObject: function(obj) {
+        styleResultsAsRows: function(results) {
             var html = '<dl class="row">';
-            for (var key in obj) {
-                html += `<dd class="col-sm-5">${obj[key]}</dd>
+            for (var key in results) {
+                console.log(key);
+                html += `<dd class="col-sm-5">${results[key]}</dd>
                 <dt class="col-sm-7">${key}</dt>`
             }
             html += '</dl>'
@@ -289,14 +287,14 @@ app.panel = {
                             type: 'timeseries',
                             tick: {
                                 fit: true,
-                                count: 12,
-                                rotate: 80,
                                 format: "%B",
                                 culling: {
                                     max: 12
                                 }
                             },
-                            "rotated": true
+                        },
+                        y: {
+                            show: true,
                         }
                     },
                     zoom: {
@@ -309,13 +307,25 @@ app.panel = {
                     legend: {
                         position: 'inset'
                     },
+                    tooltip: {
+                        format: {
+                            title: function(d) {
+                                return d;
+                            },
+                            value: function(value, ratio, id) {
+                                value = value.toFixed(4);
+                                return value;
+                            }
+                        }
+                    },
                     bindto: '#chartResult'
                 });
+                app.panel.results.chart.resize();
             },
             resize: function() {
                 window.setTimeout(function() {
-                    app.panel.results.chart.obj.resize()
-                }, 3000);
+                    app.panel.results.chart.obj.resize();
+                }, 1000);
             }
         },
         panelResultsElement: function() {
@@ -556,12 +566,12 @@ app.nav = {
             app.nav.hideSave();
             if (app.state.nav !== 'short') {
                 app.state.navHeight = 'short';
-                app.state.setStep = 'results';
             }
         },
         aggregate: function() {
             // Trigger a click on navigation so arrow appears
             $('button[data-method=aggregate]').click()
+
         },
         hydro: function() {
 
