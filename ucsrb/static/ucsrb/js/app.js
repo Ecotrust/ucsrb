@@ -94,14 +94,14 @@ app.init = {
 }
 
 app.resultsInit = function(id) {
-    app.nav.stepActions.results();
     app.map.geoSearch.closeSearchBox();
+    app.panel.results.init();
     if (!id) {
         id = app.viewModel.scenarios.scenarioList()[0].uid;
     } else if (!id.includes('ucsrb')) {
-        sid = 'ucsrb_treatmentscenario_' + id;
+        id = 'ucsrb_treatmentscenario_' + id;
         app.viewModel.scenarios.addScenarioToMap(null, {
-            uid: sid
+            uid: id
         });
     }
     app.request.get_results(id,false)
@@ -110,6 +110,7 @@ app.resultsInit = function(id) {
             app.panel.results.responseResultById(response);
             app.nav.showResultsNav();
             app.map.addDownstreamPptsToMap(response.pourpoints);
+            app.setState('aggregate');
         })
         .catch(function(response) {
             console.log('%c failed to get results: %o', 'color: salmon;', response);
@@ -126,7 +127,7 @@ initFiltering = function() {
         } else {
             initFiltering();
         }
-    }, 100);
+    }, 300);
 };
 
 drawingIsSmallEnough = function(areaInMeters) {
@@ -177,9 +178,12 @@ app.panel = {
         },
     },
     results: {
-        init: function(id) {
+        init: function() {
             app.panel.getPanelContentElement.innerHTML = app.nav.stepActions.initial;
             app.panel.moveLeft();
+            if (app.state.nav === 'tall') {
+                app.state.navHeight = 'short';
+            }
         },
         responseResultById: function(result) {
             app.panel.results.showAggregate();
@@ -190,7 +194,6 @@ app.panel = {
             app.panel.results.hydroPanel(result);
         },
         addResults: function(content) {
-            app.state.panel.content = content;
             app.panel.results.getPanelResultsElement.innerHTML += content;
         },
         showAggregate: function() {
@@ -230,11 +233,30 @@ app.panel = {
         hydroPanel: function(results) {
             var html = `<section class="hydro-results result-section" id="hydro-results">`;
             html += `<div id="pp-result-${results.id}" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">${results.name}</h4></div></div></div>`;
-            html += `<div class="charts-slider">`;
-            results.hydro_results.forEach(function(element) {
-                html += `<div class="chart-wrap container"><div id="chart-${element.title}"></div></div>`
-                app.panel.results.chart.init(element);
-            });
+            html += `<div class="charts-slider">
+                <div id="charts-carousel" class="carousel slide" data-ride="carousel">
+                  <ol class="carousel-indicators">
+                    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                    <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                    <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                  </ol>
+                  <div class="carousel-inner">`;
+            console.log(results);
+              results.forEach(function(element) {
+                  html += `<div class="carousel-item" id="${results.id}">
+                      <div class="chart-wrap container"><div id="chart-${element.title}"></div></div>
+                  </div>`
+                  app.panel.results.chart.init(element, results);
+              });
+              html += `</div></div> <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                 <span class="sr-only">Previous</span>
+               </a>
+               <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                 <span class="sr-only">Next</span>
+               </a>
+             </div>`
             html += `</div>`;
             html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
@@ -250,31 +272,44 @@ app.panel = {
             return html;
         },
         chart: {
-            init: function() {
+            init: function(element, results) {
                 var chart = bb.generate({
                     data: {
-                        rows: [
-                            ['timestep','pptId','rx','totalFlow'],
-                            ['2013-01-01 03:00:00',1,2,100],
-                            ['2013-01-01 06:00:00',1,2,200],
-                            ['2013-01-01 09:00:00',1,2,50],
-                            ['2013-01-01 12:00:00',1,2,160],
-                        ],
-                        x: 'timestep',
-                        xFormat: "%Y-%m-%d %H:%M:%S",
-                        types: {
-                            data1: "area-line-range"
-                        },
+                        json: [
+                            results
+                        ]
                     },
+                    keys: {
+                        x: 'timestep',
+                        value: ['flow']
+                    },
+                    xFormat: '%m.%d.%Y-%H:%M:%S',
+                    names: {
+                        flow: 'FPS'
+                    },
+                    type: 'spline',
                     axis: {
                         x: {
-                            type: "timeseries",
+                            type: 'timeseries',
                             tick: {
-                                format: "%Y-%m-%d %H:%M:%S",
+                                fit: true
                             }
-                        },
+                        }
                     },
-                    bindto: '#chart',
+                    zoom: {
+                        enabled: true,
+                        rescale: true,
+                    },
+                    grid: {
+                        y: {
+                            lines: [
+                                {
+                                    value: 12,
+                                    text: "Baseline"
+                                }
+                            ]
+                        }
+                    },
                 });
                 var dailyChart = bb.generate({
                     data: {
@@ -306,7 +341,7 @@ app.panel = {
                     },
                     bindto: '#daily-chart',
                 });
-            }
+            },
         },
         panelResultsElement: function() {
             return this.getPanelResultsElement;
@@ -474,7 +509,6 @@ app.nav = {
     instructions: {
         initial: `<h2 class="mx-auto w-50 text-center">Start by deciding how you want <br/>to interact with the map</h2>`,
         reset: `Decide how you want to interact with the map`,
-        result: 'Explore evaluation results',
         select: [
             'Zoom in and select a stream segment to evaluate changes in flow',
             'select one of the highlighted pour points to evaluate changes in flow associated with management activity upstream',
@@ -513,6 +547,9 @@ app.nav = {
             'Zoom in to area of interest or use the geocoder to search for places by name.<br />Click on the map to start drawing the boundary of your management area.',
             'Add additional points then double-click to finish; Re-select point to edit',
         ],
+        result: 'Explore evaluation results',
+        aggregate: 'Your Aggregate results',
+        hydro: 'Your Hydro results',
     },
     stepActions: {
         initial: '<div id="scenarios"></div><div id="scenario_form"></div><div id="draw_form"></div><div id="results"></div>',
@@ -542,11 +579,17 @@ app.nav = {
         ],
         results: function() {
             app.nav.hideSave();
-            closeConfirmSelection(true,true);
             if (app.state.nav !== 'short') {
                 app.state.navHeight = 'short';
                 app.state.setStep = 'results';
             }
+        },
+        aggregate: function() {
+            // Trigger a click on navigation so arrow appears
+            $('button[data-method=aggregate]').click()
+        },
+        hydro: function() {
+
         }
     }
 }
@@ -666,6 +709,9 @@ app.request = {
                 console.log(`%csuccess: got hydro results for pourpoint`, 'color: green');
                 return response;
             },
+            error: function(response) {
+                console.log(`%cfail @ get hydro results for pourpoint: %o`, 'color: red', response);
+            }
         });
     },
     /**
@@ -856,15 +902,20 @@ app.request = {
             success: function(response) {
                 console.log(`%csuccess: saved drawing`, 'color: green');
                 app.map.draw.disable();
-                app.state.setStep = 'results'; // go to results
+                app.nav.hideSave();
+                if (app.state.nav !== 'short') {
+                    app.state.navHeight = 'short';
+                    app.state.setStep = 'results'; // go to results
+                }
                 var vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
                     dataProjection: 'EPSG:3857',
                     featureProjection: 'EPSG:3857'
                 });
                 app.map.addScenario(vectors);
                 app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
-                app.results.init('ucsrb_treatmentscenario_' + response.id);
+                app.resultsInit('ucsrb_treatmentscenario_' + response.id);
                 app.state.scenarioId = response.id;
+                app.setState('aggregate');
             },
             error: function(response, status) {
                 console.log(`%cfail @ save drawing: %o`, 'color: red', response);

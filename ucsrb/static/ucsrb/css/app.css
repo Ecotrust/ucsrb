@@ -183,6 +183,14 @@ Nav with scenario options (select, filter, draw)
     height: 100%;
 }
 
+#results-nav img {
+    display: block;
+}
+
+#results-nav .result_nav_img {
+    display: none;
+}
+
 .icons-only #process-nav h3 {
     height: 0;
     transform: rotateX(90deg);
@@ -200,7 +208,12 @@ Nav with scenario options (select, filter, draw)
 }
 
 .icons-only #results-nav img {
+    display: none;
     margin-bottom: 0;
+}
+
+.icons-only #results-nav .result_nav_img {
+    display: block;
 }
 
 .icons-only .method-nav li:after {

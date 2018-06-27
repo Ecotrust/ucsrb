@@ -70,7 +70,7 @@ $(document).ready(function() {
             .then(function() {
                 document.getElementById('load-saved-list').addEventListener('click', function(event) {
                     $('#load-saved').modal('hide');
-                    app.panel.results.init(event.target.dataset.id);
+                    app.resultsInit(event.target.dataset.id);
                     app.map.clearLayers();
                     $('.method-nav button').each(function() {
                         $(this).removeClass('active');

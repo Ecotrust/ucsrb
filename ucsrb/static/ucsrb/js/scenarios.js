@@ -110,7 +110,6 @@ var madrona = {
                 dataType: 'json',
                 success: function(result) {
                     app.state.setStep = 'results'; // go to results
-                    app.panel.results.init(result['X-Madrona-Show']);
                     app.resultsInit(result['X-Madrona-Show']);
                     app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
                     app.viewModel.scenarios.loadingMessage(false);
@@ -1344,7 +1343,7 @@ function scenariosModel(options) {
             scenarioId = options.uid;
         }
 
-        app.state.scenarioId = scenarioId.slice(scenarioId.lastIndexOf('_') + 1)
+        app.state.scenarioId = scenarioId.slice(scenarioId.lastIndexOf('_') + 1);
 
         var isDrawingModel = false,
             isScenarioModel = false;
@@ -1540,7 +1539,6 @@ function scenariosModel(options) {
                         type: 'GET',
                         dataType: 'json',
                         success: function(result) {
-                            app.setState('aggregate');
                             if (scenario) {
                               //TODO: figure out when and why this wouldn't have a scenario (on creating empty collection)
                               //    and adjust if necessary
