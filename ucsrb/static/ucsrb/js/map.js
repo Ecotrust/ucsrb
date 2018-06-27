@@ -390,9 +390,13 @@ pourPointSelectAction = function(feat, selectEvent) {
 };
 
 pourPointResultSelection = function(feat) {
+  var l = app.map.selection.select.getLayer(feat).get('id');
+  app.map.layer[l].layer.getSource().forEachFeature(function(feature) {
+    feature.setStyle(app.map.styles.PourPoint)
+  });
+  feat.setStyle(app.map.styles.PourPointSelected);
   app.request.get_hydro_results_by_pour_point_id(feat)
     .done(function(response) {
-      feat.setStyle(app.map.styles.PourPointSelected);
       app.panel.results.loadHydroResult(response);
     })
 }
