@@ -357,13 +357,18 @@ function scenarioFormModel(options) {
                 success: function(data) {
                     if (self.currentGridRequest() === request) {
                         var wkt = data[0].wkt,
-                            featureCount = data[0].count;
+                            featureCount = data[0].count,
+                            area_m2 = data[0].area_m2;
                         self.updatedFilterResultsLayer.removeAllFeatures();
                         if (featureCount) {
                             self.updatedFilterResultsLayer.addWKTFeatures(wkt);
                         }
                         self.updatedFilterResultsLayer.setVisibility(true);
-                        self.gridCellsRemaining(featureCount);
+                        // self.gridCellsRemaining(featureCount);
+                        // convert area in meters to acres
+                        acres = area_m2*0.000247105;
+                        self.gridCellsRemaining(parseInt(acres) + ' acres');
+
                         self.showButtonSpinner(false);
                     }
                 },
