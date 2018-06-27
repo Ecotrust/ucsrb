@@ -416,7 +416,7 @@ app.map.draw = {
     app.map.addInteraction(drawInteraction);
     app.map.addInteraction(snapInteraction);
     createMeasureTooltip();
-    map.on('pointermove', pointerMoveHandler);
+    // map.on('pointermove', pointerMoveHandler);
   },
   enableEdit: function() {
     // app.map.removeInteraction(drawInteraction);

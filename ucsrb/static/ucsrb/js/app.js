@@ -30,12 +30,12 @@ scenario_type_selection_made = function(selectionType) {
     // extent = ol.proj.transformExtent(extent, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
     if (selectionType === 'draw') {
         app.map.layer.draw.layer.setVisible(true);
-        app.map.removeInteraction(app.map.Pointer);
+        // app.map.removeInteraction(app.map.Pointer);
         // app.map.getView().animate(animateObj);
     } else {
         app.map.removeInteraction(app.map.draw.draw);
         app.map.layer.draw.layer.setVisible(false);
-        app.map.addInteraction(app.map.Pointer);
+        // app.map.addInteraction(app.map.Pointer);
         // app.map.getView().animate(animateObj);
     }
 }
@@ -287,14 +287,11 @@ app.panel = {
                             type: 'timeseries',
                             tick: {
                                 fit: true,
-                                count: 12,
-                                rotate: 80,
                                 format: "%B",
                                 culling: {
                                     max: 12
                                 }
                             },
-                            "rotated": true
                         }
                     },
                     zoom: {
