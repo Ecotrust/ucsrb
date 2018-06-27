@@ -193,8 +193,11 @@ app.panel = {
         loadHydroResult: function(result) {
             app.panel.results.hydroPanel(result);
         },
-        addResults: function(content) {
+        addResults: function(content, callback) {
             app.panel.results.getPanelResultsElement.innerHTML += content;
+            if (callback) {
+                callback();
+            }
         },
         showAggregate: function() {
             $('.result-section').removeClass('show');
@@ -242,13 +245,10 @@ app.panel = {
                   </ol>
                   <div class="carousel-inner">`;
             console.log(results);
-              results.forEach(function(element) {
-                  html += `<div class="carousel-item" id="${results.id}">
-                      <div class="chart-wrap container"><div id="chart-${element.title}"></div></div>
-                  </div>`
-                  app.panel.results.chart.init(element, results);
-              });
-              html += `</div></div> <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+            html += `<div class="carousel-item">
+                            <div class="chart-wrap container"><div id="chartResult"></div></div>
+                        </div>`
+            html += `</div></div> <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                  <span class="sr-only">Previous</span>
                </a>
@@ -260,7 +260,12 @@ app.panel = {
             html += `</div>`;
             html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             html += '</section>';
-            app.panel.results.addResults(html);
+
+            $('.carousel-inner .carousel-item:last-of-type').addClass('acitve');
+            $('.carousel').carousel();
+            app.panel.results.addResults(html, function() {
+                app.panel.results.chart.init(results);
+            });
         },
         styleObject: function(obj) {
             var html = '<dl class="row">';
@@ -272,22 +277,32 @@ app.panel = {
             return html;
         },
         chart: {
-            init: function(element, results) {
+            init: function(results) {
+                var resultsArray = [];
+                var chartJSON = {};
+                for (var chart in results) {
+                    chartJSON[chart] = [];
+                    chartJSON.timestep = [];
+                    resultsArray.push(results[chart]);
+                    console.log(resultsArray);
+                }
+                for (var i = 0; i < resultsArray.length; i++) {
+                    // console.log(chartJSON[chart]);
+                    // console.log(results[chart][i]);
+                    // chartJSON[chart].push(results[chart].flow);
+                    // chartJSON[chart].push(results[chart].timestep);
+                }
+                console.log(chartJSON);
                 var chart = bb.generate({
                     data: {
-                        json: [
-                            results
-                        ]
-                    },
-                    keys: {
+                        json: chartJSON,
                         x: 'timestep',
-                        value: ['flow']
+                        xFormat: '%m.%d.%Y-%H:%M:%S',
+                        names: {
+                            flow: 'Cubic Feet per Second'
+                        },
+                        type: 'spline',
                     },
-                    xFormat: '%m.%d.%Y-%H:%M:%S',
-                    names: {
-                        flow: 'FPS'
-                    },
-                    type: 'spline',
                     axis: {
                         x: {
                             type: 'timeseries',
@@ -310,36 +325,7 @@ app.panel = {
                             ]
                         }
                     },
-                });
-                var dailyChart = bb.generate({
-                    data: {
-                        rows: [
-                            ['timestep','pptId','rx','totalFlow'],
-                            ['2013-01-01 03:00:00',1,2,[100,150,200]],
-                            ['2013-01-01 06:00:00',1,2,[200,300,300]],
-                            ['2013-01-01 09:00:00',1,2,[50,23,90]],
-                        ],
-                        x: 'timestep',
-                        xFormat: "%Y-%m-%d %H:%M:%S",
-                        types: {
-                            totalFlow: "area-spline-range"
-                        }
-                    },
-                    axis: {
-                        x: {
-                            type: "timeseries",
-                            tick: {
-                                format: "%Y-%m-%d %H:%M:%S",
-                            }
-                        },
-                    },
-                    zoom: {
-                        enabled: true
-                    },
-                    subchart: {
-                        show: true
-                    },
-                    bindto: '#daily-chart',
+                    bindto: `#chartResult`
                 });
             },
         },
