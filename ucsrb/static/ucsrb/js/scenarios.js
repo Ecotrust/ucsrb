@@ -109,7 +109,7 @@ var madrona = {
                 traditional: true,
                 dataType: 'json',
                 success: function(result) {
-                    app.state.setStep = 'results'; // go to results
+                    app.state.setStep = 'result'; // go to results
                     app.resultsInit(result['X-Madrona-Show']);
                     app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
                     app.viewModel.scenarios.loadingMessage(false);

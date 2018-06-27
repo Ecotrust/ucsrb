@@ -1012,13 +1012,17 @@ Panel
     .chart-wrap {
         display: block;
         margin: 0 auto;
+        position: relative;
+        width: 96%;
     }
 
     #chartResult {
+        border-bottom: none;
         display: block;
+        font-size: 1em;
         height: 44vh;
-        position: relative;
-        width: 100%;
+        margin: 0 0 1rem;
+        padding: 0;
     }
 
     .result-section dl {
