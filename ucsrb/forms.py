@@ -214,6 +214,10 @@ class TreatmentScenarioForm(ScenarioForm):
     def get_steps(self):
         return self.get_step_0_fields(), self.get_step_1_fields(), self.get_step_2_fields(),
 
+    def clean_focus_area_input(self):
+        foo = FocusArea.objects.get(pk=self.cleaned_data['focus_area_input'])
+        return foo
+
     def is_valid(self, *args, **kwargs):
         return super(ScenarioForm, self).is_valid()
 

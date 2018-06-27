@@ -172,7 +172,10 @@ class TreatmentScenario(Scenario):
 
     def run_filters(self, query):
         if self.focus_area_input:
-            focus_area = FocusArea.objects.get(pk=self.focus_area_input)
+            if type(self.focus_area_input) == int:
+                focus_area = FocusArea.objects.get(pk=self.focus_area_input)
+            else:
+                focus_area = self.focus_area_input
             query = (query.filter(geometry__intersects=focus_area.geometry))
 
         if self.private_own:
