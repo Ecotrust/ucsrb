@@ -22,8 +22,8 @@
     #panel.expanded #scenarios:not(:empty),
     #panel.expanded #results:not(:empty),
     #panel.expanded .result-section:not(:empty) {
-        width: 45vw;
-        max-width: 45vw;
+        width: 50vw;
+        max-width: 50vw;
     }
 
     .map-wrap .short-overlay .instructions #instruction {

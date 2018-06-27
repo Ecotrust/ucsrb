@@ -110,7 +110,7 @@ Nav with scenario options (select, filter, draw)
     border-right: 3.5vh solid transparent;
     border-top: 3vh solid #fff;
     content: '';
-    left: 50%;
+    left: 48%;
     opacity: 1;
     position: absolute;
     transform: translate(-3.5vh,0);
@@ -901,10 +901,10 @@ Panel
         height: 100%;
     }
 
-    .result-section {
+    #results .result-section {
         display: none;
     }
-    .result-section.show {
+    #results .result-section.show {
         display: block;
     }
 
@@ -1014,9 +1014,9 @@ Panel
         margin: 0 auto;
     }
 
-    .bb {
+    #chartResult {
         display: block;
-        height: 30vh;
+        height: 44vh;
         position: relative;
         width: 100%;
     }
