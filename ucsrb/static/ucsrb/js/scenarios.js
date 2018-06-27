@@ -1260,7 +1260,7 @@ function scenariosModel(options) {
         if (!form_url) {
           form_url = '/features/scenario/form/';
         }
-        app.loadingAnimation.show();
+        // app.loadingAnimation.show();
         return $.ajax({
             url: form_url,
             success: function(data) {
@@ -1280,12 +1280,12 @@ function scenariosModel(options) {
                 if ( ! self.filterLayer() && app.viewModel.modernBrowser() ) {
                     self.loadLeaseblockLayer();
                 }
-                app.loadingAnimation.hide();
+                // app.loadingAnimation.hide();
                 // window.dispatchEvent(new Event('resize'));
             },
             error: function (result) {
                 console.log('failure at scenarios.js "createNewScenario".');
-                app.loadingAnimation.hide();
+                // app.loadingAnimation.hide();
             }
         });
     };
@@ -1353,7 +1353,7 @@ function scenariosModel(options) {
             isScenarioModel = true;
         }
 
-        app.loadingAnimation.show();
+        // app.loadingAnimation.show();
         //perhaps much of this is not necessary once a scenario has been added to app.map.layers initially...?
         //(add check for scenario.layer, reset the style and move on?)
         $.ajax( {
@@ -1546,7 +1546,7 @@ function scenariosModel(options) {
                             }
                         },
                         error: function (result) {
-                            app.loadingAnimation.hide();
+                            // app.loadingAnimation.hide();
                             console.log('error in scenarios.js: addScenarioToMap (get_attributes scenarioId)');
                         }
 
@@ -1611,11 +1611,11 @@ function scenariosModel(options) {
                     }
                 }
                 setTimeout(function(){
-                  app.loadingAnimation.hide();
+                  // app.loadingAnimation.hide();
                 }, 1500)
             },
             error: function(result) {
-                app.loadingAnimation.hide();
+                // app.loadingAnimation.hide();
                 console.log('error in scenarios.js: addScenarioToMap (geojson scenarioId)');
                 app.viewModel.scenarios.errorMessage(result.responseText.split('\n\n')[0]);
             }
@@ -1959,21 +1959,21 @@ function scenariosModel(options) {
         'scenario': self.comparisonCollection().uid,
         'collections': self.comparisonCollection().selectedScenarios()
       };
-      app.loadingAnimation.show();
+      // app.loadingAnimation.show();
       $.ajax( {
         url: '/scenario/compare_scenario',
         data: data,
         type: 'POST',
         dataType: 'json',
         success: function(data) {
-          app.loadingAnimation.hide();
+          // app.loadingAnimation.hide();
           attr_list = data[0];
           report_data = data[1];
           download_link = data[2];
           app.viewModel.scenarios.showComparisonReportModal(attr_list,report_data,download_link);
         },
         error: function(result) {
-          app.loadingAnimation.hide();
+          // app.loadingAnimation.hide();
           console.log('error in scenarios.js: submitCompare');
           window.alert(result.responseText);
         }

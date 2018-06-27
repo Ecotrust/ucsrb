@@ -192,6 +192,7 @@ app.panel = {
             app.panel.results.showAggregate();
             app.panel.results.expander();
             app.panel.results.aggPanel(result);
+            app.panel.results.hydroPanel('Select a gauging station to see hydro results.');
         },
         loadHydroResult: function(result) {
             app.panel.results.hydroPanel(result);
@@ -237,7 +238,6 @@ app.panel = {
             app.panel.results.addResults(html);
         },
         hydroPanel: function(results) {
-            console.log(results);
             var html = `<section class="hydro-results result-section" id="hydro-results">`;
             html += `<div id="pp-result" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">Gauging Station </h4></div></div></div>`;
             html += `<div id="chartResult"></div>`
@@ -258,6 +258,10 @@ app.panel = {
         },
         chart: {
             init: function(results) {
+                if (typeof(results) === 'string') {
+                    $('#chartResult').html(`<h3>${results}</h3>`);
+                    return;
+                }
                 var chartJSON = {};
                 for (var chart in results) {
                     var resultsArray = [];
@@ -285,7 +289,10 @@ app.panel = {
                                 fit: true,
                                 count: 12,
                                 rotate: 80,
-                                format: "%B"
+                                format: "%B",
+                                culling: {
+                                    max: 12
+                                }
                             },
                             "rotated": true
                         }
