@@ -74,15 +74,18 @@
                                             {{ field_min.field.widget.attrs.pre_text | safe }}
                                             {{ field_min.as_widget }}
                                             {{ field_min.field.widget.attrs.post_text | safe }}
-                                        {% endif %}{% if field_max %}
+                                        {% endif %}
+                                        {% if field_max %}
                                             {{ field_max.field.widget.attrs.pre_text | safe  }}
                                             {{ field_max.as_widget }}
                                             {{ field_max.field.widget.attrs.post_text | safe  }}
-                                        {% endif %}{% if field_input %}
+                                        {% endif %}
+                                        {% if field_input %}
                                             {{ field_input.field.widget.attrs.pre_text | safe  }}
                                             {{ field_input.as_widget }}
                                             {{ field_input.field.widget.attrs.post_text | safe  }}
-                                        {% endif %}{% if field_checkbox %}
+                                        {% endif %}
+                                        {% if field_checkbox %}
                                             {{ field_checkbox.field.widget.attrs.pre_text | safe }}
                                             {{ field_checkbox.as_widget }}
                                             {{ field_checkbox.field.widget.attrs.post_text | safe }}

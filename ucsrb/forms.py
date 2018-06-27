@@ -23,12 +23,10 @@ class TreatmentScenarioForm(ScenarioForm):
         initial=True
     )
 
-    focus_area_options = FocusArea.objects.all()
-    focus_area_input = forms.ModelChoiceField(
-        queryset=focus_area_options,
+    focus_area_input = forms.IntegerField(
         label="Treatment Boundary",
         help_text="This should be invisible. Ppt Basin, HUC, or RMU Focus_Area ID",
-        required=False,     # CHANGE THIS!
+        required=True,
     )
 
     private_own = HiddenScenarioBooleanField(

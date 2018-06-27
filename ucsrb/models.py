@@ -172,7 +172,8 @@ class TreatmentScenario(Scenario):
 
     def run_filters(self, query):
         if self.focus_area_input:
-            query = (query.filter(geometry__intersects=self.focus_area_input.geometry))
+            focus_area = FocusArea.objects.get(pk=self.focus_area_input)
+            query = (query.filter(geometry__intersects=focus_area.geometry))
 
         if self.private_own:
             pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
