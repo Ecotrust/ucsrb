@@ -908,7 +908,7 @@ def get_results_by_scenario_id(request):
     except:
         return get_json_error_response('Treatment with given ID (%s) does not exist' % scenario_id, 500, {})
 
-    containing_overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__intersects=treatment.geometry_dissolved)
+    containing_overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__contains=treatment.geometry_dissolved)
     # TODO: return the smallest overlapping ppt basin to contain treatment so screen can zoom to it.
     # get smallest overlapping pourpoint basin that contains entire treatment
     # try:
@@ -916,7 +916,7 @@ def get_results_by_scenario_id(request):
     # except:
     #     containing_overlap_basin = sorted(FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__intersects=treatment.geometry_dissolved), key=lambda x: x.geometry.area)[-1]
     # get all discrete pourpoint basins that are impacted by the treatment
-    treated_basin_ids = [x.unit_id for x in FocusArea.objects.filter(unit_type='PourPointDiscrete', geometry__intersects=treatment.geometry_dissolved)]
+    # treated_basin_ids = [x.unit_id for x in FocusArea.objects.filter(unit_type='PourPointDiscrete', geometry__intersects=treatment.geometry_dissolved, geometry__coveredby=)]
     impacted_pourpoint_ids = []
 
     impacted_pourpoint_ids = [x.unit_id for x in containing_overlap_basins]
@@ -1206,6 +1206,7 @@ def get_planningunits(request):
             'road_distance': p_unit.road_distance,
             'percent_fractional_coverage': p_unit.percent_fractional_coverage,
             'percent_high_fire_risk_area': p_unit.percent_high_fire_risk_area,
+            # TODO: add new values, remove obsolete values
         })
     return HttpResponse(dumps(json))
 

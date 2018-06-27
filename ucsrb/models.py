@@ -176,7 +176,7 @@ class TreatmentScenario(Scenario):
                 focus_area = FocusArea.objects.get(pk=self.focus_area_input)
             else:
                 focus_area = self.focus_area_input
-            query = (query.filter(geometry__intersects=focus_area.geometry))
+            query = (query.filter(geometry__coveredby=focus_area.geometry))
 
         if self.private_own:
             pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
@@ -273,9 +273,11 @@ class VegPlanningUnit(models.Model):
     percent_fractional_coverage = models.FloatField()       #FrctCvg
     percent_high_fire_risk_area = models.FloatField()       #HRFApct
 
-    vegetation_type = models.CharField(max_length=255, blank=True, null=True)
-    forest_height = models.IntegerField()
-    forest_class = models.CharField(max_length=255, blank=True, null=True)
+    mgmt_alloc_code = models.CharField(max_length=255, null=True, blank=True, default=None),     #MgmtAlloca
+    mgmt_description = models.CharField(max_length=255, null=True, blank=True, default=None),    #MgmtDescri
+    mgmt_unit_id = models.IntegerField(null=True, blank=True, default=None),                   #FSmgt_etid
+    dwnstream_ppt_id = models.IntegerField(null=True, blank=True, default=None),               #ppt_ID
+    topo_height_class_majority = models.IntegerField(null=True, blank=True, default=None),     #thzonmaj
 
     geometry = gismodels.MultiPolygonField(srid=settings.GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Veg Unit Geometry")
     objects = gismodels.GeoManager()
