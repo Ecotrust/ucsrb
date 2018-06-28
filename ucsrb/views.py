@@ -908,7 +908,7 @@ def get_results_by_scenario_id(request):
     except:
         return get_json_error_response('Treatment with given ID (%s) does not exist' % scenario_id, 500, {})
 
-    containing_overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__contains=treatment.geometry_dissolved)
+    containing_overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__intersects=treatment.geometry_dissolved)
     # TODO: return the smallest overlapping ppt basin to contain treatment so screen can zoom to it.
     # get smallest overlapping pourpoint basin that contains entire treatment
     # try:
@@ -1152,6 +1152,21 @@ def run_filter_query(filters):
     if 'percent_high_fire_risk_area' in filters.keys() and filters['percent_high_fire_risk_area']:
         pu_ids = [pu.pk for pu in query if pu.percent_high_fire_risk_area > settings.FIRE_RISK_THRESHOLD]
         query = (query.filter(pk__in=pu_ids))
+
+    # if 'landform_type' in filters.keys() and filters['landform_type']:
+    #     if 'include_north' in filters.keys():
+    #         if filters['include_north']:
+    #             pu_ids = [pu.pk for pu in query if pu.
+    #     if 'include_south' in filters.keys():
+    #         if filters['include_south']:
+    #             pu_ids = [pu.pk for pu in query if pu.
+    #     if 'include_ridgetop' in filters.keys():
+    #         if filters['include_ridgetop']:
+    #     if 'include_floor' in filters.keys():
+    #         if filters['include_floor']:
+    #     if 'include_east_west' in filters.keys():
+    #         if filters['include_east_west']:
+
 
     return (query, notes)
 
