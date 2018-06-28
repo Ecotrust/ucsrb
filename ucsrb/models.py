@@ -235,6 +235,101 @@ class TreatmentScenario(Scenario):
             return super(type(self), self).run(result)
         return result
 
+    def aggregate_results(self):
+
+        def m2_to_acres(m2_area):
+            return m2_area*0.000247105;
+
+        total_treatment_acres = m2_to_acres(self.geometry_dissolved.area)
+
+        vpus = VegPlanningUnit.objects.filter(geometry__coveredby=self.geometry_dissolved)
+        totals = {
+            'Fractional Coverage': {
+                '0-20%': 0,
+                '20-40%': 0,
+                '40-60%': 0,
+                '60-80%': 0,
+                '>80%': 0,
+                'Total': 0
+            },
+            'Landforms': {
+                'Ridgetops': 0,
+                'Valley Bottoms': 0,
+                'North Facing Slopes': 0,
+                'South Facing Slopes': 0,
+                'East or West Facing Slopes': 0
+            },
+            'Habitat Characteristics': {
+                'Riparian Area': 0,
+                'Wetlands': 0,
+                'Critical Habitat': 0,
+                # 'Salmon-Bearing Streams': 0,
+                'Roadless Areas': 0
+            }
+        }
+        for vpu in vpus:
+            totals['Fractional Coverage']['Total'] += vpu.acres
+            if vpu.percent_fractional_coverage <= 20:
+                totals['Fractional Coverage']['0-20%'] += vpu.acres
+            elif vpu.percent_fractional_coverage <= 40:
+                totals['Fractional Coverage']['20-40%'] += vpu.acres
+            elif vpu.percent_fractional_coverage <= 60:
+                totals['Fractional Coverage']['40-60%'] += vpu.acres
+            elif vpu.percent_fractional_coverage <= 80:
+                totals['Fractional Coverage']['60-80%'] += vpu.acres
+            else:
+                totals['Fractional Coverage']['>80%'] += vpu.acres
+
+            try:
+                topo_class = int(str(vpu.topo_height_class_majority)[-1])
+                if topo_class == 1:
+                    totals['Landforms']['Ridgetops'] += vpu.acres
+                if topo_class == 2:
+                    totals['Landforms']['North Facing Slopes'] += vpu.acres
+                if topo_class == 3:
+                    totals['Landforms']['South Facing Slopes'] += vpu.acres
+                if topo_class == 4:
+                    totals['Landforms']['Valley Bottoms'] += vpu.acres
+                if topo_class == 5:
+                    totals['Landforms']['East or West Facing Slopes'] += vpu.acres
+            except:
+                pass
+
+            totals['Habitat Characteristics']['Riparian Area'] += vpu.acres * vpu.percent_riparian * 0.01
+            totals['Habitat Characteristics']['Wetlands'] += vpu.acres * vpu.percent_wetland * 0.01
+            totals['Habitat Characteristics']['Critical Habitat'] += vpu.acres * vpu.percent_critical_habitat * 0.01
+            totals['Habitat Characteristics']['Roadless Areas'] += vpu.acres * vpu.percent_roadless * 0.01
+
+        results = {
+            'total_acres': int(totals['Fractional Coverage']['Total']),
+            'results_list': [
+                {'Fractional Coverage': [
+                    {'0-20% (acres)': int(totals['Fractional Coverage']['0-20%'])},
+                    {'20-40% (acres)': int(totals['Fractional Coverage']['20-40%'])},
+                    {'40-60% (acres)': int(totals['Fractional Coverage']['40-60%'])},
+                    {'60-80% (acres)': int(totals['Fractional Coverage']['60-80%'])},
+                    {'>80% (acres)': int(totals['Fractional Coverage']['>80%'])},
+                    {'Total Acres': int(totals['Fractional Coverage']['Total'])}
+                    # {'Total Acres': total_treatment_acres}
+                ]},
+                    {'Landforms': [
+                    {'Ridgetops (acres)': int(totals['Landforms']['Ridgetops'])},
+                    {'Valley Bottoms (acres)': int(totals['Landforms']['Valley Bottoms'])},
+                    {'North Facing Slopes (acres)': int(totals['Landforms']['North Facing Slopes'])},
+                    {'South Facing Slopes (acres)': int(totals['Landforms']['South Facing Slopes'])},
+                    {'East or West Facing Slopes (acres)': int(totals['Landforms']['East or West Facing Slopes'])}
+                ]},
+                    {'Habitat Characteristics': [
+                    {'Riparian Area (acres)': int(totals['Habitat Characteristics']['Riparian Area'])},
+                    {'Wetlands (acres)': int(totals['Habitat Characteristics']['Wetlands'])},
+                    {'Critical Habitat (acres)': int(totals['Habitat Characteristics']['Critical Habitat'])},
+                    # {'Salmon-Bearing Streams (mi)': 13},
+                    {'Roadless Areas (acres)': int(totals['Habitat Characteristics']['Roadless Areas'])}
+                ]}
+            ]
+        }
+
+        return results
 
     class Options:
         verbose_name = 'Treatment'

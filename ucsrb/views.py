@@ -909,15 +909,6 @@ def get_results_by_scenario_id(request):
         return get_json_error_response('Treatment with given ID (%s) does not exist' % scenario_id, 500, {})
 
     containing_overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__intersects=treatment.geometry_dissolved)
-    # TODO: return the smallest overlapping ppt basin to contain treatment so screen can zoom to it.
-    # get smallest overlapping pourpoint basin that contains entire treatment
-    # try:
-    #     containing_overlap_basin = sorted(FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__contains=treatment.geometry_dissolved), key=lambda x: x.geometry.area)[0]
-    # except:
-    #     containing_overlap_basin = sorted(FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__intersects=treatment.geometry_dissolved), key=lambda x: x.geometry.area)[-1]
-    # get all discrete pourpoint basins that are impacted by the treatment
-    # treated_basin_ids = [x.unit_id for x in FocusArea.objects.filter(unit_type='PourPointDiscrete', geometry__intersects=treatment.geometry_dissolved, geometry__coveredby=)]
-    impacted_pourpoint_ids = []
 
     impacted_pourpoint_ids = [x.unit_id for x in containing_overlap_basins]
     downstream_ppts = PourPoint.objects.filter(id__in=impacted_pourpoint_ids)
@@ -925,38 +916,13 @@ def get_results_by_scenario_id(request):
     if export:
         print("Export %s" % export)
     else:
-        # TODO: How do we create treatment areas? If this is just Veg Units then do in separate query
-        total_treatment_acres = int(treatment.geometry_final_area*0.000247105)
+        aggregate_results = treatment.aggregate_results()
         return_json = {
             'scenario': {
                 'name': treatment.name,
-                'acres': total_treatment_acres
+                'acres': aggregate_results['total_acres']
             },
-            'aggregate_results': [
-                {'Fractional Coverage': [
-                    {'0-20% (acres)': 126},
-                    {'20-40% (acres)': 58},
-                    {'40-60% (acres)': 56},
-                    {'60-80% (acres)': 101},
-                    {'>80% (acres)': 10},
-                    {'Total Acres': total_treatment_acres}
-                ]},
-                {'Landforms': [
-                    {'Ridgetips (acres)': 62},
-                    {'Valley Bottoms (acres)': 86},
-                    {'North Facing Slopes (acres)': 94},
-                    {'South Facing Slopes (acres)': 89},
-                    {'East or West Facing Slopes (acres)': 20}
-                ]},
-                {'Habitat Chracteristics': [
-                    {'Riparian Area (acres)': 68},
-                    {'Wetlands (acres)': 42},
-                    {'Critical Habitat (acres)': 148},
-                    {'Salmon-Bearing Streams (mi)': 13},
-                    {'Roadless Areas (acres)': 221}
-                ]}
-            ],
-
+            'aggregate_results': aggregate_results['results_list'],
             'treatment_areas': [
                 {
                     'id': 1,
