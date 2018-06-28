@@ -1153,20 +1153,28 @@ def run_filter_query(filters):
         pu_ids = [pu.pk for pu in query if pu.percent_high_fire_risk_area > settings.FIRE_RISK_THRESHOLD]
         query = (query.filter(pk__in=pu_ids))
 
-    # if 'landform_type' in filters.keys() and filters['landform_type']:
-    #     if 'include_north' in filters.keys():
-    #         if filters['include_north']:
-    #             pu_ids = [pu.pk for pu in query if pu.
-    #     if 'include_south' in filters.keys():
-    #         if filters['include_south']:
-    #             pu_ids = [pu.pk for pu in query if pu.
-    #     if 'include_ridgetop' in filters.keys():
-    #         if filters['include_ridgetop']:
-    #     if 'include_floor' in filters.keys():
-    #         if filters['include_floor']:
-    #     if 'include_east_west' in filters.keys():
-    #         if filters['include_east_west']:
+    # 11 and 21 = ridgetops
+    # 12 and 22 = north facing slopes
+    # 13 and 23 = south facing slopes
+    # 14 and 24 = valley bottoms
+    # 15 and 25 = east and west facing slopes
 
+    if 'landform_type' in filters.keys() and filters['landform_type']:
+        if 'include_north' in filters.keys():
+            if not filters['include_north']:
+                pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 2
+        if 'include_south' in filters.keys():
+            if not filters['include_south']:
+                pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 3
+        if 'include_ridgetop' in filters.keys():
+            if not filters['include_ridgetop']:
+                pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 1
+        if 'include_floor' in filters.keys():
+            if not filters['include_floor']:
+                pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 4
+        if 'include_east_west' in filters.keys():
+            if not filters['include_east_west']:
+                pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 5
 
     return (query, notes)
 

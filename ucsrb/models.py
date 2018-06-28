@@ -171,62 +171,58 @@ class TreatmentScenario(Scenario):
     percent_high_fire_risk_area = models.BooleanField(default=False)
 
     def run_filters(self, query):
+        from ucsrb.views import run_filter_query
+        filters = {}
         if self.focus_area_input:
+            filters['focus_area'] = True
             if type(self.focus_area_input) == int:
-                focus_area = FocusArea.objects.get(pk=self.focus_area_input)
+                filters['focus_area_input'] = self.focus_area_input
             else:
-                focus_area = self.focus_area_input
-            query = (query.filter(geometry__coveredby=focus_area.geometry))
+                filters['focus_area_input'] = self.focus_area_input.pk
 
         if self.private_own:
-            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
-            query = (query.filter(pk__in=pu_ids))
+            filters['private_own'] = True
 
         if self.pub_priv_own and self.pub_priv_own_input:
-            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() == self.pub_priv_own_input.lower()]
-            query = (query.filter(pk__in=pu_ids))
+            filters['pub_priv_own'] = True
+            filters['pub_priv_own_input'] = self.pub_priv_own_input
 
         if self.lsr_percent:
-            pu_ids = [pu.pk for pu in query if pu.lsr_percent < settings.LSR_THRESHOLD]
-            query = (query.filter(pk__in=pu_ids))
+            filters['lsr_percent'] = True
 
         if self.has_critical_habitat:
-            pu_ids = [pu.pk for pu in query if pu.percent_critical_habitat < settings.CRIT_HAB_THRESHOLD and not pu.has_critical_habitat]
-            query = (query.filter(pk__in=pu_ids))
+            filters['has_critical_habitat'] = True
 
         if self.percent_roadless:
-            pu_ids = [pu.pk for pu in query if pu.percent_roadless < settings.ROADLESS_THRESHOLD]
-            query = (query.filter(pk__in=pu_ids))
+            filters['percent_roadless'] = True
 
         if self.road_distance:
+            filters['road_distance'] = True
             if self.road_distance_max:
-                pu_ids = [pu.pk for pu in query if pu.road_distance <= self.road_distance_max]
-                query = (query.filter(pk__in=pu_ids))
+                filters['road_distance_max'] = self.road_distance_max
 
         if self.percent_wetland:
-            pu_ids = [pu.pk for pu in query if pu.percent_wetland < settings.WETLAND_THRESHOLD]
-            query = (query.filter(pk__in=pu_ids))
+            filters['percent_wetland'] = True
 
         if self.percent_riparian:
-            pu_ids = [pu.pk for pu in query if pu.percent_riparian < settings.RIPARIAN_THRESHOLD]
-            query = (query.filter(pk__in=pu_ids))
+            filters['percent_riparian'] = True
 
         if self.slope:
+            filters['slope'] = True
             if self.slope_max:
-                pu_ids = [pu.pk for pu in query if pu.slope <= self.slope_max]
-                query = (query.filter(pk__in=pu_ids))
+                filters['slope_max'] = self.slope_max
 
         if self.percent_fractional_coverage:
+            filters['percent_fractional_coverage'] = True
             if self.percent_fractional_coverage_min:
-                pu_ids = [pu.pk for pu in query if pu.percent_fractional_coverage >= self.percent_fractional_coverage_min]
-                query = (query.filter(pk__in=pu_ids))
+                filters['percent_fractional_coverage'] = self.percent_fractional_coverage_min
             if self.percent_fractional_coverage_max:
-                pu_ids = [pu.pk for pu in query if pu.percent_fractional_coverage <= self.percent_fractional_coverage_max]
-                query = (query.filter(pk__in=pu_ids))
+                filters['percent_fractional_coverage_max'] = self.percent_fractional_coverage_max
 
         if self.percent_high_fire_risk_area:
-            pu_ids = [pu.pk for pu in query if pu.percent_high_fire_risk_area < settings.FIRE_RISK_THRESHOLD]
-            query = (query.filter(pk__in=pu_ids))
+            filters['percent_high_fire_risk_area'] = True
+
+        (query, notes) = run_filter_query(filters)
 
         return query
 
