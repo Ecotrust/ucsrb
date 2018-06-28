@@ -223,10 +223,10 @@ app.panel = {
             html += `<div class="media align-items-center">
             <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
             <div class="media-body">
-            <h4 class="mt-0">Eagle Creek</h4>
+            <h4 class="mt-0">${results.scenario.name}</h4>
             </div>
             </div>`;
-            html += `<div class="feature-result"><span class="lead">${results.aggregate_results['Fractional Coverage']['Total']}</span> acres</div><div class="overflow-gradient"><div class="result-list-wrap align-items-center">`;
+            html += `<div class="feature-result"><span class="lead">${results.scenario.acres}</span> acres</div><div class="overflow-gradient"><div class="result-list-wrap align-items-center">`;
             for (var result in results.aggregate_results) {
                 html += `<h5>${result}</h5>`;
                 html += app.panel.results.styleResultsAsRows(results.aggregate_results[result]);

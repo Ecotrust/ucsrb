@@ -927,6 +927,10 @@ def get_results_by_scenario_id(request):
     else:
         # TODO: How do we create treatment areas? If this is just Veg Units then do in separate query
         return_json = {
+            'scenario': {
+                'name': treatment.name,
+                'acres': int(treatment.geometry_final_area*0.000247105)
+            },
             'aggregate_results': {
                 'Fractional Coverage': {
                     '0-20': 126,
