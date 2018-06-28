@@ -281,6 +281,12 @@ app.panel = {
                             flow: 'CFPS'
                         },
                         type: 'spline',
+                        colors: {
+                            baseline: '#394861',
+                            rx_burn: '#FB7302',
+                            catastrophic_fire: '#680109',
+                            mechanical: '#93A35D',
+                        }
                     },
                     axis: {
                         x: {
@@ -310,6 +316,7 @@ app.panel = {
                     tooltip: {
                         format: {
                             title: function(d) {
+                                console.log(d);
                                 return d;
                             },
                             value: function(value, ratio, id) {
