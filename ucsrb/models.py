@@ -363,12 +363,11 @@ class VegPlanningUnit(models.Model):
     road_distance = models.FloatField()                     #RdDstEucMn ("Euclidean mean distance to roads")
     percent_fractional_coverage = models.FloatField()       #FrctCvg
     percent_high_fire_risk_area = models.FloatField()       #HRFApct
-
-    mgmt_alloc_code = models.CharField(max_length=255, null=True, blank=True, default=None),     #MgmtAlloca
-    mgmt_description = models.CharField(max_length=255, null=True, blank=True, default=None),    #MgmtDescri
-    mgmt_unit_id = models.IntegerField(null=True, blank=True, default=None),                   #FSmgt_etid
-    dwnstream_ppt_id = models.IntegerField(null=True, blank=True, default=None),               #ppt_ID
-    topo_height_class_majority = models.IntegerField(null=True, blank=True, default=None),     #thzonmaj
+    mgmt_alloc_code = models.CharField(max_length=255, null=True, blank=True, default=None)     #MgmtAlloca
+    mgmt_description = models.CharField(max_length=255, null=True, blank=True, default=None)    #MgmtDescri
+    mgmt_unit_id = models.IntegerField(null=True, blank=True, default=None)                     #FSmgt_etid
+    dwnstream_ppt_id = models.IntegerField(null=True, blank=True, default=None)                 #ppt_ID
+    topo_height_class_majority = models.IntegerField(null=True, blank=True, default=None)       #thzonmaj
 
     geometry = gismodels.MultiPolygonField(srid=settings.GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Veg Unit Geometry")
     objects = gismodels.GeoManager()
