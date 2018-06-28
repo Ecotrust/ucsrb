@@ -1150,7 +1150,7 @@ def run_filter_query(filters):
             query = (query.filter(pk__in=pu_ids))
 
     if 'percent_high_fire_risk_area' in filters.keys() and filters['percent_high_fire_risk_area']:
-        pu_ids = [pu.pk for pu in query if pu.percent_high_fire_risk_area < settings.FIRE_RISK_THRESHOLD]
+        pu_ids = [pu.pk for pu in query if pu.percent_high_fire_risk_area > settings.FIRE_RISK_THRESHOLD]
         query = (query.filter(pk__in=pu_ids))
 
     return (query, notes)
