@@ -931,30 +931,30 @@ def get_results_by_scenario_id(request):
                 'name': treatment.name,
                 'acres': int(treatment.geometry_final_area*0.000247105)
             },
-            'aggregate_results': {
-                'Fractional Coverage': {
-                    '0-20': 126,
-                    '20-40': 58,
-                    '40-60': 56,
-                    '60-80': 101,
-                    '>80': 10,
-                    'Total': 351
-                },
-                'Landforms': {
-                    'Ridgetips': 62,
-                    'Valley Bottoms': 86,
-                    'North Facing Slopes': 94,
-                    'South Facing Slopes': 89,
-                    'East or West Facing Slopes': 20
-                },
-                'Habitat Chracteristics': {
-                    'Riparian Area (acres)': 68,
-                    'Wetlands (acres)': 42,
-                    'Critical Habitat (acres)': 148,
-                    'Salmon-Bearing Streams (miles)': 13,
-                    'Roadless Areas (acres)': 221
-                }
-            },
+            'aggregate_results': [
+                'Fractional Coverage': [
+                    {'0-20% (acres)': 126},
+                    {'20-40% (acres)': 58},
+                    {'40-60% (acres)': 56},
+                    {'60-80% (acres)': 101},
+                    {'>80% (acres)': 10},
+                    {'Total Acres': 351}
+                ],
+                'Landforms': [
+                    {'Ridgetips (acres)': 62},
+                    {'Valley Bottoms (acres)': 86},
+                    {'North Facing Slopes (acres)': 94},
+                    {'South Facing Slopes (acres)': 89},
+                    {'East or West Facing Slopes (acres)': 20}
+                ],
+                'Habitat Chracteristics': [
+                    {'Riparian Area (acres)': 68},
+                    {'Wetlands (acres)': 42},
+                    {'Critical Habitat (acres)': 148},
+                    {'Salmon-Bearing Streams (mi)': 13},
+                    {'Roadless Areas (acres)': 221}
+                ]
+            ],
 
             'treatment_areas': [
                 {
