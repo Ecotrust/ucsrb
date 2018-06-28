@@ -668,7 +668,7 @@ app.map.layer = {
         id: 'salmonPriorityAreas', // set id equal to x in app.map.layer.x
         source: new ol.source.XYZ({
           attributions: 'Ecotrust',
-          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjiyt12lz99ts2rmdixj5hau1/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjiyt12lz99ts2rmdixj5hau1/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
         }),
         visible: false,
       }),
@@ -692,7 +692,7 @@ app.map.layer = {
         id: 'publicProtectedLand', // set id equal to x in app.map.layer.x
         source: new ol.source.XYZ({
           attributions: 'Ecotrust',
-          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjiwrc49c8gk52rn4009l4mhk/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjiwrc49c8gk52rn4009l4mhk/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
         }),
         visible: false,
       }),
@@ -709,6 +709,17 @@ app.map.layer = {
         visible: false,
       }),
     },
+    criticalHabitat: {
+      layer: new ol.layer.Tile({
+        name: 'Critical Habitat',
+        title: 'Critical Habitat',
+        id: 'criticalHabitat', // set id equal to x in app.map.layer.x
+        source: new ol.source.XYZ({
+          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjiwcw2wg9hz02srr549ehylf/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+        }),
+        visible: false,
+      }),
+    },
     landMgmtPlan: {
       layer: new ol.layer.Tile({
         name: 'Land Managment Plan',
@@ -716,7 +727,7 @@ app.map.layer = {
         id: 'landMgmtPlan', // set id equal to x in app.map.layer.x
         source: new ol.source.XYZ({
           attributions: 'Ecotrust',
-          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjixo5io4apn72st7znv68xoe/tiles/256/{z}/{x}/{y}?access_token=sk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqaXl2d3NyMDAwb2QzcW54dWJ6ODI3bHAifQ.dbPpTyeaRMLHKur3tEwpYw'
+          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjixo5io4apn72st7znv68xoe/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
         }),
         visible: false,
       }),
@@ -746,6 +757,7 @@ if (app.map.overlays) {
   app.map.overlays.getLayers().push(app.map.layer.publicProtectedLand.layer);
   app.map.overlays.getLayers().push(app.map.layer.roads.layer);
   app.map.overlays.getLayers().push(app.map.layer.landMgmtPlan.layer);
+  app.map.overlays.getLayers().push(app.map.layer.criticalHabitat.layer);
 }
 
 app.map.layerSwitcher = new ol.control.LayerSwitcher({
