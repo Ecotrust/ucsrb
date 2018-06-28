@@ -563,6 +563,7 @@ app.map.layer = {
         visible: false,
         renderBuffer: 300,
         minResolution: 0.3470711467930046,
+        maxResolution: 180,
         // declutter: true
       }),
       selectAction: streamSelectAction

@@ -529,6 +529,7 @@ app.nav = {
                     });
                     var eventLayer = event.target.dataset.layer;
                     app.map.toggleLayer(eventLayer);
+                    app.state.setStep = 1;
                 });
             })();
             </script>`,
