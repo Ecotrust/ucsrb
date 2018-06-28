@@ -30,7 +30,7 @@ class TreatmentScenarioForm(ScenarioForm):
     )
 
     private_own = HiddenScenarioBooleanField(
-        label="Avoid Private Land",
+        label="Public Land Only",
         help_text="Do not treat privately owned forest land",
         required=False,
     )
@@ -174,8 +174,8 @@ class TreatmentScenarioForm(ScenarioForm):
     )
 
     percent_high_fire_risk_area = HiddenScenarioBooleanField(
-        label="Avoid High Fire Risk Area",
-        help_text="Only Treat Areas With Lower Fire Risk",
+        label="Target High Fire Risk Area",
+        help_text="Only Treat Areas With High Fire Risk",
         required=False,
     )
 
