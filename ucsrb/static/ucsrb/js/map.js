@@ -453,15 +453,15 @@ app.map.draw.draw.on('drawstart', function(e) {
   }
 
   /** @type {ol.Coordinate|undefined} */
-  var tooltipCoord = e.coordinate;
+  // var tooltipCoord = e.coordinate;
 
-  app.map.draw.toolTipListener = e.feature.getGeometry().on('change', function(evt) {
-    var geom = evt.target;
-    var output = formatAreaToAcres(geom);
-    var tooltipCoord = geom.getInteriorPoint().getCoordinates();
-    app.map.draw.measureTooltipElement.innerHTML = output;
-    app.map.draw.measureTooltip.setPosition(tooltipCoord);
-  });
+  // app.map.draw.toolTipListener = e.feature.getGeometry().on('change', function(evt) {
+  //   var geom = evt.target;
+  //   var output = formatAreaToAcres(geom);
+  //   var tooltipCoord = geom.getInteriorPoint().getCoordinates();
+  //   app.map.draw.measureTooltipElement.innerHTML = output;
+  //   app.map.draw.measureTooltip.setPosition(tooltipCoord);
+  // });
 });
 
 app.map.draw.draw.on('drawend', function(e) {
@@ -648,7 +648,79 @@ app.map.layer = {
         id: 'resultPoints',
       }),
       selectAction: pourPointResultSelection,
-    }
+    },
+    wetlands: {
+      layer: new ol.layer.Tile({
+        name: 'Wetlands',
+        title: 'Wetlands',
+        id: 'wetlands', // set id equal to x in app.map.layer.x
+        source: new ol.source.XYZ({
+          attributions: 'Ecotrust',
+          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjixp1ni6ar6x2qpbaz58fit0/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+        }),
+        visible: false,
+      }),
+    },
+    salmonPriorityAreas: {
+      layer: new ol.layer.Tile({
+        name: 'Salmon Priority Areas',
+        title: 'Salmon Priority Areas',
+        id: 'salmonPriorityAreas', // set id equal to x in app.map.layer.x
+        source: new ol.source.XYZ({
+          attributions: 'Ecotrust',
+          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjiyt12lz99ts2rmdixj5hau1/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+        }),
+        visible: false,
+      }),
+    },
+    forestCover: {
+      layer: new ol.layer.Tile({
+        name: 'Forest Cover',
+        title: 'Forest Cover',
+        id: 'forestCover', // set id equal to x in app.map.layer.x
+        source: new ol.source.XYZ({
+          attributions: 'Ecotrust',
+          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjiwqrvyt8g102rn4i89lm9k9/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+        }),
+        visible: false,
+      }),
+    },
+    publicProtectedLand: {
+      layer: new ol.layer.Tile({
+        name: 'Public and protected lands',
+        title: 'Public and protected lands',
+        id: 'publicProtectedLand', // set id equal to x in app.map.layer.x
+        source: new ol.source.XYZ({
+          attributions: 'Ecotrust',
+          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjiwrc49c8gk52rn4009l4mhk/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+        }),
+        visible: false,
+      }),
+    },
+    roads: {
+      layer: new ol.layer.Tile({
+        name: 'Roads',
+        title: 'Roads',
+        id: 'roads', // set id equal to x in app.map.layer.x
+        source: new ol.source.XYZ({
+          attributions: 'Ecotrust',
+          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjiyswskt99pv2rmdzjii99et/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+        }),
+        visible: false,
+      }),
+    },
+    landMgmtPlan: {
+      layer: new ol.layer.Tile({
+        name: 'Land Managment Plan',
+        title: 'Land Managment Plan',
+        id: 'landMgmtPlan', // set id equal to x in app.map.layer.x
+        source: new ol.source.XYZ({
+          attributions: 'Ecotrust',
+          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjixo5io4apn72st7znv68xoe/tiles/256/{z}/{x}/{y}?access_token=sk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqaXl2d3NyMDAwb2QzcW54dWJ6ODI3bHAifQ.dbPpTyeaRMLHKur3tEwpYw'
+        }),
+        visible: false,
+      }),
+    },
 };
 
 app.map.layer.scenarios.layer.set('id','scenarios');
@@ -668,6 +740,12 @@ if (app.map.overlays) {
   app.map.overlays.getLayers().push(app.map.layer.streams.layer);
   // app.map.overlays.getLayers().push(app.map.layer.pourpoints.layer);
   app.map.overlays.getLayers().push(app.map.layer.boundary.layer);
+  app.map.overlays.getLayers().push(app.map.layer.wetlands.layer);
+  app.map.overlays.getLayers().push(app.map.layer.salmonPriorityAreas.layer);
+  app.map.overlays.getLayers().push(app.map.layer.forestCover.layer);
+  app.map.overlays.getLayers().push(app.map.layer.publicProtectedLand.layer);
+  app.map.overlays.getLayers().push(app.map.layer.roads.layer);
+  app.map.overlays.getLayers().push(app.map.layer.landMgmtPlan.layer);
 }
 
 app.map.layerSwitcher = new ol.control.LayerSwitcher({
