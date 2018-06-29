@@ -523,6 +523,7 @@ app.nav = {
             <div id="forest-listener">
             <button class="dropdown-item" type="button" data-layer="huc10">HUC 10</button>
             <button class="dropdown-item" type="button" data-layer="huc12">HUC 12</button>
+            <button class="dropdown-item" type="button" data-layer="landMgmtPlan">Forest Plan Mgmt Alloc</button>
             </div>
             </div>
             </div>
