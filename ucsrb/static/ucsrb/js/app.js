@@ -298,6 +298,12 @@ app.panel = {
                             tick: {
                                 fit: true,
                                 format: "%B",
+                                rotate: 44,
+                                centered: false,
+                                multiline: false,
+                                // format: function(x) {
+                                //     return "%b"
+                                // },
                                 culling: {
                                     max: 12
                                 }
@@ -319,9 +325,8 @@ app.panel = {
                     },
                     tooltip: {
                         format: {
-                            title: function(d) {
-                                console.log(d);
-                                return d;
+                            title: function(x) {
+                                return d3.timeFormat("%B %d, %Y")(x);
                             },
                             value: function(value, ratio, id) {
                                 value = value.toFixed(4);
