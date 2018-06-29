@@ -4,9 +4,9 @@
 # 2018-06-26, WAH.
 #==============================================================================#
 time.0 <- Sys.time()
-message("---------------------------------------------------------------\n",
-        "DHSVM emulator v0.1 beta.  (c) 2018 SSPA.  All rights reserved.\n", 
-        "---------------------------------------------------------------")
+# message("---------------------------------------------------------------\n",
+#         "DHSVM emulator v0.1 beta.  (c) 2018 SSPA.  All rights reserved.\n",
+#         "---------------------------------------------------------------")
 #
 # Third-party libraries.
 #
@@ -39,9 +39,9 @@ arguments <- list(
   f = list(fmt.date = "%m.%d.%Y-%H:%M:%S") # Input date-time format
 )
 parse.args <- function(arguments, args=commandArgs(trailingOnly=TRUE)) {
-  emit <- function(...) cat("INFO: ", ..., "\n", file=stderr())
+  # emit <- function(...) cat("INFO: ", ..., "\n", file=stderr())
   q <- function(s, ...) paste0("'", s, "'", ...)
-  
+
   rx <- paste0("^[-][", paste0(names(arguments), collapse=""), "]")
   current.arg <- ""
   nerrs <- 0
@@ -62,7 +62,7 @@ parse.args <- function(arguments, args=commandArgs(trailingOnly=TRUE)) {
       temp <- arguments[[current.arg]]
       temp[[1]] <- arg
       arguments[[current.arg]] <- temp
-      emit(q(names(arguments[current.arg][[1]])[1]), "set to", q(arg))
+      # emit(q(names(arguments[current.arg][[1]])[1]), "set to", q(arg))
       current.arg <- ""
     }
   }
@@ -108,7 +108,7 @@ waterYear <- function(d, delta=as.difftime(31+30+31+1/24, units="days")) {
 # READ AND CHECK THE INPUT FILE
 #
 X <- assure(as.data.table(read.csv(file=fn.in, stringsAsFactors=FALSE)),
-            paste0("Unable to read input from file '", fn.in, 
+            paste0("Unable to read input from file '", fn.in,
                    "'.  Reason given is:"))
 #
 # Check that field names and types are as expected.
@@ -117,7 +117,7 @@ vars.key <- c(
   ppt_ID="ppt_ID",          # Passed to output
   start_time="start_time",  # Selects time slices
   end_time="end_time"       # Selects time slices
-) 
+)
 vars.stations <- c(
   # mazama="MAZAMA_NOAA", # Needed only for checking sum-to-unity criterion
   winthrop="Winthrop",
@@ -178,7 +178,7 @@ if (any(duplicated(X[, .(ppt_ID)]))) {
 # Verify that all variables indeed look numeric (except for the keys).
 #
 varnames <- setdiff(names(vars), names(vars.key))
-type.number <- sapply(varnames, 
+type.number <- sapply(varnames,
                       function(f) inherits(X[[f]], c("integer", "numeric")))
 if(sum(!type.number) > 0) {
   message("These variables are not all numeric:\n",
@@ -191,7 +191,7 @@ if(sum(!type.number) > 0) {
 i.start <- is.na(to.Date(X$start_time))
 i.end <- is.na(to.Date(X$end_time))
 if (any(i.start) || any(i.end)) {
-  message("Not all start and end date-times could be parsed using format '", 
+  message("Not all start and end date-times could be parsed using format '",
           fmt.date, "\nThe unknown values are:\n",
           paste(c(X$start_time[i.start], X$end_time[i.end]), collapse=", "))
   stop(call.=FALSE)
@@ -228,15 +228,15 @@ process <- function(X, wateryear) {
   #
   X0 <- X[waterYear(end_time) >= wateryear & wateryear >= waterYear(start_time)]
   if (nrow(X0)==0) return(NULL)
-  message("Predicting during water year ", wateryear,
-          " for ", nrow(X0), " locations.")
+  # message("Predicting during water year ", wateryear,
+  #         " for ", nrow(X0), " locations.")
   #
   # Read the coefficient file.
   #
   fn.coeff <- sub("[*]", wateryear, template)
   fn <- list.files(path.data, fn.coeff, full.names=TRUE)
   if (length(fn) == 0) {
-    message("Unable to find coefficient file ", fn.coeff, " for water year ", wateryear, 
+    message("Unable to find coefficient file ", fn.coeff, " for water year ", wateryear,
             " in path ", path.data)
     return(NULL)
   }
@@ -270,13 +270,13 @@ process <- function(X, wateryear) {
   # present in input.
   #
   if (length(v <- setdiff(colnames(x), rownames(coefficients))) > 0) {
-    message("Variables were found that are not included in the models for water year ", 
+    message("Variables were found that are not included in the models for water year ",
             wateryear, ":\n",
             paste(v, collapse=", "))
     return(NULL)
   }
   if (length(v <- setdiff(rownames(coefficients), colnames(x))) > 0) {
-    warning("Variables found in the models for water year ", 
+    warning("Variables found in the models for water year ",
             wateryear, "will not be used:\n",
             paste(v, collapse=", "))
   }
@@ -289,8 +289,8 @@ process <- function(X, wateryear) {
   #
   # Format as tuples(ID, Time, Value).
   #
-  dates <- as.POSIXct(as.numeric(colnames(coefficients)), 
-                      origin=as.Date("1970-01-01")) 
+  dates <- as.POSIXct(as.numeric(colnames(coefficients)),
+                      origin=as.Date("1970-01-01"))
   Y <- data.table(ppt_ID=rep(X0$ppt_ID, each=ncol(coefficients)),
                   Time=rep(dates, nrow(X0)),
                   Response=c(t(y.hat)))
@@ -306,7 +306,7 @@ process <- function(X, wateryear) {
   # raw `Response` to obtain the flows, multiply the flows
   # by the areas, and sort by time within pourpoint.
   #
-  Y[start_time <= Time & Time < end_time, 
+  Y[start_time <= Time & Time < end_time,
     .(Value=xform.inverse(Response) * acres), keyby=.(ppt_ID, Time)]
 }
 #..............................................................................#
@@ -319,15 +319,14 @@ if (length(Y.list) > 0) {
   Y <- rbindlist(Y.list)
   invisible(Y[, Time := format(Time, fmt.date)])
   write.csv(Y, file=fn.out, row.names=FALSE)
-  message(format(nrow(Y), big.mark=","),
-          " predicted flows created for ", nrow(X), " locations.")
-  time.1 <- Sys.time()
-} else {
-  message("Nothing was predicted!")
-}
+  # message(format(nrow(Y), big.mark=","),
+  #         " predicted flows created for ", nrow(X), " locations.")
+  # time.1 <- Sys.time()
+} #else {
+#   message("Nothing was predicted!")
+# }
 #
 # Sign off.
 #
-message(format(round(as.difftime(time.1 - time.0, units="secs"), 2)), "; ",
-        memory.size(max=TRUE), " MB RAM allocated.")
-
+# message(format(round(as.difftime(time.1 - time.0, units="secs"), 2)), "; ",
+#         memory.size(max=TRUE), " MB RAM allocated.")
