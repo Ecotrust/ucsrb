@@ -234,7 +234,7 @@ app.mapbox.layers = {
     report_methods: ['filter'],
     map_layer_id: 'huc12'
   },
-  'LandMgmtPlan_OKAWEN_WCol-4m69bv': {
+  'landMgmtPlan': {
     id: 'ucsrbsupport.40j4gieb',
     id_field: 'ET_UID',
     name_field: 'MgmtDescri',
@@ -742,19 +742,7 @@ app.map.layer = {
           url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjiwcw2wg9hz02srr549ehylf/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
         }),
         visible: false,
-      }),
-    },
-    landMgmtPlan: {
-      layer: new ol.layer.Tile({
-        name: 'Land Managment Plan',
-        title: 'Land Managment Plan',
-        id: 'landMgmtPlan', // set id equal to x in app.map.layer.x
-        source: new ol.source.XYZ({
-          attributions: 'Ecotrust',
-          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjixo5io4apn72st7znv68xoe/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
-        }),
-        visible: false,
-      }),
+      })
     },
 };
 
@@ -781,7 +769,6 @@ if (app.map.overlays) {
   app.map.overlays.getLayers().push(app.map.layer.forestCover.layer);
   app.map.overlays.getLayers().push(app.map.layer.publicProtectedLand.layer);
   app.map.overlays.getLayers().push(app.map.layer.roads.layer);
-  app.map.overlays.getLayers().push(app.map.layer.landMgmtPlan.layer);
   app.map.overlays.getLayers().push(app.map.layer.criticalHabitat.layer);
 }
 
