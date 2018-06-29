@@ -156,7 +156,7 @@ app.map.selection.selectFilterSingleClick = new ol.interaction.Select(
     layers: [
       app.map.layer.huc10.layer,
       app.map.layer.huc12.layer,
-      app.map.layer.landMgmtPlan.layer,
+      app.map.layer.RMU.layer,
     ],
     style: app.map.styles.Polygon
   }

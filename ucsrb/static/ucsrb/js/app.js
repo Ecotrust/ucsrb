@@ -523,7 +523,7 @@ app.nav = {
             <div id="forest-listener">
             <button class="dropdown-item" type="button" data-layer="huc10">HUC 10</button>
             <button class="dropdown-item" type="button" data-layer="huc12">HUC 12</button>
-            <button class="dropdown-item" type="button" data-layer="landMgmtPlan">Forest Plan Mgmt Alloc</button>
+            <button class="dropdown-item" type="button" data-layer="RMU">Forest Plan Mgmt Alloc</button>
             </div>
             </div>
             </div>
@@ -806,6 +806,7 @@ app.request = {
     get_focus_area: function(feature, layerName, callback) {
         props = feature.getProperties();
         props.layer = props.layer.split('.shp')[0] //bug where mapbox started adding .shp to layer name
+        console.log(props);
         id = props[app.mapbox.layers[props.layer].id_field];
         return $.ajax({
             url: '/ucsrb/get_focus_area',

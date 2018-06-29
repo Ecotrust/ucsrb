@@ -234,13 +234,13 @@ app.mapbox.layers = {
     report_methods: ['filter'],
     map_layer_id: 'huc12'
   },
-  'landMgmtPlan': {
+  'LandMgmtPlan_OKAWEN_WCol-4m69bv': {
     id: 'ucsrbsupport.40j4gieb',
     id_field: 'ET_UID',
     name_field: 'MgmtDescri',
     name: 'Forest Plan Mgmt Alloc',
     report_methods: ['filter'],
-    map_layer_id: 'landMgmtPlan'
+    map_layer_id: 'RMU'
   },
   'ppts_all6-11-2mwii2': {
     id: 'ucsrbsupport.cgxp2slx',
@@ -625,14 +625,14 @@ app.map.layer = {
       }),
       selectAction: focusAreaSelectAction
     },
-    landMgmtPlan: {
+    RMU: {
       layer: new ol.layer.VectorTile({
         name: 'Forest Plan Mgmt Alloc',
         title: 'Forest Plan Mgmt Alloc',
-        id: 'landMgmtPlan', // set id equal to x in app.map.layer.x
+        id: 'RMU', // set id equal to x in app.map.layer.x
         source: new ol.source.VectorTile({
           format: new ol.format.MVT(),
-          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.landMgmtPlan.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
+          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['LandMgmtPlan_OKAWEN_WCol-4m69bv'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.FocusArea,
         visible: false,
@@ -760,7 +760,7 @@ if (app.map.overlays) {
   app.map.overlays.getLayers().push(app.map.layer.draw.layer);
   app.map.overlays.getLayers().push(app.map.layer.huc12.layer);
   app.map.overlays.getLayers().push(app.map.layer.huc10.layer);
-  app.map.overlays.getLayers().push(app.map.layer.landMgmtPlan.layer);
+  app.map.overlays.getLayers().push(app.map.layer.RMU.layer);
   app.map.overlays.getLayers().push(app.map.layer.streams.layer);
   // app.map.overlays.getLayers().push(app.map.layer.pourpoints.layer);
   app.map.overlays.getLayers().push(app.map.layer.boundary.layer);

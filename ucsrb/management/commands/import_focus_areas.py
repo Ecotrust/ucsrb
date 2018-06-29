@@ -96,7 +96,8 @@ class Command(BaseCommand):
                 id_field = 'HUC_12'
                 desc_field = 'HU_12_NAME'
             if in_type == 'RMU':
-                id_field = None
+                id_field = 'ET_UID'
+                desc_field = 'MgmtDescri'
             # if in_type == 'PourPoint':
             #     id_field = 'ppt_ID'
             if in_type == 'PourPointOverlap':

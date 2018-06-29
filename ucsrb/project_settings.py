@@ -205,7 +205,7 @@ INSTALLED_APPS = [
 ########################################
 ######        LAYER DATA        ########
 ########################################
-FOCUS_AREA_TYPES = ['HUC10', 'HUC12', 'RMA', 'PourPointOverlap', 'PourPointDiscrete', 'Drawing']
+FOCUS_AREA_TYPES = ['HUC10', 'HUC12', 'RMU', 'PourPointOverlap', 'PourPointDiscrete', 'Drawing']
 IMPORT_SRID = 3857
 
 
