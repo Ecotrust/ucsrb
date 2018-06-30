@@ -11,6 +11,8 @@ var app = {
     scenarioInProgress: function() {
         if (app.state.step === 0 || app.state.method === 'reset') {
             return false;
+        } else if (app.state.step === 1 && app.state.method === 'filter') {
+            return false;
         } else {
             return true;
         }
@@ -284,7 +286,7 @@ app.panel = {
                         names: {
                             flow: 'CFPS'
                         },
-                        type: 'spline',
+                        type: 'step',
                         colors: {
                             baseline: '#394861',
                             rx_burn: '#FB7302',
@@ -804,15 +806,17 @@ app.request = {
         });
     },
     get_focus_area: function(feature, layerName, callback) {
-        props = feature.getProperties();
-        props.layer = props.layer.split('.shp')[0] //bug where mapbox started adding .shp to layer name
-        console.log(props);
-        id = props[app.mapbox.layers[props.layer].id_field];
+        app.map.selectedFeature = feature;
+        var props = feature.getProperties();
+        props.layer = props.layer.split('.shp')[0];
+        var layer = app.mapbox.layers[props.layer].map_layer_id;
+        var id = props[app.mapbox.layers[props.layer].id_field];
+        id = parseInt(id,10);
         return $.ajax({
             url: '/ucsrb/get_focus_area',
             data: {
                 id: id,
-                layer: layerName,
+                layer: layer,
             },
             dataType: 'json',
             success: function(response) {
@@ -858,7 +862,6 @@ app.request = {
     get_basin: function(feature, callback) {
         var pp_id = feature.getProperties().ppt_ID;
         app.map.selectedFeature = feature;
-        console.log(pp_id);
         return $.ajax({
             url: '/ucsrb/get_basin',
             data: {

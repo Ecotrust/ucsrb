@@ -324,8 +324,9 @@ app.map.closePopup = function() {
 }
 
 confirmSelection = function(feat, vector) {
-  console.log(feat);
-  var mbLayer = app.mapbox.layers[feat.getProperties().layer];
+  var props = feat.getProperties();
+  props.layer = props.layer.split('.shp')[0];
+  var mbLayer = app.mapbox.layers[props.layer];
   var layer = app.map.layer[mbLayer.map_layer_id];
   var features = (new ol.format.GeoJSON()).readFeatures(vector, {
     dataProjection: 'EPSG:3857',
@@ -364,25 +365,32 @@ generateFilterPopup = function(content) {
     '</div>';
 }
 
-focusAreaSelectAction = function(feat) {
-  if (app.state.step < 1) {
-    app.state.setStep = 1; // step forward in state
-  }
-  var layer = app.map.selection.select.getLayer(feat).get('id');
-  app.request.get_focus_area(feat, layer, function(feat, vector) {
-    if (feat){
-      confirmSelection(feat, vector);
-      confirmationReceived();
-    }
-  });
-};
-
-streamSelectAction = function(feat) {
+app.scenarioInProgressCheck = function() {
   if (app.scenarioInProgress()) {
     app.map.mask.set('active', false);
     app.viewModel.scenarios.reset({cancel: true});
     app.state.setStep = 0; // go back to step one
   }
+}
+
+focusAreaSelectAction = function(feat) {
+  app.scenarioInProgressCheck();
+  if (app.state.step < 1) {
+    app.state.setStep = 1; // step forward in state
+  }
+  // var layer = app.map.selection.select.getLayer(feat).get('id');
+  app.request.get_focus_area(feat, layer, function(feat, vector) {
+    if (feat){
+      confirmSelection(feat, vector);
+    }
+    if (app.state.step < 2) {
+      app.state.setStep = 2; // step forward in state
+    }
+  });
+};
+
+streamSelectAction = function(feat) {
+  app.scenarioInProgressCheck();
   pourPointSelectAction(feat);
 };
 
@@ -600,7 +608,9 @@ app.map.layer = {
         id: 'huc10', // set id equal to x in app.map.layer.x
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
-          format: new ol.format.MVT(),
+          format: new ol.format.MVT({
+            featureClass: ol.Feature
+          }),
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.huc10_3857.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.FocusArea,
@@ -616,7 +626,9 @@ app.map.layer = {
         id: 'huc12', // set id equal to x in app.map.layer.x
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
-          format: new ol.format.MVT(),
+          format: new ol.format.MVT({
+            featureClass: ol.Feature
+          }),
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.huc12_3857.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.FocusArea,
@@ -631,7 +643,9 @@ app.map.layer = {
         title: 'Forest Plan Mgmt Alloc',
         id: 'RMU', // set id equal to x in app.map.layer.x
         source: new ol.source.VectorTile({
-          format: new ol.format.MVT(),
+          format: new ol.format.MVT({
+            featureClass: ol.Feature
+          }),
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['LandMgmtPlan_OKAWEN_WCol-4m69bv'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.FocusArea,

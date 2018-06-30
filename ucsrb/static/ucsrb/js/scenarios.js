@@ -375,7 +375,7 @@ function scenarioFormModel(options) {
                 error: function(result) {
                     self.showButtonSpinner(false);
                     self.showingFilteringResults(false);
-                    console.log('error in getUpdatedFilterResults: ' + result);
+                    console.log('%cerror in getUpdatedFilterResults: %o', 'color: red', result);
                 }
             });
             self.currentGridRequest(request);
