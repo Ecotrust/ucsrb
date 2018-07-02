@@ -639,10 +639,11 @@ Modal
     color: #fff;
     font-size: 1em;
     font-weight: 500;
+    margin: 0;
     position: relative;
     padding-right: 4rem;
     text-align: left;
-    width: 100%;
+    width: 90%;
 }
 #load-saved-list .btn-link:after {
     background: url('/static/ucsrb/img/icon/i_expand_white.svg');
@@ -650,12 +651,33 @@ Modal
     background-size: 50% auto;
     background-repeat: no-repeat;
     content: '';
-    height: 1rem;
+    height: 1em;
     position: absolute;
-    right: .5rem;
+    right: 5%;
     top: 50%;
     transform: translate(0,-.5rem);
     width: 1rem;
+}
+
+#load-saved-list .btn-link:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+#load-saved-list .btn-trash {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.5);
+    display: inline-block;
+    margin: 0 -2px;
+    text-align: center;
+    width: 10%;
+}
+
+#load-saved-list .btn-trash:hover {
+    background: rgba(255,0,0,0.15);
+}
+
+#load-saved-list .btn-trash img {
+    max-height: 1em;
 }
 
 #loading-modal .modal-header {

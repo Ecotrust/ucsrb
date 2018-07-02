@@ -944,7 +944,7 @@ app.request = {
     },
     saveIntermediateScenario: function(data) {
         $.ajax({
-            url: '/sceanrio/treatmentscenario/save',
+            url: '/scenario/treatmentscenario/save',
             type: 'POST',
             data: data,
             dataType: 'json',
@@ -960,7 +960,7 @@ app.request = {
     },
     saveState: function() {
         $.ajax({
-            url: '/sceanrio/treatmentscenario/save',
+            url: '/scenario/treatmentscenario/save',
             type: 'POST',
             data: app.saveState,
             dataType: 'json',
@@ -970,6 +970,23 @@ app.request = {
             },
             error: function(response, status) {
                 console.log(`%cfail @ save state: %o`, 'color: red', response);
+                return status;
+            }
+        })
+    },
+    deleteScenario: function(id) {
+        $.ajax({
+            url: '/scenario/treatmentscenario/delete',
+            type: 'POST',
+            data: {
+                id: id
+            },
+            success: function(response, status) {
+                console.log(`%csuccess deleted: %o`, 'color: green', response);
+                return status;
+            },
+            error: function(response, status) {
+                console.log(`%failed to deleted: %o`, 'color: red', response);
                 return status;
             }
         })
