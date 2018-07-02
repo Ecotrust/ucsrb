@@ -114,6 +114,8 @@ app.resultsInit = function(id) {
             app.nav.showResultsNav();
             app.map.addDownstreamPptsToMap(response.pourpoints);
             app.setState('aggregate');
+            app.nav.hideSave();
+            $('#subnav-sign-in-modal').addClass('d-none');
         })
         .catch(function(response) {
             console.log('%c failed to get results: %o', 'color: salmon;', response);
