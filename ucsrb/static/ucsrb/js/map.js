@@ -91,10 +91,11 @@ app.map.styles = {
     }),
     'FocusArea': new ol.style.Style({
         stroke: new ol.style.Stroke({
-            color: '#58595b',
-            lineCap: 'cap',
+            color: '#303030',
+            lineCap: 'butt',
             lineJoin: 'miter',
-            width: 3,
+            width: 1,
+            miterLimit: 2
         }),
         fill: new ol.style.Fill({
             color: 'rgba(0, 0, 0, 0)'
@@ -103,18 +104,18 @@ app.map.styles = {
     }),
     'Streams': function(feature, resolution) {
         var width = 2.25;
-        if (resolution < 3) {
+        if (resolution < 6) {
             width = 14;
-        } else if (resolution < 5) {
+        } else if (resolution < 10) {
             width = 11;
         } else if (resolution < 20) {
-            width = 8;
+            width = 9;
         } else if (resolution < 40) {
-            width = 5;
+            width = 6;
         } else if (resolution < 90) {
-            width = 3.75;
+            width = 5;
         } else if (resolution < 130) {
-            width = 3;
+            width = 3.5;
         }
         return new ol.style.Style({
             stroke: new ol.style.Stroke({

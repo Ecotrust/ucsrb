@@ -106,8 +106,10 @@ var main = {
             })
         },
         success: function(data) {
+            // set new csrf token
+            csrftoken = getCookie('csrftoken');
             $('#login-modal').modal('hide');
-            if (typeof(app) !== 'undefined') {
+            if (app.state.step === 'result') {
               app.nav.showSave();
               app.nav.saveElement().classList.remove('hide');
             }

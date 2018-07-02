@@ -286,7 +286,7 @@ app.panel = {
                         names: {
                             flow: 'CFPS'
                         },
-                        type: 'step',
+                        type: 'line',
                         colors: {
                             baseline: '#394861',
                             rx_burn: '#FB7302',
@@ -343,7 +343,7 @@ app.panel = {
             resize: function() {
                 window.setTimeout(function() {
                     app.panel.results.chart.obj.resize();
-                }, 1000);
+                }, 500);
             }
         },
         panelResultsElement: function() {
