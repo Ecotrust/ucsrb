@@ -891,6 +891,34 @@ Panel
     height: 5rem;
 }
 
+.panel .readonly-value {
+  background: transparent;
+  border: none;
+  color: #3a5675;
+  font-size: .875em;
+  font-weight: bold;
+  text-align: center;
+  width: 36px;
+}
+
+.panel #scenarios-form .accordion-body {
+    width: 100%;
+}
+
+.panel #scenarios-form .accordion-inner {
+    background: #fff;
+    margin: 5px auto;
+    padding: 10px;
+    text-align: center;
+    word-spacing: 5px;
+    width: 90%;
+}
+
+.panel select {
+    font-size: .875em;
+    width: 100%;
+}
+
 .panel .wizard_nav {}
 
     .panel .wizard_nav .row {
