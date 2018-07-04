@@ -807,13 +807,13 @@ app.request = {
             console.log(`%cfail @ get pourpoint id: %o`, 'color: red', response);
         });
     },
-    get_focus_area: function(feature, layerName, callback) {
+    get_focus_area: function(feature, callback) {
         app.map.selectedFeature = feature;
-        var props = feature.getProperties();
-        props.layer = props.layer.split('.shp')[0];
-        var layer = app.mapbox.layers[props.layer].map_layer_id;
-        var id = props[app.mapbox.layers[props.layer].id_field];
-        id = parseInt(id,10);
+        var props = app.map.selectedFeature.getProperties();
+        var layer = app.mapbox.layers[props.layer.split('.shp')[0]].map_layer_id;
+        var idField = app.mapbox.layers[props.layer.split('.shp')[0]].id_field;
+        var id = props[idField];
+        console.log(id);
         return $.ajax({
             url: '/ucsrb/get_focus_area',
             data: {

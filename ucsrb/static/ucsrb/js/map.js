@@ -379,8 +379,7 @@ focusAreaSelectAction = function(feat) {
   if (app.state.step < 1) {
     app.state.setStep = 1; // step forward in state
   }
-  // var layer = app.map.selection.select.getLayer(feat).get('id');
-  app.request.get_focus_area(feat, layer, function(feat, vector) {
+  app.request.get_focus_area(feat, function(feat, vector) {
     if (feat){
       confirmSelection(feat, vector);
     }
