@@ -213,6 +213,59 @@ GET_SCENARIOS_URL = '/ucsrb/get_scenarios/'
 SCENARIO_FORM_URL = '/features/treatmentscenario/form/'
 SCENARIO_LINK_BASE = '/features/treatmentscenario/ucsrb_treatmentscenario'
 
+METHOW_YEAR = 1997
+ENTIAT_YEAR = 1997
+WENATCHEE_YEAR = 1997
+
+WEATHER_STATIONS = {
+    'mazama': {   #
+        'start': '10.01.1996-00:00:00',
+        'end': '09.30.1997-23:00:00'
+    },
+    'plain': {   #
+        'start': '10.01.1996-00:00:00',
+        'end': '09.30.1997-23:00:00'
+    },
+    'poperidge': {   #
+        'start': '10.01.1996-00:00:00',
+        'end': '09.30.1997-23:00:00'
+    },
+    'trinity': {   #
+        'start': '10.01.1996-00:00:00',
+        'end': '09.30.1997-23:00:00'
+    },
+    'winthrop': {   # METHOW Valley
+    'start': '10.01.1996-00:00:00',
+    'end': '09.30.1997-23:00:00'
+    }
+}
+
+########################################
+######      TREATMENT VALS      ########
+########################################
+
+TREATMENT_TARGETS = {
+    'baseline': 100,
+    'mechanical': 50,
+    'rx_burn': 30,
+    'catastrophic_fire': 0
+}
+
+########################################
+######      HYDRO RESULTS       ########
+########################################
+
+HYDRO_INPUT_HEADERS = [
+    'ppt_ID','start_time','end_time','mazama','plain','poperidge','trinity',
+    'winthrop','area','mean_elev','avg_slp','slp_gt60','elev_dif','mean_shade',
+    'veg_prop','thc_11','thc_12','thc_13','thc_14','thc_15','thc_21','thc_22',
+    'thc_23','thc_24','thc_25','bulk_dens','cap_drv','exp_decrs','field_cap',
+    'lat_con','mannings','pore_sz','porosity','vert_con','wilt_pt','bbl_prsr',
+    'max_inf','center_x','center_y','normal_x','normal_y','normal_z','SDsphrical'
+]
+
+CSV_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'apps', 'ucsrb', 'analysis', 'input_csvs'))
+
 ########################################
 ######      FILTER CHOICES      ########
 ########################################

@@ -738,67 +738,97 @@ def get_downstream_pour_points(request):
         downstream_ppts.append(ppt_dict)
     return JsonResponse(downstream_ppts, safe=False)
 
-def parse_flow_results(input_csv, ppt_id, rx='baseline', init_year=None, init_month=None, init_day=None, init_hour=None):
-    if not init_year and not init_month and not init_day and not init_hour:
-        start_found=True
-        init_set=False
-    else:
-        start_found=False
-    if init_year and init_month and init_day and init_hour:
-        init_set = True
-
-    output = []
-
+def parse_flow_results(baseline_csv, treatment_csv):
     import csv
-    with open(input_csv) as csvfile:
-        csvReader = csv.reader(csvfile, delimiter=',')
-        for i, row in enumerate(csvReader):
-            if i==0:
-                header = row
-                time_idx = header.index('TIMESTAMP')
-                month_idx = header.index('MONTH')
-                day_idx = header.index('DAY')
-                year_idx = header.index('YEAR')
-                hour_idx = header.index('HOUR')
-                try:
-                    ppt_idx = header.index('STREAMMAPID')
-                except:
-                    ppt_idx = header.index('STREAMMAPI')
-                flow_idx = header.index('C')
+    output_dict = {}
+
+    with open(baseline_csv) as csvfile:
+        csvReader = csv.DictReader(csvfile)
+        for row in csvReader:
+            if row['ppt_ID'] == 'bottom_basin':
+                basin = 'bottom_basin'
             else:
-                if int(row[ppt_idx]) == int(ppt_id):
-                    if not start_found:
-                        if (not init_year or int(init_year) == int(row[year_idx])) and (not init_month or int(init_month) == int(row[month_idx])) and (not init_day or int(init_day) == int(row[day_idx])) and (not init_hour or int(init_hour) == int(row[hour_idx])):
-                            start_found == True
-                            init_year == row[year_idx]
-                            init_month == row[month_idx]
-                            init_day == row[day_idx]
-                            init_hour == row[hour_idx]
-                            init_set = True
-                    if start_found:
-                        if not init_set:
-                            # none were set by default.
-                            init_year = row[year_idx]
-                            init_month = row[month_idx]
-                            init_day = row[day_idx]
-                            init_hour = row[hour_idx]
-                            init_set = True
-                        if int(row[year_idx]) == int(init_year)+1 and int(row[month_idx]) == int(init_month) and int(row[day_idx]) == int(init_day) and int(row[hour_idx]) == int(init_hour):
-                            break
-                        output.append({
-                            'pptId': ppt_id,
-                            # 'rx': rx,
-                            'timestep': row[time_idx],   # or instead 'MM-DD-YYYY HH:00:00'
-                            'flow': float(row[flow_idx])/3/60/60  # value is total volume over 3 hour timestep, we want cubic meters/second
-                        })
-    return output
+                [basin, treatment] = row['ppt_ID'].split('-')
+            if not basin in output_dict.keys():
+                output_dict[basin] = {
+                    'baseline': {}
+                }
+            output_dict[basin]['baseline'][row['Time']] = row['Value']/3/60/60
+
+    output_dict['bottom_basin']['mechanical'] = output_dict['bottom_basin']['baseline']
+    output_dict['bottom_basin']['rx_burn'] = output_dict['bottom_basin']['baseline']
+    output_dict['bottom_basin']['catastrophic_fire'] = output_dict['bottom_basin']['baseline']
+
+    with open(treatment_csv) as csvfile:
+        csvReader = csv.DictReader(csvfile)
+        for row in csvReader:
+            [basin_id, treatment] = row['ppt_ID'].split('-')
+            timestamp = row['Time']
+            try:
+                # get difference for upstream basin for timestamp from baseline
+                delta = row['Value']/3/60/60 - output_dict[basin]['baseline'][timestamp]
+                # apply difference to bottom_basin
+                output_dict['bottom_basin'][treatment][timestamp] += delta
+            except:
+                import ipdb; ipdb.set_trace()
+                print('unable to update baseline value for %s %s %s' % (basin, treatment, timestamp))
+
+    return output_dict['bottom_basin']
+
+def get_basin_input_dict(basin_data, basin_geom, treatment_geom, row_id, treatment='baseline'):
+    from ucsrb import project_settings as ucsrb_settings
+    from ucsrb.models import VegPlanningUnit
+    out_dict = {}
+    vpus = VegPlanningUnit.objects.filter(geometry__intersects=basin_geom)
+
+    for field in ucsrb_settings.HYDRO_INPUT_HEADERS:
+        if 'thc_' in field:
+            thc_id = int(field.split('_')[1])
+            thc_veg_units = vpus.filter(topo_height_class_majority=thc_id)
+            thc_acres = 0
+            for veg_unit in veg_units:
+                # Reduce fractional coverage TO treatment target (take lowest val)
+                if veg_unit.intersects(treatment_geom) and ucsrb_settings.TREATMENT_TARGETS[treatment] < veg_unit.percent_fractional_coverage:
+                    thc_acres += veg_unit.acres*(ucsrb_settings.TREATMENT_TARGETS[treatment]/100)
+                else:
+                    thc_acres += veg_unit.acres*(veg_unit.percent_fractional_coverage/100)
+            out_dict[field] = thc_acres
+        else:
+            if hasattr(basin_data, field):
+                out_dict[field] = basin_data[field]
+
+    # we don't care about just basin id, but treatment, too. Using custom IDs.
+    out_dict['ppt_ID'] = row_id
+
+    # have the weather station fields been added to the ppbasin?
+    has_weather_key = False
+    weather_key = 'winthrop'
+    for key in ucsrb_settings.WEATHER_STATIONS.keys():
+        if not hasattr(basin_data, key):
+            out_dict[key] = 0
+        elif basin_data[key] > 0:
+            has_weather_key = True
+            weather_key = key
+
+    if not has_weather_key:
+        # NOTE: currently we only have climate data to support certain dates for certain weather station data.
+        #   Due to this, we cannot 'weight' our stations, but must treat them as a binary: 0 or 100%.
+        out_dict[weather_key] = 1
+
+    out_dict['start_time'] = ucsrb_settings.WEATHER_STATIONS[weather_key]['start']
+    out_dict['end_time'] = ucsrb_settings.WEATHER_STATIONS[weather_key]['end']
+
+    return out_dict
+
 
 def run_hydro_model(in_csv):
+    from ucsrb import project_settings as ucsrb_settings
 
     # TODO: Run Bill's R script
 
     # placeholder
     out_csv = in_csv
+    # TODO: Delete in_csv
     return out_csv
 
 # NEEDS:
@@ -806,6 +836,9 @@ def run_hydro_model(in_csv):
 #   treatment_id
 def get_hydro_results_by_pour_point_id(request):
     from ucsrb.models import PourPointBasin, TreatmentScenario, FocusArea
+    from ucsrb import project_settings as ucsrb_settings
+    import csv
+    import time
     # Get pourpoint_id from request or API
     pourpoint_id = request.GET.get('pourpoint_id')
     ppb_d_data = PourPointBasin.objects.get(pk=pourpoint_id)
@@ -816,85 +849,53 @@ def get_hydro_results_by_pour_point_id(request):
     treatment = TreatmentScenario.objects.get(pk=treatment_id)
 
 
-    # TODO: Filter out basins not upstream of given pourpoint
-    # - Get OL basin
+    baseline_input_rows = []
+    baseline_input_rows.append(get_basin_input_dict(ppb_d_data, ppb_d.geometry, treatment.geometry, 'bottom_basin'))
+
+    treatment_input_rows = []
     # - Get all encompassed discrete basins
+    sub_basins = FocusArea.objects.filter(unit_type="PourPointDiscrete",geometry__intersects=treatment.geometry_dissolved).filter(geometry__intersects=ppb_o)
     # - For each d_basin that intersects treatent scenario:
-    #     Get total_condensed area of each THC
-    #     Get total condenced area of each THC w/in treatment
-    #     For each treatment:
-    #         calculate new condensed area of each THC
-    #         Calculate diff with treatment area baseline
-    #     apply each diff to create rows in input sheet
+    for d_basin in sub_basins:
+        sub_basin_id = d_basin.unit_id
+        sub_basin_data = PourPointBasin.objects.get(pk=sub_basin_id)
+        for treatment in ucsrb_settings.TREATMENT_TARGETS.keys():
+            row_id = "%d-%s" % (sub_basin_id, treatment)
+            if treatment == 'baseline':
+                baseline_input_rows.append(get_basin_input_dict(ppb_d_data, ppb_d.geometry, treatment.geometry, row_id, treatment))
+            else:
+                treatment_input_rows.append(get_basin_input_dict(ppb_d_data, ppb_d.geometry, treatment.geometry, row_id, treatment))
 
-    sub_basins = FocusArea.objects.filter(unit_type="PourPointDiscrete",geometry__intersects=treatment.geometry_dissolved)
+    baseline_csv_filename = "%s%s_%s_baseline.csv" % (ucsrb_settings.CSV_DIR, str(request.user.id), str(int(time.time()*100)))
+    treatment_csv_filename = "%s%s_%s_treatment.csv" % (ucsrb_settings.CSV_DIR, str(request.user.id), str(int(time.time()*100)))
 
-    dummy_run = False
+    # write baseline csv
+    with open(baseline_csv_filename, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=ucsrb_settings.HYDRO_INPUT_HEADERS)
+        writer.writeheader()
+        for row in baselint_input_rows:
+            writer.writerow(row)
+
+    # write delta csv
+    with open(treatment_csv_filename, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=ucsrb_settings.HYDRO_INPUT_HEADERS)
+        writer.writeheader()
+        for row in treatment_input_rows:
+            writer.writerow(row)
 
     results = {}
-    # results = []
-    flow_output = {}
-
-    ###############################################################
-    # Dummy Work
-    ###############################################################
-
-    from ucsrb import project_settings as ucsrb_settings
-    import csv
-    lookup_dict = {}
-    dummy_result_location_base = '%s/docs/dummy_Data/' % ucsrb_settings.BASE_DIR
-    input_csv = '%sppt_stmmap_rx.csv' % dummy_result_location_base
-    with open(input_csv) as csvfile:
-        csvReader = csv.reader(csvfile, delimiter=',')
-        for i, row in enumerate(csvReader):
-            if i==0:
-                header = row
-                ppt_idx = header.index('ppt_id')
-                stream_idx = header.index('strmap_id')
-                baseline_idx = header.index('RxBase')
-                r50_idx = header.index('Rx50')
-                r30_idx = header.index('Rx30')
-                r0_idx = header.index('Rx0')
-            else:
-                if int(row[ppt_idx]) == int(pourpoint_id):
-                    lookup_dict = {
-                        'stream': row[stream_idx],
-                        'baseline': row[baseline_idx],
-                        'rx50': row[r50_idx],
-                        'rx30': row[r30_idx],
-                        'rx0': row[r0_idx]
-                    }
-                    break
-
-    if len(lookup_dict.keys()) > 0:
-        dummy_run = True
-        pourpoint_id = int(lookup_dict['stream'])
-        for (rx, scenario) in [('baseline', 'baseline'), ('mechanical', 'rx50'), ('rx_burn', 'rx30'), ('catastrophic_fire','rx0')]:
-            # Get output csv
-            results_csv = '%svegmet%s.txt' % (dummy_result_location_base, lookup_dict[scenario])
-            flow_output[rx] = results_csv
-
-    ###############################################################
-    # END Dummy Work
-    ###############################################################
-
-
-    if not dummy_run:
-        sub_basin_results = {}
-        for basin in sub_basins:
-            input_csv = ''
-            # TODO:
-            # gather input data for Bill's R script
-            #   All Treatment Types
-            #   All impacted basins
-            # run Bill's R script
-            flow_output = run_hydro_model(input_csv)
-            # TODO: aggregate stream-flow diff and calculate downstream value for full basin
+    baseline_out_csv = run_hydro_model(baseline_csv_filename)
+    treatment__out_csv = run_hydro_model(treatment_csv_filename)
+    flow_output = parse_flow_results(baseline_out_csv, treatment_out_csv)
 
     for rx in flow_output.keys():
         # Interpret script output and format for API handoff
-        results[rx] = parse_flow_results(flow_output[rx], pourpoint_id, rx)
         # results.extend(parse_flow_results(flow_output[rx], pourpoint_id, rx))
+        results[key] = [{'timestep':time_key, 'flow': flow_output[key][time_key], 'pptId':pourpoint_id} for time_key in flow_output[key].keys().sort(key=lambda timestamp: datetime.strptime(timestamp, "%d.%m.%Y-%H:%M:%S"))]
+
+    # TODO: send flow data to various report-calculation functions, such as:
+    #   delta flow
+    #   7-day low-flow
 
     return JsonResponse(results)
 
@@ -924,6 +925,7 @@ def get_results_by_scenario_id(request):
             },
             'aggregate_results': aggregate_results['results_list'],
             'treatment_areas': [
+                # TODO: Is this the 'boundary area' for the treatment, or the filtered veg-units themselves (which we already have)
                 {
                     'id': 1,
                     'geometry': {
