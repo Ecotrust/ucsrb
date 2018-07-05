@@ -109,6 +109,24 @@ class Command(BaseCommand):
             fc_24Idx = fieldsArray.index('fc_24')-1
             fc_25Idx = fieldsArray.index('fc_25')-1
             dwnst_pptIdx = fieldsArray.index('dwnst_ppt')-1
+            bulk_densIdx = fieldsArray.index('bulk_dens')-1
+            cap_drvIdx = fieldsArray.index('cap_drv')-1
+            exp_decrsIdx = fieldsArray.index('exp_decrs')-1
+            field_capIdx = fieldsArray.index('field_cap')-1
+            lat_conIdx = fieldsArray.index('lat_con')-1
+            manningsIdx = fieldsArray.index('mannings')-1
+            pore_szIdx = fieldsArray.index('pore_sz')-1
+            porosityIdx = fieldsArray.index('porosity')-1
+            vert_conIdx = fieldsArray.index('vert_con')-1
+            wilt_ptIdx = fieldsArray.index('wilt_pt')-1
+            bbl_prsrIdx = fieldsArray.index('bbl_prsr')-1
+            max_infIdx = fieldsArray.index('max_inf')-1
+            center_xIdx = fieldsArray.index('center_x')-1
+            center_yIdx = fieldsArray.index('center_y')-1
+            normal_xIdx = fieldsArray.index('normal_x')-1
+            normal_yIdx = fieldsArray.index('normal_y')-1
+            normal_zIdx = fieldsArray.index('normal_z')-1
+            SDsphricalIdx = fieldsArray.index('SDsphrical')-1
 
             in_type = 'PourPointDiscrete'
             id_field = 'ppt_ID'
@@ -178,7 +196,25 @@ class Command(BaseCommand):
                     fc_23 = int(shapeRecord.record[fc_23Idx]),
                     fc_24 = int(shapeRecord.record[fc_24Idx]),
                     fc_25 = int(shapeRecord.record[fc_25Idx]),
-                    dwnst_ppt = shapeRecord.record[dwnst_pptIdx]
+                    dwnst_ppt = shapeRecord.record[dwnst_pptIdx],
+                    bulk_dens = shapeRecord.record[bulk_densIdx],
+                    cap_drv = shapeRecord.record[cap_drvIdx],
+                    exp_decrs = shapeRecord.record[exp_decrsIdx],
+                    field_cap = shapeRecord.record[field_capIdx],
+                    lat_con = shapeRecord.record[lat_conIdx],
+                    mannings = shapeRecord.record[manningsIdx],
+                    pore_sz = shapeRecord.record[pore_szIdx],
+                    porosity = shapeRecord.record[porosityIdx],
+                    vert_con = shapeRecord.record[vert_conIdx],
+                    wilt_pt = shapeRecord.record[wilt_ptIdx],
+                    bbl_prsr = shapeRecord.record[bbl_prsrIdx],
+                    max_inf = shapeRecord.record[max_infIdx],
+                    center_x= int(shapeRecord.record[center_xIdx]),
+                    center_y= int(shapeRecord.record[center_yIdx]),
+                    normal_x = shapeRecord.record[normal_xIdx],
+                    normal_y = shapeRecord.record[normal_yIdx],
+                    normal_z = shapeRecord.record[normal_zIdx],
+                    SDsphrical = shapeRecord.record[SDsphricalIdx],
                 )
                 import_count += 1
 

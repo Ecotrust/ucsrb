@@ -264,7 +264,9 @@ HYDRO_INPUT_HEADERS = [
     'max_inf','center_x','center_y','normal_x','normal_y','normal_z','SDsphrical'
 ]
 
-CSV_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'apps', 'ucsrb', 'analysis', 'input_csvs'))
+ANALYSIS_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'ucsrb', 'analysis'))
+
+CSV_DIR = os.path.realpath(os.path.join(ANALYSIS_DIR, 'input_csvs'))
 
 ########################################
 ######      FILTER CHOICES      ########
