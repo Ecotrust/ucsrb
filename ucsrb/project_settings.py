@@ -255,6 +255,8 @@ TREATMENT_TARGETS = {
 ######      HYDRO RESULTS       ########
 ########################################
 
+DELETE_CSVS = True
+
 HYDRO_INPUT_HEADERS = [
     'ppt_ID','start_time','end_time','mazama','plain','poperidge','trinity',
     'winthrop','area','mean_elev','avg_slp','slp_gt60','elev_dif','mean_shade',

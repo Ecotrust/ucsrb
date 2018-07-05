@@ -848,7 +848,8 @@ def run_hydro_model(in_csv):
         '-t', "Coeff_*"                     # format to use to identify necessary coefficient files by year
     ])
 
-    #TODO: delete in_csv
+    if ucsrb_settings.DELETE_CSVS:
+        os.remove(in_csv)
 
     return out_csv
 
@@ -860,6 +861,7 @@ def get_hydro_results_by_pour_point_id(request):
     from ucsrb import project_settings as ucsrb_settings
     import csv
     import time
+    import os
 
     # TODO: cache results
 
@@ -928,7 +930,9 @@ def get_hydro_results_by_pour_point_id(request):
     #   delta flow
     #   7-day low-flow
 
-    # TODO: delete output csv file
+    if ucsrb_settings.DELETE_CSVS:
+        os.remove(baseline_out_csv)
+        os.remove(treatment_out_csv)
 
     return JsonResponse(results)
 
