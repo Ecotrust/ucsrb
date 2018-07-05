@@ -334,12 +334,13 @@ confirmSelection = function(feat, vector) {
     featureProjection: 'EPSG:3857'
   });
 
+  var feature = features[0];
+
   // add features for use later in results
   app.map.layer.selectedFeature.layer.getSource().clear();
-  app.map.layer.selectedFeature.layer.getSource().addFeature(feat);
+  app.map.layer.selectedFeature.layer.getSource().addFeature(feature);
   app.map.layer.selectedFeature.layer.setVisible(true);
 
-  var feature = features[0];
   if (app.state.method == 'select') {
     // hack for when we have no ppt basins and default to HUC 12.
     setFilter(feature, app.map.layer.streams.layer);
