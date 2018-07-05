@@ -18,7 +18,9 @@ $(document).ready(function() {
     app.nav.stepActions.initial = app.panel.getPanelContentElement.innerHTML;
 
     $('.method-nav button').click(function(event) {
-        app.setState(event.currentTarget.dataset.method);
+      if (event.currentTarget.dataset.method !== app.state.method) {
+          app.setState(event.currentTarget.dataset.method);
+      }
         // changing the method, so filter form needs to be cleared for new query
         if ($(this).parents('#process-nav').length > 0) {
             app.state.setStep = 'reset';
@@ -62,22 +64,29 @@ $(document).ready(function() {
             .then(function(response) {
                 var html = '<ul id="load-saved-list">'
                 for (scenario in response) {
-                    html += `<li><button data-id="${response[scenario].id}" class="scenario-name btn btn-link">${response[scenario].name} <span class="description">${response[scenario].description}</span></button></li>`;
+                    html += `<li>
+                      <button data-id="${response[scenario].id}" class="scenario-name btn btn-link">${response[scenario].name} <span class="description">${response[scenario].description}</span></button>
+                      <button data-id="${response[scenario].id}" class="scenario-name btn btn-trash"><img  src="/static/ucsrb/img/icon/i_trash.png" alt="delete scenario" /></button>
+                    </li>`;
                 }
                 html += '</ul>';
                 modal.find('.load-saved-wrap').html(html);
             })
             .then(function() {
                 document.getElementById('load-saved-list').addEventListener('click', function(event) {
-                    $('#load-saved').modal('hide');
-                    app.resultsInit(event.target.dataset.id);
-                    app.state.setStep = 'aggregate';
-                    app.map.clearLayers();
-                    $('.method-nav button').each(function() {
-                        $(this).removeClass('active');
-                    });
-                    $('.method-nav button[data-method="aggregate"]').addClass('active');
-                    app.nav.showStartOver();
+                    if (event.target.classList.contains('btn-trash')) {
+                      app.request.deleteScenario(event.target.dataset.id);
+                    } else {
+                      $('#load-saved').modal('hide');
+                      app.resultsInit(event.target.dataset.id);
+                      app.state.setStep = 'aggregate';
+                      app.map.clearLayers();
+                      $('.method-nav button').each(function() {
+                          $(this).removeClass('active');
+                      });
+                      $('.method-nav button[data-method="aggregate"]').addClass('active');
+                      app.nav.showStartOver();
+                    }
                 });
             });
     });

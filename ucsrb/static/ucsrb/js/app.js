@@ -11,6 +11,8 @@ var app = {
     scenarioInProgress: function() {
         if (app.state.step === 0 || app.state.method === 'reset') {
             return false;
+        } else if (app.state.step === 1 && app.state.method === 'filter') {
+            return false;
         } else {
             return true;
         }
@@ -112,6 +114,8 @@ app.resultsInit = function(id) {
             app.nav.showResultsNav();
             app.map.addDownstreamPptsToMap(response.pourpoints);
             app.setState('aggregate');
+            app.nav.hideSave();
+            $('#subnav-sign-in-modal').addClass('d-none');
         })
         .catch(function(response) {
             console.log('%c failed to get results: %o', 'color: salmon;', response);
@@ -284,7 +288,7 @@ app.panel = {
                         names: {
                             flow: 'CFPS'
                         },
-                        type: 'spline',
+                        type: 'line',
                         colors: {
                             baseline: '#394861',
                             rx_burn: '#FB7302',
@@ -298,6 +302,12 @@ app.panel = {
                             tick: {
                                 fit: true,
                                 format: "%B",
+                                rotate: 44,
+                                centered: false,
+                                multiline: false,
+                                // format: function(x) {
+                                //     return "%b"
+                                // },
                                 culling: {
                                     max: 12
                                 }
@@ -319,9 +329,8 @@ app.panel = {
                     },
                     tooltip: {
                         format: {
-                            title: function(d) {
-                                console.log(d);
-                                return d;
+                            title: function(x) {
+                                return d3.timeFormat("%B %d, %Y")(x);
                             },
                             value: function(value, ratio, id) {
                                 value = value.toFixed(4);
@@ -336,7 +345,7 @@ app.panel = {
             resize: function() {
                 window.setTimeout(function() {
                     app.panel.results.chart.obj.resize();
-                }, 1000);
+                }, 500);
             }
         },
         panelResultsElement: function() {
@@ -518,6 +527,7 @@ app.nav = {
             <div id="forest-listener">
             <button class="dropdown-item" type="button" data-layer="huc10">HUC 10</button>
             <button class="dropdown-item" type="button" data-layer="huc12">HUC 12</button>
+            <button class="dropdown-item" type="button" data-layer="RMU">Forest Plan Mgmt Alloc</button>
             </div>
             </div>
             </div>
@@ -797,15 +807,18 @@ app.request = {
             console.log(`%cfail @ get pourpoint id: %o`, 'color: red', response);
         });
     },
-    get_focus_area: function(feature, layerName, callback) {
-        props = feature.getProperties();
-        props.layer = props.layer.split('.shp')[0] //bug where mapbox started adding .shp to layer name
-        id = props[app.mapbox.layers[props.layer].id_field];
+    get_focus_area: function(feature, callback) {
+        app.map.selectedFeature = feature;
+        var props = app.map.selectedFeature.getProperties();
+        var layer = app.mapbox.layers[props.layer.split('.shp')[0]].map_layer_id;
+        var idField = app.mapbox.layers[props.layer.split('.shp')[0]].id_field;
+        var id = props[idField];
+        console.log(id);
         return $.ajax({
             url: '/ucsrb/get_focus_area',
             data: {
                 id: id,
-                layer: layerName,
+                layer: layer,
             },
             dataType: 'json',
             success: function(response) {
@@ -851,7 +864,6 @@ app.request = {
     get_basin: function(feature, callback) {
         var pp_id = feature.getProperties().ppt_ID;
         app.map.selectedFeature = feature;
-        console.log(pp_id);
         return $.ajax({
             url: '/ucsrb/get_basin',
             data: {
@@ -932,7 +944,7 @@ app.request = {
     },
     saveIntermediateScenario: function(data) {
         $.ajax({
-            url: '/sceanrio/treatmentscenario/save',
+            url: '/scenario/treatmentscenario/save',
             type: 'POST',
             data: data,
             dataType: 'json',
@@ -948,7 +960,7 @@ app.request = {
     },
     saveState: function() {
         $.ajax({
-            url: '/sceanrio/treatmentscenario/save',
+            url: '/scenario/treatmentscenario/save',
             type: 'POST',
             data: app.saveState,
             dataType: 'json',
@@ -958,6 +970,23 @@ app.request = {
             },
             error: function(response, status) {
                 console.log(`%cfail @ save state: %o`, 'color: red', response);
+                return status;
+            }
+        })
+    },
+    deleteScenario: function(id) {
+        $.ajax({
+            url: '/scenario/treatmentscenario/delete',
+            type: 'POST',
+            data: {
+                id: id
+            },
+            success: function(response, status) {
+                console.log(`%csuccess deleted: %o`, 'color: green', response);
+                return status;
+            },
+            error: function(response, status) {
+                console.log(`%failed to deleted: %o`, 'color: red', response);
                 return status;
             }
         })

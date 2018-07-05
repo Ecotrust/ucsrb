@@ -91,10 +91,11 @@ app.map.styles = {
     }),
     'FocusArea': new ol.style.Style({
         stroke: new ol.style.Stroke({
-            color: '#58595b',
-            lineCap: 'cap',
+            color: '#303030',
+            lineCap: 'butt',
             lineJoin: 'miter',
-            width: 3,
+            width: 1,
+            miterLimit: 2
         }),
         fill: new ol.style.Fill({
             color: 'rgba(0, 0, 0, 0)'
@@ -103,18 +104,18 @@ app.map.styles = {
     }),
     'Streams': function(feature, resolution) {
         var width = 2.25;
-        if (resolution < 3) {
+        if (resolution < 6) {
             width = 14;
-        } else if (resolution < 5) {
+        } else if (resolution < 10) {
             width = 11;
         } else if (resolution < 20) {
-            width = 8;
+            width = 9;
         } else if (resolution < 40) {
-            width = 5;
+            width = 6;
         } else if (resolution < 90) {
-            width = 3.75;
+            width = 5;
         } else if (resolution < 130) {
-            width = 3;
+            width = 3.5;
         }
         return new ol.style.Style({
             stroke: new ol.style.Stroke({
@@ -234,6 +235,14 @@ app.mapbox.layers = {
     report_methods: ['filter'],
     map_layer_id: 'huc12'
   },
+  'LandMgmtPlan_OKAWEN_WCol-4m69bv': {
+    id: 'ucsrbsupport.40j4gieb',
+    id_field: 'ET_UID',
+    name_field: 'MgmtDescri',
+    name: 'Forest Plan Mgmt Alloc',
+    report_methods: ['filter'],
+    map_layer_id: 'RMU'
+  },
   'ppts_all6-11-2mwii2': {
     id: 'ucsrbsupport.cgxp2slx',
     id_field: 'ppt_ID',
@@ -316,20 +325,22 @@ app.map.closePopup = function() {
 }
 
 confirmSelection = function(feat, vector) {
-  console.log(feat);
-  var mbLayer = app.mapbox.layers[feat.getProperties().layer];
+  var props = feat.getProperties();
+  props.layer = props.layer.split('.shp')[0];
+  var mbLayer = app.mapbox.layers[props.layer];
   var layer = app.map.layer[mbLayer.map_layer_id];
   var features = (new ol.format.GeoJSON()).readFeatures(vector, {
     dataProjection: 'EPSG:3857',
     featureProjection: 'EPSG:3857'
   });
 
+  var feature = features[0];
+
   // add features for use later in results
   app.map.layer.selectedFeature.layer.getSource().clear();
-  app.map.layer.selectedFeature.layer.getSource().addFeature(feat);
+  app.map.layer.selectedFeature.layer.getSource().addFeature(feature);
   app.map.layer.selectedFeature.layer.setVisible(true);
 
-  var feature = features[0];
   if (app.state.method == 'select') {
     // hack for when we have no ppt basins and default to HUC 12.
     setFilter(feature, app.map.layer.streams.layer);
@@ -356,25 +367,31 @@ generateFilterPopup = function(content) {
     '</div>';
 }
 
-focusAreaSelectAction = function(feat) {
-  if (app.state.step < 1) {
-    app.state.setStep = 1; // step forward in state
-  }
-  var layer = app.map.selection.select.getLayer(feat).get('id');
-  app.request.get_focus_area(feat, layer, function(feat, vector) {
-    if (feat){
-      confirmSelection(feat, vector);
-      confirmationReceived();
-    }
-  });
-};
-
-streamSelectAction = function(feat) {
+app.scenarioInProgressCheck = function() {
   if (app.scenarioInProgress()) {
     app.map.mask.set('active', false);
     app.viewModel.scenarios.reset({cancel: true});
     app.state.setStep = 0; // go back to step one
   }
+}
+
+focusAreaSelectAction = function(feat) {
+  app.scenarioInProgressCheck();
+  if (app.state.step < 1) {
+    app.state.setStep = 1; // step forward in state
+  }
+  app.request.get_focus_area(feat, function(feat, vector) {
+    if (feat){
+      confirmSelection(feat, vector);
+    }
+    if (app.state.step < 2) {
+      app.state.setStep = 2; // step forward in state
+    }
+  });
+};
+
+streamSelectAction = function(feat) {
+  app.scenarioInProgressCheck();
   pourPointSelectAction(feat);
 };
 
@@ -592,7 +609,9 @@ app.map.layer = {
         id: 'huc10', // set id equal to x in app.map.layer.x
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
-          format: new ol.format.MVT(),
+          format: new ol.format.MVT({
+            featureClass: ol.Feature
+          }),
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.huc10_3857.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.FocusArea,
@@ -608,12 +627,31 @@ app.map.layer = {
         id: 'huc12', // set id equal to x in app.map.layer.x
         source: new ol.source.VectorTile({
           attributions: 'NRCS',
-          format: new ol.format.MVT(),
+          format: new ol.format.MVT({
+            featureClass: ol.Feature
+          }),
           url: 'https://api.mapbox.com/v4/' + app.mapbox.layers.huc12_3857.id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
         }),
         style: app.map.styles.FocusArea,
         visible: false,
         renderBuffer: 500
+      }),
+      selectAction: focusAreaSelectAction
+    },
+    RMU: {
+      layer: new ol.layer.VectorTile({
+        name: 'Forest Plan Mgmt Alloc',
+        title: 'Forest Plan Mgmt Alloc',
+        id: 'RMU', // set id equal to x in app.map.layer.x
+        source: new ol.source.VectorTile({
+          format: new ol.format.MVT({
+            featureClass: ol.Feature
+          }),
+          url: 'https://api.mapbox.com/v4/' + app.mapbox.layers['LandMgmtPlan_OKAWEN_WCol-4m69bv'].id + '/{z}/{x}/{y}.mvt?access_token=' + app.mapbox.key
+        }),
+        style: app.map.styles.FocusArea,
+        visible: false,
+        renderBuffer: 200
       }),
       selectAction: focusAreaSelectAction
     },
@@ -657,7 +695,7 @@ app.map.layer = {
         id: 'wetlands', // set id equal to x in app.map.layer.x
         source: new ol.source.XYZ({
           attributions: 'Ecotrust',
-          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjixp1ni6ar6x2qpbaz58fit0/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
+          url: `https://api.mapbox.com/styles/v1/ucsrbsupport/cjixp1ni6ar6x2qpbaz58fit0/tiles/256/{z}/{x}/{y}@2x?access_token=${app.mapbox.key}`
         }),
         visible: false,
       }),
@@ -719,19 +757,7 @@ app.map.layer = {
           url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjiwcw2wg9hz02srr549ehylf/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
         }),
         visible: false,
-      }),
-    },
-    landMgmtPlan: {
-      layer: new ol.layer.Tile({
-        name: 'Land Managment Plan',
-        title: 'Land Managment Plan',
-        id: 'landMgmtPlan', // set id equal to x in app.map.layer.x
-        source: new ol.source.XYZ({
-          attributions: 'Ecotrust',
-          url: 'https://api.mapbox.com/styles/v1/ucsrbsupport/cjixo5io4apn72st7znv68xoe/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidWNzcmJzdXBwb3J0IiwiYSI6ImNqY3Fzanl6cDAxaGgzM3F6ZXVqeHI0eTYifQ.7T_7fsmV6QIuh_9EEo0wMw'
-        }),
-        visible: false,
-      }),
+      })
     },
 };
 
@@ -749,6 +775,7 @@ if (app.map.overlays) {
   app.map.overlays.getLayers().push(app.map.layer.draw.layer);
   app.map.overlays.getLayers().push(app.map.layer.huc12.layer);
   app.map.overlays.getLayers().push(app.map.layer.huc10.layer);
+  app.map.overlays.getLayers().push(app.map.layer.RMU.layer);
   app.map.overlays.getLayers().push(app.map.layer.streams.layer);
   // app.map.overlays.getLayers().push(app.map.layer.pourpoints.layer);
   app.map.overlays.getLayers().push(app.map.layer.boundary.layer);
@@ -757,7 +784,6 @@ if (app.map.overlays) {
   app.map.overlays.getLayers().push(app.map.layer.forestCover.layer);
   app.map.overlays.getLayers().push(app.map.layer.publicProtectedLand.layer);
   app.map.overlays.getLayers().push(app.map.layer.roads.layer);
-  app.map.overlays.getLayers().push(app.map.layer.landMgmtPlan.layer);
   app.map.overlays.getLayers().push(app.map.layer.criticalHabitat.layer);
 }
 

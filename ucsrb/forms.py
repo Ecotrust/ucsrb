@@ -78,7 +78,8 @@ class TreatmentScenarioForm(ScenarioForm):
         initial=500,
         widget=forms.TextInput(
             attrs={
-                'class': 'slidervalue',
+                'class': 'slidervalue readonly-value',
+                'readonly': 'readonly',
                 # 'pre_text': 'to',
                 'post_text': 'meters'
             }
@@ -117,7 +118,8 @@ class TreatmentScenarioForm(ScenarioForm):
         initial=30,
         widget=forms.TextInput(
             attrs={
-                'class': 'slidervalue',
+                'class': 'slidervalue readonly-value',
+                'readonly': 'readonly',
                 # 'pre_text': 'to',
                 'post_text': '%'
             }
@@ -141,12 +143,13 @@ class TreatmentScenarioForm(ScenarioForm):
 
     percent_fractional_coverage_min = forms.FloatField(
         required=False,
-        initial=30,
+        initial=0,
         widget=forms.TextInput(
             attrs={
-                'class': 'slidervalue',
+                'class': 'slidervalue readonly-value',
                 'pre_text': 'from',
-                # 'post_text': 'miles'
+                'readonly': 'readonly',
+                'post_text': '%',
             }
         )
     )
@@ -156,9 +159,10 @@ class TreatmentScenarioForm(ScenarioForm):
         initial=100,
         widget=forms.TextInput(
             attrs={
-                'class': 'slidervalue',
+                'class': 'slidervalue readonly-value',
                 'pre_text': 'to',
-                'post_text': '%'
+                'readonly': 'readonly',
+                'post_text': '%',
             }
         )
     )
@@ -182,24 +186,19 @@ class TreatmentScenarioForm(ScenarioForm):
     def get_step_0_fields(self):
         names = [
             ('focus_area', None, None, 'focus_area_input'),
-            ('private_own', None, None, None),
-            ('pub_priv_own', None, None, 'pub_priv_own_input'),
             ('lsr_percent', None, None, None),
             ('has_critical_habitat', None, None, None),
-        ]
-        return self._get_fields(names)
-
-    def get_step_1_fields(self):
-        names = [
             ('percent_roadless', None, None, None),
-            ('road_distance', None, 'road_distance_max', 'road_distance_input'),
             ('percent_wetland', None, None, None),
             ('percent_riparian', None, None, None),
         ]
         return self._get_fields(names)
 
-    def get_step_2_fields(self):
+    def get_step_1_fields(self):
         names = [
+            ('private_own', None, None, None),
+            ('pub_priv_own', None, None, 'pub_priv_own_input'),
+            ('road_distance', None, 'road_distance_max', 'road_distance_input'),
             ('slope', None, 'slope_max', 'slope_input'),
             (
                 'percent_fractional_coverage',
@@ -208,11 +207,18 @@ class TreatmentScenarioForm(ScenarioForm):
                 'percent_fractional_coverage_input'
             ),
             ('percent_high_fire_risk_area', None, None, None),
+
         ]
         return self._get_fields(names)
+    #
+    # def get_step_2_fields(self):
+    #     names = [
+    #
+    #     ]
+    #     return self._get_fields(names)
 
     def get_steps(self):
-        return self.get_step_0_fields(), self.get_step_1_fields(), self.get_step_2_fields(),
+        return self.get_step_0_fields(), self.get_step_1_fields(),
 
     def clean_focus_area_input(self):
         foo = FocusArea.objects.get(pk=self.cleaned_data['focus_area_input'])
