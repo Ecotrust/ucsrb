@@ -64,9 +64,10 @@ $(document).ready(function() {
             .then(function(response) {
                 var html = '<ul id="load-saved-list">'
                 for (scenario in response) {
-                    html += `<li>
+                    html += `<li data-id="${response[scenario].id}">
                       <button data-id="${response[scenario].id}" class="scenario-name btn btn-link">${response[scenario].name} <span class="description">${response[scenario].description}</span></button>
                       <button data-id="${response[scenario].id}" class="scenario-name btn btn-trash"><img  src="/static/ucsrb/img/icon/i_trash.png" alt="delete scenario" /></button>
+                      <button data-confirm="confirm-${response[scenario].id}" data-id="${response[scenario].id}" class="confirm-delete  d-none btn-trash">Confirm Delete</button>
                     </li>`;
                 }
                 html += '</ul>';
@@ -75,7 +76,20 @@ $(document).ready(function() {
             .then(function() {
                 document.getElementById('load-saved-list').addEventListener('click', function(event) {
                     if (event.target.classList.contains('btn-trash')) {
-                      app.request.deleteScenario(event.target.dataset.id);
+                      var tar = event.target;
+                    } else if (event.target.parentElement.classList.contains('btn-trash')) {
+                      var tar = event.target.parentElement;
+                    }
+                    if (tar) {
+                      var confirmDelete = document.querySelector(`[data-confirm="confirm-${tar.dataset.id}"]`);
+                      if (confirmDelete) {
+                        confirmDelete.classList.remove('d-none');
+                        tar.classList.add('d-none');
+                        confirmDelete.addEventListener('click', function(e) {
+                          app.request.deleteScenario(confirmDelete.dataset.id);
+                          tar.parentElement.remove();
+                        });
+                      }
                     } else {
                       $('#load-saved').modal('hide');
                       app.resultsInit(event.target.dataset.id);

@@ -622,7 +622,10 @@ Modal
 }
 
 #load-saved-list li {
+    align-items: center;
     border-bottom: 1px solid #efefef;
+    display: flex;
+    justify-content: space-between;
     margin-bottom: .25rem;
     padding-bottom: .25rem;
 }
@@ -643,7 +646,7 @@ Modal
     position: relative;
     padding-right: 4rem;
     text-align: left;
-    width: 90%;
+    width: 75%;
 }
 #load-saved-list .btn-link:after {
     background: url('/static/ucsrb/img/icon/i_expand_white.svg');
@@ -666,10 +669,12 @@ Modal
 #load-saved-list .btn-trash {
     background: transparent;
     border: 1px solid rgba(255,255,255,0.5);
-    display: inline-block;
+    color: #ffa0a0;
+    font-size: .75em;
     margin: 0 -2px;
     text-align: center;
-    width: 10%;
+    min-width: 10%;
+    max-width: 25%;
 }
 
 #load-saved-list .btn-trash:hover {
