@@ -738,6 +738,37 @@ def get_downstream_pour_points(request):
         downstream_ppts.append(ppt_dict)
     return JsonResponse(downstream_ppts, safe=False)
 
+def sort_output(flow_output, pourpoint_id):
+    results = {}
+    def get_timestamp_from_string(time_string):
+        from datetime import datetime
+        return datetime.strptime(time_string, "%m.%d.%Y-%H:%M:%S")
+    for rx in flow_output.keys():
+        time_keys = sorted(list(flow_output[rx].keys()), key=get_timestamp_from_string)
+        results[rx] = [{'timestep':time_key, 'flow': flow_output[rx][time_key], 'pptId':pourpoint_id} for time_key in time_keys]
+    return results
+
+def get_results_delta(flow_output, pourpoint_id):
+    from copy import deepcopy
+    out_dict = deepcopy(flow_output)
+    for timestep in out_dict['baseline'].keys():
+        baseflow = deepcopy(out_dict['baseline'][timestep])
+        for rx in out_dict.keys():
+            out_dict[rx][timestep] -= baseflow
+
+    return sort_output(out_dict, pourpoint_id)
+
+def get_results_7d_low(flow_output, sorted_results, pourpoint_id):
+    from copy import deepcopy
+    out_dict = deepcopy(flow_output)
+    for rx in sorted_results.keys():
+        for index, timestep in enumerate(sorted_results[rx]):
+            if index < 7*8:
+                flows = [x.flow for x in sorted_results[rx][0:55]]
+            else:
+                flows = [x.flow for x in sorted_results[rx][index-55:index]]
+
+
 def parse_flow_results(baseline_csv, treatment_csv):
     import csv
     from copy import deepcopy
@@ -914,27 +945,28 @@ def get_hydro_results_by_pour_point_id(request):
     treatment_out_csv = run_hydro_model(treatment_csv_filename)
     flow_output = parse_flow_results(baseline_out_csv, treatment_out_csv)
 
-
-    def get_timestamp_from_string(time_string):
-        from datetime import datetime
-        return datetime.strptime(time_string, "%m.%d.%Y-%H:%M:%S")
-
-    for rx in flow_output.keys():
-        # Interpret script output and format for API handoff
-        # results.extend(parse_flow_results(flow_output[rx], pourpoint_id, rx))
-        time_keys = sorted(list(flow_output[rx].keys()), key=get_timestamp_from_string)
-        # time_keys = list(flow_output[rx].keys()).sort(key=lambda timestamp: datetime.strptime(timestamp, "%m.%d.%Y-%H:%M:%S"))
-        results[rx] = [{'timestep':time_key, 'flow': flow_output[rx][time_key], 'pptId':pourpoint_id} for time_key in time_keys]
-
-    # TODO: send flow data to various report-calculation functions, such as:
-    #   delta flow
-    #   7-day low-flow
-
     if ucsrb_settings.DELETE_CSVS:
         os.remove(baseline_out_csv)
         os.remove(treatment_out_csv)
 
-    return JsonResponse(results)
+    absolute_results = sort_output(flow_output, pourpoint_id)
+    #   delta flow
+    delta_results = get_results_delta(flow_output, pourpoint_id)
+    #   7-day low-flow (needs sort_by_time)
+    # seven_d_low_results = get_results_7d_low(flow_output, absolute_results, pourpoint_id)
+
+    results = [
+        {
+            'title': 'Absolute Flow Rate @ 3hr Steps',
+            'data': absolute_results
+        },
+        {
+            'title': 'Change in Flow Rate @ 3hr Steps',
+            'data': delta_results
+        },
+    ]
+
+    return JsonResponse({'results': results})
 
 def get_results_by_scenario_id(request):
     from ucsrb.models import TreatmentScenario, FocusArea, PourPoint, PourPointBasin
