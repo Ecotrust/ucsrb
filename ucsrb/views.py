@@ -738,17 +738,17 @@ def get_downstream_pour_points(request):
         downstream_ppts.append(ppt_dict)
     return JsonResponse(downstream_ppts, safe=False)
 
-def sort_output(flow_output, pourpoint_id):
+def sort_output(flow_output):
     results = {}
     def get_timestamp_from_string(time_string):
         from datetime import datetime
         return datetime.strptime(time_string, "%m.%d.%Y-%H:%M:%S")
     for rx in flow_output.keys():
         time_keys = sorted(list(flow_output[rx].keys()), key=get_timestamp_from_string)
-        results[rx] = [{'timestep':time_key, 'flow': flow_output[rx][time_key], 'pptId':pourpoint_id} for time_key in time_keys]
+        results[rx] = [{'timestep':time_key, 'flow': flow_output[rx][time_key]} for time_key in time_keys]
     return results
 
-def get_results_delta(flow_output, pourpoint_id):
+def get_results_delta(flow_output):
     from copy import deepcopy
     out_dict = deepcopy(flow_output)
     for timestep in out_dict['baseline'].keys():
@@ -756,17 +756,35 @@ def get_results_delta(flow_output, pourpoint_id):
         for rx in out_dict.keys():
             out_dict[rx][timestep] -= baseflow
 
-    return sort_output(out_dict, pourpoint_id)
+    return sort_output(out_dict)
 
-def get_results_7d_low(flow_output, sorted_results, pourpoint_id):
+def get_results_7d_low(flow_output, sorted_results):
     from copy import deepcopy
     out_dict = deepcopy(flow_output)
     for rx in sorted_results.keys():
-        for index, timestep in enumerate(sorted_results[rx]):
+        for index, treatment_result in enumerate(sorted_results[rx]):
+            timestep = treatment_result['timestep']
             if index < 7*8:
-                flows = [x.flow for x in sorted_results[rx][0:55]]
+                flows = [x['flow'] for x in sorted_results[rx][0:56]]
             else:
-                flows = [x.flow for x in sorted_results[rx][index-55:index]]
+                flows = [x['flow'] for x in sorted_results[rx][index-55:index+1]]
+            low_flow = min(float(x) for x in flows)
+            out_dict[rx][timestep] = low_flow
+    return sort_output(out_dict)
+
+def get_results_7d_mean(flow_output, sorted_results):
+    from copy import deepcopy
+    out_dict = deepcopy(flow_output)
+    for rx in sorted_results.keys():
+        for index, treatment_result in enumerate(sorted_results[rx]):
+            timestep = treatment_result['timestep']
+            if index < 7*8:
+                flows = [x['flow'] for x in sorted_results[rx][0:56]]
+            else:
+                flows = [x['flow'] for x in sorted_results[rx][index-55:index+1]]
+            mean_flow = sum(flows)/float(len(flows))
+            out_dict[rx][timestep] = mean_flow
+    return sort_output(out_dict)
 
 
 def parse_flow_results(baseline_csv, treatment_csv):
@@ -949,11 +967,12 @@ def get_hydro_results_by_pour_point_id(request):
         os.remove(baseline_out_csv)
         os.remove(treatment_out_csv)
 
-    absolute_results = sort_output(flow_output, pourpoint_id)
+    absolute_results = sort_output(flow_output)
     #   delta flow
-    delta_results = get_results_delta(flow_output, pourpoint_id)
+    delta_results = get_results_delta(flow_output)
     #   7-day low-flow (needs sort_by_time)
-    # seven_d_low_results = get_results_7d_low(flow_output, absolute_results, pourpoint_id)
+    seven_d_low_results = get_results_7d_low(flow_output, absolute_results)
+    seven_d_mean_results = get_results_7d_mean(flow_output, absolute_results)
 
     results = [
         {
@@ -963,6 +982,14 @@ def get_hydro_results_by_pour_point_id(request):
         {
             'title': 'Change in Flow Rate @ 3hr Steps',
             'data': delta_results
+        },
+        {
+            'title': 'Seven Day Low Flow @ 3hr Steps',
+            'data': seven_d_low_results
+        },
+        {
+            'title': 'Seven Day Mean Flow @ 3hr Steps',
+            'data': seven_d_mean_results
         },
     ]
 
