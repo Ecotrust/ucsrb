@@ -265,21 +265,28 @@ app.panel = {
             return html;
         },
         chart: {
-            init: function(results) {
-                if (typeof(results) === 'string') {
+            init: function(resultsData) {
+                if (typeof(resultsData) === 'string') {
                     $('#chartResult').html(`<h3>${results}</h3>`);
                     return;
                 }
+
                 var chartJSON = {};
-                for (var chart in results) {
-                    var resultsArray = [];
-                    chartJSON[chart] = [];
-                    chartJSON.timestep = [];
-                    for (var i = 0; i < results[chart].length; i++) {
-                        chartJSON[chart].push(results[chart][i].flow);
-                        chartJSON.timestep.push(results[chart][i].timestep);
+                for (var chart in resultsData.results) {
+                    for (var ch in resultsData.results[chart].data) {
+                        resultsArray = [];
+                        chartJSON.timestep = [];
+                        if (ch !== 'baseline') {
+                            for (var x = 0; x < resultsData.results[chart].data[ch].length; x++) {
+                                resultsArray.push(resultsData.results[chart].data[ch][x].flow);
+                                chartJSON.timestep.push(resultsData.results[chart].data[ch][x].timestep);
+                            }
+                        }
+                        chartJSON[ch] = resultsArray;
                     }
                 }
+
+
                 app.panel.results.chart.obj = bb.generate({
                     data: {
                         json: chartJSON,
@@ -301,20 +308,27 @@ app.panel = {
                             type: 'timeseries',
                             tick: {
                                 fit: true,
-                                format: "%B",
-                                rotate: 44,
-                                centered: false,
+                                format: "%b",
+                                rotate: 60,
                                 multiline: false,
                                 // format: function(x) {
                                 //     return "%b"
                                 // },
-                                culling: {
-                                    max: 12
-                                }
+                                // culling: {
+                                //     max: 13
+                                // }
                             },
                         },
                         y: {
                             show: true,
+                        }
+                    },
+                    grid: {
+                        y: {
+                            lines: [{
+                                value: 0,
+                                text: "Baseline"
+                            }]
                         }
                     },
                     zoom: {
@@ -325,7 +339,7 @@ app.panel = {
                         show: false,
                     },
                     legend: {
-                        position: 'inset'
+                        position: 'top'
                     },
                     tooltip: {
                         format: {
