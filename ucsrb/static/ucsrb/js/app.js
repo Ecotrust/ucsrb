@@ -377,10 +377,17 @@ app.panel = {
                 '<p class="display"><span class="bb">' + drawingAcres.toFixed(0).toString() + '</span> acres selected</p>' +
                 warning +
                 '<p><small>Click the map to start a new drawing<br />Re-select point to edit<br />Select drawing boundary to alter<br />Alt+Select point to delete</small></p>' +
+                '<form id="draw_submit_form">' +
+                '<label for="treat_name">Treatment Name:</label>' +
+                '<input type="text" name="treat_name" required><br>' +
+                '<label for="treat_desc">Description:</label>' +
+                '<textarea rows="2" columns="35" name="treat_desc"></textarea><br>' +
+                '<br>' +
                 '<div class="btn-toolbar justify-content-between drawing-buttons">' +
                 '<button type="button" class="btn btn-primary ' + saveDisable + '" onclick="app.panel.draw.saveDrawing()">Begin Evaluation</button>' +
                 '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
                 '</div>' +
+                '</form>' +
                 '</div>';
                 app.panel.draw.setContent(html);
             }, 300);
@@ -423,7 +430,9 @@ app.panel = {
                 totalArea += ol.Sphere.getArea(drawFeatures[i].getGeometry());
             }
             if (drawingIsSmallEnough(totalArea)) {
-                app.request.saveDrawing();
+                var drawing_name = $('#draw_submit_form').find('[name=treat_name]').val();
+                var drawing_desc = $('#draw_submit_form').find('[name=treat_desc]').val();
+                app.request.saveDrawing(drawing_name, drawing_desc);
             } else {
                 areaInAcres = totalArea/4046.86;
                 alert('Your treatment area is too large (' + areaInAcres.toFixed(0) + ' acres). Please keep it below ' + app.map.draw.maxAcres.toString() + ' acres');
@@ -436,16 +445,17 @@ app.panel = {
     },
     element: function() { // returns a function. to edit dom element don't forget to invoke: element()
     return this.getElement;
-},
-panelContentElement: function() { // returns a function. to edit dom element don't forget to invoke: panelContentElement()
-return this.getPanelContentElement;
-},
-get getElement() {
-    return document.getElementById('panel');
-},
-get getPanelContentElement() {
-    return document.getElementById('panel-content');
-}
+    },
+
+    panelContentElement: function() { // returns a function. to edit dom element don't forget to invoke: panelContentElement()
+      return this.getPanelContentElement;
+    },
+    get getElement() {
+        return document.getElementById('panel');
+    },
+    get getPanelContentElement() {
+        return document.getElementById('panel-content');
+    }
 }
 
 enableDrawing = function() {
@@ -713,7 +723,6 @@ app.request = {
             },
             dataType: 'json',
             success: function(response) {
-                console.log(`%csuccess: got hydro results for pourpoint`, 'color: green');
                 return response;
             },
             error: function(response) {
@@ -894,7 +903,7 @@ app.request = {
             }
         })
     },
-    saveDrawing: function() {
+    saveDrawing: function(draw_name, draw_desc) {
         var drawFeatures = app.map.draw.source.getFeatures();
         var geojsonFormat = new ol.format.GeoJSON();
         var featureJson = geojsonFormat.writeFeatures(drawFeatures);
@@ -904,8 +913,8 @@ app.request = {
             data: {
                 drawing: featureJson,
                 // TODO: Set name/description with form
-                name: 'drawing',
-                description: null
+                name: draw_name,
+                description: draw_desc
             },
             dataType: 'json',
             method: 'POST',
