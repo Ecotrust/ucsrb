@@ -391,14 +391,14 @@ app.panel = {
                 '<p class="display"><span class="bb">' + drawingAcres.toFixed(0).toString() + '</span> acres selected</p>' +
                 warning +
                 '<p><small>Click the map to start a new drawing<br />Re-select point to edit<br />Select drawing boundary to alter<br />Alt+Select point to delete</small></p>' +
-                '<form id="draw_submit_form">' +
+                '<form id="draw_submit_form" onsubmit="app.panel.draw.saveDrawing(); return false;">' +
                 '<label for="treat_name">Treatment Name:</label>' +
                 '<input type="text" name="treat_name" required><br>' +
                 '<label for="treat_desc">Description:</label>' +
                 '<textarea rows="2" columns="35" name="treat_desc"></textarea><br>' +
                 '<br>' +
                 '<div class="btn-toolbar justify-content-between drawing-buttons">' +
-                '<button type="button" class="btn btn-primary ' + saveDisable + '" onclick="app.panel.draw.saveDrawing()">Begin Evaluation</button>' +
+                '<button type="submit" class="btn btn-primary ' + saveDisable + '" >Begin Evaluation</button>' +
                 '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
                 '</div>' +
                 '</form>' +
