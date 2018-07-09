@@ -223,12 +223,13 @@ app.panel = {
             }
         },
         aggPanel: function(results) {
+            console.log(results);
             var html = `<section class="aggregate result-section" id="aggregate-results">`;
             html += `<div class="media align-items-center">
             <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
-            <div class="media-body">
-            <h4 class="mt-2 mb-2">${results.scenario.name}</h4>
-            </div>
+                <div class="media-body">
+                    <h4 class="mt-2 mb-2">${results.scenario.name}</h4>
+                </div>
             </div>`;
             html += `<div class="feature-result"><span class="lead">${results.scenario.acres}</span> acres</div><div class="overflow-gradient"><div class="result-list-wrap align-items-center">`;
             for (var result of results.aggregate_results) {
@@ -998,11 +999,11 @@ app.request = {
         })
     },
     deleteScenario: function(id) {
-        $.ajax({
-            url: '/scenario/treatmentscenario/delete',
+        return $.ajax({
+            url: `/scenario/delete_design/ucsrb_treatmentscenario_${id}/`,
             type: 'POST',
             data: {
-                id: id
+                uid: id
             },
             success: function(response, status) {
                 console.log(`%csuccess deleted: %o`, 'color: green', response);
