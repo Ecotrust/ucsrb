@@ -1148,7 +1148,9 @@ def run_filter_query(filters):
 
     if 'focus_area' in filters.keys() and 'focus_area_input' in filters.keys() and filters['focus_area']:
         focus_area = FocusArea.objects.get(pk=filters['focus_area_input']).geometry;
-        query = VegPlanningUnit.objects.filter(geometry__coveredby=focus_area)
+        # query = VegPlanningUnit.objects.filter(geometry__coveredby=focus_area)
+        query = VegPlanningUnit.objects.filter(geometry__intersects=focus_area)
+        # query = query.filter(geometry__coveredby=focus_area)
     else:
         notes = ['Please Filter By Focus Area']
         query = VegPlanningUnit.objects.filter(pk=None)
