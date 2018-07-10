@@ -144,60 +144,64 @@ class Command(BaseCommand):
         for shapeRecord in shape.shapeRecords():
             geometry = GEOSGeometry(json.dumps(shapeRecord.shape.__geo_interface__), srid=settings.IMPORT_SRID)
             if geometry.geom_type == 'Polygon':
-                multiGeometry = MultiPolygon((geometry))
-            elif geometry.geom_type == 'MultiPolygon':
+                # multiGeometry = MultiPolygon((geometry))
                 multiGeometry = geometry
+
+                # elif geometry.geom_type == 'MultiPolygon':
+                #     multiGeometry = geometry
+
+                new_unit = VegPlanningUnit.objects.create(
+                    planning_unit_id = shapeRecord.record[planning_unit_id_index],
+                    veg_unit_id = shapeRecord.record[veg_unit_id_index],
+                    gridcode = shapeRecord.record[gridcode_index],
+                    acres = shapeRecord.record[acres_index],
+                    huc_2_id = shapeRecord.record[huc_2_id_index],
+                    huc_4_id = shapeRecord.record[huc_4_id_index],
+                    huc_6_id = shapeRecord.record[huc_6_id_index],
+                    huc_8_id = shapeRecord.record[huc_8_id_index],
+                    huc_10_id = shapeRecord.record[huc_10_id_index],
+                    huc_12_id = shapeRecord.record[huc_12_id_index],
+                    pub_priv_own = shapeRecord.record[pub_priv_own_index],
+                    lsr_percent = shapeRecord.record[lsr_percent_index],
+                    has_critical_habitat = shapeRecord.record[has_critical_habitat_index],
+                    percent_critical_habitat = shapeRecord.record[percent_critical_habitat_index],
+                    percent_roadless = shapeRecord.record[percent_roadless_index],
+                    percent_wetland = shapeRecord.record[percent_wetland_index],
+                    percent_riparian = shapeRecord.record[percent_riparian_index],
+                    slope = shapeRecord.record[slope_index],
+                    road_distance = shapeRecord.record[road_distance_index],
+                    percent_fractional_coverage = shapeRecord.record[mean_fractional_coverage_index],
+                    percent_high_fire_risk_area = shapeRecord.record[percent_high_fire_risk_area_index],
+
+                    # Fields to add to model
+                    # mgmt_alloc_code = shapeRecord.record[mgmt_allocation_code],
+                    # mgmt_description = shapeRecord.record[mgmt_description],
+                    # mgmt_unit_id = shapeRecord.record[rma_id_et],
+                    # dwnstream_ppt_id = shapeRecord.record[ppt_id],
+                    # topo_height_class_majority = shapeRecord.record[thc_zm],
+
+                    geometry = multiGeometry
+                )
+
+                # Stupid effing workaround:
+                new_unit.mgmt_alloc_code = shapeRecord.record[mgmt_allocation_code]
+                new_unit.mgmt_description = shapeRecord.record[mgmt_description]
+                new_unit.mgmt_unit_id = shapeRecord.record[rma_id_et]
+                new_unit.dwnstream_ppt_id = shapeRecord.record[ppt_id]
+                new_unit.topo_height_class_majority = shapeRecord.record[thc_zm]
+
+                import_count += 1
+                new_unit.save()
+
+                if import_count % 10000 == 0:
+                    self.stdout.write('%s Planning Units Added...' % str(import_count))
+                    pu_count = len(VegPlanningUnit.objects.all())
+                    if not import_count == pu_count:
+                        self.stdout.write('Only %d Planning Units Added after %d tries...' % (pu_count, import_count))
             else:
-                self.stdout.write('--- ERROR: Features in shapefile are not all (Multi)Polygons ---')
-                sys.exit()
-
-            new_unit = VegPlanningUnit.objects.create(
-                planning_unit_id = shapeRecord.record[planning_unit_id_index],
-                veg_unit_id = shapeRecord.record[veg_unit_id_index],
-                gridcode = shapeRecord.record[gridcode_index],
-                acres = shapeRecord.record[acres_index],
-                huc_2_id = shapeRecord.record[huc_2_id_index],
-                huc_4_id = shapeRecord.record[huc_4_id_index],
-                huc_6_id = shapeRecord.record[huc_6_id_index],
-                huc_8_id = shapeRecord.record[huc_8_id_index],
-                huc_10_id = shapeRecord.record[huc_10_id_index],
-                huc_12_id = shapeRecord.record[huc_12_id_index],
-                pub_priv_own = shapeRecord.record[pub_priv_own_index],
-                lsr_percent = shapeRecord.record[lsr_percent_index],
-                has_critical_habitat = shapeRecord.record[has_critical_habitat_index],
-                percent_critical_habitat = shapeRecord.record[percent_critical_habitat_index],
-                percent_roadless = shapeRecord.record[percent_roadless_index],
-                percent_wetland = shapeRecord.record[percent_wetland_index],
-                percent_riparian = shapeRecord.record[percent_riparian_index],
-                slope = shapeRecord.record[slope_index],
-                road_distance = shapeRecord.record[road_distance_index],
-                percent_fractional_coverage = shapeRecord.record[mean_fractional_coverage_index],
-                percent_high_fire_risk_area = shapeRecord.record[percent_high_fire_risk_area_index],
-
-                # Fields to add to model
-                # mgmt_alloc_code = shapeRecord.record[mgmt_allocation_code],
-                # mgmt_description = shapeRecord.record[mgmt_description],
-                # mgmt_unit_id = shapeRecord.record[rma_id_et],
-                # dwnstream_ppt_id = shapeRecord.record[ppt_id],
-                # topo_height_class_majority = shapeRecord.record[thc_zm],
-
-                geometry = multiGeometry
-            )
-
-            # Stupid effing workaround:
-            new_unit.mgmt_alloc_code = shapeRecord.record[mgmt_allocation_code]
-            new_unit.mgmt_description = shapeRecord.record[mgmt_description]
-            new_unit.mgmt_unit_id = shapeRecord.record[rma_id_et]
-            new_unit.dwnstream_ppt_id = shapeRecord.record[ppt_id]
-            new_unit.topo_height_class_majority = shapeRecord.record[thc_zm]
-
-            import_count += 1
-            new_unit.save()
-
-            if import_count % 10000 == 0:
-                self.stdout.write('%s Planning Units Added...' % str(import_count))
-                pu_count = len(VegPlanningUnit.objects.all())
-                if not import_count == pu_count:
-                    self.stdout.write('Only %d Planning Units Added after %d tries...' % (pu_count, import_count))
+                # self.stdout.write('--- ERROR: Features in shapefile are not all (Multi)Polygons ---')
+                # self.stdout.write('--- ERROR: Features in shapefile are not all Polygons ---')
+                self.stdout.write('Discovered non-Polygon for record with Et_ID: %s' % str(shapeRecord.record[planning_unit_id_index]))
+                # sys.exit()
 
         self.stdout.write('Successfully added %s Veg Planning Unit records' % import_count)

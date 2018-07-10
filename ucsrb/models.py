@@ -387,7 +387,8 @@ class VegPlanningUnit(models.Model):
     dwnstream_ppt_id = models.IntegerField(null=True, blank=True, default=None)                 #ppt_ID
     topo_height_class_majority = models.IntegerField(null=True, blank=True, default=None)       #thzonmaj
 
-    geometry = gismodels.MultiPolygonField(srid=settings.GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Veg Unit Geometry")
+    # geometry = gismodels.MultiPolygonField(srid=settings.GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Veg Unit Geometry")
+    geometry = gismodels.PolygonField(srid=settings.GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Veg Unit Geometry")
     objects = gismodels.GeoManager()
 
     def is_private(self):
