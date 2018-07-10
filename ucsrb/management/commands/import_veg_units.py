@@ -145,7 +145,7 @@ class Command(BaseCommand):
             geometry = GEOSGeometry(json.dumps(shapeRecord.shape.__geo_interface__), srid=settings.IMPORT_SRID)
             if geometry.geom_type == 'Polygon':
                 # multiGeometry = MultiPolygon((geometry))
-                multiGeometry = geometry
+                multiGeometry = geometry.union(geometry).buffer(0)
 
                 # elif geometry.geom_type == 'MultiPolygon':
                 #     multiGeometry = geometry
