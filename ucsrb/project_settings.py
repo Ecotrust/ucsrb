@@ -206,6 +206,14 @@ INSTALLED_APPS = [
 ######        LAYER DATA        ########
 ########################################
 FOCUS_AREA_TYPES = ['HUC10', 'HUC12', 'RMU', 'PourPointOverlap', 'PourPointDiscrete', 'Drawing']
+FOCUS_AREA_FIELD_ID_LOOKUP = {
+    'HUC10': 'huc_10_id',
+    'HUC12': 'huc_12_id',
+    'RMU': 'mgmt_unit_id',
+    'PourPointOverlap': 'dwnstream_ppt_id',
+    'PourPointDiscrete': 'dwnstream_ppt_id',
+    'Drawing': False
+}
 IMPORT_SRID = 3857
 
 

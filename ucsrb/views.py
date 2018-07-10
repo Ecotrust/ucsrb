@@ -1142,44 +1142,40 @@ def get_results_by_state(request):
 def run_filter_query(filters):
     from collections import OrderedDict
     from ucsrb.models import VegPlanningUnit, FocusArea
+    # from ucsrb import project_settings as ucsrb_settings
     # TODO: This would be nicer if it generically knew how to filter fields
     # by name, and what kinds of filters they were. For now, hard code.
     notes = []
 
+    filter_dict = {}
+    exclude_dict = {}
+
     if 'focus_area' in filters.keys() and 'focus_area_input' in filters.keys() and filters['focus_area']:
-        focus_area = FocusArea.objects.get(pk=filters['focus_area_input']).geometry;
-        # query = VegPlanningUnit.objects.filter(geometry__coveredby=focus_area)
-        query = VegPlanningUnit.objects.filter(geometry__intersects=focus_area)
-        # query = query.filter(geometry__coveredby=focus_area)
+        # focus_area = FocusArea.objects.get(pk=filters['focus_area_input']).geometry;
+        focus_area = FocusArea.objects.get(pk=filters['focus_area_input']);
+        veg_unit_type_field = settings.FOCUS_AREA_FIELD_ID_LOOKUP[focus_area.unit_type]
+        if veg_unit_type_field:
+            filter_dict[veg_unit_type_field] = focus_area.unit_id
+        else:
+            filter_dict['geometry__coveredby'] = focus_area.geometry
     else:
         notes = ['Please Filter By Focus Area']
         query = VegPlanningUnit.objects.filter(pk=None)
         return (query, notes)
 
     if 'private_own' in filters.keys() and filters['private_own']:
-        if 'avoid_private_input' in filters.keys():
-            if filters['avoid_private_input'] == 'Avoid':
-                pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
-            else:
-                pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() in ['private land', 'private']]
-        else:
-            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() not in ['private land', 'private']]
-        query = (query.filter(pk__in=pu_ids))
+        exclude_dict['pub_priv_own__icontains']='private'   # real value is 'Private land'
 
     if 'pub_priv_own' in filters.keys() and filters['pub_priv_own']:
         if 'pub_priv_own_input' in filters.keys():
-            pu_ids = [pu.pk for pu in query if pu.pub_priv_own.lower() == filters['pub_priv_own_input'].lower()]
-        else:
-            pu_ids = [pu.pk for pu in query]
-        query = (query.filter(pk__in=pu_ids))
+            filter_dict['pub_priv_own__iexact'] = filters['pub_priv_own_input']
 
     if 'lsr_percent' in filters.keys() and filters['lsr_percent']:
-        pu_ids = [pu.pk for pu in query if pu.lsr_percent < settings.LSR_THRESHOLD]
-        query = (query.filter(pk__in=pu_ids))
+        filter_dict['lsr_percent__lt'] = settings.LSR_THRESHOLD
 
     if 'has_critical_habitat' in filters.keys() and filters['has_critical_habitat']:
-        pu_ids = [pu.pk for pu in query if pu.percent_critical_habitat < settings.CRIT_HAB_THRESHOLD and not pu.has_critical_habitat]
-        query = (query.filter(pk__in=pu_ids))
+        filter_dict['percent_critical_habitat__lt'] = settings.CRIT_HAB_THRESHOLD
+        exclude_dict['has_critical_habitat'] = True
 
     # if 'area' in filters.keys() and filters['area']:
     #     # RDH 1/8/18: filter(geometry__area_range(...)) does not seem available.
@@ -1191,38 +1187,30 @@ def run_filter_query(filters):
     #     query = (query.filter(pk__in=pu_ids))
 
     if 'percent_roadless' in filters.keys() and filters['percent_roadless']:
-        pu_ids = [pu.pk for pu in query if pu.percent_roadless < settings.ROADLESS_THRESHOLD]
-        query = (query.filter(pk__in=pu_ids))
+        filter_dict['percent_roadless__lt'] = settings.ROADLESS_THRESHOLD
 
     if 'road_distance' in filters.keys() and filters['road_distance']:
         if 'road_distance_max' in filters.keys():
-            pu_ids = [pu.pk for pu in query if pu.road_distance <= float(filters['road_distance_max'])]
-            query = (query.filter(pk__in=pu_ids))
+            filter_dict['road_distance__lte'] = float(filters['road_distance_max'])
 
     if 'percent_wetland' in filters.keys() and filters['percent_wetland']:
-        pu_ids = [pu.pk for pu in query if pu.percent_wetland < settings.WETLAND_THRESHOLD]
-        query = (query.filter(pk__in=pu_ids))
+        filter_dict['percent_wetland__lt'] = settings.WETLAND_THRESHOLD
 
     if 'percent_riparian' in filters.keys() and filters['percent_riparian']:
-        pu_ids = [pu.pk for pu in query if pu.percent_riparian < settings.RIPARIAN_THRESHOLD]
-        query = (query.filter(pk__in=pu_ids))
+        filter_dict['percent_riparian__lt'] = settings.RIPARIAN_THRESHOLD
 
     if 'slope' in filters.keys() and filters['slope']:
         if 'slope_max' in filters.keys():
-            pu_ids = [pu.pk for pu in query if pu.slope <= float(filters['slope_max'])]
-            query = (query.filter(pk__in=pu_ids))
+            filter_dict['slope__lte'] = float(filters['slope_max'])
 
     if 'percent_fractional_coverage' in filters.keys() and filters['percent_fractional_coverage']:
         if 'percent_fractional_coverage_min' in filters.keys():
-            pu_ids = [pu.pk for pu in query if pu.percent_fractional_coverage >= float(filters['percent_fractional_coverage_min'])]
-            query = (query.filter(pk__in=pu_ids))
+            filter_dict['percent_fractional_coverage__gte'] = float(filters['percent_fractional_coverage_min'])
         if 'percent_fractional_coverage_max' in filters.keys():
-            pu_ids = [pu.pk for pu in query if pu.percent_fractional_coverage <= float(filters['percent_fractional_coverage_max'])]
-            query = (query.filter(pk__in=pu_ids))
+            filter_dict['percent_fractional_coverage__lte'] = float(filters['percent_fractional_coverage_max'])
 
     if 'percent_high_fire_risk_area' in filters.keys() and filters['percent_high_fire_risk_area']:
-        pu_ids = [pu.pk for pu in query if pu.percent_high_fire_risk_area > settings.FIRE_RISK_THRESHOLD]
-        query = (query.filter(pk__in=pu_ids))
+        filter_dict['percent_high_fire_risk_area__gt'] = settings.FIRE_RISK_THRESHOLD
 
     # 11 and 21 = ridgetops
     # 12 and 22 = north facing slopes
@@ -1233,19 +1221,26 @@ def run_filter_query(filters):
     if 'landform_type' in filters.keys() and filters['landform_type']:
         if 'include_north' in filters.keys():
             if not filters['include_north']:
-                pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 2
+                exclude_dict['topo_height_class__in'] = [12, 22]
+                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 2
         if 'include_south' in filters.keys():
             if not filters['include_south']:
-                pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 3
+                exclude_dict['topo_height_class__in'] = [13, 23]
+                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 3
         if 'include_ridgetop' in filters.keys():
             if not filters['include_ridgetop']:
-                pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 1
+                exclude_dict['topo_height_class__in'] = [11, 21]
+                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 1
         if 'include_floor' in filters.keys():
             if not filters['include_floor']:
-                pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 4
+                exclude_dict['topo_height_class__in'] = [14, 24]
+                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 4
         if 'include_east_west' in filters.keys():
             if not filters['include_east_west']:
-                pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 5
+                exclude_dict['topo_height_class__in'] = [15, 25]
+                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 5
+
+    query = VegPlanningUnit.objects.filter(**filter_dict).exclude(**exclude_dict)
 
     return (query, notes)
 
