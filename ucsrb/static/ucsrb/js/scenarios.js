@@ -360,7 +360,7 @@ function scenarioFormModel(options) {
                             featureCount = data[0].count,
                             area_m2 = data[0].area_m2;
                         self.updatedFilterResultsLayer.removeAllFeatures();
-                        if (featureCount) {
+                        if (featureCount && wkt) {
                             self.updatedFilterResultsLayer.addWKTFeatures(wkt);
                         }
                         self.updatedFilterResultsLayer.setVisibility(true);
