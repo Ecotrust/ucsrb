@@ -333,7 +333,7 @@ except ImportError:
 ADMIN_URL = '/admin/'
 CMS_ADMIN_BUTTON = False
 
-MAX_SCENARIO_RESULTS = 25000
+MAX_SCENARIO_RESULTS = 10000
 MAPBOX_ACCESS_TOKEN = 'set_in_local_settings'
 
 EMAIL_HOST_USER = 'noreply@s2fdemo.ecotrust.org'

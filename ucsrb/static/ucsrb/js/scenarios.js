@@ -270,6 +270,8 @@ function scenarioFormModel(options) {
     // Updating Dynamic Display
 
     self.gridCellsRemaining = ko.observable('...');
+    self.filterNotesExist = ko.observable(false);
+    self.filterNotesMessage = ko.observable('');
     self.showingFilteringResults = ko.observable(true);
     self.inputsHaveChanged = ko.observable(true);
     self.showButtonSpinner = ko.observable(false);
@@ -309,6 +311,8 @@ function scenarioFormModel(options) {
             self.showButtonSpinner(true);
         }
         self.gridCellsRemaining('...');
+        self.filterNotesExist(false);
+        self.filterNotesMessage('');
         self.updatedFilterResultsLayer.removeAllFeatures();
 
         self.updateFilterResults();
@@ -359,6 +363,10 @@ function scenarioFormModel(options) {
                         var wkt = data[0].wkt,
                             featureCount = data[0].count,
                             area_m2 = data[0].area_m2;
+                            if (data[0].notes.length > 0) {
+                              self.filterNotesMessage(data[0].notes);
+                              self.filterNotesExist(true);
+                            }
                         self.updatedFilterResultsLayer.removeAllFeatures();
                         if (featureCount && wkt) {
                             self.updatedFilterResultsLayer.addWKTFeatures(wkt);
