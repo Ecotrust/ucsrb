@@ -65,7 +65,7 @@ def get_user_scenario_list(request):
             "name": us.name,
             "description": us.description,
         })
-    return JsonResponse(user_scenarios_list, safe=False)
+    return JsonResponse(sorted(user_scenarios_list, key=lambda k: k['name'].lower()), safe=False)
 
 def get_json_error_response(error_msg="Error", status_code=500, context={}):
     context['success'] = False
