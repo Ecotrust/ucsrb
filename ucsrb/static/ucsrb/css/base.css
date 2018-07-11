@@ -138,12 +138,12 @@ nav .navbar-toggler {
     border-radius: 50%;
     border: none;
     color: #58595b;
-    height: 6vh;
+    height: 5.25vh;
     outline: none;
     text-align: center;
     position: relative;
     padding: 0;
-    width: 6vh;
+    width: 5.25vh;
 }
 
 nav .navbar-toggler:after {
@@ -154,7 +154,7 @@ nav .navbar-toggler .navbar-toggler-icon {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    height: 2.6125vh;
+    height: 2.25vh;
     line-height: 9vh;
     display: block;
     margin: 0 auto;
@@ -169,9 +169,9 @@ nav .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
 }
 
 .top-nav-wrap .navbar h1 {
-    font-size: 2.25em;
+    font-size: 2em;
     line-height: 9vh;
-    margin: 0 1rem;
+    margin: 0 2rem;
 }
 
 #menu {

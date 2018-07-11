@@ -226,7 +226,6 @@ app.panel = {
             }
         },
         aggPanel: function(results) {
-            console.log(results);
             var html = `<section class="aggregate result-section" id="aggregate-results">`;
             html += `<div class="media align-items-center">
             <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
@@ -236,8 +235,6 @@ app.panel = {
             </div>`;
             html += `<div class="feature-result"><span class="lead">${results.scenario.acres}</span> acres</div><div class="overflow-gradient"><div class="result-list-wrap align-items-center">`;
             for (var result of results.aggregate_results) {
-                console.log(result);
-                console.log(results.aggregate_results);
                 html += `<h5>${Object.keys(result)}</h5>`;
                 html += app.panel.results.styleResultsAsRows(Object.values(result));
             }
@@ -247,11 +244,36 @@ app.panel = {
             app.panel.results.addResults(html);
         },
         hydroPanel: function(results) {
+            console.log(results);
+            if (typeof(results) === 'string') {
+                var html = `<section class="hydro-results result-section" id="hydro-note">`;
+                html += `<div class="chart-wrap"><div id="chartResult">${results}</div></div>`;
+                html += `</section>`;
+                app.panel.results.addResults(html);
+                return;
+            }
             var html = `<section class="hydro-results result-section" id="hydro-results">`;
-            html += `<div id="pp-result" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_hydro.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0 blue">Gauging Station </h4></div></div></div>`;
-            html += `<div class="chart-wrap"><div id="chartResult"></div></div>`
-            // html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
+                html += `<div id="chart-carousel" class="carousel slide" data-ride="carousel">`;
+                    html += `<ol class="carousel-indicators">`;
+                    for (var result in results.results) {
+                        html += `<li data-target="#chart-carousel" data-slide-to="${result}"></li>`
+                    }
+                    html += `</ol>`;
+                    html += `<div class="carousel-inner">`;
+                    for (var result in results.results) {
+                        if (result < 1) {
+                            html += `<div class="carousel-item active">`
+                        } else {
+                            html += `<div class="carousel-item">`
+                        }
+                            html += `<div id="pp-result-${result}" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_hydro.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0 blue">Gauging Station </h4></div></div></div>`;
+                            html += `<div class="chart-wrap"><div id="chartResult-${result}"></div></div>`;
+                        html += `</div>`
+                    }
+                    html += `<a class="carousel-control-prev" href="#chart-carousel" role="button" data-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="sr-only">Previous</span></a><a class="carousel-control-next" href="#chart-carousel" role="button" data-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="sr-only">Next</span></a>`
+                html += '</div>';
             html += '</section>';
+            // html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
             app.panel.results.addResults(html, function() {
                 app.panel.results.chart.init(results);
             });
@@ -270,13 +292,9 @@ app.panel = {
         },
         chart: {
             init: function(resultsData) {
-                if (typeof(resultsData) === 'string') {
-                    $('#chartResult').html(`<h3>${results}</h3>`);
-                    return;
-                }
-
-                var chartJSON = {};
+                app.panel.results.chart.obj = {};
                 for (var chart in resultsData.results) {
+                    var chartJSON = {};
                     for (var ch in resultsData.results[chart].data) {
                         resultsArray = [];
                         chartJSON.timestep = [];
@@ -288,82 +306,83 @@ app.panel = {
                         }
                         chartJSON[ch] = resultsArray;
                     }
-                }
-
-
-                app.panel.results.chart.obj = bb.generate({
-                    data: {
-                        json: chartJSON,
-                        x: 'timestep',
-                        xFormat: '%m.%d.%Y-%H:%M:%S',
-                        names: {
-                            flow: 'CFPS'
-                        },
-                        type: 'line',
-                        colors: {
-                            baseline: '#394861',
-                            rx_burn: '#FB7302',
-                            catastrophic_fire: '#680109',
-                            mechanical: '#93A35D',
-                        }
-                    },
-                    axis: {
-                        x: {
-                            type: 'timeseries',
-                            tick: {
-                                fit: true,
-                                format: "%b",
-                                rotate: 60,
-                                multiline: false,
-                                // format: function(x) {
-                                //     return "%b"
-                                // },
-                                // culling: {
-                                //     max: 13
-                                // }
+                    app.panel.results.chart.obj[chart] = bb.generate({
+                        data: {
+                            json: chartJSON,
+                            x: 'timestep',
+                            xFormat: '%m.%d.%Y-%H:%M:%S',
+                            names: {
+                                flow: 'CFPS'
                             },
-                        },
-                        y: {
-                            show: true,
-                        }
-                    },
-                    grid: {
-                        y: {
-                            lines: [{
-                                value: 0,
-                                text: "Baseline"
-                            }]
-                        }
-                    },
-                    zoom: {
-                        enabled: true,
-                        rescale: true,
-                    },
-                    point: {
-                        show: false,
-                    },
-                    legend: {
-                        position: 'top'
-                    },
-                    tooltip: {
-                        format: {
-                            title: function(x) {
-                                return d3.timeFormat("%B %d, %Y")(x);
-                            },
-                            value: function(value, ratio, id) {
-                                value = value.toFixed(4);
-                                return value;
+                            type: 'line',
+                            colors: {
+                                baseline: '#394861',
+                                rx_burn: '#FB7302',
+                                catastrophic_fire: '#680109',
+                                mechanical: '#93A35D',
                             }
-                        }
-                    },
-                    bindto: '#chartResult'
-                });
+                        },
+                        axis: {
+                            x: {
+                                type: 'timeseries',
+                                tick: {
+                                    fit: true,
+                                    format: "%b",
+                                    rotate: 60,
+                                    multiline: false,
+                                    // format: function(x) {
+                                    //     return "%b"
+                                    // },
+                                    // culling: {
+                                    //     max: 13
+                                    // }
+                                },
+                            },
+                            y: {
+                                show: true,
+                            }
+                        },
+                        grid: {
+                            y: {
+                                lines: [{
+                                    value: 0,
+                                    text: "Baseline"
+                                }]
+                            }
+                        },
+                        zoom: {
+                            enabled: true,
+                            rescale: true,
+                        },
+                        point: {
+                            show: false,
+                        },
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            format: {
+                                title: function(x) {
+                                    return d3.timeFormat("%B %d, %Y")(x);
+                                },
+                                value: function(value, ratio, id) {
+                                    value = value.toFixed(4);
+                                    return value;
+                                }
+                            }
+                        },
+                        bindto: `#chartResult-${chart}`
+                    });
+                }
                 app.panel.results.chart.resize();
             },
             resize: function() {
                 window.setTimeout(function() {
-                    app.panel.results.chart.obj.resize();
-                }, 500);
+                    for (var chart in app.panel.results.chart.obj) {
+                        console.log(chart);
+                        app.panel.results.chart.obj[chart].resize();
+                    }
+                }, 100);
             }
         },
         panelResultsElement: function() {
