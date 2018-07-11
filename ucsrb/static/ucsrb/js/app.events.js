@@ -133,7 +133,6 @@ $(document).ready(function() {
      * @return {[type]}       [description]
      */
     $('header').on('click', function(event) {
-        console.log('navigated to %o', event.target);
         if (app.viewModel.scenarios.scenarioForm()) {
             if (event.target.href > 0 && event.target.href[0] !== '#') {
                 if (!window.confirm("Any unsaved changes you have made will be lost")) {
