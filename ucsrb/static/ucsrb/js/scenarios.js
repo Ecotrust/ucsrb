@@ -151,6 +151,12 @@ function scenarioFormModel(options) {
     self.slope = ko.observable(false);
     self.percent_fractional_coverage = ko.observable(false);
     self.percent_high_fire_risk_area = ko.observable(false);
+    self.landform_type = ko.observable(false);
+    self.landform_type_checkboxes_include_0 = ko.observable(true); //north
+    self.landform_type_checkboxes_include_1 = ko.observable(true); //south
+    self.landform_type_checkboxes_include_2 = ko.observable(true); //ridgetop
+    self.landform_type_checkboxes_include_3 = ko.observable(true); //floors
+    self.landform_type_checkboxes_include_4 = ko.observable(true); //east/west
 
     self.lastChange = (new Date()).getTime();
 
@@ -270,6 +276,8 @@ function scenarioFormModel(options) {
     // Updating Dynamic Display
 
     self.gridCellsRemaining = ko.observable('...');
+    self.filterNotesExist = ko.observable(false);
+    self.filterNotesMessage = ko.observable('');
     self.showingFilteringResults = ko.observable(true);
     self.inputsHaveChanged = ko.observable(true);
     self.showButtonSpinner = ko.observable(false);
@@ -309,6 +317,8 @@ function scenarioFormModel(options) {
             self.showButtonSpinner(true);
         }
         self.gridCellsRemaining('...');
+        self.filterNotesExist(false);
+        self.filterNotesMessage('');
         self.updatedFilterResultsLayer.removeAllFeatures();
 
         self.updateFilterResults();
@@ -359,6 +369,10 @@ function scenarioFormModel(options) {
                         var wkt = data[0].wkt,
                             featureCount = data[0].count,
                             area_m2 = data[0].area_m2;
+                            if (data[0].notes.length > 0) {
+                              self.filterNotesMessage(data[0].notes);
+                              self.filterNotesExist(true);
+                            }
                         self.updatedFilterResultsLayer.removeAllFeatures();
                         if (featureCount && wkt) {
                             self.updatedFilterResultsLayer.addWKTFeatures(wkt);

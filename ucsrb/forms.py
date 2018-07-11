@@ -183,6 +183,22 @@ class TreatmentScenarioForm(ScenarioForm):
         required=False,
     )
 
+    landform_type = HiddenScenarioBooleanField(
+        label="Landform Type",
+        help_text="Only treat certain types of geography",
+        required=False,
+    )
+
+    landform_classes = (("0", "Include North Slopes"), ("1", "Inlcude South Slopes"), ("2", "Include Ridgetops"), ("3", "Include Valley Floors"), ("4", "Include East/West Slopes"))
+    landform_type_checkboxes = forms.MultipleChoiceField(
+        required=False,
+        choices=landform_classes,
+        widget=forms.CheckboxSelectMultiple(),
+        initial=("0", "1", "2", "3", "4"),
+        label="Land to include",
+        help_text="Uncheck any topo types that you don't want included in your treatment",
+    )
+
     def get_step_0_fields(self):
         names = [
             ('focus_area', None, None, 'focus_area_input'),
@@ -207,6 +223,7 @@ class TreatmentScenarioForm(ScenarioForm):
                 'percent_fractional_coverage_input'
             ),
             ('percent_high_fire_risk_area', None, None, None),
+            ('landform_type', None, None, None, 'landform_type_checkboxes'),
 
         ]
         return self._get_fields(names)
@@ -225,7 +242,35 @@ class TreatmentScenarioForm(ScenarioForm):
         return foo
 
     def is_valid(self, *args, **kwargs):
+        import ipdb; ipdb.set_trace()
+        if len(self.errors.keys()) == 1 and 'landform_type_checkboxes' in self.errors.keys() and len(self.errors['landform_type_checkboxes']) == 1 and 'is not one of the available choices.' in self.errors['landform_type_checkboxes'][0]:
+            del self._errors['landform_type_checkboxes']
         return super(ScenarioForm, self).is_valid()
+
+    def clean(self):
+        super(FeatureForm, self).clean()
+        import ipdb; ipdb.set_trace()
+        try:
+            if self.cleaned_data['landform_type'] == True:
+                for landform_type in settings.LANDFORM_TYPES:
+                    if 'landform_type_checkboxes_%s' % landform_type in self.data.keys():
+                        if self.data['landform_type_checkboxes_%s' % landform_type]:
+                            self.cleaned_data['landform_type_checkboxes_%s' % landform_type] = True
+                self.data.__delitem__('landform_type_checkboxes')
+        except Exception as e:
+            print(e)
+            pass
+        return self.cleaned_data
+
+    # def save(self, commit=True):
+    #     inst = super(ScenarioForm, self).save(commit=False)
+    #     import ipdb; ipdb.set_trace()
+    #     if self.data.get('clear_support_file'):
+    #         inst.support_file = None
+    #     if commit:
+    #         inst.save()
+    #     return inst
+
 
     class Meta(ScenarioForm.Meta):
         model = TreatmentScenario

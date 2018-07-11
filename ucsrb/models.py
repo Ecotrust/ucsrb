@@ -135,58 +135,56 @@ class ScenarioState(models.Model):
 class TreatmentScenario(Scenario):
     focus_area = models.BooleanField(default=False)
     focus_area_input = models.ForeignKey(FocusArea, null=True, blank=True, default=None)#, models.SET_NULL)
-    # id = models.IntegerField(primary_key=True)
     scenario = models.ForeignKey(ScenarioState, null=True, blank=True, default=None)#, models.CASCADE)
 
     # Avoid Private land? (USE PUB_PRIV_OWN!)
     private_own = models.BooleanField(default=False)
 
-    # pub_priv_own = models.CharField(max_length=255)         #PubPrivOwn
     OWNERSHIP_CHOICES = settings.OWNERSHIP_CHOICES
 
     # Target Land Ownership
-    pub_priv_own = models.BooleanField(default=False)
+    pub_priv_own = models.BooleanField(default=False)                   #PubPrivOwn
     pub_priv_own_input = models.CharField(max_length=255, blank=True, null=True, default=None, choices=OWNERSHIP_CHOICES)
 
-    # lsr_percent = models.FloatField()                       #LSRpct ("Late Successional Reserve")
     # Avoid Late Successional Reserve?
-    lsr_percent = models.BooleanField(default=False)
+    lsr_percent = models.BooleanField(default=False)                    #LSRpct ("Late Successional Reserve")
 
-    # has_critical_habitat = models.BooleanField(default=False) #CritHabLn
     # Avoid Critical Habitat?
-    has_critical_habitat = models.BooleanField(default=False)
+    has_critical_habitat = models.BooleanField(default=False)           #CritHabLn
 
-    # percent_roadless = models.FloatField()                  #IRApct ("Inventoried Roadless Area")
     # Avoid Inventoried Roadless Areas
-    percent_roadless = models.BooleanField(default=False)
+    percent_roadless = models.BooleanField(default=False)               #IRApct ("Inventoried Roadless Area")
 
-    # road_distance = models.FloatField()                     #RdDstEucMn ("Euclidean mean distance to roads")
     # Max distance from roads
-    road_distance = models.BooleanField(default=False)
+    road_distance = models.BooleanField(default=False)          #RdDstEucMn ("Euclidean mean distance to roads")
     road_distance_max = models.FloatField(null=True, blank=True, default=None)
 
-    # percent_wetland = models.FloatField()                   #NWIwetpct
     # Avoid Wetlands?
-    percent_wetland = models.BooleanField(default=False)
+    percent_wetland = models.BooleanField(default=False)                #NWIwetpct
 
-    # percent_riparian = models.FloatField()                  #NWIrippct
     # Avoid Riparian Areas?
-    percent_riparian = models.BooleanField(default=False)
+    percent_riparian = models.BooleanField(default=False)               #NWIrippct
 
-    # slope = models.FloatField()                             #SlopeMean
     # Max Slope
-    slope = models.BooleanField(default=False)
+    slope = models.BooleanField(default=False)                          #SlopeMean
     slope_max = models.FloatField(null=True, blank=True, default=None)
 
-    # percent_fractional_coverage = models.FloatField()       #FrctCvg
     # Current Fractional Coverage
-    percent_fractional_coverage = models.BooleanField(default=False)
+    percent_fractional_coverage = models.BooleanField(default=False)    #FrctCvg
     percent_fractional_coverage_min = models.FloatField(null=True, blank=True, default=None)
     percent_fractional_coverage_max = models.FloatField(null=True, blank=True, default=None)
 
-    # percent_high_fire_risk_area = models.FloatField()       #HRFApct
     # Target High Fire Risk Areas
-    percent_high_fire_risk_area = models.BooleanField(default=False)
+    percent_high_fire_risk_area = models.BooleanField(default=False)    #HRFApct
+
+    # Filter by Landform type
+    landform_type = models.BooleanField(default=False)
+    landform_type_checkboxes_include_north = models.BooleanField(default=True)
+    landform_type_checkboxes_include_south = models.BooleanField(default=True)
+    landform_type_checkboxes_include_ridgetop = models.BooleanField(default=True)
+    landform_type_checkboxes_include_floor = models.BooleanField(default=True)
+    landform_type_checkboxes_include_east_west = models.BooleanField(default=True)
+    landform_type_checkboxes = models.TextField(null=True, blank=True, default=None)
 
     def run_filters(self, query):
         from ucsrb.views import run_filter_query
@@ -240,6 +238,14 @@ class TreatmentScenario(Scenario):
         if self.percent_high_fire_risk_area:
             filters['percent_high_fire_risk_area'] = True
 
+        if self.landform_type:
+            filters['landform_type'] = self.landform_type
+            filters['landform_type_checkboxes_include_north'] = self.landform_type_checkboxes_include_north
+            filters['landform_type_checkboxes_include_south'] = self.landform_type_checkboxes_include_south
+            filters['landform_type_checkboxes_include_ridgetop'] = self.landform_type_checkboxes_include_ridgetop
+            filters['landform_type_checkboxes_include_floor'] = self.landform_type_checkboxes_include_floor
+            filters['landform_type_checkboxes_include_east_west'] = self.landform_type_checkboxes_include_east_west
+
         (query, notes) = run_filter_query(filters)
 
         return query
@@ -260,7 +266,7 @@ class TreatmentScenario(Scenario):
 
         total_treatment_acres = m2_to_acres(self.geometry_dissolved.area)
 
-        vpus = VegPlanningUnit.objects.filter(geometry__coveredby=self.geometry_dissolved)
+        vpus = VegPlanningUnit.objects.filter(geometry__intersects=self.geometry_dissolved)
         totals = {
             'Fractional Coverage': {
                 '0-20%': 0,

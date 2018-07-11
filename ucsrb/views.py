@@ -905,14 +905,13 @@ def run_hydro_model(in_csv):
 # NEEDS:
 #   pourpoint_id
 #   treatment_id
+@cache_page(60 * 60) # 1 hour of caching
 def get_hydro_results_by_pour_point_id(request):
     from ucsrb.models import PourPointBasin, TreatmentScenario, FocusArea
     from ucsrb import project_settings as ucsrb_settings
     import csv
     import time
     import os
-
-    # TODO: cache results
 
     # Get pourpoint_id from request or API
     pourpoint_id = request.GET.get('pourpoint_id')
@@ -923,13 +922,17 @@ def get_hydro_results_by_pour_point_id(request):
     treatment_id = request.GET.get('treatment_id')
     treatment = TreatmentScenario.objects.get(pk=treatment_id)
 
-
     baseline_input_rows = []
     baseline_input_rows.append(get_basin_input_dict(ppb_d_data, ppb_d.geometry, treatment.geometry_dissolved, 'bottom_basin'))
 
     treatment_input_rows = []
     # - Get all encompassed discrete basins
-    sub_basins = FocusArea.objects.filter(unit_type="PourPointDiscrete",geometry__intersects=treatment.geometry_dissolved).filter(geometry__intersects=ppb_o.geometry)
+    sub_basins = FocusArea.objects.filter(unit_type="PourPointDiscrete", geometry__intersects=ppb_o.geometry).filter(geometry__intersects=treatment.geometry_dissolved)
+
+    # TODO: if len(sub_basins) > 5, this may take a LONG time to work through.
+    if len(sub_basins) > 5:
+        print("Running Hydro model on %d basins! This may be a while..." % len(sub_basins))
+
     # - For each d_basin that intersects treatent scenario:
     for d_basin in sub_basins:
         sub_basin_id = d_basin.unit_id
@@ -943,6 +946,7 @@ def get_hydro_results_by_pour_point_id(request):
 
     baseline_csv_filename = "%s/%s_%s_baseline.csv" % (ucsrb_settings.CSV_DIR, str(request.user.id), str(int(time.time()*100)))
     treatment_csv_filename = "%s/%s_%s_treatment.csv" % (ucsrb_settings.CSV_DIR, str(request.user.id), str(int(time.time()*100)))
+
 
     # write baseline csv
     with open(baseline_csv_filename, 'w') as csvfile:
@@ -995,6 +999,7 @@ def get_hydro_results_by_pour_point_id(request):
 
     return JsonResponse({'results': results})
 
+@cache_page(60 * 60) # 1 hour of caching
 def get_results_by_scenario_id(request):
     from ucsrb.models import TreatmentScenario, FocusArea, PourPoint, PourPointBasin
     from features.registry import get_feature_by_uid
@@ -1219,30 +1224,41 @@ def run_filter_query(filters):
     # 15 and 25 = east and west facing slopes
 
     if 'landform_type' in filters.keys() and filters['landform_type']:
-        if 'include_north' in filters.keys():
-            if not filters['include_north']:
-                exclude_dict['topo_height_class__in'] = [12, 22]
-                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 2
-        if 'include_south' in filters.keys():
-            if not filters['include_south']:
-                exclude_dict['topo_height_class__in'] = [13, 23]
-                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 3
-        if 'include_ridgetop' in filters.keys():
-            if not filters['include_ridgetop']:
-                exclude_dict['topo_height_class__in'] = [11, 21]
-                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 1
-        if 'include_floor' in filters.keys():
-            if not filters['include_floor']:
-                exclude_dict['topo_height_class__in'] = [14, 24]
-                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 4
-        if 'include_east_west' in filters.keys():
-            if not filters['include_east_west']:
-                exclude_dict['topo_height_class__in'] = [15, 25]
-                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 5
+        exclusion_list = []
+        if not 'landform_type_checkboxes_0' in filters.keys() or not filters['landform_type_include_north']:
+            exclusion_list += [12, 22]
+        if not 'landform_type_checkboxes_1' in filters.keys() or not filters['landform_type_include_south']:
+            exclusion_list += [13, 23]
+        if not 'landform_type_checkboxes_2' in filters.keys() or not filters['landform_type_include_ridgetop']:
+            exclusion_list += [11, 21]
+        if not 'landform_type_checkboxes_3' in filters.keys() or not filters['landform_type_include_floors']:
+            exclusion_list += [14, 24]
+        if not 'landform_type_checkboxes_4' in filters.keys() or not filters['landform_type_include_east_west']:
+            exclusion_list += [15, 25]
+        exclude_dict['topo_height_class_majority__in'] = exclusion_list
 
     query = VegPlanningUnit.objects.filter(**filter_dict).exclude(**exclude_dict)
 
     return (query, notes)
+
+def parse_filter_checkboxes(request):
+    filter_dict = dict(request.GET.items())
+    landform_checkboxes = {
+        'landform_type_checkboxes_0': 'landform_type_include_north',
+        'landform_type_checkboxes_1': 'landform_type_include_south',
+        'landform_type_checkboxes_2': 'landform_type_include_ridgetop',
+        'landform_type_checkboxes_3': 'landform_type_include_floors',
+        'landform_type_checkboxes_4': 'landform_type_include_east_west',
+    }
+    for checkbox_key in landform_checkboxes.keys():
+        if checkbox_key in filter_dict.keys():
+            if filter_dict[checkbox_key] == 'true':
+                filter_dict[landform_checkboxes[checkbox_key]] = True
+            else:
+                filter_dict[landform_checkboxes[checkbox_key]] = False
+        else:
+            filter_dict[landform_checkboxes[checkbox_key]] = False
+    return filter_dict
 
 
 '''
@@ -1250,7 +1266,7 @@ def run_filter_query(filters):
 @cache_page(60 * 60) # 1 hour of caching
 def get_filter_count(request, query=False, notes=[]):
     if not query:
-        filter_dict = dict(request.GET.items())
+        filter_dict = parse_filter_checkboxes(request)
         (query, notes) = run_filter_query(filter_dict)
     from scenarios import views as scenarioViews
     return scenarioViews.get_filter_count(request, query, notes)
@@ -1262,7 +1278,7 @@ def get_filter_count(request, query=False, notes=[]):
 @cache_page(60 * 60) # 1 hour of caching
 def get_filter_results(request, query=False, notes=[]):
     if not query:
-        filter_dict = dict(request.GET.items())
+        filter_dict = parse_filter_checkboxes(request)
         (query, notes) = run_filter_query(filter_dict)
     from scenarios import views as scenarioViews
     return scenarioViews.get_filter_results(request, query, notes)

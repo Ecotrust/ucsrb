@@ -300,6 +300,14 @@ OWNERSHIP_CHOICES = (
     ('Washington State Government', 'Washington State Government'),
 )
 
+LANDFORM_TYPES = [
+    'include_north',
+    'include_south',
+    'include_ridgetop',
+    'include_floors',
+    'include_east_west'
+]
+
 DEFAULT_PRESENCE_THRESHOLD = 10 # % of planning unit with a given property to count as 'having' that property
 LSR_THRESHOLD = DEFAULT_PRESENCE_THRESHOLD
 CRIT_HAB_THRESHOLD = DEFAULT_PRESENCE_THRESHOLD
@@ -333,7 +341,7 @@ except ImportError:
 ADMIN_URL = '/admin/'
 CMS_ADMIN_BUTTON = False
 
-MAX_SCENARIO_RESULTS = 25000
+MAX_SCENARIO_RESULTS = 10000
 MAPBOX_ACCESS_TOKEN = 'set_in_local_settings'
 
 EMAIL_HOST_USER = 'noreply@s2fdemo.ecotrust.org'
