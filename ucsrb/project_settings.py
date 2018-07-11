@@ -200,6 +200,7 @@ INSTALLED_APPS = [
     'scenarios',
     # 'filter',
     ### END INSERTED INSTALLED APPS ###
+    'ckeditor',
 ]
 
 ########################################
