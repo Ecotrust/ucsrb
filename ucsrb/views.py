@@ -1275,9 +1275,18 @@ def get_filter_count(request, query=False, notes=[]):
     if not query:
         filter_dict = parse_filter_checkboxes(request)
         (query, notes) = run_filter_query(filter_dict)
-    from scenarios import views as scenarioViews
-    return scenarioViews.get_filter_count(request, query, notes)
-    # return HttpResponse(query.count(), status=200)
+    # from scenarios import views as scenarioViews
+    # return scenarioViews.get_filter_count(request, query, notes)
+    count = query.count()
+    area_m2 = 0
+    if count < 15000:
+        for pu in query:
+            clone_pu = pu.geometry.clone()
+            clone_pu.transform(2163)
+            area_m2 += clone_pu.area
+
+        return HttpResponse("%d acres" % int(area_m2/4046.86), status=200)
+    return HttpResponse("too many", status=200)
 
 
 '''

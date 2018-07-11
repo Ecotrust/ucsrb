@@ -334,24 +334,17 @@ function scenarioFormModel(options) {
     };
 
     self.getUpdatedFilterCount = function() {
-        (function() {
-            var request = $.ajax({
-                url: '/scenario/get_filter_count',
-                type: 'GET',
-                data: self.filters,
-                dataType: 'json',
-                success: function(data) {
-                    if (self.currentCountRequest() === request) {
-                        self.gridCellsRemaining(data);
-                    }
-                },
-                error: function(error) {
-                    console.log('error in getUpdatedFilterCount: ' + error);
-                }
-            });
-            self.currentCountRequest(request);
-            var request = request;
-        })();
+        $.ajax({
+            url: '/scenario/get_filter_count',
+            type: 'GET',
+            data: self.filters,
+            success: function(data) {
+                self.gridCellsRemaining(data);
+            },
+            error: function(error) {
+                console.log('error in getUpdatedFilterCount: ' + error);
+            }
+        });
     };
 
     self.getUpdatedFilterResults = function() {
