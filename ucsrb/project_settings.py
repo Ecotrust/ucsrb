@@ -300,6 +300,14 @@ OWNERSHIP_CHOICES = (
     ('Washington State Government', 'Washington State Government'),
 )
 
+LANDFORM_TYPES = [
+    'include_north',
+    'include_south',
+    'include_ridgetop',
+    'include_floors',
+    'include_east_west'
+]
+
 DEFAULT_PRESENCE_THRESHOLD = 10 # % of planning unit with a given property to count as 'having' that property
 LSR_THRESHOLD = DEFAULT_PRESENCE_THRESHOLD
 CRIT_HAB_THRESHOLD = DEFAULT_PRESENCE_THRESHOLD

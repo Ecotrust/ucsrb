@@ -1224,26 +1224,19 @@ def run_filter_query(filters):
     # 15 and 25 = east and west facing slopes
 
     if 'landform_type' in filters.keys() and filters['landform_type']:
-        if 'include_north' in filters.keys():
-            if not filters['include_north']:
-                exclude_dict['topo_height_class__in'] = [12, 22]
-                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 2
-        if 'include_south' in filters.keys():
-            if not filters['include_south']:
-                exclude_dict['topo_height_class__in'] = [13, 23]
-                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 3
-        if 'include_ridgetop' in filters.keys():
-            if not filters['include_ridgetop']:
-                exclude_dict['topo_height_class__in'] = [11, 21]
-                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 1
-        if 'include_floor' in filters.keys():
-            if not filters['include_floor']:
-                exclude_dict['topo_height_class__in'] = [14, 24]
-                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 4
-        if 'include_east_west' in filters.keys():
-            if not filters['include_east_west']:
-                exclude_dict['topo_height_class__in'] = [15, 25]
-                # pu_ids = [pu.pk for pu in query if not int(str(pu.topo_height_class_majority)[-1])] == 5
+        # import ipdb; ipdb.set_trace()
+        exclusion_list = []
+        if not 'landform_type_checkboxes_include_north' in filters.keys() or not filters['landform_type_checkboxes_include_north']:
+            exclusion_list += [12, 22]
+        if not 'landform_type_checkboxes_include_south' in filters.keys() or not filters['landform_type_checkboxes_include_south']:
+            exclusion_list += [13, 23]
+        if not 'landform_type_checkboxes_include_ridgetop' in filters.keys() or not filters['landform_type_checkboxes_include_ridgetop']:
+            exclusion_list += [11, 21]
+        if not 'landform_type_checkboxes_include_floor' in filters.keys() or not filters['landform_type_checkboxes_include_floor']:
+            exclusion_list += [14, 24]
+        if not 'landform_type_checkboxes_include_east_west' in filters.keys() or not filters['landform_type_checkboxes_include_east_west']:
+            exclusion_list += [15, 25]
+        exclude_dict['topo_height_class_majority__in'] = exclusion_list
 
     query = VegPlanningUnit.objects.filter(**filter_dict).exclude(**exclude_dict)
 
