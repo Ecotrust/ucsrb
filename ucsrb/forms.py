@@ -189,12 +189,12 @@ class TreatmentScenarioForm(ScenarioForm):
         required=False,
     )
 
-    landform_classes = (("include_north", "Include North Slopes"), ("include_south", "Inlcude South Slopes"), ("include_ridgetop", "Include Ridgetops"), ("include_floor", "Include Valley Floors"), ("include_east_west", "Include East/West Slopes"))
+    landform_classes = (("0", "Include North Slopes"), ("1", "Inlcude South Slopes"), ("2", "Include Ridgetops"), ("3", "Include Valley Floors"), ("4", "Include East/West Slopes"))
     landform_type_checkboxes = forms.MultipleChoiceField(
         required=False,
         choices=landform_classes,
-        widget=CheckboxSelectMultiple(),
-        initial=["include_north", "include_south", "include_ridgetop", "include_floor", "include_east_west"],
+        widget=forms.CheckboxSelectMultiple(),
+        initial=("0", "1", "2", "3", "4"),
         label="Land to include",
         help_text="Uncheck any topo types that you don't want included in your treatment",
     )

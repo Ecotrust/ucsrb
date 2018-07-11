@@ -1224,17 +1224,16 @@ def run_filter_query(filters):
     # 15 and 25 = east and west facing slopes
 
     if 'landform_type' in filters.keys() and filters['landform_type']:
-        # import ipdb; ipdb.set_trace()
         exclusion_list = []
-        if not 'landform_type_checkboxes_include_north' in filters.keys() or not filters['landform_type_checkboxes_include_north']:
+        if not 'landform_type_checkboxes_0' in filters.keys() or not filters['landform_type_include_north']:
             exclusion_list += [12, 22]
-        if not 'landform_type_checkboxes_include_south' in filters.keys() or not filters['landform_type_checkboxes_include_south']:
+        if not 'landform_type_checkboxes_1' in filters.keys() or not filters['landform_type_include_south']:
             exclusion_list += [13, 23]
-        if not 'landform_type_checkboxes_include_ridgetop' in filters.keys() or not filters['landform_type_checkboxes_include_ridgetop']:
+        if not 'landform_type_checkboxes_2' in filters.keys() or not filters['landform_type_include_ridgetop']:
             exclusion_list += [11, 21]
-        if not 'landform_type_checkboxes_include_floor' in filters.keys() or not filters['landform_type_checkboxes_include_floor']:
+        if not 'landform_type_checkboxes_3' in filters.keys() or not filters['landform_type_include_floors']:
             exclusion_list += [14, 24]
-        if not 'landform_type_checkboxes_include_east_west' in filters.keys() or not filters['landform_type_checkboxes_include_east_west']:
+        if not 'landform_type_checkboxes_4' in filters.keys() or not filters['landform_type_include_east_west']:
             exclusion_list += [15, 25]
         exclude_dict['topo_height_class_majority__in'] = exclusion_list
 
@@ -1242,13 +1241,32 @@ def run_filter_query(filters):
 
     return (query, notes)
 
+def parse_filter_checkboxes(request):
+    filter_dict = dict(request.GET.items())
+    landform_checkboxes = {
+        'landform_type_checkboxes_0': 'landform_type_include_north',
+        'landform_type_checkboxes_1': 'landform_type_include_south',
+        'landform_type_checkboxes_2': 'landform_type_include_ridgetop',
+        'landform_type_checkboxes_3': 'landform_type_include_floors',
+        'landform_type_checkboxes_4': 'landform_type_include_east_west',
+    }
+    for checkbox_key in landform_checkboxes.keys():
+        if checkbox_key in filter_dict.keys():
+            if filter_dict[checkbox_key] == 'true':
+                filter_dict[landform_checkboxes[checkbox_key]] = True
+            else:
+                filter_dict[landform_checkboxes[checkbox_key]] = False
+        else:
+            filter_dict[landform_checkboxes[checkbox_key]] = False
+    return filter_dict
+
 
 '''
 '''
 @cache_page(60 * 60) # 1 hour of caching
 def get_filter_count(request, query=False, notes=[]):
     if not query:
-        filter_dict = dict(request.GET.items())
+        filter_dict = parse_filter_checkboxes(request)
         (query, notes) = run_filter_query(filter_dict)
     from scenarios import views as scenarioViews
     return scenarioViews.get_filter_count(request, query, notes)
@@ -1260,7 +1278,7 @@ def get_filter_count(request, query=False, notes=[]):
 @cache_page(60 * 60) # 1 hour of caching
 def get_filter_results(request, query=False, notes=[]):
     if not query:
-        filter_dict = dict(request.GET.items())
+        filter_dict = parse_filter_checkboxes(request)
         (query, notes) = run_filter_query(filter_dict)
     from scenarios import views as scenarioViews
     return scenarioViews.get_filter_results(request, query, notes)
