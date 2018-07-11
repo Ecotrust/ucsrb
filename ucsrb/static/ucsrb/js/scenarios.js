@@ -152,11 +152,11 @@ function scenarioFormModel(options) {
     self.percent_fractional_coverage = ko.observable(false);
     self.percent_high_fire_risk_area = ko.observable(false);
     self.landform_type = ko.observable(false);
-    self.landform_type_checkboxes_include_north = ko.observable(true);
-    self.landform_type_checkboxes_include_south = ko.observable(true);
-    self.landform_type_checkboxes_include_ridgetop = ko.observable(true);
-    self.landform_type_checkboxes_include_floors = ko.observable(true);
-    self.landform_type_checkboxes_include_east_west = ko.observable(true);
+    self.landform_type_checkboxes_include_0 = ko.observable(true); //north
+    self.landform_type_checkboxes_include_1 = ko.observable(true); //south
+    self.landform_type_checkboxes_include_2 = ko.observable(true); //ridgetop
+    self.landform_type_checkboxes_include_3 = ko.observable(true); //floors
+    self.landform_type_checkboxes_include_4 = ko.observable(true); //east/west
 
     self.lastChange = (new Date()).getTime();
 
