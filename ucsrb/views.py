@@ -905,14 +905,13 @@ def run_hydro_model(in_csv):
 # NEEDS:
 #   pourpoint_id
 #   treatment_id
+@cache_page(60 * 60) # 1 hour of caching
 def get_hydro_results_by_pour_point_id(request):
     from ucsrb.models import PourPointBasin, TreatmentScenario, FocusArea
     from ucsrb import project_settings as ucsrb_settings
     import csv
     import time
     import os
-
-    # TODO: cache results
 
     # Get pourpoint_id from request or API
     pourpoint_id = request.GET.get('pourpoint_id')
@@ -923,13 +922,17 @@ def get_hydro_results_by_pour_point_id(request):
     treatment_id = request.GET.get('treatment_id')
     treatment = TreatmentScenario.objects.get(pk=treatment_id)
 
-
     baseline_input_rows = []
     baseline_input_rows.append(get_basin_input_dict(ppb_d_data, ppb_d.geometry, treatment.geometry_dissolved, 'bottom_basin'))
 
     treatment_input_rows = []
     # - Get all encompassed discrete basins
-    sub_basins = FocusArea.objects.filter(unit_type="PourPointDiscrete",geometry__intersects=treatment.geometry_dissolved).filter(geometry__intersects=ppb_o.geometry)
+    sub_basins = FocusArea.objects.filter(unit_type="PourPointDiscrete", geometry__intersects=ppb_o.geometry).filter(geometry__intersects=treatment.geometry_dissolved)
+
+    # TODO: if len(sub_basins) > 5, this may take a LONG time to work through.
+    if len(sub_basins) > 5:
+        print("Running Hydro model on %d basins! This may be a while..." % len(sub_basins))
+
     # - For each d_basin that intersects treatent scenario:
     for d_basin in sub_basins:
         sub_basin_id = d_basin.unit_id
@@ -943,6 +946,7 @@ def get_hydro_results_by_pour_point_id(request):
 
     baseline_csv_filename = "%s/%s_%s_baseline.csv" % (ucsrb_settings.CSV_DIR, str(request.user.id), str(int(time.time()*100)))
     treatment_csv_filename = "%s/%s_%s_treatment.csv" % (ucsrb_settings.CSV_DIR, str(request.user.id), str(int(time.time()*100)))
+
 
     # write baseline csv
     with open(baseline_csv_filename, 'w') as csvfile:
@@ -995,6 +999,7 @@ def get_hydro_results_by_pour_point_id(request):
 
     return JsonResponse({'results': results})
 
+@cache_page(60 * 60) # 1 hour of caching
 def get_results_by_scenario_id(request):
     from ucsrb.models import TreatmentScenario, FocusArea, PourPoint, PourPointBasin
     from features.registry import get_feature_by_uid

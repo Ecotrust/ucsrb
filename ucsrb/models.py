@@ -260,7 +260,7 @@ class TreatmentScenario(Scenario):
 
         total_treatment_acres = m2_to_acres(self.geometry_dissolved.area)
 
-        vpus = VegPlanningUnit.objects.filter(geometry__coveredby=self.geometry_dissolved)
+        vpus = VegPlanningUnit.objects.filter(geometry__intersects=self.geometry_dissolved)
         totals = {
             'Fractional Coverage': {
                 '0-20%': 0,
