@@ -92,6 +92,7 @@ app.init = {
     },
     'aggregate': function() {
         reportInit();
+        app.state.setStep = 'aggregate';
         app.panel.results.showAggregate();
     }
 }
@@ -107,19 +108,21 @@ app.resultsInit = function(id) {
             uid: id
         });
     }
+    app.loadingAnimation.panel.show();
     app.request.get_results(id,false)
         .done(function(response) {
-            console.log(response.pourpoints);
             app.panel.results.responseResultById(response);
-            app.nav.showResultsNav();
-            app.map.addDownstreamPptsToMap(response.pourpoints);
-            app.setState('aggregate');
-            app.nav.hideSave();
-            $('#subnav-sign-in-modal').addClass('d-none');
+            // run this after function is called for performance
+            window.setTimeout(function() {
+              app.map.addDownstreamPptsToMap(response.pourpoints);
+            }, 500);
         })
         .catch(function(response) {
             console.log('%c failed to get results: %o', 'color: salmon;', response);
         });
+    app.nav.hideSave();
+    app.nav.showResultsNav();
+    $('#subnav-sign-in-modal').addClass('d-none');
 }
 
 initFiltering = function() {
@@ -194,9 +197,8 @@ app.panel = {
             }
         },
         responseResultById: function(result) {
-            app.panel.results.showAggregate();
-            app.panel.results.expander();
             app.panel.results.aggPanel(result);
+            app.init['aggregate']();
             app.panel.results.hydroPanel('Select a gauging station to see hydro results.');
         },
         loadHydroResult: function(result) {
@@ -205,6 +207,7 @@ app.panel = {
         },
         addResults: function(content, callback) {
             app.panel.results.getPanelResultsElement.innerHTML += content;
+            app.panel.results.expander();
             if (callback) {
                 callback();
             }
@@ -632,6 +635,14 @@ app.loadingAnimation = {
     },
     hide: function() {
         $('#loading-modal').modal('hide');
+    },
+    panel: {
+        show: function() {
+
+        },
+        hide: function() {
+
+        }
     }
 }
 // using jQuery to get CSRF Token
@@ -949,7 +960,7 @@ app.request = {
                 app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
                 app.resultsInit('ucsrb_treatmentscenario_' + response.id);
                 app.state.scenarioId = response.id;
-                app.setState('aggregate');
+                app.state.setStep = 'results';
             },
             error: function(response, status) {
                 console.log(`%cfail @ save drawing: %o`, 'color: red', response);
