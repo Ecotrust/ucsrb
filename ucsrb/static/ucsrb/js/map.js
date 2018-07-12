@@ -787,6 +787,10 @@ if (app.map.overlays) {
   app.map.overlays.getLayers().push(app.map.layer.criticalHabitat.layer);
 }
 
+app.map.scaleLine = new ol.control.ScaleLine();
+app.map.scaleLine.setUnits('us');
+app.map.addControl(app.map.scaleLine);
+
 app.map.layerSwitcher = new ol.control.LayerSwitcher({
   tipLabel: 'Layers'
 });

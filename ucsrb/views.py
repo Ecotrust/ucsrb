@@ -65,7 +65,7 @@ def get_user_scenario_list(request):
             "name": us.name,
             "description": us.description,
         })
-    return JsonResponse(user_scenarios_list, safe=False)
+    return JsonResponse(sorted(user_scenarios_list, key=lambda k: k['name'].lower()), safe=False)
 
 def get_json_error_response(error_msg="Error", status_code=500, context={}):
     context['success'] = False
@@ -1143,10 +1143,9 @@ def get_results_by_state(request):
 
 '''
 '''
-
 def run_filter_query(filters):
     from collections import OrderedDict
-    from ucsrb.models import VegPlanningUnit, FocusArea
+    from ucsrb.models import VegPlanningUnit, FocusArea, PourPoint
     # from ucsrb import project_settings as ucsrb_settings
     # TODO: This would be nicer if it generically knew how to filter fields
     # by name, and what kinds of filters they were. For now, hard code.
@@ -1160,9 +1159,15 @@ def run_filter_query(filters):
         focus_area = FocusArea.objects.get(pk=filters['focus_area_input']);
         veg_unit_type_field = settings.FOCUS_AREA_FIELD_ID_LOOKUP[focus_area.unit_type]
         if veg_unit_type_field:
-            filter_dict[veg_unit_type_field] = focus_area.unit_id
+            if veg_unit_type_field == 'dwnstream_ppt_id':
+                discrete_basin_ids = [x.id for x in PourPoint.objects.filter(geometry__coveredby=focus_area.geometry)]
+                if not focus_area.unit_id in discrete_basin_ids:
+                    discrete_basin_ids.append(focus_area.unit_id)
+                filter_dict['dwnstream_ppt_id__in'] = discrete_basin_ids
+            else:
+                filter_dict[veg_unit_type_field] = focus_area.unit_id
         else:
-            filter_dict['geometry__coveredby'] = focus_area.geometry
+                filter_dict['geometry__intersects'] = focus_area.geometry
     else:
         notes = ['Please Filter By Focus Area']
         query = VegPlanningUnit.objects.filter(pk=None)
@@ -1223,8 +1228,8 @@ def run_filter_query(filters):
     # 14 and 24 = valley bottoms
     # 15 and 25 = east and west facing slopes
 
+    exclusion_list = []
     if 'landform_type' in filters.keys() and filters['landform_type']:
-        exclusion_list = []
         if not 'landform_type_checkboxes_0' in filters.keys() or not filters['landform_type_include_north']:
             exclusion_list += [12, 22]
         if not 'landform_type_checkboxes_1' in filters.keys() or not filters['landform_type_include_south']:
@@ -1235,9 +1240,11 @@ def run_filter_query(filters):
             exclusion_list += [14, 24]
         if not 'landform_type_checkboxes_4' in filters.keys() or not filters['landform_type_include_east_west']:
             exclusion_list += [15, 25]
-        exclude_dict['topo_height_class_majority__in'] = exclusion_list
 
     query = VegPlanningUnit.objects.filter(**filter_dict).exclude(**exclude_dict)
+    # For some reason multiple keys in 'exclude_dict' don't always seem to process correctly
+    if len(exclusion_list) > 0:
+        query = query.exclude(topo_height_class_majority__in=exclusion_list)
 
     return (query, notes)
 
@@ -1268,9 +1275,18 @@ def get_filter_count(request, query=False, notes=[]):
     if not query:
         filter_dict = parse_filter_checkboxes(request)
         (query, notes) = run_filter_query(filter_dict)
-    from scenarios import views as scenarioViews
-    return scenarioViews.get_filter_count(request, query, notes)
-    # return HttpResponse(query.count(), status=200)
+    # from scenarios import views as scenarioViews
+    # return scenarioViews.get_filter_count(request, query, notes)
+    count = query.count()
+    area_m2 = 0
+    if count < 15000:
+        for pu in query:
+            clone_pu = pu.geometry.clone()
+            clone_pu.transform(2163)
+            area_m2 += clone_pu.area
+
+        return HttpResponse("%d acres" % int(area_m2/4046.86), status=200)
+    return HttpResponse("too many", status=200)
 
 
 '''

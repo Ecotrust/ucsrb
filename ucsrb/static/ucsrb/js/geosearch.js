@@ -94,7 +94,6 @@ app.map.geoSearch.requestJSON = (function() {
     return $.ajax({
         url: '/static/ucsrb/data/gnis_3857.geojson',
         success: function(response) {
-            console.log('%csuccessful returned parsed geosearch data: %o', 'color: green', JSON.parse(response));
             app.map.geoSearch.geojson = JSON.parse(response);
         },
         error: function(response) {
@@ -127,8 +126,6 @@ app.map.geoSearch.autoCompleteLookup = function() {
                   app.map.getView().animate({center: y, zoom: 14});
                   resultsList.innerHTML = '';
                   app.map.dropPin(y);
-                  console.log(this.value);
-                  console.log(event.target.innerText);
                   input.value = event.target.innerText;
               });
             }
