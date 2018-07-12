@@ -1253,6 +1253,7 @@ function scenariosModel(options) {
         $(scenarioForm).empty();
         ko.cleanNode(scenarioForm);
         delete self.scenarioFormModel;
+        delete app.viewModel.scenarios.scenarioFormModel;
         //hide remaining leaseblocks
         if ( self.filterLayer() && app.map.getLayersByName(self.filterLayer().name).length ) {
             app.map.removeLayer(self.filterLayer());

@@ -604,6 +604,8 @@ app.nav = {
             app.panel.getPanelContentElement.innerHTML = app.nav.stepActions.initial;
             app.panel.moveRight();
             app.nav.hideSave();
+            app.map.removeLayer(app.map.layer.selectedFeature.layer);
+            app.map.removeLayer(app.map.layer.resultPoints.layer);
             app.map.geoSearch.closeSearchBox();
             if (app.map.mask) {
                 app.map.mask.set('active', false);

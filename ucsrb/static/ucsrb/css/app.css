@@ -753,8 +753,8 @@ Panel
 #panel {
     background: rgba(255,255,255,0.9);
     border-radius: .5em;
-    bottom: 5vh;
-    max-height: 68vh;
+    bottom: 6vh;
+    max-height: 64vh;
     right: 2vh;
     overflow: auto;
     position: absolute;
@@ -969,7 +969,7 @@ Panel
     }
 
     .result-list-wrap {
-        height: 42vh;
+        height: 46vh;
         overflow: scroll;
     }
 
