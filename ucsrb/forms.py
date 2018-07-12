@@ -242,14 +242,12 @@ class TreatmentScenarioForm(ScenarioForm):
         return foo
 
     def is_valid(self, *args, **kwargs):
-        import ipdb; ipdb.set_trace()
         if len(self.errors.keys()) == 1 and 'landform_type_checkboxes' in self.errors.keys() and len(self.errors['landform_type_checkboxes']) == 1 and 'is not one of the available choices.' in self.errors['landform_type_checkboxes'][0]:
             del self._errors['landform_type_checkboxes']
         return super(ScenarioForm, self).is_valid()
 
     def clean(self):
         super(FeatureForm, self).clean()
-        import ipdb; ipdb.set_trace()
         try:
             if self.cleaned_data['landform_type'] == True:
                 for landform_type in settings.LANDFORM_TYPES:
