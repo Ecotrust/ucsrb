@@ -202,8 +202,8 @@ app.panel = {
             app.panel.results.hydroPanel('Select a gauging station to see hydro results.');
         },
         loadHydroResult: function(result) {
-            app.panel.results.showHydro();
             app.panel.results.hydroPanel(result);
+            app.panel.results.showHydro();
         },
         addResults: function(content, callback) {
             app.panel.results.getPanelResultsElement.innerHTML += content;
@@ -252,7 +252,7 @@ app.panel = {
             console.log(results);
             if (typeof(results) === 'string') {
                 var html = `<section class="hydro-results result-section" id="hydro-note">`;
-                html += `${results}`;
+                html += `<div>${results}</div>`;
                 html += `</section>`;
                 app.panel.results.addResults(html);
                 return;

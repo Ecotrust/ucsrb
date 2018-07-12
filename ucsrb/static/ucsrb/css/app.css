@@ -1096,6 +1096,11 @@ Panel
         margin-bottom: 0;
     }
 
+    #hydro-note div {
+      height: 44vh;
+      padding: 1rem;
+    }
+
     /**
     * =========================================================================
     Popup
