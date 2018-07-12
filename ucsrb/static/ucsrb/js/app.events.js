@@ -18,9 +18,9 @@ $(document).ready(function() {
     app.nav.stepActions.initial = app.panel.getPanelContentElement.innerHTML;
 
     $('.method-nav button').click(function(event) {
-      if (event.currentTarget.dataset.method !== app.state.method) {
-          app.setState(event.currentTarget.dataset.method);
-      }
+        if (event.currentTarget.dataset.method !== app.state.method) {
+            app.setState(event.currentTarget.dataset.method);
+        }
         // changing the method, so filter form needs to be cleared for new query
         if ($(this).parents('#process-nav').length > 0) {
             app.state.setStep = 'reset';
