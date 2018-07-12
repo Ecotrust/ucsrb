@@ -753,8 +753,8 @@ Panel
 #panel {
     background: rgba(255,255,255,0.9);
     border-radius: .5em;
-    bottom: 8vh;
-    max-height: 58vh;
+    bottom: 5vh;
+    max-height: 68vh;
     right: 2vh;
     overflow: auto;
     position: absolute;
