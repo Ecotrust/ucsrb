@@ -237,7 +237,7 @@ app.panel = {
         },
         expander: function() {
             if (!document.querySelector('#expand')) {
-                app.panel.getPanelContentElement.insertAdjacentHTML('afterbegin', '<a id="expand" href="#" onclick="app.panel.toggleSize()" /><img class="align-self-middle" src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>');
+                app.panel.getPanelContentElement.insertAdjacentHTML('afterbegin', '<a id="expand" href="#" onclick="app.panel.toggleSize()" /><img src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>');
             }
         },
         aggPanel: function(results) {
@@ -288,6 +288,8 @@ app.panel = {
                 $('.dropdown').on('click', function(event) {
                     var chartName = event.target.dataset.chart;
                     $(this).find('#dropdownMenuButton').text(chartName);
+                    $(this).find('button').removeClass('active');
+                    event.target.classList.add('active');
                 })
             });
         },
@@ -342,16 +344,12 @@ app.panel = {
                                 format: "%b",
                                 rotate: 60,
                                 multiline: false,
-                                // format: function(x) {
-                                //     return "%b"
-                                // },
-                                // culling: {
-                                //     max: 13
-                                // }
                             },
+                            label: 'Datetime',
                         },
                         y: {
                             show: true,
+                            label: 'Cubic Feet per Second',
                         }
                     },
                     grid: {
@@ -375,7 +373,7 @@ app.panel = {
                     tooltip: {
                         format: {
                             title: function(x) {
-                                return d3.timeFormat("%B %d, %Y")(x);
+                                return d3.timeFormat("%B %d, %Y @ %-I %p")(x);
                             },
                             value: function(value, ratio, id) {
                                 value = value.toFixed(4);

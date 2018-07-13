@@ -965,7 +965,7 @@ Panel
 
     .result-section:not(:empty) .media,
     .result-section:not(:empty) .result-list-wrap {
-        padding: 1.5rem;
+        padding: .5rem 1.5rem;
     }
 
     .result-list-wrap {
@@ -988,12 +988,12 @@ Panel
     }
 
     .result-section .media {
-        height: 9vh;
+        height: 8vh;
     }
 
     .result-section .media img {
-        max-width: 56px;
-        max-height: 6vh;
+        max-width: 5vh;
+        max-height: 5vh;
     }
 
     .result-section .media h4 {
@@ -1003,7 +1003,7 @@ Panel
     .feature-result {
         border-bottom: 2px solid #e6e7e8;
         border-top: 2px solid #e6e7e8;
-        font-size: 2vh;
+        font-size: 1.875vh;
         line-height: 5vh;
         height: 5vh;
         padding: 0 1.5rem;
@@ -1042,16 +1042,18 @@ Panel
     }
 
     #panel #expand {
-        height: 2vh;
         position: absolute;
-        right: 1.5rem;
-        top: 1.5rem;
-        width: 2vh;
+        right: 2vh;
+        top: 2vh;
         z-index: 2;
+        transition: 0.1s transform ease;
+        transform: rotate(0deg);
+        transform-origin: center;
     }
 
     #panel #expand img {
-        width: 100%;
+        height: 2vh;
+        width: 2vh;
     }
 
     #panel.expanded #expand {
@@ -1065,8 +1067,11 @@ Panel
     */
 
     .chart-wrap {
+        background: #f8f8f8;
+        box-sizing: border-box;
         display: block;
-        margin: 0 auto;
+        margin: 1vh auto;
+        padding: .5vh;
         position: relative;
         width: 96%;
     }
@@ -1076,15 +1081,15 @@ Panel
         display: block;
         font-size: 1em;
         height: 46vh;
-        margin: 0 0 1rem;
+        margin: 0;
         padding: 0;
     }
 
     .result-section dl {
         font-weight: 500;
         font-size: .75em;
-        line-height: 2;
-        padding-left: 1.5rem;
+        line-height: 1.5;
+        padding-left: 1rem;
     }
 
     .result-section dt {
@@ -1110,7 +1115,14 @@ Panel
 
     .dropdown-wrap #dropdownMenuButton {
         color: #67b8c6;
+        font-size: 1.8375vh;
         font-weight: 700;
+        margin-top: -2px;
+        padding: 0;
+    }
+
+    .dropdown-wrap #chart-dropdown {
+      margin-top: 0;
     }
 
     /**
