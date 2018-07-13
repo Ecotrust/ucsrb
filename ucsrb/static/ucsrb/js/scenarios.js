@@ -1279,8 +1279,8 @@ function scenariosModel(options) {
             success: function(data) {
                 self.scenarioForm(true);
                 $('#scenario_form').html(data);
-                self.scenarioFormModel = new scenarioFormModel;
-                app.viewModel.scenarios.scenarioFormModel = new scenarioFormModel();
+                self.scenarioFormModel = new scenarioFormModel();
+                app.viewModel.scenarios.scenarioFormModel = self.scenarioFormModel;
                 var model = app.viewModel.scenarios.scenarioFormModel;
                 app.state.formModel = model;
                 try {
@@ -1288,7 +1288,7 @@ function scenariosModel(options) {
                   ko.applyBindings(self.scenarioFormModel, document.getElementById(form_id).children[0]);
                 } catch (err) {
                   var form_id = 'scenario_form';
-                  ko.applyBindings(model, document.getElementById(form_id).children[0]);
+                  ko.applyBindings(app.viewModel.scenarios.scenarioFormModel, document.getElementById(form_id).children[0]);
                 }
                 if ( ! self.filterLayer() && app.viewModel.modernBrowser() ) {
                     self.loadLeaseblockLayer();

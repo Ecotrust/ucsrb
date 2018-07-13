@@ -183,7 +183,7 @@ app.panel = {
     form: {
         init: function() {
             app.panel.moveRight();
-            app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
+            app.form.scenario = app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
             app.nav.showSave();
             initFiltering();
         },
@@ -210,6 +210,13 @@ app.panel = {
             app.panel.results.expander();
             if (callback) {
                 callback();
+            }
+        },
+        addHydroResults: function(content) {
+            if (document.getElementById('hydro-results')) {
+                $('#hydro-results').replaceWith(content);
+            } else {
+                app.panel.results.addResults(content);
             }
         },
         showAggregate: function() {
@@ -260,21 +267,21 @@ app.panel = {
             // charts array
             app.panel.results.charts = []
             var html = `<section class="hydro-results result-section" id="hydro-results">`;
-                html += `<div id="pp-result-${result}" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_hydro.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0 blue">Gauging Station </h4></div></div></div>`;
+                html += `<div id="pp-result-${result}" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_hydro.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">Gauging Station</h4></div></div></div>`;
 
-                html += `<div class="dropdown"><button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Chart</button>`;
-                html += `<div class="dropdown-menu" id="chart-dropdown" aria-labelledby="dropdownMenuButton">`
+                html += `<div class="feature-result dropdown-wrap"><div class="dropdown"><button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Chart</button>`;
+                html += `<div class="dropdown-menu dropdown-menu-center" id="chart-dropdown" aria-labelledby="dropdownMenuButton">`
                 for (var result in results.results) {
                     // load into charts array
                     var resultObj = results.results[result];
                     app.panel.results.charts.push(resultObj);
-                    html += `<button class="dropdown-item" data-chart="${resultObj.title}" onclick="app.panel.results.chart.init(${result})" type="button">${resultObj.title}</button>`;
+                    html += `<button class="dropdown-item btn-sm" data-chart="${resultObj.title}" onclick="app.panel.results.chart.init(${result})" type="button">${resultObj.title}</button>`;
                 }
-                html += `</div></div>`;
+                html += `</div></div></div>`;
                 html += `<div class="chart-wrap"><div id="chartResult"></div></div>`;
             html += '</section>';
             // html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
-            app.panel.results.addResults(html);
+            app.panel.results.addHydroResults(html);
         },
         styleResultsAsRows: function(results) {
             var html = '<div class="table-responsive"><table class="table-light table-borderless table"><tbody>';
@@ -638,7 +645,7 @@ app.nav = {
 
         },
         hydro: function() {
-
+            $('button[data-method=hydro]').click()
         }
     }
 }

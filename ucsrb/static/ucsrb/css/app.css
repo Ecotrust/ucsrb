@@ -988,7 +988,7 @@ Panel
     }
 
     .result-section .media {
-        height: 10vh;
+        height: 9vh;
     }
 
     .result-section .media img {
@@ -1075,7 +1075,7 @@ Panel
         border-bottom: none;
         display: block;
         font-size: 1em;
-        height: 44vh;
+        height: 46vh;
         margin: 0 0 1rem;
         padding: 0;
     }
@@ -1097,8 +1097,20 @@ Panel
     }
 
     #hydro-note div {
-      height: 44vh;
+      height: 40vh;
       padding: 1rem;
+      text-align: center;
+    }
+
+    .dropdown-wrap {
+        display: block;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .dropdown-wrap #dropdownMenuButton {
+        color: #67b8c6;
+        font-weight: 700;
     }
 
     /**
