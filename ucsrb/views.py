@@ -803,6 +803,7 @@ def parse_flow_results(baseline_csv, treatment_csv):
                 output_dict[basin] = {
                     'baseline': {}
                 }
+            # Convert total 3-hour flow to per-second flow
             output_dict[basin]['baseline'][row['Time']] = float(row['Value'])/3/60/60
 
     output_dict['bottom_basin']['mechanical'] = deepcopy(output_dict['bottom_basin']['baseline'])
@@ -907,7 +908,7 @@ def run_hydro_model(in_csv):
 #   treatment_id
 @cache_page(60 * 60) # 1 hour of caching
 def get_hydro_results_by_pour_point_id(request):
-    from ucsrb.models import PourPointBasin, TreatmentScenario, FocusArea
+    from ucsrb.models import PourPointBasin, TreatmentScenario, FocusArea, PourPoint
     from ucsrb import project_settings as ucsrb_settings
     import csv
     import time
@@ -927,10 +928,15 @@ def get_hydro_results_by_pour_point_id(request):
 
     treatment_input_rows = []
     # - Get all encompassed discrete basins
-    sub_basins = FocusArea.objects.filter(unit_type="PourPointDiscrete", geometry__intersects=ppb_o.geometry).filter(geometry__intersects=treatment.geometry_dissolved)
+    discrete_basin_ids = [x.id for x in PourPoint.objects.filter(geometry__coveredby=ppb_o.geometry)]
+    if ppb_o.unit_id in discrete_basin_ids:
+        # discrete_basin_ids.append(ppb_o.unit_id)
+        discrete_basin_ids.remove(ppb_0.unit_id)
+    sub_basins = FocusArea.objects.filter(unit_type="PourPointDiscrete", unit_id__in=discrete_basin_ids)
 
-    # TODO: if len(sub_basins) > 5, this may take a LONG time to work through.
-    if len(sub_basins) > 5:
+    # if len(sub_basins) > 5, this may take a LONG time to work through.
+    # TODO: Disable 'Evaluate' button when too many Veg Units are impacted (issue #134)
+    if len(sub_basins) > 10:
         print("Running Hydro model on %d basins! This may be a while..." % len(sub_basins))
 
     # - For each d_basin that intersects treatent scenario:
@@ -984,16 +990,16 @@ def get_hydro_results_by_pour_point_id(request):
             'data': absolute_results
         },
         {
-            'title': 'Change in Flow Rate @ 3hr Steps',
-            'data': delta_results
-        },
-        {
             'title': 'Seven Day Low Flow @ 3hr Steps',
             'data': seven_d_low_results
         },
         {
             'title': 'Seven Day Mean Flow @ 3hr Steps',
             'data': seven_d_mean_results
+        },
+        {
+        'title': 'Change in Flow Rate @ 3hr Steps',
+        'data': delta_results
         },
     ]
 
