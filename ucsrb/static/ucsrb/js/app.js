@@ -212,11 +212,14 @@ app.panel = {
                 callback();
             }
         },
-        addHydroResults: function(content) {
+        addHydroResults: function(content, callback) {
             if (document.getElementById('hydro-results')) {
                 $('#hydro-results').replaceWith(content);
             } else {
                 app.panel.results.addResults(content);
+            }
+            if (callback) {
+              callback();
             }
         },
         showAggregate: function() {
@@ -281,7 +284,12 @@ app.panel = {
                 html += `<div class="chart-wrap"><div id="chartResult"></div></div>`;
             html += '</section>';
             // html += `<div class="download-wrap"><button class="btn btn-outline-primary">Download</button></div>`
-            app.panel.results.addHydroResults(html);
+            app.panel.results.addHydroResults(html, function() {
+                $('.dropdown').on('click', function(event) {
+                    var chartName = event.target.dataset.chart;
+                    $(this).find('#dropdownMenuButton').text(chartName);
+                })
+            });
         },
         styleResultsAsRows: function(results) {
             var html = '<div class="table-responsive"><table class="table-light table-borderless table"><tbody>';
