@@ -906,7 +906,7 @@ def run_hydro_model(in_csv):
 # NEEDS:
 #   pourpoint_id
 #   treatment_id
-# @cache_page(60 * 60) # 1 hour of caching
+@cache_page(60 * 60) # 1 hour of caching
 def get_hydro_results_by_pour_point_id(request):
     from ucsrb.models import PourPointBasin, TreatmentScenario, FocusArea, PourPoint
     from ucsrb import project_settings as ucsrb_settings
