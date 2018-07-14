@@ -1018,8 +1018,17 @@ Panel
         font-weight: 700;
     }
 
-    .feature-result h4 {
-        margin-bottom: 0;
+    .feature-result h5 {
+        margin: 1rem 0 .5rem;
+    }
+
+    #results table td,
+    #results table th, {
+        padding: .25rem 1.5rem;
+    }
+
+    #results table tr:nth-of-type(2n+2) {
+        background: #EAF2F4;
     }
 
     .result-section {
@@ -1067,7 +1076,7 @@ Panel
     */
 
     .chart-wrap {
-        background: #f8f8f8;
+        background: #EAF2F4;
         box-sizing: border-box;
         display: block;
         margin: 1vh auto;

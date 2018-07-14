@@ -183,8 +183,8 @@ app.panel = {
     form: {
         init: function() {
             app.panel.moveRight();
-            app.form.scenario = app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
-            app.nav.showSave();
+            app.panel.form.scenario = app.viewModel.scenarios.createNewScenario('/features/treatmentscenario/form/');
+            // app.nav.showSave();
             initFiltering();
         },
     },
@@ -506,6 +506,32 @@ enableDrawing = function() {
     app.map.geoSearch.openSearchBox();
 }
 
+app.filterDropdownContent = `<div class="dropdown">
+        <button class="btn btn-sm ml-2 btn-outline-light dropdown-toggle" type="button" id="forestUnit" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select unit</button>
+        <div class="dropdown-menu forest-unit-dropdown" aria-labelledby="forestUnit">
+            <div id="forest-listener">
+                <button class="dropdown-item" type="button" data-layer="huc10">HUC 10</button>
+                <button class="dropdown-item" type="button" data-layer="huc12">HUC 12</button>
+                <button class="dropdown-item" type="button" data-layer="RMU">Forest Plan Mgmt Alloc</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function() {
+            $('#forest-listener button').on('click', function(event) {
+                event.preventDefault();
+                $('#forest-listener').children().each(function(i) {
+                    if ($(this)[0].dataset.layer !== event.target.dataset.layer) {
+                        app.map.disableLayer($(this)[0].dataset.layer);
+                    }
+                });
+                var eventLayer = event.target.dataset.layer;
+                app.map.toggleLayer(eventLayer);
+                app.state.setStep = 1;
+            });
+        })();
+    </script>`;
+
 app.nav = {
     setState: function(height) {
         app.state.navHeight = height;
@@ -573,34 +599,8 @@ app.nav = {
             'Select filters to narrow your treatment region',
         ],
         filter: [
-            `<div class="text-center">Select area to manage based on:
-            <div class="dropdown show">
-            <button class="btn btn-sm dropdown-toggle" type="button" id="forestUnit" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select unit</button>
-            <div class="dropdown-menu show forest-unit-dropdown" aria-labelledby="forestUnit">
-            <div id="forest-listener">
-            <button class="dropdown-item" type="button" data-layer="huc10">HUC 10</button>
-            <button class="dropdown-item" type="button" data-layer="huc12">HUC 12</button>
-            <button class="dropdown-item" type="button" data-layer="RMU">Forest Plan Mgmt Alloc</button>
-            </div>
-            </div>
-            </div>
-            </div>
-            <script>
-            (function() {
-                $('#forest-listener button').click(function(event) {
-                    event.preventDefault();
-                    $('#forest-listener').children().each(function(i) {
-                        if ($(this)[0].dataset.layer !== event.target.dataset.layer) {
-                            app.map.disableLayer($(this)[0].dataset.layer);
-                        }
-                    });
-                    var eventLayer = event.target.dataset.layer;
-                    app.map.toggleLayer(eventLayer);
-                    app.state.setStep = 1;
-                });
-            })();
-            </script>`,
-            'Select forest unit to filter',
+            `Select area to manage based on: ${app.filterDropdownContent}`,
+            `Select forest unit to filter or change selection: ${app.filterDropdownContent}`,
             'Select filters to narrow your treatment area',
         ],
         draw: [
@@ -631,7 +631,7 @@ app.nav = {
             app.panel.form.init
         ],
         filter: [
-            app.forestUnitSelection,
+            false,
             false,
             app.panel.form.init
         ],

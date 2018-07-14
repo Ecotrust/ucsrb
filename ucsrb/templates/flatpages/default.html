@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block body_class %}flatpage{% endblock body_class %}
+{% block site_style %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'ucsrb/css/landing-layout.css' %}"/>
+    <link rel="stylesheet" href="{% static 'ucsrb/css/landing-mq.css' %}"/>
+{% endblock site_style %}
+
+{% block body_class %}Flat Pages{% endblock body_class %}
+{% block layout %}default{% endblock layout %}
 
 {% block content %}
 

@@ -376,6 +376,12 @@ function scenarioFormModel(options) {
                         acres = area_m2*0.000247105;
                         self.gridCellsRemaining(parseInt(acres) + ' acres');
 
+                        if (acres < app.map.draw.maxAcres) {
+                          $('.submit_button').removeClass('disabled');
+                      } else {
+                          $('#scenarios-form').append(`<div class="alert alert-warning" role="alert">Too large of area. The emissions of computing would reduce our confidence. Filter to less than ${app.map.draw.maxAcres} acres.`);
+                      }
+
                         self.showButtonSpinner(false);
                     }
                 },
@@ -1617,10 +1623,10 @@ function scenariosModel(options) {
                     app.map.addLayer(app.map.scenarioLayer);
                     //add scenario to Active tab
                     app.viewModel.activeLayers.remove(function(item) { return item.uid === scenario.uid; } );
-                    // app.viewModel.activeLayers.unshift(scenario);
+                    app.viewModel.activeLayers.unshift(scenario);
 
                     if (zoomTo) {
-                        self.zoomToScenario(scenario);
+                        // self.zoomToScenario(scenario);
                     }
                 }
                 setTimeout(function(){

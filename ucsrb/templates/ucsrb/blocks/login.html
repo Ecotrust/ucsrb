@@ -3,9 +3,13 @@
     <script>
     (function() {
         var email_input = document.getElementById('id_username');
-        email_input.setAttribute('id', 'id_login_email');
+        if (email_input) {
+            email_input.setAttribute('id', 'id_login_email');
+        }
         var password_input = document.getElementById('id_password');
-        password_input.setAttribute('id', 'id_login_password');
+        if (password_input) {
+            password_input.setAttribute('id', 'id_login_password');
+        }
     })();
     </script>
     <hr />
