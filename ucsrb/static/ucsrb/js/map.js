@@ -759,6 +759,20 @@ app.map.layer = {
         }),
         visible: false,
       })
+    },
+    satellite: {
+      layer: new ol.layer.Tile({
+        name: 'Satellite',
+        title: 'Satellite',
+        id: 'satellite',
+        preload: Infinity,
+        source: new ol.source.XYZ({
+          // url:'https://{1-4}.aerial.maps.cit.api.here.com/maptile/2.1/maptile/newest/satellite.day/{z}/{x}/{y}/256/png?app_id=p5jWgIultJxoVtXb03Xl&app_code=Cpj_I6Yx3J3yhVFE7aD12Q',
+          url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          // attributions: 'Map Tiles &copy; ' + new Date().getFullYear() + ' ' + '<a href="https://developer.here.com">HERE</a>',
+          attributions: 'Sources: Esri, DigitalGlobe, Earthstar Geographics, CNES/Airbus DS, GeoEye, USDA FSA, USGS, Getmapping, Aerogrid, IGN, IGP, and the GIS User Community'
+        })
+      })
     }
 };
 
