@@ -759,7 +759,7 @@ app.map.layer = {
         }),
         visible: false,
       })
-    },
+    }
 };
 
 app.map.layer.scenarios.layer.set('id','scenarios');

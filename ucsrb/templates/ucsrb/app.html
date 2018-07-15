@@ -241,6 +241,10 @@
       app.mapbox = {
           key: '{{ MAPBOX_TOKEN }}'
       };
+      app.here = {
+        key: '{{ HERE_TOKEN }}',
+        appCode: '{{ HERE_APP_CODE }}',
+      }
     </script>
     <script src="{% static 'ucsrb/js/map.js' %}"></script>
     <script src="{% static 'ucsrb/js/selection.js' %}"></script>

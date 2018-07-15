@@ -1623,7 +1623,7 @@ function scenariosModel(options) {
                     app.map.addLayer(app.map.scenarioLayer);
                     //add scenario to Active tab
                     app.viewModel.activeLayers.remove(function(item) { return item.uid === scenario.uid; } );
-                    app.viewModel.activeLayers.unshift(scenario);
+                    // app.viewModel.activeLayers.unshift(scenario);
 
                     if (zoomTo) {
                         // self.zoomToScenario(scenario);

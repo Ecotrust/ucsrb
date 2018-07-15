@@ -53,6 +53,8 @@ def app(request):
     context = accounts_context()
     context['title'] = 'UCSRB'
     context['MAPBOX_TOKEN'] = settings.MAPBOX_ACCESS_TOKEN
+    context['HERE_TOKEN'] = settings.HERE_API_TOKEN
+    context['HERE_APP_CODE'] = settings.HERE_APP_CODE
     context['MAP_TECH'] = 'ol4'
     return HttpResponse(template.render(context, request))
 
