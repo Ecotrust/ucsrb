@@ -771,7 +771,8 @@ app.map.layer = {
           url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
           // attributions: 'Map Tiles &copy; ' + new Date().getFullYear() + ' ' + '<a href="https://developer.here.com">HERE</a>',
           attributions: 'Sources: Esri, DigitalGlobe, Earthstar Geographics, CNES/Airbus DS, GeoEye, USDA FSA, USGS, Getmapping, Aerogrid, IGN, IGP, and the GIS User Community'
-        })
+        }),
+        visible: false
       })
     }
 };
@@ -832,6 +833,15 @@ overlays.each(function() {
     layer: lyr_obj.layer
   };
 });
+
+if (app.map.getLayerGroup) {
+  app.map.getLayerGroup().getLayers().forEach(function(lyr) {
+    if (lyr.getProperties().title === 'Base maps') {
+      console.log(lyr.getLayers());
+      lyr.getLayers().push(app.map.layer.satellite.layer);
+    }
+  });
+}
 
 app.map.forestFilterOverlays = {}
 
