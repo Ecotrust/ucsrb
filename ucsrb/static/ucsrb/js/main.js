@@ -109,9 +109,8 @@ var main = {
             // set new csrf token
             csrftoken = getCookie('csrftoken');
             $('#login-modal').modal('hide');
-            if (app.state.step === 'result') {
-              // app.nav.showSave();
-              // app.nav.saveElement().classList.remove('hide');
+            if (app) {
+              $('#nav-load-save').removeClass('hide');
             }
             // show alert
             $('body').prepend(`<div class="alert alert-success fade show" role="alert" style="position: fixed; top: 10px; left: 50%; transform: translate(-50%,0); min-width: 200px; z-index: 3; text-align: center; font-size: .875em;">SUCCESS</div>`);
