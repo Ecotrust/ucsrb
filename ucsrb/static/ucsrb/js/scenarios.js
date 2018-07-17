@@ -28,8 +28,6 @@ var madrona = {
                 $('#invalid-name-message').show();
                 return false;
             }
-            app.panel.results.init();
-            app.loadingAnimation.panel.show();
             //submitted = true;
             submitForm($form);
         });
@@ -100,6 +98,7 @@ var madrona = {
 
             app.viewModel.scenarios.scenarioForm(false);
             app.viewModel.scenarios.loadingMessage("Creating Design");
+            app.loadingAnimation.show();
 
             $.ajax({
                 url: url,
@@ -111,6 +110,7 @@ var madrona = {
                 traditional: true,
                 dataType: 'json',
                 success: function(result) {
+                    app.loadingAnimation.hide();
                     app.state.setStep = 'result'; // go to results
                     app.resultsInit(result['X-Madrona-Show']);
                     app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
@@ -120,6 +120,7 @@ var madrona = {
                     console.log(`%c form submitted: %o`, 'color: green;', result);
                 },
                 error: function(result) {
+                    app.loadingAnimation.hide();
                     app.viewModel.scenarios.loadingMessage(null);
                     // clearInterval(barTimer);
                     if (result.status === 400) {
