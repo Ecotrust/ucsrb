@@ -9,6 +9,7 @@ app.map.geoSearch = function(opt_options) {
     var options = opt_options || {};
 
     var button = document.createElement('button');
+    button.setAttribute('role', 'toggle search box');
 
     var input = document.createElement('input');
     input.className = 'ol-geo-search-input form-control d-none';

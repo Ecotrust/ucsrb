@@ -30,7 +30,7 @@
             {# <p class="step-text"><i>Step  of {{ form.get_steps|length|add:"1" }} </i></p> #}
             <div id="step{{ forloop.counter }}_inputs" class="step-inputs">
                 <div class="form-group">
-                    <label class="instructions">Select criteria to filter forested areas</label>
+                    <p class="instructions">Select criteria to filter forested areas</p>
                 </div>
                 <div class="parameters">
                     {% for field, field_min, field_max, field_input, field_checkbox in step %}
