@@ -118,6 +118,14 @@ h5 {
     font-weight: 500;
 }
 
+.bg-light {
+  background-color: #EAF2F4 !important;
+}
+
+.error {
+  color: red;
+}
+
 /**
  * =========================================================================
    Navbar

@@ -407,6 +407,7 @@ pourPointSelectAction = function(feat, selectEvent) {
 };
 
 pourPointResultSelection = function(feat) {
+  app.panel.loading.show();
   var l = app.map.selection.select.getLayer(feat).get('id');
   app.map.layer[l].layer.getSource().forEachFeature(function(feature) {
     feature.setStyle(app.map.styles.PourPoint)

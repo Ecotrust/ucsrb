@@ -152,6 +152,16 @@ app.panel = {
     show: function() {
         app.panel.element.hidden = false;
     },
+    loading: {
+        show: function() {
+            $('.panel .loading-animation').removeClass('hide');
+            $('.panel .loading-animation').addClass('show');
+        },
+        hide: function() {
+            $('.panel .loading-animation').removeClass('show');
+            $('.panel .loading-animation').addClass('hide');
+        }
+    },
     moveLeft: function() {
         app.panel.show();
         app.panel.getElement.classList.add('left');
@@ -292,6 +302,8 @@ app.panel = {
                     event.target.classList.add('active');
                 })
             });
+
+            app.panel.loading.hide();
         },
         styleResultsAsRows: function(results) {
             var html = '<div class="table-responsive"><table class="table-light table-borderless table"><tbody>';

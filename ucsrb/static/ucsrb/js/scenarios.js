@@ -1626,7 +1626,7 @@ function scenariosModel(options) {
                     // app.viewModel.activeLayers.unshift(scenario);
 
                     if (zoomTo) {
-                        // self.zoomToScenario(scenario);
+                        self.zoomToScenario(scenario);
                     }
                 }
                 setTimeout(function(){
