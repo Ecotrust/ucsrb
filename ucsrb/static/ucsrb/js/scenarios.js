@@ -376,10 +376,15 @@ function scenarioFormModel(options) {
                         acres = area_m2*0.000247105;
                         self.gridCellsRemaining(parseInt(acres) + ' acres');
 
-                        if (acres < app.map.draw.maxAcres) {
+                      if (parseInt(acres) < parseInt(app.map.draw.maxAcres)) {
                           $('.submit_button').removeClass('disabled');
+                          $('#scenarios-form .alert').addClass('d-none');
                       } else {
-                          $('#scenarios-form').append(`<div class="alert alert-warning" role="alert">Too large of area. The emissions of computing would reduce our confidence. Filter to less than ${app.map.draw.maxAcres} acres.`);
+                          if ($('#scenarios-form .alert').length > 0) {
+                              $('#scenarios-form .alert').removeClass('d-none');
+                          } else {
+                              $('#scenarios-form').append(`<div class="alert alert-warning" role="alert">Too large of area. Filter to less than ${app.map.draw.maxAcres} acres.`);
+                          }
                       }
 
                         self.showButtonSpinner(false);
