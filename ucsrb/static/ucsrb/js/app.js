@@ -99,7 +99,6 @@ app.init = {
 
 app.resultsInit = function(id) {
     app.map.geoSearch.closeSearchBox();
-    app.panel.results.init();
     if (!id) {
         id = app.viewModel.scenarios.scenarioList()[0].uid;
     } else if (!id.includes('ucsrb')) {
@@ -108,7 +107,7 @@ app.resultsInit = function(id) {
             uid: id
         });
     }
-    app.loadingAnimation.panel.show();
+    app.loadingAnimation.panel.hide();
     app.request.get_results(id,false)
         .done(function(response) {
             app.panel.results.responseResultById(response);

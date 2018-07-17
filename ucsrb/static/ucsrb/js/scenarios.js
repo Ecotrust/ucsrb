@@ -28,6 +28,8 @@ var madrona = {
                 $('#invalid-name-message').show();
                 return false;
             }
+            app.panel.results.init();
+            app.loadingAnimation.panel.show();
             //submitted = true;
             submitForm($form);
         });
