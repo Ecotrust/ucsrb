@@ -206,6 +206,7 @@ app.panel = {
                 app.state.navHeight = 'short';
             }
         },
+        name: '',
         responseResultById: function(result) {
             app.panel.results.aggPanel(result);
             app.init['aggregate']();
@@ -251,11 +252,12 @@ app.panel = {
             }
         },
         aggPanel: function(results) {
+            app.panel.results.name = results.scenario.name;
             var html = `<section class="aggregate result-section" id="aggregate-results">`;
             html += `<div class="media align-items-center">
             <img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_pie_chart.svg" alt="aggregate">
                 <div class="media-body">
-                    <h4 class="mt-2 mb-2">${results.scenario.name}</h4>
+                    <h4 class="mt-2 mb-2">${app.panel.results.name}</h4>
                 </div>
             </div>`;
             html += `<div class="feature-result"><span class="lead">${results.scenario.acres}</span> acres</div><div class="overflow-gradient"><div class="result-list-wrap align-items-center">`;
@@ -280,7 +282,7 @@ app.panel = {
             // charts array
             app.panel.results.charts = []
             var html = `<section class="hydro-results result-section" id="hydro-results">`;
-                html += `<div id="pp-result-${result}" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_hydro.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">Gauging Station</h4></div></div></div>`;
+                html += `<div id="pp-result-${result}" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_hydro.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">${app.panel.results.name}</h4></div></div></div>`;
 
                 html += `<div class="feature-result dropdown-wrap"><div class="dropdown"><button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Chart</button>`;
                 html += `<div class="dropdown-menu dropdown-menu-center" id="chart-dropdown" aria-labelledby="dropdownMenuButton">`
