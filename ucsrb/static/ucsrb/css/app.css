@@ -496,6 +496,11 @@ Map controls
     width: 3vh;
 }
 
+.layer-switcher .panel {
+    box-shadow: 0 0 40px rgba(60,60,60,0.5);
+    max-height: 70vh;
+}
+
 .layer-switcher button {
     background: url('/static/ucsrb/img/icon/i_layers.svg') rgba(58,86,117,1) 50% no-repeat;
     background-size: auto 60%;
