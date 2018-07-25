@@ -180,7 +180,8 @@ function scenarioFormModel(options) {
           strokeColor: '#e6e7e8',
           strokeOpacity: .9,
           strokeWidth: 1,
-          strokeDash: [2,4]
+          strokeDash: [2,4],
+          zIndex: 1,
       });
       var styleMap = new OpenLayers.StyleMap( {
           'default': mapSettings.defaultStyle
@@ -1360,6 +1361,7 @@ function scenariosModel(options) {
             stroke = 1,
             fillColor = "#00A29B",
             strokeColor = "#00827B",
+            zIndex = 1,
             zoomTo = (options && options.zoomTo) || false;
 
         if ( scenario ) {
@@ -1424,14 +1426,16 @@ function scenariosModel(options) {
                             fillOpacity: scenario.opacity(),
                             strokeOpacity: scenario.opacity(),
                             fillColor: "#C9BE62",
-                            strokeColor: "#A99E42"
+                            strokeColor: "#A99E42",
+                            zIndex: zIndex,
                         }
                       );
                     } else {
                       var style = new OpenLayers.Style(
                         {
                           fillOpacity: opacity,
-                          strokeOpacity: stroke
+                          strokeOpacity: stroke,
+                          zIndex: zIndex,
                         },
                         {
                           rules:[

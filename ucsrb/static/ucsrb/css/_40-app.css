@@ -12,6 +12,6 @@
     #panel.expanded #scenarios:not(:empty),
     #panel.expanded #results:not(:empty),
     #panel.expanded .result-section:not(:empty) {
-        width: 80vw;
+        width: 90vw;
     }
 }

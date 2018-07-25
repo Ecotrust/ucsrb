@@ -12,26 +12,26 @@ app.map.zoomToExtent = function zoomToExtent(extent) {
 app.map.styles = {
     'Point': new ol.style.Style({
         image: new ol.style.Circle({
-            radius: 8,
+            radius: 4,
             fill:  new ol.style.Fill({
                 color: '#67b8c6',
             }),
             stroke: new ol.style.Stroke({
                 color: '#ffffff',
-                width: 2,
+                width: 1,
             }),
         }),
         zIndex: 2,
     }),
     'PointSelected': new ol.style.Style({
         image: new ol.style.Circle({
-            radius: 16,
+            radius: 8,
             fill:  new ol.style.Fill({
                 color: '#4D4D4D',
             }),
             stroke: new ol.style.Stroke({
                 color: '#ffffff',
-                width: 3,
+                width: 2,
             }),
         }),
         zIndex: 5
@@ -128,11 +128,11 @@ app.map.styles = {
         });
     },
     'PourPoint': function(feature, resolution) {
-      var radius = 10;
+      var radius = 5;
       if (resolution < 5) {
-          radius = 14;
-      } else if (resolution < 40) {
           radius = 12;
+      } else if (resolution < 40) {
+          radius = 8;
       }
       return new ol.style.Style({
         image: new ol.style.Circle({
@@ -142,18 +142,18 @@ app.map.styles = {
             }),
             stroke: new ol.style.Stroke({
                 color: '#aaffff',
-                width: 3,
+                width: 2,
             }),
         }),
-        zIndex: 6
+        zIndex: 9
       });
     },
     'PourPointSelected': function(feature, resolution) {
-      var radius = 15;
+      var radius = 8;
       if (resolution < 5) {
-          radius = 20;
-      } else if (resolution < 40) {
           radius = 18;
+      } else if (resolution < 40) {
+          radius = 13;
       }
       return new ol.style.Style({
         image: new ol.style.Circle({
@@ -163,10 +163,10 @@ app.map.styles = {
             }),
             stroke: new ol.style.Stroke({
                 color: '#ffffff',
-                width: 5,
+                width: 4,
             }),
         }),
-        zIndex: 7
+        zIndex: 10
       });
     },
     'Boundary': new ol.style.Style({

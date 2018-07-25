@@ -145,13 +145,17 @@ Nav with scenario options (select, filter, draw)
 
 #file-nav a,
 #file-nav .button-modal {
-    display: inline-block;
-    font-size: .9375em;
+    display: flex;
+    font-size: .875em;
     font-weight: 700;
-    line-height: .9375em;
+    line-height: 1.25;
     /* padding: .25rem 1em; */
     text-align: left;
 }
+#file-nav .button-modal a {
+  font-size: 1em;
+}
+
 #file-nav a.hide,
 #file-nav .button-modal.hide {
     display: none;
@@ -490,6 +494,11 @@ Map controls
     height: 3vh;
     right: 2vh;
     width: 3vh;
+}
+
+.layer-switcher .panel {
+    box-shadow: 0 0 40px rgba(60,60,60,0.5);
+    max-height: 70vh;
 }
 
 .layer-switcher button {
@@ -928,7 +937,7 @@ Panel
     width: 75%;
 }
 
-.panel form input,
+.panel form input[type=text],
 .panel form textarea {
     border: 1px solid #67b8c6;
     font-size: .875em;
@@ -941,6 +950,15 @@ Panel
 
 .panel form textarea {
     height: 4rem;
+}
+
+.panel form input[type='checkbox'] {
+    border: 1px solid #67b8c6;
+    display: inline-block;
+    font-size: .875em;
+    height: 20px;
+    vertical-align: middle;
+    width: 20px;
 }
 
 .panel i.check {
@@ -1004,6 +1022,15 @@ Panel
 .panel #scenarios-form i.icon-check-empty {
     cursor: pointer;
     opacity: 1;
+}
+
+#id_landform_type_checkboxes {
+    list-style: none;
+    text-align: left;
+}
+
+#id_landform_type_checkboxes li {
+    margin-bottom: .5rem;
 }
 
     /**
