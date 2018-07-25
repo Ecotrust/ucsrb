@@ -640,10 +640,15 @@ Modal
 }
 
 #load-saved-list li span {
+    border-left: 1px solid #fff;
     display: inline-block;
-    font-size: .75em;
-    margin-left: 3rem;
+    font-size: .6125em;
+    margin-left: .75rem;
+    overflow: hidden;
+    padding: 0 .75rem;
+    text-rendering: geometricPrecision;
     vertical-align: middle;
+    white-space: normal;
 }
 
 #load-saved-list .btn-link {
@@ -655,20 +660,7 @@ Modal
     position: relative;
     padding-right: 4rem;
     text-align: left;
-    width: 75%;
-}
-#load-saved-list .btn-link:after {
-    background: url('/static/ucsrb/img/icon/i_expand_white.svg');
-    background-position: 50%;
-    background-size: 50% auto;
-    background-repeat: no-repeat;
-    content: '';
-    height: 1em;
-    position: absolute;
-    right: 5%;
-    top: 50%;
-    transform: translate(0,-.5rem);
-    width: 1rem;
+    width: 80%;
 }
 
 #load-saved-list .btn-link:hover {
@@ -683,7 +675,7 @@ Modal
     margin: 0 -2px;
     text-align: center;
     min-width: 10%;
-    max-width: 25%;
+    max-width: 20%;
 }
 
 #load-saved-list .btn-trash:hover {
