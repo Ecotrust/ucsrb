@@ -660,7 +660,7 @@ Modal
     position: relative;
     padding-right: 4rem;
     text-align: left;
-    width: 80%;
+    width: 75%;
 }
 
 #load-saved-list .btn-link:hover {
@@ -675,7 +675,7 @@ Modal
     margin: 0 -2px;
     text-align: center;
     min-width: 10%;
-    max-width: 20%;
+    max-width: 25%;
 }
 
 #load-saved-list .btn-trash:hover {
