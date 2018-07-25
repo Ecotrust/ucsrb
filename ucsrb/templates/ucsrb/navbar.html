@@ -13,13 +13,13 @@
             </li>
         </ul>
         <ul id="results-nav" class="col-9 nav method-nav justify-content-start align-items-center d-none">
-            <li class="nav-item col col-3">
+            <li class="nav-item col">
                 <button data-method="hydro">
-                    <img src="{% static 'ucsrb/img/icon/i_hydro_results.svg' %}" alt="hydro results" class="result_nav_img" />
-                    <img src="{% static 'ucsrb/img/icon/i_hydro.svg' %}" alt="hydro results" />
-                    <h3>Hydro Results</h3></button>
+                    <img src="{% static 'ucsrb/img/icon/i_hydro_results.svg' %}" alt="hydrologic results" class="result_nav_img" />
+                    <img src="{% static 'ucsrb/img/icon/i_hydro.svg' %}" alt="hydrologic results" />
+                    <h3>Hydrologic Results</h3></button>
             </li>
-            <li class="nav-item col col-3">
+            <li class="nav-item col">
                 <button data-method="aggregate">
                     <img src="{% static 'ucsrb/img/icon/i_forest_management_summary.svg' %}" alt="forest management summary" class="result_nav_img" />
                     <img src="{% static 'ucsrb/img/icon/i_forest.svg' %}" alt="forest management summary" />
@@ -28,7 +28,7 @@
             </li>
         </ul>
         <nav id="file-nav" class="col-3 nav justify-content-center flex-row align-items-center">
-            <div class="row justify-content-center pl-4">
+            <div class="row justify-content-center pl-1">
                 <button id="nav-anon-save" type="button" class="col nav-item button-modal btn btn-link d-none {% if not user.is_authenticated %}hide{% endif %}"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_backup.svg' %}" /></i> save</button>
                 <button id="nav-load-save" type="button" class="col nav-item button-modal btn btn-link {% if not user.is_authenticated %}hide{% endif %}" data-toggle="modal" data-target="#load-saved"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_folder.svg' %}" /></i> load saved</button>
                 <button id="subnav-sign-in-modal" type="button" class="d-none results-nav-item col nav-item button-modal btn btn-link {% if user.is_authenticated %}hide{% endif %}" data-toggle="modal" data-target="#login-modal"><i class="svg_icon"><img src="{% static '/ucsrb/img/icon/i_user_blue.svg' %}" /></i> sign up to save</button>

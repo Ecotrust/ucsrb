@@ -145,13 +145,17 @@ Nav with scenario options (select, filter, draw)
 
 #file-nav a,
 #file-nav .button-modal {
-    display: inline-block;
-    font-size: .9375em;
+    display: flex;
+    font-size: .875em;
     font-weight: 700;
-    line-height: .9375em;
+    line-height: 1.25;
     /* padding: .25rem 1em; */
     text-align: left;
 }
+#file-nav .button-modal a {
+  font-size: 1em;
+}
+
 #file-nav a.hide,
 #file-nav .button-modal.hide {
     display: none;
@@ -928,7 +932,7 @@ Panel
     width: 75%;
 }
 
-.panel form input,
+.panel form input[type=text],
 .panel form textarea {
     border: 1px solid #67b8c6;
     font-size: .875em;
@@ -941,6 +945,16 @@ Panel
 
 .panel form textarea {
     height: 4rem;
+}
+
+.panel form input[type='checkbox'] {
+    border: 1px solid #67b8c6;
+    display: inline-block;
+    font-size: .875em;
+    height: 20px;
+    margin-bottom: .5rem;
+    vertical-align: middle;
+    width: 20px;
 }
 
 .panel i.check {

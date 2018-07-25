@@ -6,4 +6,12 @@
     h3 {
         font-size: 1.3125em;
     }
+
+    .icons-only .method-nav {
+        padding-right: 30%;
+    }
+
+    .icons-only #results-nav .method-nav {
+      padding-right: 40%;
+    }
 }

@@ -209,7 +209,7 @@ app.panel = {
         responseResultById: function(result) {
             app.panel.results.aggPanel(result);
             app.init['aggregate']();
-            app.panel.results.hydroPanel('Select a gauging station to see hydro results.');
+            app.panel.results.hydroPanel('Select a gauging station to see hydrologic results.');
         },
         loadHydroResult: function(result) {
             app.panel.results.hydroPanel(result);
@@ -585,9 +585,6 @@ app.nav = {
         setTimeout(function() {
             $('#process-nav').addClass('justify-content-start');
             $('#process-nav').removeClass('justify-content-center');
-            $('#process-nav .col').each(function(i) {
-                $(this).addClass('col-2');
-            })
             $('.overlay').removeClass('fade-out');
         }, 1000);
     },
@@ -597,9 +594,6 @@ app.nav = {
         setTimeout(function() {
             $('#process-nav').removeClass('justify-content-start');
             $('#process-nav').addClass('justify-content-center');
-            $('#process-nav .col').each(function(i) {
-                $(this).removeClass('col-2');
-            })
         }, 1000);
     },
     instructions: {
@@ -620,8 +614,8 @@ app.nav = {
             'Add additional points then double-click to finish; Re-select point to edit',
         ],
         result: 'Explore evaluation results',
-        aggregate: 'Your Aggregate results',
-        hydro: 'Your Hydro results',
+        aggregate: 'Your aggregate results',
+        hydro: 'Your hydrologic results',
     },
     stepActions: {
         initial: '<div id="scenarios"></div><div id="scenario_form"></div><div id="draw_form"></div><div id="results"></div>',
