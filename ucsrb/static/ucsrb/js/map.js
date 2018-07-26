@@ -60,7 +60,7 @@ app.map.styles = {
                 width: 5,
             }),
         }),
-        zIndex: 4
+        zIndex: 2
     }),
     'Polygon': new ol.style.Style({
         stroke: new ol.style.Stroke({
@@ -87,7 +87,7 @@ app.map.styles = {
         fill: new ol.style.Fill({
             color: 'rgba(93, 116, 82, 0.45)'
         }),
-        zIndex: 4
+        zIndex: 2
     }),
     'FocusArea': new ol.style.Style({
         stroke: new ol.style.Stroke({
@@ -381,7 +381,7 @@ focusAreaSelectAction = function(feat) {
     app.state.setStep = 1; // step forward in state
   }
   app.request.get_focus_area(feat, function(feat, vector) {
-    if (feat){
+    if (feat) {
       confirmSelection(feat, vector);
     }
     if (app.state.step < 2) {
@@ -683,9 +683,9 @@ app.map.layer = {
     resultPoints: {
       layer: new ol.layer.Vector({
         source: new ol.source.Vector({
-          format: new ol.format.GeoJSON(),
-          style: app.map.styles.PourPoint
+          format: new ol.format.GeoJSON()
         }),
+        style: app.map.styles.PourPoint,
         id: 'resultPoints',
       }),
       selectAction: pourPointResultSelection,
@@ -908,7 +908,7 @@ app.map.dropPin = function(coords) {
 }
 
 app.map.addDownstreamPptsToMap = function(pptsArray) {
-  app.map.addLayer(app.map.layer.resultPoints.layer);
+  app.map.layer.resultPoints.layer.setVisible(true);
   for (var i = 0; i < pptsArray.length; i++) {
     let feature = new ol.Feature({
       geometry: new ol.geom.Point(pptsArray[i].geometry.coordinates),
@@ -917,6 +917,5 @@ app.map.addDownstreamPptsToMap = function(pptsArray) {
     feature.setStyle(app.map.styles.PourPoint);
     app.map.layer.resultPoints.layer.getSource().addFeature(feature);
   }
-  app.map.layer.resultPoints.layer.setVisible(true);
   app.map.selection.setSelect(app.map.selection.selectResultsPourPoint);
 }
