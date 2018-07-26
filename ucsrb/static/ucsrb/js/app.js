@@ -387,6 +387,9 @@ app.panel = {
                     zoom: {
                         enabled: true,
                         rescale: true,
+                        subchart: {
+                            show: true
+                        },
                     },
                     point: {
                         show: false,
