@@ -112,6 +112,16 @@ app.resultsInit = function(id) {
     app.request.get_results(id,false)
         .done(function(response) {
             app.panel.results.responseResultById(response);
+            app.map.layer.resultPoints.layer.getSource().clear();
+            var layerAdded = false;
+            app.map.getLayers().forEach(function(i) {
+                if (i.get('id') === 'resultPoints') {
+                    layerAdded = true;
+                }
+            });
+            if (!layerAdded) {
+                app.map.addLayer(app.map.layer.resultPoints.layer);
+            }
             // run this after function is called for performance
             window.setTimeout(function() {
               app.map.addDownstreamPptsToMap(response.pourpoints);
