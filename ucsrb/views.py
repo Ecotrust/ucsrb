@@ -939,6 +939,7 @@ def get_hydro_results_by_pour_point_id(request):
     # if len(sub_basins) > 5, this may take a LONG time to work through.
     # TODO: Disable 'Evaluate' button when too many Veg Units are impacted (issue #134)
     if len(sub_basins) > 10:
+        # TODO: return something to frontend so we can give feedback to the user
         print("Running Hydro model on %d basins! This may be a while..." % len(sub_basins))
 
     # - For each d_basin that intersects treatent scenario:

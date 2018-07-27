@@ -104,6 +104,7 @@ app.resultsInit = function(id) {
         id = app.viewModel.scenarios.scenarioList()[0].uid;
     } else if (!id.includes('ucsrb')) {
         id = 'ucsrb_treatmentscenario_' + id;
+        console.log(id);
         app.viewModel.scenarios.addScenarioToMap(null, {
             uid: id
         });
@@ -364,10 +365,9 @@ app.panel = {
                         x: {
                             type: 'timeseries',
                             tick: {
-                                fit: true,
+                                fit: false,
                                 format: "%b",
                                 rotate: 60,
-                                multiline: false,
                             },
                             label: 'Datetime',
                         },

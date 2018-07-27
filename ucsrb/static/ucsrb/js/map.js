@@ -60,7 +60,7 @@ app.map.styles = {
                 width: 5,
             }),
         }),
-        zIndex: 2
+        zIndex: 4
     }),
     'Polygon': new ol.style.Style({
         stroke: new ol.style.Stroke({
@@ -87,7 +87,7 @@ app.map.styles = {
         fill: new ol.style.Fill({
             color: 'rgba(93, 116, 82, 0.45)'
         }),
-        zIndex: 2
+        zIndex: 4
     }),
     'FocusArea': new ol.style.Style({
         stroke: new ol.style.Stroke({
@@ -909,6 +909,7 @@ app.map.dropPin = function(coords) {
 
 app.map.addDownstreamPptsToMap = function(pptsArray) {
   app.map.layer.resultPoints.layer.setVisible(true);
+  app.map.layer.resultPoints.layer.setZIndex(10);
   for (var i = 0; i < pptsArray.length; i++) {
     let feature = new ol.Feature({
       geometry: new ol.geom.Point(pptsArray[i].geometry.coordinates),
