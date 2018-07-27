@@ -301,7 +301,7 @@ app.panel = {
                     // load into charts array
                     var resultObj = results.results[result];
                     app.panel.results.charts.push(resultObj);
-                    html += `<button class="dropdown-item btn-sm" data-chart="${resultObj.title}" onclick="app.panel.results.chart.init(${result})" type="button">${resultObj.title}</button>`;
+                    html += `<button class="dropdown-item btn-sm" id="chart-${result}" data-chart="${resultObj.title}" onclick="app.panel.results.chart.init(${result})" type="button">${resultObj.title}</button>`;
                 }
                 html += `</div></div></div>`;
                 html += `<div class="chart-wrap"><div id="chartResult"></div></div>`;
@@ -313,7 +313,8 @@ app.panel = {
                     $(this).find('#dropdownMenuButton').text(chartName);
                     $(this).find('button').removeClass('active');
                     event.target.classList.add('active');
-                })
+                });
+                $('#chart-0').click();
             });
 
             app.panel.loading.hide();
@@ -331,9 +332,9 @@ app.panel = {
             return html;
         },
         chart: {
-            init: function(chartId) {
+            init: function(chartIndex) {
                 var chartJSON = {};
-                var data = app.panel.results.charts[chartId].data;
+                var data = app.panel.results.charts[chartIndex].data;
                 for (var chart in data) {
                     resultsArray = [];
                     chartJSON.timestep = [];
@@ -365,11 +366,11 @@ app.panel = {
                         x: {
                             type: 'timeseries',
                             tick: {
-                                fit: false,
-                                format: "%b",
+                                fit: true,
+                                format: "%m",
                                 rotate: 60,
                             },
-                            label: 'Datetime',
+                            label: 'Month',
                         },
                         y: {
                             show: true,
@@ -385,17 +386,23 @@ app.panel = {
                         }
                     },
                     zoom: {
-                        enabled: true,
+                        enabled: false,
                         rescale: true,
-                        subchart: {
-                            show: true
-                        },
+                    },
+                    subchart: {
+                        show: true,
+                        size: {
+         height: 50
+     },
                     },
                     point: {
                         show: false,
                     },
                     legend: {
-                        position: 'top'
+                        position: 'inset',
+                        inset: {
+                            anchor: 'top-right'
+                        }
                     },
                     tooltip: {
                         format: {
@@ -407,6 +414,12 @@ app.panel = {
                                 return value;
                             }
                         }
+                    },
+                    padding: {
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        left: 0
                     },
                     bindto: `#chartResult`
                 });

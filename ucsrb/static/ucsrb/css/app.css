@@ -1158,8 +1158,8 @@ Panel
         background: #EAF2F4;
         box-sizing: border-box;
         display: block;
-        margin: 1vh auto;
-        padding: .5vh;
+        margin: .5rem auto;
+        padding: .5rem;
         position: relative;
         width: 96%;
     }
@@ -1167,10 +1167,9 @@ Panel
     #chartResult {
         border-bottom: none;
         display: block;
-        font-size: 1em;
         height: 48vh;
-        margin: 0;
-        padding: 0;
+        font-size: .875em;
+        width: 100%;
     }
 
     .result-section dl {
