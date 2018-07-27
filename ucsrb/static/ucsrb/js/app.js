@@ -366,15 +366,21 @@ app.panel = {
                         x: {
                             type: 'timeseries',
                             tick: {
-                                fit: true,
-                                format: "%m",
-                                rotate: 60,
+                                count: 12,
+                                culling: false,
+                                fit: false,
+                                outer: true,
+                                format: function(val) {
+                                    var fval = d3.timeFormat('%b')(val);
+                                    return fval.substring(0,1);
+                                },
                             },
                             label: 'Month',
                         },
                         y: {
                             show: true,
-                            label: 'Cubic Feet per Second',
+                            inner: true,
+                            label: 'CFS',
                         }
                     },
                     grid: {
@@ -392,8 +398,8 @@ app.panel = {
                     subchart: {
                         show: true,
                         size: {
-         height: 50
-     },
+                             height: 45
+                         },
                     },
                     point: {
                         show: false,
@@ -416,10 +422,8 @@ app.panel = {
                         }
                     },
                     padding: {
-                        top: 0,
-                        right: 0,
-                        bottom: 0,
-                        left: 0
+                        left: 8,
+                        right: 8
                     },
                     bindto: `#chartResult`
                 });
