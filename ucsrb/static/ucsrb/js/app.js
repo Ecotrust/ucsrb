@@ -646,7 +646,7 @@ app.nav = {
             'Add additional points then double-click to finish; Re-select point to edit',
         ],
         result: 'Explore evaluation results',
-        aggregate: 'Your aggregate results',
+        aggregate: 'Select virtual gauging station ( <span style="height: 20px; background: #fff; border: 2px solid #67b8c6; border-radius: 50%; box-shadow: 0 0 4px #333, 0 0 4px #999; width: 20px; margin: 4px 10px; display: inline-block;"></span> ) to view predicted changes in flow.',
         hydro: 'Your hydrologic results',
     },
     stepActions: {
