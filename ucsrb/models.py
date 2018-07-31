@@ -269,7 +269,7 @@ class TreatmentScenario(Scenario):
 
         vpus = VegPlanningUnit.objects.filter(geometry__intersects=self.geometry_dissolved)
         totals = {
-            'Fractional Coverage': {
+            'Forest Overstory Fractional Coverage': {
                 '0-20%': 0,
                 '20-40%': 0,
                 '40-60%': 0,
