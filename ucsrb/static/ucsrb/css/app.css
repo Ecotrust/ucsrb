@@ -739,9 +739,10 @@ Modal
 
 .loading-animation {
     background: rgba(255,255,255,0.5);
-    bottom: 0;
+    height: 100%;
     display: none;
     left: 0;
+    overflow: hidden;
     position: absolute;
     right: 0;
     top: 0;
@@ -758,13 +759,13 @@ Modal
 
 .loading-animation .animation {
     animation: drip 2s infinite linear;
-	background: #67b8c6;
-	border-radius: 0% 100% 100% 100%;
-	height: 20px;
+    background: #67b8c6;
+    border-radius: 0% 100% 100% 100%;
+    height: 20px;
     left: 50%;
     position: absolute;
-	width: 20px;
-	transform: rotateZ(45deg);
+    width: 20px;
+    transform: rotateZ(45deg);
 }
 
 @keyframes water-move {

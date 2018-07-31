@@ -282,7 +282,6 @@ app.panel = {
             app.panel.results.addResults(html);
         },
         hydroPanel: function(results) {
-            console.log(results);
             if (typeof(results) === 'string') {
                 var html = `<section class="hydro-results result-section" id="hydro-note">`;
                 html += `<div>${results}</div>`;
@@ -314,7 +313,7 @@ app.panel = {
                     $(this).find('button').removeClass('active');
                     event.target.classList.add('active');
                 });
-                $('#chart-0').click();
+                // $('#chart-0').click();
             });
 
             app.panel.loading.hide();
@@ -337,15 +336,25 @@ app.panel = {
                 var data = app.panel.results.charts[chartIndex].data;
                 for (var chart in data) {
                     resultsArray = [];
-                    chartJSON.timestep = [];
                     if (chart !== 'baseline') {
+                        chartJSON.timestep = [];
                         for (var i = 0; i < data[chart].length; i++) {
                             resultsArray.push(data[chart][i].flow);
                             chartJSON.timestep.push(data[chart][i].timestep);
                         }
+                    } else {
+                        if (data[chart][0].flow > 0) {
+                            chartJSON.timestep = [];
+                            for (var i = 0; i < data[chart].length; i++) {
+                                resultsArray.push(data[chart][i].flow);
+                                chartJSON.timestep.push(data[chart][i].timestep);
+                            }
+                        }
                     }
                     chartJSON[chart] = resultsArray;
                 }
+                console.log(resultsArray);
+                console.log(chartJSON);
                 app.panel.results.chart.obj = bb.generate({
                     data: {
                         json: chartJSON,
@@ -383,17 +392,9 @@ app.panel = {
                             label: 'CFS',
                         }
                     },
-                    grid: {
-                        y: {
-                            lines: [{
-                                value: 0,
-                                text: "Baseline"
-                            }]
-                        }
-                    },
                     zoom: {
                         enabled: false,
-                        rescale: true,
+                        // rescale: true,
                     },
                     subchart: {
                         show: true,
