@@ -332,6 +332,7 @@ app.panel = {
         },
         chart: {
             init: function(chartIndex) {
+                app.panel.loading.show();
                 var chartJSON = {};
                 var data = app.panel.results.charts[chartIndex].data;
                 for (var chart in data) {
@@ -429,6 +430,7 @@ app.panel = {
                     bindto: `#chartResult`
                 });
                 app.panel.results.chart.resize();
+                app.panel.loading.hide();
             },
             resize: function() {
                 window.setTimeout(function() {
