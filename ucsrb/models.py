@@ -262,14 +262,15 @@ class TreatmentScenario(Scenario):
 
     def aggregate_results(self):
 
-        def m2_to_acres(m2_area):
-            return m2_area*0.000247105;
+        # def m2_to_acres(m2_area):
+        #     return m2_area*0.000247105;
 
-        total_treatment_acres = m2_to_acres(self.geometry_dissolved.area)
-
-        vpus = VegPlanningUnit.objects.filter(geometry__intersects=self.geometry_dissolved)
+        # total_treatment_acres = m2_to_acres(self.geometry_dissolved.area)
+        #
+        intersect_vpus = VegPlanningUnit.objects.all()
+        vpus = self.run_filters(intersect_vpus)
         totals = {
-            'Forest Overstory Fractional Coverage': {
+            'Fractional Coverage': {
                 '0-20%': 0,
                 '20-40%': 0,
                 '40-60%': 0,
@@ -328,13 +329,13 @@ class TreatmentScenario(Scenario):
         results = {
             'total_acres': int(totals['Fractional Coverage']['Total']),
             'results_list': [
-                {'Fractional Coverage': [
+                {'Forest Overstory Fractional Coverage': [
                     {'0-20% (acres)': int(totals['Fractional Coverage']['0-20%'])},
                     {'20-40% (acres)': int(totals['Fractional Coverage']['20-40%'])},
                     {'40-60% (acres)': int(totals['Fractional Coverage']['40-60%'])},
                     {'60-80% (acres)': int(totals['Fractional Coverage']['60-80%'])},
                     {'>80% (acres)': int(totals['Fractional Coverage']['>80%'])},
-                    {'Total Acres': int(totals['Fractional Coverage']['Total'])}
+                    # {'Total Acres': int(totals['Fractional Coverage']['Total'])}
                     # {'Total Acres': total_treatment_acres}
                 ]},
                     {'Landforms': [
