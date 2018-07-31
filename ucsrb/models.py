@@ -136,6 +136,7 @@ class TreatmentScenario(Scenario):
     focus_area = models.BooleanField(default=False)
     focus_area_input = models.ForeignKey(FocusArea, null=True, blank=True, default=None)#, models.SET_NULL)
     scenario = models.ForeignKey(ScenarioState, null=True, blank=True, default=None)#, models.CASCADE)
+    aggregate_report = models.TextField(null=True, blank=True, default=None)
 
     # Avoid Private land? (USE PUB_PRIV_OWN!)
     private_own = models.BooleanField(default=False)
@@ -354,6 +355,10 @@ class TreatmentScenario(Scenario):
         }
 
         return results
+
+    def set_report(self):
+        self.aggregate_report = self.aggregate_results()
+        self.save()
 
     class Options:
         verbose_name = 'Treatment'

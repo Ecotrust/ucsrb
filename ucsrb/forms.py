@@ -260,14 +260,15 @@ class TreatmentScenarioForm(ScenarioForm):
             pass
         return self.cleaned_data
 
-    # def save(self, commit=True):
-    #     inst = super(ScenarioForm, self).save(commit=False)
-    #     import ipdb; ipdb.set_trace()
-    #     if self.data.get('clear_support_file'):
-    #         inst.support_file = None
-    #     if commit:
-    #         inst.save()
-    #     return inst
+    def save(self, commit=True):
+        inst = super(TreatmentScenarioForm, self).save(commit=True)
+        inst.aggregate_report = inst.aggregate_results()
+        # import ipdb; ipdb.set_trace()
+        # if self.data.get('clear_support_file'):
+        #     inst.support_file = None
+        if commit:
+            inst.save()
+        return inst
 
 
     class Meta(ScenarioForm.Meta):
