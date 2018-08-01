@@ -241,11 +241,11 @@ class TreatmentScenario(Scenario):
 
         if self.landform_type:
             filters['landform_type'] = self.landform_type
-            filters['landform_type_checkboxes_include_north'] = self.landform_type_checkboxes_include_north
-            filters['landform_type_checkboxes_include_south'] = self.landform_type_checkboxes_include_south
-            filters['landform_type_checkboxes_include_ridgetop'] = self.landform_type_checkboxes_include_ridgetop
-            filters['landform_type_checkboxes_include_floor'] = self.landform_type_checkboxes_include_floor
-            filters['landform_type_checkboxes_include_east_west'] = self.landform_type_checkboxes_include_east_west
+            filters['landform_type_include_north'] = self.landform_type_checkboxes_include_north
+            filters['landform_type_include_south'] = self.landform_type_checkboxes_include_south
+            filters['landform_type_include_ridgetop'] = self.landform_type_checkboxes_include_ridgetop
+            filters['landform_type_include_floors'] = self.landform_type_checkboxes_include_floor
+            filters['landform_type_include_east_west'] = self.landform_type_checkboxes_include_east_west
 
         (query, notes) = run_filter_query(filters)
 
@@ -261,14 +261,8 @@ class TreatmentScenario(Scenario):
         return result
 
     def aggregate_results(self):
-
-        # def m2_to_acres(m2_area):
-        #     return m2_area*0.000247105;
-
-        # total_treatment_acres = m2_to_acres(self.geometry_dissolved.area)
-        #
-        intersect_vpus = VegPlanningUnit.objects.all()
-        vpus = self.run_filters(intersect_vpus)
+        # intersect_vpus = VegPlanningUnit.objects.all()
+        vpus = self.run_filters(None) # There seems to be no need for passing a query here.
         totals = {
             'Fractional Coverage': {
                 '0-20%': 0,

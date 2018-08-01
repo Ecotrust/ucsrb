@@ -247,14 +247,29 @@ class TreatmentScenarioForm(ScenarioForm):
         return super(ScenarioForm, self).is_valid()
 
     def clean(self):
+
+        checkbox_lookup = {
+            '0': 'include_north',
+            '1': 'include_south',
+            '2': 'include_ridgetop',
+            '3': 'include_floor',
+            '4': 'include_east_west',
+        }
+
         super(FeatureForm, self).clean()
         try:
-            if self.cleaned_data['landform_type'] == True:
-                for landform_type in settings.LANDFORM_TYPES:
-                    if 'landform_type_checkboxes_%s' % landform_type in self.data.keys():
-                        if self.data['landform_type_checkboxes_%s' % landform_type]:
-                            self.cleaned_data['landform_type_checkboxes_%s' % landform_type] = True
-                self.data.__delitem__('landform_type_checkboxes')
+            if 'landform_type_checkboxes' not in self.cleaned_data.keys() and self.cleaned_data['landform_type'] == True:
+                checkdata = self.data.getlist('landform_type_checkboxes')
+                checklist = False
+                for box in checkdata:
+                    if not box == 'False':
+                        checklist = True
+                        self.cleaned_data['landform_type_checkboxes'] = str([str(x) for x in box.split(',')])
+                for landform_type_id in eval(self.cleaned_data['landform_type_checkboxes']):
+                    landform_type = checkbox_lookup[landform_type_id]
+                    self.cleaned_data['landform_type_checkboxes_%s' % landform_type] = True
+                if not checklist:
+                    self.data.__delitem__('landform_type_checkboxes')
         except Exception as e:
             print(e)
             pass
@@ -263,13 +278,11 @@ class TreatmentScenarioForm(ScenarioForm):
     def save(self, commit=True):
         inst = super(TreatmentScenarioForm, self).save(commit=True)
         inst.aggregate_report = inst.aggregate_results()
-        # import ipdb; ipdb.set_trace()
         # if self.data.get('clear_support_file'):
         #     inst.support_file = None
         if commit:
             inst.save()
         return inst
-
 
     class Meta(ScenarioForm.Meta):
         model = TreatmentScenario

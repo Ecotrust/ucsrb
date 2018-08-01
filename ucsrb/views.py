@@ -564,7 +564,7 @@ def get_results_by_scenario_id(request):
     if export:
         print("Export %s" % export)
     else:
-        if treatment.aggregate_report is None:
+        if treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
             treatment.set_report()
             treatment = get_feature_by_uid(scenario_id)
         aggregate_results = eval(treatment.aggregate_report)
@@ -675,21 +675,27 @@ def run_filter_query(filters):
 
     exclusion_list = []
     if 'landform_type' in filters.keys() and filters['landform_type']:
-        if not 'landform_type_checkboxes_0' in filters.keys() or not filters['landform_type_include_north']:
-            exclusion_list += [12, 22]
-        if not 'landform_type_checkboxes_1' in filters.keys() or not filters['landform_type_include_south']:
-            exclusion_list += [13, 23]
-        if not 'landform_type_checkboxes_2' in filters.keys() or not filters['landform_type_include_ridgetop']:
-            exclusion_list += [11, 21]
-        if not 'landform_type_checkboxes_3' in filters.keys() or not filters['landform_type_include_floors']:
-            exclusion_list += [14, 24]
-        if not 'landform_type_checkboxes_4' in filters.keys() or not filters['landform_type_include_east_west']:
-            exclusion_list += [15, 25]
+        if not 'landform_type_checkboxes_0' in filters.keys():
+            if not 'landform_type_include_north' in filters.keys() or not filters['landform_type_include_north']:
+                exclusion_list += [12, 22]
+        if not 'landform_type_checkboxes_1' in filters.keys():
+            if not 'landform_type_include_south' in filters.keys() or not filters['landform_type_include_south']:
+                exclusion_list += [13, 23]
+        if not 'landform_type_checkboxes_2' in filters.keys():
+            if not 'landform_type_include_ridgetop' in filters.keys() or not filters['landform_type_include_ridgetop']:
+                exclusion_list += [11, 21]
+        if not 'landform_type_checkboxes_3' in filters.keys():
+            if not 'landform_type_include_floors' in filters.keys() or not filters['landform_type_include_floors']:
+                exclusion_list += [14, 24]
+        if not 'landform_type_checkboxes_4' in filters.keys():
+            if not 'landform_type_include_east_west' in filters.keys() or not filters['landform_type_include_east_west']:
+                exclusion_list += [15, 25]
+        if len(exclusion_list) > 0:
+            # query = query.exclude(topo_height_class_majority__in=exclusion_list)
+            exclude_dict['topo_height_class_majority__in'] = exclusion_list
 
     query = VegPlanningUnit.objects.filter(**filter_dict).exclude(**exclude_dict)
     # For some reason multiple keys in 'exclude_dict' don't always seem to process correctly
-    if len(exclusion_list) > 0:
-        query = query.exclude(topo_height_class_majority__in=exclusion_list)
 
     return (query, notes)
 

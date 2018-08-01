@@ -68,7 +68,7 @@ var madrona = {
             $form.find('input,select,textarea').each( function(index, input) {
                 var $input = $(input);
                 if ($input.attr('type') === 'checkbox') {
-                    if ($input.attr('checked')) {
+                    if ($input[0].checked) {
                       if ($input.attr('name').indexOf('checkboxes') >= 0) {
                         if ($input.attr('name') in app.checkboxes) {
                           app.checkboxes[$input.attr('name')].push($input.attr('value'));
