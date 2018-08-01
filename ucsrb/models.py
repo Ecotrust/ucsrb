@@ -210,8 +210,8 @@ class TreatmentScenario(Scenario):
         if self.has_critical_habitat:
             filters['has_critical_habitat'] = True
 
-        if self.percent_roadless:
-            filters['percent_roadless'] = True
+        # if self.percent_roadless:
+        #     filters['percent_roadless'] = True
 
         if self.road_distance:
             filters['road_distance'] = True
@@ -285,7 +285,7 @@ class TreatmentScenario(Scenario):
                 'Wetlands': 0,
                 'Critical Habitat': 0,
                 # 'Salmon-Bearing Streams': 0,
-                'Roadless Areas': 0
+                # 'Roadless Areas': 0
             }
         }
         for vpu in vpus:
@@ -319,7 +319,7 @@ class TreatmentScenario(Scenario):
             totals['Habitat Characteristics']['Riparian Area'] += vpu.acres * vpu.percent_riparian * 0.01
             totals['Habitat Characteristics']['Wetlands'] += vpu.acres * vpu.percent_wetland * 0.01
             totals['Habitat Characteristics']['Critical Habitat'] += vpu.acres * vpu.percent_critical_habitat * 0.01
-            totals['Habitat Characteristics']['Roadless Areas'] += vpu.acres * vpu.percent_roadless * 0.01
+            # totals['Habitat Characteristics']['Roadless Areas'] += vpu.acres * vpu.percent_roadless * 0.01
 
         results = {
             'total_acres': int(totals['Fractional Coverage']['Total']),
@@ -345,7 +345,7 @@ class TreatmentScenario(Scenario):
                     {'Wetlands (acres)': int(totals['Habitat Characteristics']['Wetlands'])},
                     {'Critical Habitat (acres)': int(totals['Habitat Characteristics']['Critical Habitat'])},
                     # {'Salmon-Bearing Streams (mi)': 13},
-                    {'Roadless Areas (acres)': int(totals['Habitat Characteristics']['Roadless Areas'])}
+                    # {'Roadless Areas (acres)': int(totals['Habitat Characteristics']['Roadless Areas'])}
                 ]}
             ]
         }

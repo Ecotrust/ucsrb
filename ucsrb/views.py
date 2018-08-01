@@ -641,8 +641,8 @@ def run_filter_query(filters):
     #     pu_ids = [pu.pk for pu in query if pu.geometry.area <= float(filters['area_max']) and pu.geometry.area>= float(filters['area_min'])]
     #     query = (query.filter(pk__in=pu_ids))
 
-    if 'percent_roadless' in filters.keys() and filters['percent_roadless']:
-        filter_dict['percent_roadless__lt'] = settings.ROADLESS_THRESHOLD
+    # if 'percent_roadless' in filters.keys() and filters['percent_roadless']:
+    #     filter_dict['percent_roadless__lt'] = settings.ROADLESS_THRESHOLD
 
     if 'road_distance' in filters.keys() and filters['road_distance']:
         if 'road_distance_max' in filters.keys():
@@ -771,7 +771,7 @@ def get_planningunits(request):
             'lsr_percent': p_unit.lsr_percent,
             'has_critical_habitat': p_unit.has_critical_habitat,
             'percent_critical_habitat': p_unit.percent_critical_habitat,
-            'percent_roadless': p_unit.percent_roadless,
+            # 'percent_roadless': p_unit.percent_roadless,
             'percent_wetland': p_unit.percent_wetland,
             'percent_riparian': p_unit.percent_riparian,
             'slope': p_unit.slope,

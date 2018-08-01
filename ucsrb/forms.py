@@ -61,11 +61,11 @@ class TreatmentScenarioForm(ScenarioForm):
         required=False,
     )
 
-    percent_roadless = HiddenScenarioBooleanField(
-        label="Avoid Roadless Area",
-        help_text="Areas identified as 'roadless' in the Inventoried Roadless Areas",
-        required=False,
-    )
+    # percent_roadless = HiddenScenarioBooleanField(
+    #     label="Avoid Roadless Area",
+    #     help_text="Areas identified as 'roadless' in the Inventoried Roadless Areas",
+    #     required=False,
+    # )
 
     road_distance = HiddenScenarioBooleanField(
         label="Max Dist. From Roads",
@@ -204,7 +204,7 @@ class TreatmentScenarioForm(ScenarioForm):
             ('focus_area', None, None, 'focus_area_input'),
             ('lsr_percent', None, None, None),
             ('has_critical_habitat', None, None, None),
-            ('percent_roadless', None, None, None),
+            # ('percent_roadless', None, None, None),
             ('percent_wetland', None, None, None),
             ('percent_riparian', None, None, None),
         ]
