@@ -203,43 +203,40 @@ class TreatmentScenarioForm(ScenarioForm):
         names = [
             ('focus_area', None, None, 'focus_area_input'),
             ('lsr_percent', None, None, None),
-            ('has_critical_habitat', None, None, None),
             # ('percent_roadless', None, None, None),
-            ('percent_wetland', None, None, None),
-            ('percent_riparian', None, None, None),
+            ('pub_priv_own', None, None, 'pub_priv_own_input'),
+            ('private_own', None, None, None),
         ]
         return self._get_fields(names)
 
     def get_step_1_fields(self):
         names = [
-            ('private_own', None, None, None),
-            ('pub_priv_own', None, None, 'pub_priv_own_input'),
+            ('percent_riparian', None, None, None),
+            ('percent_wetland', None, None, None),
+            ('has_critical_habitat', None, None, None),
+        ]
+        return self._get_fields(names)
+
+    def get_step_2_fields(self):
+        names = [
             ('road_distance', None, 'road_distance_max', 'road_distance_input'),
-            ('slope', None, 'slope_max', 'slope_input'),
+            ('landform_type', None, None, None, 'landform_type_checkboxes'),
             (
                 'percent_fractional_coverage',
                 'percent_fractional_coverage_min',
                 'percent_fractional_coverage_max',
                 'percent_fractional_coverage_input'
             ),
+            ('slope', None, 'slope_max', 'slope_input'),
             ('percent_high_fire_risk_area', None, None, None),
-            ('landform_type', None, None, None, 'landform_type_checkboxes'),
-
         ]
         return self._get_fields(names)
-    #
-    # def get_step_2_fields(self):
-    #     names = [
-    #
-    #     ]
-    #     return self._get_fields(names)
 
     def get_steps(self):
-        return self.get_step_0_fields(), self.get_step_1_fields(),
+        return self.get_step_0_fields(), self.get_step_1_fields(), self.get_step_2_fields(),
 
     def clean_focus_area_input(self):
-        foo = FocusArea.objects.get(pk=self.cleaned_data['focus_area_input'])
-        return foo
+        return FocusArea.objects.get(pk=self.cleaned_data['focus_area_input'])
 
     def is_valid(self, *args, **kwargs):
         if len(self.errors.keys()) == 1 and 'landform_type_checkboxes' in self.errors.keys() and len(self.errors['landform_type_checkboxes']) == 1 and 'is not one of the available choices.' in self.errors['landform_type_checkboxes'][0]:
