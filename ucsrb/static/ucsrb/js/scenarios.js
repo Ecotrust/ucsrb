@@ -366,6 +366,7 @@ function scenarioFormModel(options) {
                         var wkt = data[0].wkt,
                             featureCount = data[0].count,
                             area_m2 = data[0].area_m2;
+                            area_acres = data[0].area_acres;
                             if (data[0].notes.length > 0) {
                               self.filterNotesMessage(data[0].notes);
                               self.filterNotesExist(true);
@@ -375,9 +376,7 @@ function scenarioFormModel(options) {
                             self.updatedFilterResultsLayer.addWKTFeatures(wkt);
                         }
                         self.updatedFilterResultsLayer.setVisibility(true);
-                        // self.gridCellsRemaining(featureCount);
-                        // convert area in meters to acres
-                        acres = area_m2*0.000247105;
+                        acres = area_acres;
                         self.gridCellsRemaining(parseInt(acres) + ' acres');
 
                       if (parseInt(acres) < parseInt(app.map.draw.maxAcres)) {

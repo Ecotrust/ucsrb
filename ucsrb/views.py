@@ -597,7 +597,7 @@ def run_filter_query(filters):
     notes = []
 
     filter_dict = {}
-    exclude_dict = {}
+    exclude_dicts = []
 
     if 'focus_area' in filters.keys() and 'focus_area_input' in filters.keys() and filters['focus_area']:
         # focus_area = FocusArea.objects.get(pk=filters['focus_area_input']).geometry;
@@ -619,7 +619,7 @@ def run_filter_query(filters):
         return (query, notes)
 
     if 'private_own' in filters.keys() and filters['private_own']:
-        exclude_dict['pub_priv_own__icontains']='private'   # real value is 'Private land'
+        exclude_dicts.append({'pub_priv_own__icontains':'private'})   # real value is 'Private land'
 
     if 'pub_priv_own' in filters.keys() and filters['pub_priv_own']:
         if 'pub_priv_own_input' in filters.keys():
@@ -630,7 +630,7 @@ def run_filter_query(filters):
 
     if 'has_critical_habitat' in filters.keys() and filters['has_critical_habitat']:
         filter_dict['percent_critical_habitat__lt'] = settings.CRIT_HAB_THRESHOLD
-        exclude_dict['has_critical_habitat'] = True
+        exclude_dicts.append({'has_critical_habitat':True})
 
     # if 'area' in filters.keys() and filters['area']:
     #     # RDH 1/8/18: filter(geometry__area_range(...)) does not seem available.
@@ -691,11 +691,13 @@ def run_filter_query(filters):
             if not 'landform_type_include_east_west' in filters.keys() or not filters['landform_type_include_east_west']:
                 exclusion_list += [15, 25]
         if len(exclusion_list) > 0:
+            exclude_dicts.append({'topo_height_class_majority__in':exclusion_list})
             # query = query.exclude(topo_height_class_majority__in=exclusion_list)
-            exclude_dict['topo_height_class_majority__in'] = exclusion_list
 
-    query = VegPlanningUnit.objects.filter(**filter_dict).exclude(**exclude_dict)
-    # For some reason multiple keys in 'exclude_dict' don't always seem to process correctly
+    query = VegPlanningUnit.objects.filter(**filter_dict)
+    # We want all exclusions in 'exclude_dict' to be applied independently, not only excluding items that match all
+    for exclude_dict in exclude_dicts:
+        query = query.exclude(**exclude_dict)
 
     return (query, notes)
 
@@ -726,19 +728,12 @@ def get_filter_count(request, query=False, notes=[]):
     if not query:
         filter_dict = parse_filter_checkboxes(request)
         (query, notes) = run_filter_query(filter_dict)
-    # from scenarios import views as scenarioViews
-    # return scenarioViews.get_filter_count(request, query, notes)
     count = query.count()
-    area_m2 = 0
-    if count < 15000:
-        for pu in query:
-            clone_pu = pu.geometry.clone()
-            clone_pu.transform(2163)
-            area_m2 += clone_pu.area
+    area_acres = 0
+    for pu in query:
+        area_acres += pu.acres
 
-        return HttpResponse("%d acres" % int(area_m2/4046.86), status=200)
-    return HttpResponse("too many", status=200)
-
+    return HttpResponse("%d acres" % int(area_acres), status=200)
 
 '''
 '''
@@ -747,8 +742,11 @@ def get_filter_results(request, query=False, notes=[]):
     if not query:
         filter_dict = parse_filter_checkboxes(request)
         (query, notes) = run_filter_query(filter_dict)
+    area_acres = 0
+    for pu in query:
+        area_acres += pu.acres
     from scenarios import views as scenarioViews
-    return scenarioViews.get_filter_results(request, query, notes)
+    return scenarioViews.get_filter_results(request, query, notes, {'area_acres': area_acres})
 
 
 @cache_page(60 * 60) # 1 hour of caching
