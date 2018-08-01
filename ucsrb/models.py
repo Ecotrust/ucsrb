@@ -261,8 +261,9 @@ class TreatmentScenario(Scenario):
         return result
 
     def aggregate_results(self):
-        # intersect_vpus = VegPlanningUnit.objects.all()
         vpus = self.run_filters(None) # There seems to be no need for passing a query here.
+        # pu_ids = [int(x) for x in self.planning_units.split(',')]
+        # vpus = VegPlanningUnit.objects.filter(pk__in=pu_ids)
         totals = {
             'Fractional Coverage': {
                 '0-20%': 0,
