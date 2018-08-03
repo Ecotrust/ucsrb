@@ -279,6 +279,9 @@ ANALYSIS_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'ucsrb', 'analysis'
 
 CSV_DIR = os.path.realpath(os.path.join(ANALYSIS_DIR, 'input_csvs'))
 
+NN_DATA_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'ucsrb', 'ucsrb', 'data'))
+NN_CSV_FLOW_COLUMN = 'C'
+
 ########################################
 ######      FILTER CHOICES      ########
 ########################################

@@ -326,34 +326,43 @@ def get_results_7d_mean(flow_output, sorted_results):
     return sort_output(out_dict)
 
 
-def parse_flow_results(baseline_csv, treatment_csv):
+def parse_flow_results(baseline_csv, treatment_csv, pourpoint_id):
     import csv
     from copy import deepcopy
+    from ucsrb import project_settings as ucsrb_settings
     output_dict = {}
 
+    # with open(baseline_csv) as csvfile:
     with open(baseline_csv) as csvfile:
         csvReader = csv.DictReader(csvfile)
         for row in csvReader:
-            if row['ppt_ID'] == 'bottom_basin':
-                basin = 'bottom_basin'
-            else:
-                [basin, treatment] = row['ppt_ID'].split('-')
+            # if row['ppt_ID'] == 'bottom_basin':
+                # basin = 'bottom_basin'
+            # else:
+                # [basin, treatment] = row['ppt_ID'].split('-')
+            basin = row['STREAMMAPID']
             if not basin in output_dict.keys():
                 output_dict[basin] = {
                     'baseline': {}
                 }
             # Convert total 3-hour flow to per-second flow
-            output_dict[basin]['baseline'][row['Time']] = float(row['Value'])/3/60/60
+            # output_dict[basin]['baseline'][row['Time']] = float(row['Value'])/3/60/60
+            output_dict[basin]['baseline'][row['TIMESTAMP']] = row['TIMESTAMP']
 
-    output_dict['bottom_basin']['mechanical'] = deepcopy(output_dict['bottom_basin']['baseline'])
-    output_dict['bottom_basin']['rx_burn'] = deepcopy(output_dict['bottom_basin']['baseline'])
-    output_dict['bottom_basin']['catastrophic_fire'] = deepcopy(output_dict['bottom_basin']['baseline'])
+    # output_dict['bottom_basin']['mechanical'] = deepcopy(output_dict['bottom_basin']['baseline'])
+    # output_dict['bottom_basin']['rx_burn'] = deepcopy(output_dict['bottom_basin']['baseline'])
+    # output_dict['bottom_basin']['catastrophic_fire'] = deepcopy(output_dict['bottom_basin']['baseline'])
+    output_dict[basin]['mechanical'] = deepcopy(output_dict[basin]['baseline'])
+    output_dict[basin]['rx_burn'] = deepcopy(output_dict[basin]['baseline'])
+    output_dict[basin]['catastrophic_fire'] = deepcopy(output_dict[basin]['baseline'])
 
     with open(treatment_csv) as csvfile:
         csvReader = csv.DictReader(csvfile)
         for row in csvReader:
-            [basin_id, treatment] = row['ppt_ID'].split('-')
-            timestamp = row['Time']
+            # [basin_id, treatment] = row['ppt_ID'].split('-')
+            basin_id = row['STREAMMAPID']
+            # timestamp = row['Time']
+            timestamp = row['TIMESTAMP']
             try:
                 # get difference for upstream basin for timestamp from baseline
                 delta = float(row['Value'])/3/60/60 - output_dict[basin]['baseline'][timestamp]
@@ -429,6 +438,8 @@ def run_hydro_model(in_csv):
     script_location = "%s/%s" % (ucsrb_settings.ANALYSIS_DIR, 'DHSVMe.R')
     out_csv = "%s_out.csv" % ''.join(in_csv.lower().split('.csv'))
 
+    location = "/usr/local/apps/marineplanner-core/apps/ucsrb/ucsrb/data/" % (ucsrb_settings.ANALYSIS_DIR, 'DHSVMe.R')
+
     r_output = subprocess.call([
         command, script_location,           # call the script with R
         '-i', in_csv,                       # location of input csv
@@ -462,6 +473,9 @@ def get_hydro_results_by_pour_point_id(request):
     treatment_id = request.GET.get('treatment_id')
     treatment = TreatmentScenario.objects.get(pk=treatment_id)
 
+    # Get nearest neighbor from request
+    nn = request.GET.get('nn')
+
     baseline_input_rows = []
     baseline_input_rows.append(get_basin_input_dict(ppb_d_data, ppb_d.geometry, treatment.geometry_dissolved, 'bottom_basin'))
 
@@ -475,9 +489,9 @@ def get_hydro_results_by_pour_point_id(request):
 
     # if len(sub_basins) > 5, this may take a LONG time to work through.
     # TODO: Disable 'Evaluate' button when too many Veg Units are impacted (issue #134)
-    if len(sub_basins) > 10:
+    # if len(sub_basins) > 10:
         # TODO: return something to frontend so we can give feedback to the user
-        print("Running Hydro model on %d basins! This may be a while..." % len(sub_basins))
+        # print("Running Hydro model on %d basins! This may be a while..." % len(sub_basins))
 
     # - For each d_basin that intersects treatent scenario:
     for d_basin in sub_basins:
@@ -490,32 +504,39 @@ def get_hydro_results_by_pour_point_id(request):
             else:
                 treatment_input_rows.append(get_basin_input_dict(sub_basin_data, d_basin.geometry, treatment.geometry_dissolved, row_id, treatment_type))
 
-    baseline_csv_filename = "%s/%s_%s_baseline.csv" % (ucsrb_settings.CSV_DIR, str(request.user.id), str(int(time.time()*100)))
-    treatment_csv_filename = "%s/%s_%s_treatment.csv" % (ucsrb_settings.CSV_DIR, str(request.user.id), str(int(time.time()*100)))
-
+    # baseline_csv_filename = "%s/%s_%s_baseline.csv" % (ucsrb_settings.CSV_DIR, str(request.user.id), str(int(time.time()*100)))
+    # treatment_csv_filename = "%s/%s_%s_treatment.csv" % (ucsrb_settings.CSV_DIR, str(request.user.id), str(int(time.time()*100)))
 
     # write baseline csv
-    with open(baseline_csv_filename, 'w') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=ucsrb_settings.HYDRO_INPUT_HEADERS)
-        writer.writeheader()
-        for row in baseline_input_rows:
-            writer.writerow(row)
+    # with open(baseline_csv_filename, 'w') as csvfile:
+        # writer = csv.DictWriter(csvfile, fieldnames=ucsrb_settings.HYDRO_INPUT_HEADERS)
+        # writer.writeheader()
+        # for row in baseline_input_rows:
+            # writer.writerow(row)
 
     # write delta csv
-    with open(treatment_csv_filename, 'w') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=ucsrb_settings.HYDRO_INPUT_HEADERS)
-        writer.writeheader()
-        for row in treatment_input_rows:
-            writer.writerow(row)
+    # with open(treatment_csv_filename, 'w') as csvfile:
+        # writer = csv.DictWriter(csvfile, fieldnames=ucsrb_settings.HYDRO_INPUT_HEADERS)
+        # writer.writeheader()
+        # for row in treatment_input_rows:
+            # writer.writerow(row)
 
     results = {}
-    baseline_out_csv = run_hydro_model(baseline_csv_filename)
-    treatment_out_csv = run_hydro_model(treatment_csv_filename)
-    flow_output = parse_flow_results(baseline_out_csv, treatment_out_csv)
+    # baseline_out_csv = run_hydro_model(baseline_csv_filename)
+    # treatment_out_csv = run_hydro_model(treatment_csv_filename)
+    # flow_output = parse_flow_results(baseline_out_csv, treatment_out_csv)
 
-    if ucsrb_settings.DELETE_CSVS:
-        os.remove(baseline_out_csv)
-        os.remove(treatment_out_csv)
+    # need file name to match on available in data dir (e.g., vegwen20_50.csv)
+        # break down of file name: "veg(wen, met, or ent)#_#"
+    basefilenameholder = "vegwen_base"
+    vegfilenameholder = "vegwen20_50"
+    baseline_csv_file = "%s/%s.csv" % (ucsrb_settings.NN_DATA_DIR, basefilenameholder)
+    nn_csv_file = "%s/%s.csv" % (ucsrb_settings.NN_DATA_DIR, vegfilenameholder)
+    flow_output = parse_flow_results(baseline_csv_file, nn_csv_file, pourpoint_id)
+
+    # if ucsrb_settings.DELETE_CSVS:
+        # os.remove(baseline_out_csv)
+        # os.remove(treatment_out_csv)
 
     absolute_results = sort_output(flow_output)
     #   delta flow
