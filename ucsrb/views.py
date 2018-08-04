@@ -453,6 +453,23 @@ def run_hydro_model(in_csv):
 
     return out_csv
 
+def calculate_basin_fc(ppt, scenario=None, target_fc=-1):
+    pptbasin = PourPointBasin.objects.get(ppt_ID=ppt.id)
+    veg_fc_total = 0
+    basin = FocusArea.objects.get(unit_id=ppt.id,unit_type='PourPointOverlap')
+    included_ppts = [x.id for x in PourPoint.objects.filter(geometry__intersects=basin.geometry)]
+    veg_units = VegPlanningUnit.objects.filter(dwnstream_ppt_id__in=included_ppts)
+    if scenario and target_fc >= 0:
+        planning_units = [int(x) for x in scenario.planning_units.split(',')]
+    else:
+        planning_units = False
+    for vu in veg_units:
+        if planning_units and vu.id in planning_units:
+            veg_fc_total += target_fc * vu.acres
+        else:
+            veg_fc_total += vu.percent_fractional_coverage * vu.acres
+    return veg_fc_total/pptbasin.area
+
 # NEEDS:
 #   pourpoint_id
 #   treatment_id
