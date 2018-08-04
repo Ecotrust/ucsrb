@@ -128,11 +128,11 @@ app.map.styles = {
         });
     },
     'PourPoint': function(feature, resolution) {
-      var radius = 5;
+      var radius = 4;
       if (resolution < 5) {
-          radius = 12;
+          radius = 10;
       } else if (resolution < 40) {
-          radius = 8;
+          radius = 6;
       }
       return new ol.style.Style({
         image: new ol.style.Circle({
@@ -149,11 +149,11 @@ app.map.styles = {
       });
     },
     'PourPointSelected': function(feature, resolution) {
-      var radius = 8;
+      var radius = 7;
       if (resolution < 5) {
-          radius = 18;
+          radius = 16;
       } else if (resolution < 40) {
-          radius = 13;
+          radius = 10;
       }
       return new ol.style.Style({
         image: new ol.style.Circle({
@@ -163,7 +163,7 @@ app.map.styles = {
             }),
             stroke: new ol.style.Stroke({
                 color: '#ffffff',
-                width: 4,
+                width: 3,
             }),
         }),
         zIndex: 10
