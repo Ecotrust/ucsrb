@@ -283,6 +283,16 @@ NN_DATA_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'ucsrb', 'ucsrb', 'd
 NN_CSV_FLOW_COLUMN = 'C'
 
 ########################################
+######   MODEL FIELD CHOICES    ########
+########################################
+
+WATERSHED_CHOICES = [
+    ('ent', 'Upper Entiat'),
+    ('met', 'Upper Methow'),
+    ('wen', 'Chiwawa')
+]
+
+########################################
 ######      FILTER CHOICES      ########
 ########################################
 OWNERSHIP_CHOICES = (

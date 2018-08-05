@@ -42,6 +42,10 @@ class PourPoint(models.Model):
     id = models.IntegerField(primary_key=True, verbose_name='Pour Point ID')
     geometry = gismodels.PointField(srid=GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Pour Point")
 
+    imputed_ppt = models.ForeignKey('self', null=True, blank=True, default=None, verbose_name='Nearest Neighbor Match')
+    streammap_id = models.IntegerField(null=True, blank=True, default=None)
+    watershed_id = models.CharField(max_length=3, null=True, blank=True, default=None, choices=settings.WATERSHED_CHOICES, verbose_name="Modeled Watershed Identifier")
+
     objects = gismodels.GeoManager()
 
     def __str__(self):
@@ -49,6 +53,19 @@ class PourPoint(models.Model):
 
     def __unicode__(self):
         return 'Virtual Gauging Station Number %s' % (self.id)
+
+class ScenarioNNLookup(models.Model):
+    ppt_id = models.IntegerField(verbose_name='Pour Point ID')
+    # watershed_id = models.CharField(max_length=3, null=True, blank=True, default=None, choices=settings.WATERSHED_CHOICES, verbose_name="Modeled Watershed Identifier")
+    scenario_id = models.IntegerField(verbose_name="Harvest Scenario Identifier")
+    treatment_target = models.IntegerField()
+    fc_delta = models.FloatField(verbose_name="Percent Change in Fractional Coverage")
+
+    def __str__(self):
+        return "Nearest Neighbor Pour Point %d, Scenario %d" % (self.ppt_id, self.scenario_id)
+
+    def __unicode__(self):
+        return "Nearest Neighbor Pour Point %d, Scenario %d" % (self.ppt_id, self.scenario_id)
 
 class PourPointBasin(models.Model):
     ppt_ID = models.IntegerField(primary_key=True, verbose_name='Pour Point ID')
