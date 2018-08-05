@@ -444,8 +444,10 @@ def calculate_basin_fc(ppt, scenario=None, target_fc=-1):
         basin_area += subbasin.area
 
     if basin_area == 0:
-        print("Basin Acres == 0, will lead to divide by 0 error!")
-        import ipdb; ipdb.set_trace()
+        # Reproject basin to equal-area
+        basin.transform(2163)
+        # Get basin area in sq meters and convert to acres
+        basin_area == basin.area/4046.86
 
     if scenario and target_fc >= 0:
         planning_units = [int(x) for x in scenario.planning_units.split(',')]
