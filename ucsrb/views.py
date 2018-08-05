@@ -448,7 +448,7 @@ def calculate_basin_fc(ppt, scenario=None, target_fc=-1):
         basin_geom = basin.geometry
         basin_geom.transform(2163)
         # Get basin area in sq meters and convert to acres
-        basin_area == basin_geom.area/4046.86
+        basin_area = basin_geom.area/4046.86
 
     if scenario and target_fc >= 0:
         planning_units = [int(x) for x in scenario.planning_units.split(',')]
@@ -491,7 +491,10 @@ def get_hydro_results_by_pour_point_id(request):
 
     rx_fc_pct_delta = {}
     for rx in ['mechanical', 'rx_burn', 'catastrophic_fire']:
-        rx_fc_pct_delta[rx] = (basin_fractional_coverage['baseline'] - basin_fractional_coverage[rx])/basin_fractional_coverage['baseline']*100
+        if basin_fractional_coverage['baseline'] == 0:
+            rx_fc_pct_delta[rx] = 0
+        else:
+            rx_fc_pct_delta[rx] = (basin_fractional_coverage['baseline'] - basin_fractional_coverage[rx])/basin_fractional_coverage['baseline']*100
 
     if ppt.imputed_ppt:
         imputed_ppt = ppt.imputed_ppt
