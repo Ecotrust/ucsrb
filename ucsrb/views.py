@@ -325,53 +325,27 @@ def get_results_7d_mean(flow_output, sorted_results):
             out_dict[rx][timestep] = mean_flow
     return sort_output(out_dict)
 
-
-def parse_flow_results(baseline_csv, treatment_csv, pourpoint_id):
+def parse_flow_results(csv_dict, ppt):
     import csv
     from copy import deepcopy
     from ucsrb import project_settings as ucsrb_settings
-    output_dict = {}
+    output_dict = {
+        'baseline': {},
+        'mechanical': {},
+        'rx_burn': {},
+        'catastrophic_fire': {},
+    }
 
-    # with open(baseline_csv) as csvfile:
-    with open(baseline_csv) as csvfile:
-        csvReader = csv.DictReader(csvfile)
-        for row in csvReader:
-            # if row['ppt_ID'] == 'bottom_basin':
-                # basin = 'bottom_basin'
-            # else:
-                # [basin, treatment] = row['ppt_ID'].split('-')
-            basin = row['STREAMMAPID']
-            if not basin in output_dict.keys():
-                output_dict[basin] = {
-                    'baseline': {}
-                }
-            # Convert total 3-hour flow to per-second flow
-            # output_dict[basin]['baseline'][row['Time']] = float(row['Value'])/3/60/60
-            output_dict[basin]['baseline'][row['TIMESTAMP']] = row['TIMESTAMP']
 
-    # output_dict['bottom_basin']['mechanical'] = deepcopy(output_dict['bottom_basin']['baseline'])
-    # output_dict['bottom_basin']['rx_burn'] = deepcopy(output_dict['bottom_basin']['baseline'])
-    # output_dict['bottom_basin']['catastrophic_fire'] = deepcopy(output_dict['bottom_basin']['baseline'])
-    output_dict[basin]['mechanical'] = deepcopy(output_dict[basin]['baseline'])
-    output_dict[basin]['rx_burn'] = deepcopy(output_dict[basin]['baseline'])
-    output_dict[basin]['catastrophic_fire'] = deepcopy(output_dict[basin]['baseline'])
+    for treatment in csv_dict.keys():
+        with open(csv_dict[treatment]) as csvfile:
+            csvReader = csv.DictReader(csvfile)
+            for row in csvReader:
+                if int(row['STREAMMAPID']) == ppt.streammap_id:
+                    # Convert total 3-hour flow  in cubic meters to per-second flow in cubic feet
+                    output_dict[treatment][row['TIMESTAMP']] = float(row[settings.NN_CSV_FLOW_COLUMN])/3/60/60*35.3147
 
-    with open(treatment_csv) as csvfile:
-        csvReader = csv.DictReader(csvfile)
-        for row in csvReader:
-            # [basin_id, treatment] = row['ppt_ID'].split('-')
-            basin_id = row['STREAMMAPID']
-            # timestamp = row['Time']
-            timestamp = row['TIMESTAMP']
-            try:
-                # get difference for upstream basin for timestamp from baseline
-                delta = float(row['Value'])/3/60/60 - output_dict[basin]['baseline'][timestamp]
-                # apply difference to bottom_basin
-                output_dict['bottom_basin'][treatment][timestamp] += delta
-            except:
-                print('unable to update baseline value for %s %s %s' % (basin, treatment, timestamp))
-
-    return output_dict['bottom_basin']
+    return output_dict
 
 def get_basin_input_dict(basin_data, basin_geom, treatment_geom, row_id, treatment='baseline'):
     from ucsrb import project_settings as ucsrb_settings
@@ -453,22 +427,39 @@ def run_hydro_model(in_csv):
 
     return out_csv
 
+def get_flow_csv_match(ppt, delta):
+    from ucsrb.models import ScenarioNNLookup
+    from ucsrb import project_settings as ucsrb_settings
+    candidates = [x for x in ScenarioNNLookup.objects.filter(ppt_id=ppt.id)]
+    best_match = min(candidates, key=lambda x:abs(x.fc_delta-delta))
+    return "%s/veg%s%d_%d.csv" % (ucsrb_settings.NN_DATA_DIR, ppt.watershed_id, best_match.scenario_id, best_match.treatment_target)
+
 def calculate_basin_fc(ppt, scenario=None, target_fc=-1):
-    pptbasin = PourPointBasin.objects.get(ppt_ID=ppt.id)
-    veg_fc_total = 0
+    from ucsrb.models import FocusArea, PourPoint, PourPointBasin, VegPlanningUnit
     basin = FocusArea.objects.get(unit_id=ppt.id,unit_type='PourPointOverlap')
     included_ppts = [x.id for x in PourPoint.objects.filter(geometry__intersects=basin.geometry)]
-    veg_units = VegPlanningUnit.objects.filter(dwnstream_ppt_id__in=included_ppts)
+    # To get a full acres area (calculated at discrete ppt basin) we need to sum up all subbasins
+    basin_area = 0
+    for subbasin in PourPointBasin.objects.filter(ppt_ID__in=included_ppts):
+        basin_area += subbasin.area
+
+    if basin_area == 0:
+        print("Basin Acres == 0, will lead to divide by 0 error!")
+        import ipdb; ipdb.set_trace()
+
     if scenario and target_fc >= 0:
         planning_units = [int(x) for x in scenario.planning_units.split(',')]
     else:
         planning_units = False
+
+    veg_units = VegPlanningUnit.objects.filter(dwnstream_ppt_id__in=included_ppts)
+    veg_fc_total = 0
     for vu in veg_units:
         if planning_units and vu.id in planning_units:
             veg_fc_total += target_fc * vu.acres
         else:
             veg_fc_total += vu.percent_fractional_coverage * vu.acres
-    return veg_fc_total/pptbasin.area
+    return veg_fc_total/basin_area
 
 # NEEDS:
 #   pourpoint_id
@@ -483,77 +474,35 @@ def get_hydro_results_by_pour_point_id(request):
 
     # Get pourpoint_id from request or API
     pourpoint_id = request.GET.get('pourpoint_id')
-    ppb_d_data = PourPointBasin.objects.get(pk=pourpoint_id)
-    ppb_d = FocusArea.objects.get(unit_id=pourpoint_id, unit_type='PourPointDiscrete')
-    ppb_o = FocusArea.objects.get(unit_id=pourpoint_id, unit_type='PourPointOverlap')
+    ppt = PourPoint.objects.get(id=pourpoint_id)
     # Get treatment_id from request or API
     treatment_id = request.GET.get('treatment_id')
     treatment = TreatmentScenario.objects.get(pk=treatment_id)
 
-    # Get nearest neighbor from request
-    nn = request.GET.get('nn')
+    basin_fractional_coverage = {
+        'baseline': calculate_basin_fc(ppt),
+        'mechanical': calculate_basin_fc(ppt, treatment, 50),
+        'rx_burn': calculate_basin_fc(ppt, treatment, 30),
+        'catastrophic_fire': calculate_basin_fc(ppt, treatment, 0)
+    }
 
-    baseline_input_rows = []
-    baseline_input_rows.append(get_basin_input_dict(ppb_d_data, ppb_d.geometry, treatment.geometry_dissolved, 'bottom_basin'))
+    rx_fc_pct_delta = {}
+    for rx in ['mechanical', 'rx_burn', 'catastrophic_fire']:
+        rx_fc_pct_delta[rx] = (basin_fractional_coverage['baseline'] - basin_fractional_coverage[rx])/basin_fractional_coverage['baseline']*100
 
-    treatment_input_rows = []
-    # - Get all encompassed discrete basins
-    discrete_basin_ids = [x.id for x in PourPoint.objects.filter(geometry__coveredby=ppb_o.geometry)]
-    if ppb_o.unit_id in discrete_basin_ids:
-        # discrete_basin_ids.append(ppb_o.unit_id)
-        discrete_basin_ids.remove(ppb_0.unit_id)
-    sub_basins = FocusArea.objects.filter(unit_type="PourPointDiscrete", unit_id__in=discrete_basin_ids)
+    if ppt.imputed_ppt:
+        imputed_ppt = ppt.imputed_ppt
+    else:
+        imputed_ppt = PourPoint.objects.get(id=settings.DEFAULT_NN_PPT)
 
-    # if len(sub_basins) > 5, this may take a LONG time to work through.
-    # TODO: Disable 'Evaluate' button when too many Veg Units are impacted (issue #134)
-    # if len(sub_basins) > 10:
-        # TODO: return something to frontend so we can give feedback to the user
-        # print("Running Hydro model on %d basins! This may be a while..." % len(sub_basins))
+    results_csvs = {
+        'baseline': "%s/veg%s_base.csv" % (ucsrb_settings.NN_DATA_DIR, imputed_ppt.watershed_id),
+        'mechanical': get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['mechanical']),
+        'rx_burn': get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['rx_burn']),
+        'catastrophic_fire': get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['catastrophic_fire'])
+    }
 
-    # - For each d_basin that intersects treatent scenario:
-    for d_basin in sub_basins:
-        sub_basin_id = d_basin.unit_id
-        sub_basin_data = PourPointBasin.objects.get(pk=sub_basin_id)
-        for treatment_type in ucsrb_settings.TREATMENT_TARGETS.keys():
-            row_id = "%s-%s" % (sub_basin_id, treatment_type)
-            if treatment_type == 'baseline':
-                baseline_input_rows.append(get_basin_input_dict(sub_basin_data, d_basin.geometry, treatment.geometry_dissolved, row_id, treatment_type))
-            else:
-                treatment_input_rows.append(get_basin_input_dict(sub_basin_data, d_basin.geometry, treatment.geometry_dissolved, row_id, treatment_type))
-
-    # baseline_csv_filename = "%s/%s_%s_baseline.csv" % (ucsrb_settings.CSV_DIR, str(request.user.id), str(int(time.time()*100)))
-    # treatment_csv_filename = "%s/%s_%s_treatment.csv" % (ucsrb_settings.CSV_DIR, str(request.user.id), str(int(time.time()*100)))
-
-    # write baseline csv
-    # with open(baseline_csv_filename, 'w') as csvfile:
-        # writer = csv.DictWriter(csvfile, fieldnames=ucsrb_settings.HYDRO_INPUT_HEADERS)
-        # writer.writeheader()
-        # for row in baseline_input_rows:
-            # writer.writerow(row)
-
-    # write delta csv
-    # with open(treatment_csv_filename, 'w') as csvfile:
-        # writer = csv.DictWriter(csvfile, fieldnames=ucsrb_settings.HYDRO_INPUT_HEADERS)
-        # writer.writeheader()
-        # for row in treatment_input_rows:
-            # writer.writerow(row)
-
-    results = {}
-    # baseline_out_csv = run_hydro_model(baseline_csv_filename)
-    # treatment_out_csv = run_hydro_model(treatment_csv_filename)
-    # flow_output = parse_flow_results(baseline_out_csv, treatment_out_csv)
-
-    # need file name to match on available in data dir (e.g., vegwen20_50.csv)
-        # break down of file name: "veg(wen, met, or ent)#_#"
-    basefilenameholder = "vegwen_base"
-    vegfilenameholder = "vegwen20_50"
-    baseline_csv_file = "%s/%s.csv" % (ucsrb_settings.NN_DATA_DIR, basefilenameholder)
-    nn_csv_file = "%s/%s.csv" % (ucsrb_settings.NN_DATA_DIR, vegfilenameholder)
-    flow_output = parse_flow_results(baseline_csv_file, nn_csv_file, pourpoint_id)
-
-    # if ucsrb_settings.DELETE_CSVS:
-        # os.remove(baseline_out_csv)
-        # os.remove(treatment_out_csv)
+    flow_output = parse_flow_results(results_csvs, imputed_ppt)
 
     absolute_results = sort_output(flow_output)
     #   delta flow

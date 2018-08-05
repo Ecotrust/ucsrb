@@ -30,7 +30,7 @@ class Command(BaseCommand):
             for row in csvReader:
                 try:
                     ppt = PourPoint.objects.get(id=int(row['ppt_ID']))
-                    ppt.imputed_ppt = int(row['imputedPpt'])
+                    ppt.imputed_ppt = PourPoint.objects.get(id=int(row['imputedPpt']))
                     ppt.streammap_id = int(row['strmMap_id'])
                     if row['wshed_name'] == 'Upper Methow':     #Methow
                         ppt.watershed_id = 'met'
