@@ -299,8 +299,13 @@ app.panel = {
                 for (var result in results.results) {
                     // load into charts array
                     var resultObj = results.results[result];
-                    app.panel.results.charts.push(resultObj);
-                    html += `<button class="dropdown-item btn-sm" id="chart-${result}" data-chart="${resultObj.title}" onclick="app.panel.results.chart.init(${result})" type="button">${resultObj.title}</button>`;
+                    if (resultObj.type !== 'summary') {
+                        for (var report in results.results[result].reports) {
+                            var reportObj = results.results[result].reports[report];
+                            app.panel.results.charts.push(reportObj);
+                            html += `<button class="dropdown-item btn-sm" id="chart-${report}" data-chart="${reportObj.title}" onclick="app.panel.results.chart.init(${report})" type="button">${reportObj.title}</button>`;
+                        }
+                    }
                 }
                 html += `</div></div></div>`;
                 html += `<div class="chart-wrap"><div id="chartResult"></div></div>`;
