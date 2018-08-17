@@ -517,7 +517,7 @@ def get_hydro_results_by_pour_point_id(request):
     seven_d_low_results = get_results_7d_low(flow_output, absolute_results)
     seven_d_mean_results = get_results_7d_mean(flow_output, absolute_results)
 
-    results = [
+    charts = [
         {
             'title': 'Absolute Flow Rate @ 3hr Steps',
             'data': absolute_results
@@ -534,6 +534,17 @@ def get_hydro_results_by_pour_point_id(request):
         'title': 'Change in Flow Rate @ 3hr Steps',
         'data': delta_results
         },
+    ]
+
+    results = [
+        {
+            'type': 'summary',
+            'reports': []
+        },
+        {
+            'type': 'charts',
+            'reports' : charts
+         }
     ]
 
     return JsonResponse({'results': results})
