@@ -18,7 +18,7 @@ app.map.styles = {
             }),
             stroke: new ol.style.Stroke({
                 color: '#ffffff',
-                width: 1,
+                width: 2,
             }),
         }),
         zIndex: 2,
@@ -31,7 +31,7 @@ app.map.styles = {
             }),
             stroke: new ol.style.Stroke({
                 color: '#ffffff',
-                width: 2,
+                width: 3,
             }),
         }),
         zIndex: 5
@@ -128,11 +128,11 @@ app.map.styles = {
         });
     },
     'PourPoint': function(feature, resolution) {
-      var radius = 4;
+      var radius = 5;
       if (resolution < 5) {
-          radius = 10;
+          radius = 12;
       } else if (resolution < 40) {
-          radius = 6;
+          radius = 7;
       }
       return new ol.style.Style({
         image: new ol.style.Circle({
@@ -142,14 +142,14 @@ app.map.styles = {
             }),
             stroke: new ol.style.Stroke({
                 color: '#aaffff',
-                width: 2,
+                width: 3,
             }),
         }),
         zIndex: 9
       });
     },
     'PourPointSelected': function(feature, resolution) {
-      var radius = 7;
+      var radius = 8;
       if (resolution < 5) {
           radius = 16;
       } else if (resolution < 40) {

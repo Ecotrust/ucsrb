@@ -519,19 +519,19 @@ def get_hydro_results_by_pour_point_id(request):
 
     charts = [
         {
-            'title': 'Absolute Flow Rate @ 3hr Steps',
+            'title': 'Absolute Flow Rate',
             'data': absolute_results
         },
         {
-            'title': 'Seven Day Low Flow @ 3hr Steps',
+            'title': 'Seven Day Low Flow',
             'data': seven_d_low_results
         },
         {
-            'title': 'Seven Day Mean Flow @ 3hr Steps',
+            'title': 'Seven Day Mean Flow',
             'data': seven_d_mean_results
         },
         {
-        'title': 'Change in Flow Rate @ 3hr Steps',
+        'title': 'Change in Flow Rate',
         'data': delta_results
         },
     ]
