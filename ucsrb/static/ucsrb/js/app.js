@@ -301,15 +301,20 @@ app.panel = {
                     // load into charts array
                     var resultObj = results.results[result];
                     console.log(resultObj);
-                    for (var report in results.results[result].reports) {
-                        var reportObj = results.results[result].reports[report];
-                        app.panel.results.charts.push(reportObj);
-                        console.log(reportObj);
-                        if (resultObj.type !== 'summary') {
+                    if (resultObj.type != 'summary') {
+                        for (var report in results.results[result].reports) {
+                            var reportObj = results.results[result].reports[report];
+                            app.panel.results.charts.push(reportObj);
+                            console.log(reportObj);
                             html += `<button class="dropdown-item btn-sm" id="chart-${report}" data-chart="${reportObj.title}" onclick="app.panel.results.chart.init(${report})" type="button">${reportObj.title}</button>`;
-                        } else {
+                        }
+                    } else {
+                        console.log('yo');
+                        for (var report in resultObj.reports) {
+                            var reportObj = results.results[result].reports[report];
                             app.panel.results.summary.push(reportObj.data);
-                            html += `<button class="dropdown-item btn-sm" id="summary" data-chart="${resultObj.title}" onclick="app.panel.results.summary.init()" type="button">${resultObj.title}</button>`;
+                            console.log(reportObj);
+                            html += `<button class="dropdown-item btn-sm" id="chart-summary" data-chart="${resultObj.title}" onclick="app.panel.results.summary.init()" type="button">${resultObj.title}</button>`;
 
                         }
                     }

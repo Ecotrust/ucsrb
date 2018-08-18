@@ -539,7 +539,18 @@ def get_hydro_results_by_pour_point_id(request):
     results = [
         {
             'type': 'summary',
-            'reports': []
+            'reports': [
+                {
+                    'title': 'basin characteristics',
+                    'data': [
+                        {
+                          'key': 'forest area in basin',
+                          'value': 245.3,
+                          'unit': 'acres'
+                        },
+                    ]
+                }
+          ]
         },
         {
             'type': 'charts',
