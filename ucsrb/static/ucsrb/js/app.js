@@ -209,6 +209,11 @@ app.panel = {
             initFiltering();
         },
     },
+    summary: {
+        init: function() {
+            document.getElementById('chartResult').innerHTML = app.panel.results.styleResultsAsRows(app.panel.results.summary);
+        }
+    },
     results: {
         init: function() {
             app.panel.getPanelContentElement.innerHTML = app.nav.stepActions.initial;
@@ -314,7 +319,7 @@ app.panel = {
                             var reportObj = results.results[result].reports[report];
                             app.panel.results.summary.push(reportObj.data);
                             console.log(reportObj);
-                            html += `<button class="dropdown-item btn-sm" id="chart-summary" data-chart="${resultObj.title}" onclick="app.panel.results.summary.init()" type="button">${resultObj.title}</button>`;
+                            html += `<button class="dropdown-item btn-sm" id="chart-summary" data-chart="${resultObj.title}" onclick="app.panel.summary.init()" type="button">${resultObj.title}</button>`;
 
                         }
                     }
@@ -346,11 +351,6 @@ app.panel = {
             }
             html += '</tr></tbody></table></div>'
             return html;
-        },
-        summary: {
-            init: function() {
-                document.getElementById('chartResult').innerHTML = app.panel.results.styleResultsAsRows(app.panel.results.summary.data);
-            }
         },
         chart: {
             init: function(chartIndex) {
