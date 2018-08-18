@@ -291,6 +291,7 @@ app.panel = {
             }
             // charts array
             app.panel.results.charts = []
+            app.panel.results.summary = []
             var html = `<section class="hydro-results result-section" id="hydro-results">`;
                 html += `<div id="pp-result-${result}" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_hydro.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">${app.panel.results.name}</h4></div></div></div>`;
 
@@ -299,11 +300,17 @@ app.panel = {
                 for (var result in results.results) {
                     // load into charts array
                     var resultObj = results.results[result];
-                    if (resultObj.type !== 'summary') {
-                        for (var report in results.results[result].reports) {
-                            var reportObj = results.results[result].reports[report];
-                            app.panel.results.charts.push(reportObj);
+                    console.log(resultObj);
+                    for (var report in results.results[result].reports) {
+                        var reportObj = results.results[result].reports[report];
+                        app.panel.results.charts.push(reportObj);
+                        console.log(reportObj);
+                        if (resultObj.type !== 'summary') {
                             html += `<button class="dropdown-item btn-sm" id="chart-${report}" data-chart="${reportObj.title}" onclick="app.panel.results.chart.init(${report})" type="button">${reportObj.title}</button>`;
+                        } else {
+                            app.panel.results.summary.push(reportObj.data);
+                            html += `<button class="dropdown-item btn-sm" id="summary" data-chart="${resultObj.title}" onclick="app.panel.results.summary.init()" type="button">${resultObj.title}</button>`;
+
                         }
                     }
                 }
@@ -334,6 +341,11 @@ app.panel = {
             }
             html += '</tr></tbody></table></div>'
             return html;
+        },
+        summary: {
+            init: function() {
+                document.getElementById('chartResult').innerHTML = app.panel.results.styleResultsAsRows(app.panel.results.summary.data);
+            }
         },
         chart: {
             init: function(chartIndex) {
