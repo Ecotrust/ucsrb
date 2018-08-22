@@ -342,7 +342,7 @@ def parse_flow_results(csv_dict, ppt):
             for row in csvReader:
                 if int(row['STREAMMAPID']) == ppt.streammap_id:
                     # Convert total 3-hour flow  in cubic meters to per-second flow in cubic feet
-                    output_dict[treatment][row['TIMESTAMP']] = float(row[settings.NN_CSV_FLOW_COLUMN])/3/60/60*35.3147
+                    output_dict[treatment][row['TIMESTAMP']] = float(row[settings.NN_CSV_FLOW_COLUMN])/settings.TIME_STEP_HOURS/60/60*35.3147
 
     return output_dict
 

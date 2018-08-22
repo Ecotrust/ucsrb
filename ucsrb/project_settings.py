@@ -277,6 +277,8 @@ HYDRO_INPUT_HEADERS = [
 
 ANALYSIS_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'ucsrb', 'analysis'))
 
+TIME_STEP_HOURS = 6
+
 CSV_DIR = os.path.realpath(os.path.join(ANALYSIS_DIR, 'input_csvs'))
 
 NN_DATA_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'ucsrb', 'ucsrb', 'data'))
