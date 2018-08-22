@@ -278,7 +278,8 @@ def get_downstream_pour_points(request):
     return JsonResponse(downstream_ppts, safe=False)
 
 def sort_output(flow_output):
-    results = {}
+    from collections import OrderedDict
+    results = OrderedDict({})
     def get_timestamp_from_string(time_string):
         from datetime import datetime
         return datetime.strptime(time_string, "%m.%d.%Y-%H:%M:%S")
@@ -329,15 +330,13 @@ def parse_flow_results(csv_dict, ppt):
     import csv
     from copy import deepcopy
     from ucsrb import project_settings as ucsrb_settings
-    output_dict = {
-        'baseline': {},
-        'mechanical': {},
-        'rx_burn': {},
-        'catastrophic_fire': {},
-    }
+    from collections import OrderedDict
 
+    output_dict = OrderedDict({})
 
     for treatment in csv_dict.keys():
+        if treatment not in output_dict.keys():
+            output_dict[treatment] = {}
         with open(csv_dict[treatment]) as csvfile:
             csvReader = csv.DictReader(csvfile)
             for row in csvReader:
@@ -501,12 +500,12 @@ def get_hydro_results_by_pour_point_id(request):
     else:
         imputed_ppt = PourPoint.objects.get(id=settings.DEFAULT_NN_PPT)
 
-    results_csvs = {
-        'baseline': "%s/veg%s_base.csv" % (ucsrb_settings.NN_DATA_DIR, imputed_ppt.watershed_id),
-        'mechanical': get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['mechanical']),
-        'rx_burn': get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['rx_burn']),
-        'catastrophic_fire': get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['catastrophic_fire'])
-    }
+    from collections import OrderedDict
+    results_csvs = OrderedDict({})
+    results_csvs['baseline'] = "%s/veg%s_base.csv" % (ucsrb_settings.NN_DATA_DIR, imputed_ppt.watershed_id)
+    results_csvs['reduce to 50'] = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['mechanical'])
+    results_csvs['reduce to 30'] = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['rx_burn'])
+    results_csvs['reduce to 0'] = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['catastrophic_fire'])
 
     flow_output = parse_flow_results(results_csvs, imputed_ppt)
 
