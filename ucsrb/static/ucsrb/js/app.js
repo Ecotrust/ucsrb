@@ -211,7 +211,7 @@ app.panel = {
     },
     summary: {
         init: function() {
-            document.getElementById('chartResult').innerHTML = app.panel.results.styleResultsAsRows(app.panel.results.summary);
+            document.getElementById('chartResult').innerHTML = app.panel.results.styleSummaryResultsAsRows(app.panel.results.summary);
         }
     },
     results: {
@@ -298,30 +298,25 @@ app.panel = {
             app.panel.results.charts = []
             app.panel.results.summary = []
             var html = `<section class="hydro-results result-section" id="hydro-results">`;
-                html += `<div id="pp-result-${result}" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_hydro.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">${app.panel.results.name}</h4></div></div></div>`;
+                html += `<div id="pp-result" class="pourpoint-result-wrap"><div class="media align-items-center"><img class="align-self-center mr-3" src="/static/ucsrb/img/icon/i_hydro.svg" alt="aggregate"><div class="media-body"><h4 class="mt-0">${app.panel.results.name}</h4></div></div></div>`;
 
                 html += `<div class="feature-result dropdown-wrap"><div class="dropdown"><button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Chart</button>`;
                 html += `<div class="dropdown-menu dropdown-menu-center" id="chart-dropdown" aria-labelledby="dropdownMenuButton">`
                 for (var result in results.results) {
                     // load into charts array
                     var resultObj = results.results[result];
-                    console.log(resultObj);
-                    if (resultObj.type != 'summary') {
+                    if (resultObj.type != 'Summary') {
                         for (var report in results.results[result].reports) {
                             var reportObj = results.results[result].reports[report];
                             app.panel.results.charts.push(reportObj);
-                            console.log(reportObj);
                             html += `<button class="dropdown-item btn-sm" id="chart-${report}" data-chart="${reportObj.title}" onclick="app.panel.results.chart.init(${report})" type="button">${reportObj.title}</button>`;
                         }
                     } else {
-                        console.log('yo');
                         for (var report in resultObj.reports) {
                             var reportObj = results.results[result].reports[report];
-                            app.panel.results.summary.push(reportObj.data);
-                            console.log(reportObj);
-                            html += `<button class="dropdown-item btn-sm" id="chart-summary" data-chart="${resultObj.title}" onclick="app.panel.summary.init()" type="button">${resultObj.title}</button>`;
-
+                            app.panel.results.summary.push(reportObj);
                         }
+                        html += `<button class="dropdown-item btn-sm" id="chart-summary" data-chart="Summary" onclick="app.panel.summary.init()" type="button">Summary</button>`;
                     }
                 }
                 html += `</div></div></div>`;
@@ -345,12 +340,28 @@ app.panel = {
             for (var result in results) {
                 html += '<tr>'
                 for (var i = 0; i < results[result].length; i++) {
-                    html += `<tr><td>${Object.keys(results[result][i])}</td><td>${Object.values(results[result][i])}</td></tr>`;
+
+                  for (var j=0; j < Object.keys(results[result][i]).length; j++){
+                    html += `<tr><td>${Object.keys(results[result][i])[j]}</td><td>${Object.values(results[result][i])[j]}</td></tr>`;
+                  }
                 }
                 html += '</tr>'
             }
             html += '</tr></tbody></table></div>'
             return html;
+        },
+        styleSummaryResultsAsRows: function(results) {
+          var html = '<h2>Summary Report</h2>';
+          for (var result in results) {
+              html += `<h3>${results[result].title}</h3>`
+              html += '<div class="table-responsive"><table class="table-light table-borderless table"><tbody>';
+              // html += '<tr><th>Field</th><th>Value</th><th>Unit</th></tr>';
+              for (var i = 0; i < results[result].data.length; i++) {
+                html += `<tr><td>${results[result].data[i]["key"]}</td><td>${results[result].data[i]["value"]}</td><td>${results[result].data[i]["unit"]}</td></tr>`;
+              }
+              html += '</tbody></table></div>'
+          }
+          return html;
         },
         chart: {
             init: function(chartIndex) {

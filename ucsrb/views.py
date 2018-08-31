@@ -340,9 +340,8 @@ def parse_flow_results(csv_dict, ppt):
         with open(csv_dict[treatment]) as csvfile:
             csvReader = csv.DictReader(csvfile)
             for row in csvReader:
-                if int(row['STREAMMAPID']) == ppt.streammap_id:
-                    # Convert total 3-hour flow  in cubic meters to per-second flow in cubic feet
-                    output_dict[treatment][row['TIMESTAMP']] = float(row[settings.NN_CSV_FLOW_COLUMN])/settings.TIME_STEP_HOURS/60/60*35.3147
+                # Convert total 3-hour flow  in cubic meters to per-second flow in cubic feet
+                output_dict[treatment][row['TIMESTAMP']] = float(row[settings.NN_CSV_FLOW_COLUMN])/settings.TIME_STEP_HOURS/60/60*35.3147
 
     return output_dict
 
@@ -427,11 +426,16 @@ def run_hydro_model(in_csv):
     return out_csv
 
 def get_flow_csv_match(ppt, delta):
+    import os
     from ucsrb.models import ScenarioNNLookup
     from ucsrb import project_settings as ucsrb_settings
     candidates = [x for x in ScenarioNNLookup.objects.filter(ppt_id=ppt.id)]
     best_match = min(candidates, key=lambda x:abs(x.fc_delta-delta))
-    return "%s/veg%s%d_%d.csv" % (ucsrb_settings.NN_DATA_DIR, ppt.watershed_id, best_match.scenario_id, best_match.treatment_target)
+    rx_dir = "%d_%d" % (best_match.scenario_id, best_match.treatment_target)
+    return (
+        os.path.join(ucsrb_settings.NN_DATA_DIR,"veg%s" % ppt.watershed_id,rx_dir, "%s.csv" % str(ppt.streammap_id)),
+        rx_dir
+    )
 
 def calculate_basin_fc(ppt, scenario=None, target_fc=-1):
     from ucsrb.models import FocusArea, PourPoint, PourPointBasin, VegPlanningUnit
@@ -500,12 +504,18 @@ def get_hydro_results_by_pour_point_id(request):
     else:
         imputed_ppt = PourPoint.objects.get(id=settings.DEFAULT_NN_PPT)
 
+    if ppt == imputed_ppt:
+        est_type = 'Modeled'
+    else:
+        est_type = 'Imputed'
+    impute_id = str(imputed_ppt.pk)
+
     from collections import OrderedDict
     results_csvs = OrderedDict({})
-    results_csvs['baseline'] = "%s/veg%s_base.csv" % (ucsrb_settings.NN_DATA_DIR, imputed_ppt.watershed_id)
-    results_csvs['reduce to 50'] = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['mechanical'])
-    results_csvs['reduce to 30'] = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['rx_burn'])
-    results_csvs['reduce to 0'] = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['catastrophic_fire'])
+    results_csvs['baseline'] = os.path.join(ucsrb_settings.NN_DATA_DIR,"veg%s" % imputed_ppt.watershed_id,"_base","%s.csv" % imputed_ppt.streammap_id)
+    (results_csvs['reduce to 50'], rx_50) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['mechanical'])
+    (results_csvs['reduce to 30'], rx_30) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['rx_burn'])
+    (results_csvs['reduce to 0'], rx_0) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['catastrophic_fire'])
 
     flow_output = parse_flow_results(results_csvs, imputed_ppt)
 
@@ -535,12 +545,23 @@ def get_hydro_results_by_pour_point_id(request):
         },
     ]
 
+    flow_est_data = []
+    if settings.DEBUG:
+        flow_est_data.append({'key': 'Estimation Type','value': est_type,'unit': ''})
+        flow_est_data.append({'key': 'Imputed ppt_ID','value': impute_id,'unit': ''})
+        flow_est_data.append({'key': 'Imputed veg mgmt scenario (50)','value': rx_50,'unit': ''})
+        flow_est_data.append({'key': 'Imputed veg mgmt scenario (30)','value': rx_30,'unit': ''})
+        flow_est_data.append({'key': 'Imputed veg mgmt scenario (00)','value': rx_0,'unit': ''})
+    flow_est_data.append({'key': 'Baseline Confidence', 'value': "unset", 'unit': 'plus/minus x'})
+    flow_est_data.append({'key': 'Change in Flow Confidence', 'value': "unset", 'unit': 'plus/minus x'})
+
+
     results = [
         {
-            'type': 'summary',
+            'type': 'Summary',
             'reports': [
                 {
-                    'title': 'basin characteristics',
+                    'title': 'Basin Characteristics',
                     'data': [
                         {
                           'key': 'forest area in basin',
@@ -548,8 +569,29 @@ def get_hydro_results_by_pour_point_id(request):
                           'unit': 'acres'
                         },
                     ]
-                }
-          ]
+                },{
+                    'title': 'Hydrologic Characteristics',
+                    'data': [
+                        {
+                          'key': 'forest area in basin',
+                          'value': 245.3,
+                          'unit': 'acres'
+                        },
+                    ]
+                },{
+                    'title': 'Proposed Management',
+                    'data': [
+                        {
+                          'key': 'forest area in basin',
+                          'value': 245.3,
+                          'unit': 'acres'
+                        },
+                    ]
+                },{
+                    'title': 'Flow Estimation Confidence',
+                    'data': flow_est_data
+                },
+            ]
         },
         {
             'type': 'charts',
