@@ -1167,7 +1167,7 @@ Panel
 
     #chartResult {
         border-bottom: none;
-        display: initial;
+        display: table;
         height: 46vh;
         font-size: .875em;
         width: 100%;
