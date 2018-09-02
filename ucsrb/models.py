@@ -270,7 +270,7 @@ class TreatmentScenario(Scenario):
 
     def run(self, result=None):
         if self.focus_area_input:
-            result = VegPlanningUnit.objects.filter(geometry__intersects=self.focus_area_input.geometry)
+            result = VegPlanningUnit.objects.filter(geometry__within=self.focus_area_input.geometry)
         else:
             result = VegPlanningUnit.objects.all()
         if result.count() > 0:
@@ -372,6 +372,15 @@ class TreatmentScenario(Scenario):
     def set_report(self):
         self.aggregate_report = self.aggregate_results()
         self.save()
+
+    @property
+    def veg_units(self):
+        if len(self.planning_units) == 0:  #empty result
+            planninunit_ids = []
+        else:
+            planningunit_ids = [int(id) for id in self.planning_units.split(',')]
+        planningunits = VegPlanningUnit.objects.filter(pk__in=planningunit_ids)
+        return planningunits
 
     class Options:
         verbose_name = 'Treatment'

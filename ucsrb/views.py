@@ -612,11 +612,15 @@ def get_results_by_scenario_id(request):
     except:
         return get_json_error_response('Treatment with given ID (%s) does not exist' % scenario_id, 500, {})
 
-    # containing_overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__intersects=treatment.geometry_dissolved)
-    containing_basin = sorted(FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__covers=treatment.geometry_dissolved), key= lambda x: x.geometry.area)[0]
-    containing_overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap', geometry__within=containing_basin.geometry)
+    veg_units = treatment.veg_units
+    impacted_pourpoint_ids = [x.dwnstream_ppt_id for x in veg_units]
+    intermediate_downstream_ppts = PourPoint.objects.filter(id__in=impacted_pourpoint_ids)
+    overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap')
+    for ppt in intermediate_downstream_ppts:
+        overlap_basins = overlap_basins.filter(geometry__intersects=ppt.geometry)
+    containing_basin = sorted(overlap_basins, key= lambda x: x.geometry.area)[0]
+    impacted_pourpoint_ids.append(containing_basin.unit_id)
 
-    impacted_pourpoint_ids = [x.unit_id for x in containing_overlap_basins]
     downstream_ppts = PourPoint.objects.filter(id__in=impacted_pourpoint_ids)
 
     if export:
