@@ -270,7 +270,7 @@ class TreatmentScenario(Scenario):
 
     def run(self, result=None):
         if self.focus_area_input:
-            result = VegPlanningUnit.objects.filter(geometry__within=self.focus_area_input.geometry)
+            result = VegPlanningUnit.objects.filter(geometry__intersects=self.focus_area_input.geometry)
         else:
             result = VegPlanningUnit.objects.all()
         if result.count() > 0:
