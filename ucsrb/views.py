@@ -339,9 +339,18 @@ def parse_flow_results(csv_dict, ppt):
             output_dict[treatment] = {}
         with open(csv_dict[treatment]) as csvfile:
             csvReader = csv.DictReader(csvfile)
-            for row in csvReader:
-                # Convert total 3-hour flow  in cubic meters to per-second flow in cubic feet
-                output_dict[treatment][row['TIMESTAMP']] = float(row[settings.NN_CSV_FLOW_COLUMN])/settings.TIME_STEP_HOURS/60/60*35.3147
+            if settings.TIME_STEP_HOURS == settings.TIME_STEP_REPORTING:
+                for row in csvReader:
+                    # Convert total 3-hour flow  in cubic meters to per-second flow in cubic feet
+                    output_dict[treatment][row['TIMESTAMP']] = float(row[settings.NN_CSV_FLOW_COLUMN])/settings.TIME_STEP_HOURS/60/60*35.3147
+            else:
+                steps_to_aggregate = settings.TIME_STEP_REPORTING/settings.TIME_STEP_HOURS
+                aggregate_flow = 0
+                for index, row in enumerate(csvReader):
+                    aggregate_flow += float(row[settings.NN_CSV_FLOW_COLUMN])
+                    if index%steps_to_aggregate == 0:
+                        output_dict[treatment][row['TIMESTAMP']] = aggregate_flow/settings.TIME_STEP_REPORTING/60/60*35.3147
+                        aggregate_flow = 0
 
     return output_dict
 
@@ -437,21 +446,8 @@ def get_flow_csv_match(ppt, delta):
         rx_dir
     )
 
-def calculate_basin_fc(ppt, scenario=None, target_fc=-1):
+def calculate_basin_fc(ppt, basin_area, included_ppts, scenario=None, target_fc=-1):
     from ucsrb.models import FocusArea, PourPoint, PourPointBasin, VegPlanningUnit
-    basin = FocusArea.objects.get(unit_id=ppt.id,unit_type='PourPointOverlap')
-    included_ppts = [x.id for x in PourPoint.objects.filter(geometry__intersects=basin.geometry)]
-    # To get a full acres area (calculated at discrete ppt basin) we need to sum up all subbasins
-    basin_area = 0
-    for subbasin in PourPointBasin.objects.filter(ppt_ID__in=included_ppts):
-        basin_area += subbasin.area
-
-    if basin_area == 0:
-        # Reproject basin to equal-area
-        basin_geom = basin.geometry
-        basin_geom.transform(2163)
-        # Get basin area in sq meters and convert to acres
-        basin_area = basin_geom.area/4046.86
 
     if scenario and target_fc >= 0:
         planning_units = [int(x) for x in scenario.planning_units.split(',')]
@@ -472,7 +468,7 @@ def calculate_basin_fc(ppt, scenario=None, target_fc=-1):
 #   treatment_id
 @cache_page(60 * 60) # 1 hour of caching
 def get_hydro_results_by_pour_point_id(request):
-    from ucsrb.models import PourPointBasin, TreatmentScenario, FocusArea, PourPoint
+    from ucsrb.models import PourPointBasin, TreatmentScenario, FocusArea, PourPoint, VegPlanningUnit
     from ucsrb import project_settings as ucsrb_settings
     import csv
     import time
@@ -484,12 +480,28 @@ def get_hydro_results_by_pour_point_id(request):
     # Get treatment_id from request or API
     treatment_id = request.GET.get('treatment_id')
     treatment = TreatmentScenario.objects.get(pk=treatment_id)
+    overlap_basin = FocusArea.objects.get(unit_type='PourPointOverlap', unit_id=pourpoint_id)
+    # basin_geom = overlap_basin.geometry.clone()
+    # basin_geom.transform(2163)
+    # basin_acres = int(basin_geom.area/4046.86)
+    # RDH 09/03/2018
+    # Some of the data I need is at the Overlapping Ppt Basin level, while some is aggregated to
+    # the PourPointBasin, which I am discovering was calculated to the Discrete Ppt Basins.
+    # Since the Discrete Ppt basins and the Overlapping ppt basins DO NOT MATCH, you will see
+    # a lot of workarounds in this section.
+    # If the two layers are made to match in the future this could be MUCH simpler.
+    upslope_ppts = [x.id for x in PourPoint.objects.filter(geometry__intersects=overlap_basin.geometry)]
+    if pourpoint_id not in upslope_ppts:
+        upslope_ppts.append(pourpoint_id)
+    drainage_basins = PourPointBasin.objects.filter(ppt_ID__in=upslope_ppts)
+    # agg_ppt_basin_acres = sum([x.area for x in drainage_basins])
+    basin_acres = sum([x.area for x in drainage_basins])
 
     basin_fractional_coverage = {
-        'baseline': calculate_basin_fc(ppt),
-        'mechanical': calculate_basin_fc(ppt, treatment, 50),
-        'rx_burn': calculate_basin_fc(ppt, treatment, 30),
-        'catastrophic_fire': calculate_basin_fc(ppt, treatment, 0)
+        'baseline': calculate_basin_fc(ppt, basin_acres, upslope_ppts),
+        'mechanical': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 50),
+        'rx_burn': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 30),
+        'catastrophic_fire': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 0)
     }
 
     rx_fc_pct_delta = {}
@@ -520,10 +532,22 @@ def get_hydro_results_by_pour_point_id(request):
     flow_output = parse_flow_results(results_csvs, imputed_ppt)
 
     absolute_results = sort_output(flow_output)
+    # TODO:
+    #     Baseline water yield (bas_char)
+    #     Baseline average annual flow (bas_char, hydro_char)
+    #     Rx (50, 30, 0) average annual flow (hydro_char)
+    #     Baseline September mean flow (bas_char, hydro_char)
+    #     Rx (50, 30, 0) September mean flow (hydro_char)
+
     #   delta flow
     delta_results = get_results_delta(flow_output)
+
     #   7-day low-flow (needs sort_by_time)
     seven_d_low_results = get_results_7d_low(flow_output, absolute_results)
+    # TODO:
+    #     Baseline September median 7 day avg low flow (bas_char, hydro_char)
+    #     Rx (50, 30, 0) September median 7 day avg low flow (hydro_char)
+
     seven_d_mean_results = get_results_7d_mean(flow_output, absolute_results)
 
     charts = [
@@ -545,53 +569,77 @@ def get_hydro_results_by_pour_point_id(request):
         },
     ]
 
-    flow_est_data = []
+    bas_char_data = []
+    bas_char_data.append({'key': 'Total area upslope of this gauging station', 'value': basin_acres, 'unit': 'acres' })
+    vus = VegPlanningUnit.objects.filter(dwnstream_ppt_id__in=upslope_ppts)
+    acres_forested = int(sum([x.acres for x in vus]))
+    bas_char_data.append({'key': 'Total forested area upslope', 'value': acres_forested, 'unit': 'acres' })
+    # bas_char_data.append({'key': 'Percent Forested', 'value': int(acres_forested/basin_acres*100), 'unit': '%' })
     if settings.DEBUG:
-        flow_est_data.append({'key': 'Estimation Type','value': est_type,'unit': ''})
+        # TODO: Calculate these values during chart building
+        bas_char_data.append({'key': 'Baseline water yield', 'value': 'TBD', 'unit': 'inches/year' })
+        bas_char_data.append({'key': 'Baseline average annual flow', 'value': 'TBD', 'unit': 'CFS' })
+        bas_char_data.append({'key': 'Baseline September mean flow', 'value': 'TBD', 'unit': 'CFS' })
+        bas_char_data.append({'key': 'Baseline September median 7 day avg low flow', 'value': 'TBD', 'unit': 'CFS' })
+
+    hydro_char_data = []
+    if settings.DEBUG:
+        hydro_char_data.append({'key': '<b>Change in avg annual flow from management</b>', 'value': '', 'unit': '' })
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline annl flow - 50 annl flow
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline annl flow - 30 annl flow
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline annl flow - 0 annl flow
+        hydro_char_data.append({'key': '<b>Change in avg Sept. flow from proposed management </b>', 'value': '', 'unit': '' })
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
+        hydro_char_data.append({'key': '<b>Change in Sept. 7-day low flow from proposed management </b>', 'value': '', 'unit': '' })
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
+
+    prop_mgmt_data = []
+    basin_veg_units = treatment.veg_units.filter(geometry__intersects=overlap_basin.geometry) #within may be more accurate, but slower
+    treatment_acres = sum([x.acres for x in basin_veg_units])
+    prop_mgmt_data.append({'key': 'Total forested area in proposed treatment', 'value': int(treatment_acres), 'unit': 'acres' })
+    if settings.DEBUG:
+        prop_mgmt_data.append({'key': '<b>Reduction in avg fractional coverage from proposed management</b>', 'value': '', 'unit': '' })
+        prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': 'TBD', 'unit': '%' }) #Baseline avg fc - 50 avg fc
+        prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': 'TBD', 'unit': '%' }) #Baseline avg fc - 30 avg fc
+        prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': 'TBD', 'unit': '%' }) #Baseline avg fc - 0 avg fc
+
+    flow_est_data = []
+    flow_est_data.append({'key': 'Estimation Type','value': est_type,'unit': ''})
+    if settings.DEBUG:
         flow_est_data.append({'key': 'Imputed ppt_ID','value': impute_id,'unit': ''})
         flow_est_data.append({'key': 'Imputed veg mgmt scenario (50)','value': rx_50,'unit': ''})
         flow_est_data.append({'key': 'Imputed veg mgmt scenario (30)','value': rx_30,'unit': ''})
-        flow_est_data.append({'key': 'Imputed veg mgmt scenario (00)','value': rx_0,'unit': ''})
-    flow_est_data.append({'key': 'Baseline Confidence', 'value': "unset", 'unit': 'plus/minus x'})
-    flow_est_data.append({'key': 'Change in Flow Confidence', 'value': "unset", 'unit': 'plus/minus x'})
+        flow_est_data.append({'key': 'Imputed veg mgmt scenario (0)','value': rx_0,'unit': ''})
+        flow_est_data.append({'key': 'Baseline Confidence', 'value': "TBD", 'unit': 'plus/minus x'})
+        flow_est_data.append({'key': 'Change in Flow Confidence', 'value': "TBD", 'unit': 'plus/minus x'})
 
+
+    summary_reports = []
+    # if settings.DEBUG:
+    #     summary_reports.append(
+    #         {
+    #             'title': 'Debug Data',
+    #             'data': [
+    #                 {'key': 'Gauging station ID', 'value': pourpoint_id, 'unit': ''},
+    #                 # {'key': 'Overlap Basin Area', 'value': basin_acres, 'unit': 'Acres'},
+    #                 # {'key': 'Agg. Ppt Basin Area', 'value': agg_ppt_basin_acres, 'unit': 'Acres'},
+    #                 {'key': 'Agg. Ppt Basin Area', 'value': basin_acres, 'unit': 'Acres'},
+    #             ]
+    #         }
+    #     )
+    summary_reports.append({'title': 'Basin Characteristics','data': bas_char_data})
+    summary_reports.append({'title': 'Hydrologic Characteristics','data': hydro_char_data})
+    summary_reports.append({'title': 'Proposed Management','data': prop_mgmt_data})
+    summary_reports.append({'title': 'Flow Estimation Confidence','data': flow_est_data})
 
     results = [
         {
             'type': 'Summary',
-            'reports': [
-                {
-                    'title': 'Basin Characteristics',
-                    'data': [
-                        {
-                          'key': 'forest area in basin',
-                          'value': 245.3,
-                          'unit': 'acres'
-                        },
-                    ]
-                },{
-                    'title': 'Hydrologic Characteristics',
-                    'data': [
-                        {
-                          'key': 'forest area in basin',
-                          'value': 245.3,
-                          'unit': 'acres'
-                        },
-                    ]
-                },{
-                    'title': 'Proposed Management',
-                    'data': [
-                        {
-                          'key': 'forest area in basin',
-                          'value': 245.3,
-                          'unit': 'acres'
-                        },
-                    ]
-                },{
-                    'title': 'Flow Estimation Confidence',
-                    'data': flow_est_data
-                },
-            ]
+            'reports': summary_reports
         },
         {
             'type': 'charts',
