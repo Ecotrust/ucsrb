@@ -104,7 +104,6 @@ app.resultsInit = function(id) {
         id = app.viewModel.scenarios.scenarioList()[0].uid;
     } else if (!id.includes('ucsrb')) {
         id = 'ucsrb_treatmentscenario_' + id;
-        console.log(id);
         app.viewModel.scenarios.addScenarioToMap(null, {
             uid: id
         });
@@ -330,7 +329,7 @@ app.panel = {
                     $(this).find('button').removeClass('active');
                     event.target.classList.add('active');
                 });
-                $('#chart-0').click();
+                $('#chart-summary').click();
             });
 
             app.panel.loading.hide();
@@ -370,7 +369,6 @@ app.panel = {
                 var data = app.panel.results.charts[chartIndex].data;
                 for (var chart in data) {
                     resultsArray = [];
-                    console.log(chart);
                     if (chart !== 'baseline') {
                         chartJSON.timestep = [];
                         for (var i = 0; i < data[chart].length; i++) {
@@ -488,7 +486,6 @@ app.panel = {
             window.setTimeout(function() {
                 var drawingArea = app.map.draw.getDrawingArea();
                 var drawingAcres = drawingArea/4046.86;
-                console.log(drawingArea)
                 var saveDisable = 'disabled';
                 var warning = '<p><em>must be under ' + app.map.draw.maxAcres.toString() + '</em></p>';
                 if (drawingIsSmallEnough(drawingArea)) {
@@ -802,7 +799,6 @@ app.request = {
             },
             dataType: 'json',
             success: function(response) {
-                console.log('%csuccessfully returned result: %o', 'color: green', response);
                 return response;
             },
             error: function(response) {
@@ -821,7 +817,6 @@ app.request = {
             },
             dataType: 'json',
             success: function(response) {
-                console.log('%csuccessfully returned downstream pourpoints: %o', 'color: green', response);
                 return response;
             },
             error: function(response) {
@@ -864,7 +859,6 @@ app.request = {
     get_planningunits: function() {
         return $.ajax('/scenario/get_planningunits')
         .done(function(response) {
-            console.log('%csuccessfully returned planning units: %o', 'color: green', response);
             return response;
         })
         .fail(function(response) {
@@ -874,7 +868,6 @@ app.request = {
     get_user_scenarios: function() {
         return $.ajax('/get_user_scenario_list/')
         .done(function(response) {
-            console.log('%csuccessfully got user scenarios: %o', 'color: green', response);
             return response;
         })
         .fail(function(response) {
@@ -884,7 +877,6 @@ app.request = {
     get_scenarios: function() {
         return $.ajax('/ucsrb/get_scenarios/')
         .done(function(response) {
-            console.log('%csuccessfully got scenarios: %o', 'color: green', response);
             return response;
         })
         .fail(function(response) {
@@ -904,7 +896,6 @@ app.request = {
             dataType: 'json'
         })
         .done(function(response) {
-            console.log('%csuccessfully returned segments by bbox', 'color: green');
             return response;
         })
         .fail(function(response) {
@@ -948,7 +939,6 @@ app.request = {
         var layer = app.mapbox.layers[props.layer.split('.shp')[0]].map_layer_id;
         var idField = app.mapbox.layers[props.layer.split('.shp')[0]].id_field;
         var id = props[idField];
-        console.log(id);
         return $.ajax({
             url: '/ucsrb/get_focus_area',
             data: {
@@ -957,7 +947,6 @@ app.request = {
             },
             dataType: 'json',
             success: function(response) {
-                console.log(`%csuccess: got focus area`, 'color: green');
                 app.state.setFocusArea = response;
                 callback(feature, response.geojson);
             },
@@ -982,7 +971,6 @@ app.request = {
             },
             dataType: 'json',
             success: function(response) {
-                console.log(`%csuccess: got focus area at point`, 'color: green');
                 callback(feature, response);
             },
             error: function(response, status) {
@@ -1006,7 +994,6 @@ app.request = {
             },
             dataType: 'json',
             success: function(response) {
-                console.log(`%csuccess: got basin`, 'color: green');
                 app.state.setFocusArea = response;
                 callback(feature, response.geojson);
                 return response;
@@ -1045,7 +1032,6 @@ app.request = {
             dataType: 'json',
             method: 'POST',
             success: function(response) {
-                console.log(`%csuccess: saved drawing`, 'color: green');
                 app.map.draw.disable();
                 app.nav.hideSave();
                 if (app.state.nav !== 'short') {
@@ -1084,7 +1070,6 @@ app.request = {
             data: data,
             dataType: 'json',
             success: function(response, status) {
-                console.log(`%csuccess: ${response}`, 'color: green');
                 return status;
             },
             error: function(response, status) {
@@ -1100,7 +1085,6 @@ app.request = {
             data: app.saveState,
             dataType: 'json',
             success: function(response, status) {
-                console.log(`%csuccess: ${response}`, 'color: green');
                 return status;
             },
             error: function(response, status) {
@@ -1117,7 +1101,6 @@ app.request = {
                 uid: id
             },
             success: function(response, status) {
-                console.log(`%csuccess deleted: %o`, 'color: green', response);
                 return status;
             },
             error: function(response, status) {
