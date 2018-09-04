@@ -618,11 +618,26 @@ def get_hydro_results_by_pour_point_id(request):
     else:
         r0_change = str(round(r0_change_val,2))
     hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_change, 'unit': 'CFS' }) #Baseline annl flow - 0 annl flow
+    hydro_char_data.append({'key': '<b>Change in average September flow from proposed management </b>', 'value': '', 'unit': '' })
+    r50_sept_avg_delta = float(sept_avg_flow['reduce to 50'])-float(sept_avg_flow['baseline'])
+    if r50_sept_avg_delta > 0:
+        r50_sept_avg_change = "+%s" % str(round(r50_sept_avg_delta, 2))
+    else:
+        r50_sept_avg_change = str(round(r50_sept_avg_delta, 2))
+    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
+    r30_sept_avg_delta = float(sept_avg_flow['reduce to 30'])-float(sept_avg_flow['baseline'])
+    if r30_sept_avg_delta > 0:
+        r30_sept_avg_change = "+%s" % str(round(r30_sept_avg_delta, 2))
+    else:
+        r30_sept_avg_change = str(round(r30_sept_avg_delta, 2))
+    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
+    r0_sept_avg_delta = float(sept_avg_flow['reduce to 0'])-float(sept_avg_flow['baseline'])
+    if r0_sept_avg_delta > 0:
+        r0_sept_avg_change = "+%s" % str(round(r0_sept_avg_delta, 2))
+    else:
+        r0_sept_avg_change = str(round(r0_sept_avg_delta, 2))
+    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
     if settings.DEBUG:
-        hydro_char_data.append({'key': '<b>Change in average September flow from proposed management </b>', 'value': '', 'unit': '' })
-        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
-        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
-        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
         hydro_char_data.append({'key': '<b>Change in Sept. 7-day low flow from proposed management </b>', 'value': '', 'unit': '' })
         hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
         hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
