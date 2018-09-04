@@ -395,9 +395,9 @@ app.panel = {
                         type: 'line',
                         colors: {
                             baseline: '#394861',
-                            rx_burn: '#FB7302',
-                            catastrophic_fire: '#680109',
-                            mechanical: '#93A35D',
+                            'reduce to 30': '#FB7302',
+                            'reduce to 0': '#680109',
+                            'reduce to 50': '#93A35D',
                         }
                     },
                     axis: {

@@ -374,6 +374,7 @@ def parse_flow_results(csv_dict, ppt):
 
     return (output_dict, annual_water_volume, sept_avg_flow)
 
+#TODO: Delete this function - left over from old regression modelling approach.
 def get_basin_input_dict(basin_data, basin_geom, treatment_geom, row_id, treatment='baseline'):
     from ucsrb import project_settings as ucsrb_settings
     from ucsrb.models import VegPlanningUnit
@@ -460,7 +461,11 @@ def get_flow_csv_match(ppt, delta):
     from ucsrb import project_settings as ucsrb_settings
     candidates = [x for x in ScenarioNNLookup.objects.filter(ppt_id=ppt.id)]
     best_match = min(candidates, key=lambda x:abs(x.fc_delta-delta))
-    rx_dir = "%d_%d" % (best_match.scenario_id, best_match.treatment_target)
+    # IF Baseline run is more accurate than NN:
+    if delta < 0.5*best_match.fc_delta:
+        rx_dir = "_base"
+    else:
+        rx_dir = "%d_%d" % (best_match.scenario_id, best_match.treatment_target)
     return (
         os.path.join(ucsrb_settings.NN_DATA_DIR,"veg%s" % ppt.watershed_id,rx_dir, "%s.csv" % str(ppt.streammap_id)),
         rx_dir
@@ -477,11 +482,18 @@ def calculate_basin_fc(ppt, basin_area, included_ppts, scenario=None, target_fc=
     veg_units = VegPlanningUnit.objects.filter(dwnstream_ppt_id__in=included_ppts)
     veg_fc_total = 0
     for vu in veg_units:
-        if planning_units and vu.id in planning_units:
+        if planning_units and vu.id in planning_units and vu.percent_fractional_coverage > target_fc:
             veg_fc_total += target_fc * vu.acres
         else:
             veg_fc_total += vu.percent_fractional_coverage * vu.acres
     return veg_fc_total/basin_area
+
+def get_float_change_as_rounded_string(rx_val,baseline):
+    change_val = float(rx_val) - float(baseline)
+    if change_val > 0:
+        return "+%s" % str(round(change_val,2))
+    else:
+        return str(round(change_val,2))
 
 # NEEDS:
 #   pourpoint_id
@@ -516,17 +528,20 @@ def get_hydro_results_by_pour_point_id(request):
 
     basin_fractional_coverage = {
         'baseline': calculate_basin_fc(ppt, basin_acres, upslope_ppts),
-        'mechanical': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 50),
-        'rx_burn': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 30),
-        'catastrophic_fire': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 0)
+        'reduce to 50': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 50),
+        'reduce to 30': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 30),
+        'reduce to 0': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 0)
     }
 
     rx_fc_pct_delta = {}
-    for rx in ['mechanical', 'rx_burn', 'catastrophic_fire']:
+    rx_fc_delta = {}
+    for rx in ['reduce to 50', 'reduce to 30', 'reduce to 0']:
         if basin_fractional_coverage['baseline'] == 0:
+            rx_fc_delta[rx] = 0
             rx_fc_pct_delta[rx] = 0
         else:
-            rx_fc_pct_delta[rx] = (basin_fractional_coverage['baseline'] - basin_fractional_coverage[rx])/basin_fractional_coverage['baseline']*100
+            rx_fc_delta[rx] = basin_fractional_coverage['baseline'] - basin_fractional_coverage[rx]
+            rx_fc_pct_delta[rx] = rx_fc_delta[rx]/basin_fractional_coverage['baseline']*100
 
     if ppt.imputed_ppt:
         imputed_ppt = ppt.imputed_ppt
@@ -542,9 +557,9 @@ def get_hydro_results_by_pour_point_id(request):
     from collections import OrderedDict
     results_csvs = OrderedDict({})
     results_csvs['baseline'] = os.path.join(ucsrb_settings.NN_DATA_DIR,"veg%s" % imputed_ppt.watershed_id,"_base","%s.csv" % imputed_ppt.streammap_id)
-    (results_csvs['reduce to 50'], rx_50) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['mechanical'])
-    (results_csvs['reduce to 30'], rx_30) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['rx_burn'])
-    (results_csvs['reduce to 0'], rx_0) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['catastrophic_fire'])
+    (results_csvs['reduce to 50'], rx_50) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 50'])
+    (results_csvs['reduce to 30'], rx_30) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 30'])
+    (results_csvs['reduce to 0'], rx_0) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 0'])
 
     (flow_output, annual_water_volume, sept_avg_flow) = parse_flow_results(results_csvs, imputed_ppt)
     # Baseline water yield (bas_char)
@@ -555,7 +570,6 @@ def get_hydro_results_by_pour_point_id(request):
     r50_average_flow = str(round(annual_water_volume['reduce to 50']/(365*24*60*60), 2))
     r30_average_flow = str(round(annual_water_volume['reduce to 30']/(365*24*60*60), 2))
     r0_average_flow = str(round(annual_water_volume['reduce to 0']/(365*24*60*60), 2))
-
 
     absolute_results = sort_output(flow_output)
 
@@ -599,73 +613,37 @@ def get_hydro_results_by_pour_point_id(request):
 
     hydro_char_data = []
     hydro_char_data.append({'key': '<b>Change in average annual flow from proposed management</b>', 'value': '', 'unit': '' })
-    r50_change_val = float(r50_average_flow) - float(baseline_average_flow)
-    if r50_change_val > 0:
-        r50_change = "+%s" % str(round(r50_change_val,2))
-    else:
-        r50_change = str(round(r50_change_val,2))
+    r50_change = get_float_change_as_rounded_string(r50_average_flow,baseline_average_flow)
     hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_change, 'unit': 'CFS' }) #Baseline annl flow - 50 annl flow
-    r30_change_val = float(r30_average_flow) - float(baseline_average_flow)
-    if r30_change_val > 0:
-        r30_change = "+%s" % str(round(r30_change_val,2))
-    else:
-        r30_change = str(round(r30_change_val,2))
+    r30_change = get_float_change_as_rounded_string(r30_average_flow,baseline_average_flow)
     hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_change, 'unit': 'CFS' }) #Baseline annl flow - 30 annl flow
-    r0_change_val = float(r0_average_flow) - float(baseline_average_flow)
-    if r0_change_val > 0:
-        r0_change = "+%s" % str(round(r0_change_val,2))
-    else:
-        r0_change = str(round(r0_change_val,2))
+    r0_change = get_float_change_as_rounded_string(r0_average_flow,baseline_average_flow)
     hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_change, 'unit': 'CFS' }) #Baseline annl flow - 0 annl flow
+
     hydro_char_data.append({'key': '<b>Change in average September flow from proposed management </b>', 'value': '', 'unit': '' })
-    r50_sept_avg_delta = float(sept_avg_flow['reduce to 50'])-float(sept_avg_flow['baseline'])
-    if r50_sept_avg_delta > 0:
-        r50_sept_avg_change = "+%s" % str(round(r50_sept_avg_delta, 2))
-    else:
-        r50_sept_avg_change = str(round(r50_sept_avg_delta, 2))
+    r50_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow['reduce to 50'],sept_avg_flow['baseline'])
     hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
-    r30_sept_avg_delta = float(sept_avg_flow['reduce to 30'])-float(sept_avg_flow['baseline'])
-    if r30_sept_avg_delta > 0:
-        r30_sept_avg_change = "+%s" % str(round(r30_sept_avg_delta, 2))
-    else:
-        r30_sept_avg_change = str(round(r30_sept_avg_delta, 2))
+    r30_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow['reduce to 30'],sept_avg_flow['baseline'])
     hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
-    r0_sept_avg_delta = float(sept_avg_flow['reduce to 0'])-float(sept_avg_flow['baseline'])
-    if r0_sept_avg_delta > 0:
-        r0_sept_avg_change = "+%s" % str(round(r0_sept_avg_delta, 2))
-    else:
-        r0_sept_avg_change = str(round(r0_sept_avg_delta, 2))
+    r0_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow['reduce to 0'],sept_avg_flow['baseline'])
     hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
 
     hydro_char_data.append({'key': '<b>Change in Sept. 7-day low flow from proposed management </b>', 'value': '', 'unit': '' })
-    r50_sept_7_day_low_diff_float = sept_median_7_day_low['reduce to 50'] - sept_median_7_day_low['baseline']
-    if r50_sept_7_day_low_diff_float > 0:
-        r50_sept_7_day_low_diff = "+%s" % str(round(r50_sept_7_day_low_diff_float, 2))
-    else:
-        r50_sept_7_day_low_diff = str(round(r50_sept_7_day_low_diff_float, 2))
+    r50_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low['reduce to 50'],sept_median_7_day_low['baseline'])
     hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
-    r30_sept_7_day_low_diff_float = sept_median_7_day_low['reduce to 30'] - sept_median_7_day_low['baseline']
-    if r30_sept_7_day_low_diff_float > 0:
-        r30_sept_7_day_low_diff = "+%s" % str(round(r30_sept_7_day_low_diff_float, 2))
-    else:
-        r30_sept_7_day_low_diff = str(round(r30_sept_7_day_low_diff_float, 2))
+    r30_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low['reduce to 30'],sept_median_7_day_low['baseline'])
     hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
-    r0_sept_7_day_low_diff_float = sept_median_7_day_low['reduce to 0'] - sept_median_7_day_low['baseline']
-    if r0_sept_7_day_low_diff_float > 0:
-        r0_sept_7_day_low_diff = "+%s" % str(round(r0_sept_7_day_low_diff_float, 2))
-    else:
-        r0_sept_7_day_low_diff = str(round(r0_sept_7_day_low_diff_float, 2))
+    r0_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low['reduce to 0'],sept_median_7_day_low['baseline'])
     hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
 
     prop_mgmt_data = []
     basin_veg_units = treatment.veg_units.filter(geometry__intersects=overlap_basin.geometry) #within may be more accurate, but slower
     treatment_acres = sum([x.acres for x in basin_veg_units])
     prop_mgmt_data.append({'key': 'Total forested area in proposed treatment', 'value': int(treatment_acres), 'unit': 'acres' })
-    if settings.DEBUG:
-        prop_mgmt_data.append({'key': '<b>Reduction in avg fractional coverage from proposed management</b>', 'value': '', 'unit': '' })
-        prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': 'TBD', 'unit': '%' }) #Baseline avg fc - 50 avg fc
-        prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': 'TBD', 'unit': '%' }) #Baseline avg fc - 30 avg fc
-        prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': 'TBD', 'unit': '%' }) #Baseline avg fc - 0 avg fc
+    prop_mgmt_data.append({'key': '<b>Reduction in avg fractional coverage from proposed management</b>', 'value': '', 'unit': '' })
+    prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': str(round(rx_fc_delta['reduce to 50'],2)), 'unit': '%' }) #Baseline avg fc - 50 avg fc
+    prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': str(round(rx_fc_delta['reduce to 30'],2)), 'unit': '%' }) #Baseline avg fc - 30 avg fc
+    prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': str(round(rx_fc_delta['reduce to 0'],2)), 'unit': '%' }) #Baseline avg fc - 0 avg fc
 
     flow_est_data = []
     flow_est_data.append({'key': 'Estimation Type','value': est_type,'unit': ''})
@@ -674,8 +652,8 @@ def get_hydro_results_by_pour_point_id(request):
         flow_est_data.append({'key': 'Imputed veg mgmt scenario (50)','value': rx_50,'unit': ''})
         flow_est_data.append({'key': 'Imputed veg mgmt scenario (30)','value': rx_30,'unit': ''})
         flow_est_data.append({'key': 'Imputed veg mgmt scenario (0)','value': rx_0,'unit': ''})
-        flow_est_data.append({'key': 'Baseline Confidence', 'value': "TBD", 'unit': 'plus/minus x'})
-        flow_est_data.append({'key': 'Change in Flow Confidence', 'value': "TBD", 'unit': 'plus/minus x'})
+    flow_est_data.append({'key': 'Baseline Confidence', 'value': "TBD", 'unit': 'plus/minus x'})
+    flow_est_data.append({'key': 'Change in Flow Confidence', 'value': "TBD", 'unit': 'plus/minus x'})
 
 
     summary_reports = []

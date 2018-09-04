@@ -255,9 +255,9 @@ WEATHER_STATIONS = {
 
 TREATMENT_TARGETS = {
     'baseline': 100,
-    'mechanical': 50,
-    'rx_burn': 30,
-    'catastrophic_fire': 0
+    'reduce to 50': 50,
+    'reduce to 30': 30,
+    'reduce to 0': 0
 }
 
 ########################################
