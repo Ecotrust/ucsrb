@@ -300,17 +300,26 @@ def get_results_delta(flow_output):
 
 def get_results_7d_low(flow_output, sorted_results):
     from copy import deepcopy
+    from datetime import datetime
+    from statistics import median
     out_dict = deepcopy(flow_output)
+    sept_median_7_day_low = {}
     for rx in sorted_results.keys():
+        sept_list = []
         for index, treatment_result in enumerate(sorted_results[rx]):
             timestep = treatment_result['timestep']
-            if index < 7*8:
-                flows = [x['flow'] for x in sorted_results[rx][0:56]]
+            time_object = datetime.strptime(timestep, "%m.%d.%Y-%H:%M:%S")
+            seven_day_timestep_count = int(7*(24/settings.TIME_STEP_HOURS))
+            if index < seven_day_timestep_count:
+                flows = [x['flow'] for x in sorted_results[rx][0:seven_day_timestep_count]]
             else:
-                flows = [x['flow'] for x in sorted_results[rx][index-55:index+1]]
+                flows = [x['flow'] for x in sorted_results[rx][index-(seven_day_timestep_count-1):index+1]]
             low_flow = min(float(x) for x in flows)
             out_dict[rx][timestep] = low_flow
-    return sort_output(out_dict)
+            if time_object.month == 9:
+                sept_list.append(low_flow)
+        sept_median_7_day_low[rx] = median(sept_list)
+    return (sort_output(out_dict), sept_median_7_day_low)
 
 def get_results_7d_mean(flow_output, sorted_results):
     from copy import deepcopy
@@ -549,20 +558,12 @@ def get_hydro_results_by_pour_point_id(request):
 
 
     absolute_results = sort_output(flow_output)
-    # TODO:
-    #     Baseline average annual flow (bas_char, hydro_char)
-    #     Rx (50, 30, 0) average annual flow (hydro_char)
-    #     Baseline September mean flow (bas_char, hydro_char)
-    #     Rx (50, 30, 0) September mean flow (hydro_char)
 
     #   delta flow
     delta_results = get_results_delta(flow_output)
 
     #   7-day low-flow (needs sort_by_time)
-    seven_d_low_results = get_results_7d_low(flow_output, absolute_results)
-    # TODO:
-    #     Baseline September median 7 day avg low flow (bas_char, hydro_char)
-    #     Rx (50, 30, 0) September median 7 day avg low flow (hydro_char)
+    (seven_d_low_results, sept_median_7_day_low) = get_results_7d_low(flow_output, absolute_results)
 
     seven_d_mean_results = get_results_7d_mean(flow_output, absolute_results)
 
@@ -594,9 +595,7 @@ def get_hydro_results_by_pour_point_id(request):
     bas_char_data.append({'key': 'Baseline water yield', 'value': baseline_water_yield, 'unit': 'inches/year' })
     bas_char_data.append({'key': 'Baseline average annual flow', 'value': baseline_average_flow, 'unit': 'CFS' })
     bas_char_data.append({'key': 'Baseline September mean flow', 'value': sept_avg_flow['baseline'], 'unit': 'CFS' })
-    if settings.DEBUG:
-        # TODO: Calculate these values during chart building
-        bas_char_data.append({'key': 'Baseline September median 7 day avg low flow', 'value': 'TBD', 'unit': 'CFS' })
+    bas_char_data.append({'key': 'Baseline September median 7 day avg low flow', 'value': round(sept_median_7_day_low['baseline'], 2), 'unit': 'CFS' })
 
     hydro_char_data = []
     hydro_char_data.append({'key': '<b>Change in average annual flow from proposed management</b>', 'value': '', 'unit': '' })
@@ -637,11 +636,26 @@ def get_hydro_results_by_pour_point_id(request):
     else:
         r0_sept_avg_change = str(round(r0_sept_avg_delta, 2))
     hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
-    if settings.DEBUG:
-        hydro_char_data.append({'key': '<b>Change in Sept. 7-day low flow from proposed management </b>', 'value': '', 'unit': '' })
-        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
-        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
-        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
+
+    hydro_char_data.append({'key': '<b>Change in Sept. 7-day low flow from proposed management </b>', 'value': '', 'unit': '' })
+    r50_sept_7_day_low_diff_float = sept_median_7_day_low['reduce to 50'] - sept_median_7_day_low['baseline']
+    if r50_sept_7_day_low_diff_float > 0:
+        r50_sept_7_day_low_diff = "+%s" % str(round(r50_sept_7_day_low_diff_float, 2))
+    else:
+        r50_sept_7_day_low_diff = str(round(r50_sept_7_day_low_diff_float, 2))
+    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
+    r30_sept_7_day_low_diff_float = sept_median_7_day_low['reduce to 30'] - sept_median_7_day_low['baseline']
+    if r30_sept_7_day_low_diff_float > 0:
+        r30_sept_7_day_low_diff = "+%s" % str(round(r30_sept_7_day_low_diff_float, 2))
+    else:
+        r30_sept_7_day_low_diff = str(round(r30_sept_7_day_low_diff_float, 2))
+    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
+    r0_sept_7_day_low_diff_float = sept_median_7_day_low['reduce to 0'] - sept_median_7_day_low['baseline']
+    if r0_sept_7_day_low_diff_float > 0:
+        r0_sept_7_day_low_diff = "+%s" % str(round(r0_sept_7_day_low_diff_float, 2))
+    else:
+        r0_sept_7_day_low_diff = str(round(r0_sept_7_day_low_diff_float, 2))
+    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
 
     prop_mgmt_data = []
     basin_veg_units = treatment.veg_units.filter(geometry__intersects=overlap_basin.geometry) #within may be more accurate, but slower
