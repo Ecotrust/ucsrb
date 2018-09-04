@@ -425,7 +425,7 @@ app.panel = {
                     },
                     zoom: {
                         enabled: false,
-                        // rescale: true,
+                        rescale: true,
                     },
                     subchart: {
                         show: true,
@@ -445,7 +445,7 @@ app.panel = {
                     tooltip: {
                         format: {
                             title: function(x) {
-                                return d3.timeFormat("%B %d, %Y @ %-I %p")(x);
+                                return d3.timeFormat("%B %d @ %-I %p")(x);
                             },
                             value: function(value, ratio, id) {
                                 value = value.toFixed(4);
