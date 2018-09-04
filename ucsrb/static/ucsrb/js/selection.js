@@ -176,9 +176,6 @@ app.map.selection.setSelect = function(selectionInteraction) {
   app.map.selection.select = selectionInteraction;
   app.map.addInteraction(app.map.selection.select);
   app.map.selection.select.on('select', function(event) {
-    console.log('selection event at ' + ol.coordinate.toStringHDMS(ol.proj.transform(
-      event.mapBrowserEvent.coordinate, 'EPSG:3857', 'EPSG:4326'
-    )));
     // var lastSelected = event.target.getFeatures().item(event.target.getFeatures().getLength() - 1);
     app.map.selection.select.getFeatures().forEach(function(feat) {
         var layer = app.map.selection.select.getLayer(feat).get('id');

@@ -838,7 +838,6 @@ overlays.each(function() {
 if (app.map.getLayerGroup) {
   app.map.getLayerGroup().getLayers().forEach(function(lyr) {
     if (lyr.getProperties().title === 'Base maps') {
-      console.log(lyr.getLayers());
       lyr.getLayers().push(app.map.layer.satellite.layer);
     }
   });
