@@ -328,31 +328,42 @@ def get_results_7d_mean(flow_output, sorted_results):
 
 def parse_flow_results(csv_dict, ppt):
     import csv
+    from datetime import datetime
     from copy import deepcopy
     from ucsrb import project_settings as ucsrb_settings
     from collections import OrderedDict
 
     output_dict = OrderedDict({})
+    annual_water_volume = {}
+    sept_avg_flow = {}
 
     for treatment in csv_dict.keys():
         if treatment not in output_dict.keys():
             output_dict[treatment] = {}
+        if treatment not in annual_water_volume.keys():
+            annual_water_volume[treatment] = 0
+
         with open(csv_dict[treatment]) as csvfile:
             csvReader = csv.DictReader(csvfile)
-            if settings.TIME_STEP_HOURS == settings.TIME_STEP_REPORTING:
-                for row in csvReader:
-                    # Convert total 3-hour flow  in cubic meters to per-second flow in cubic feet
-                    output_dict[treatment][row['TIMESTAMP']] = float(row[settings.NN_CSV_FLOW_COLUMN])/settings.TIME_STEP_HOURS/60/60*35.3147
-            else:
-                steps_to_aggregate = settings.TIME_STEP_REPORTING/settings.TIME_STEP_HOURS
-                aggregate_flow = 0
-                for index, row in enumerate(csvReader):
-                    aggregate_flow += float(row[settings.NN_CSV_FLOW_COLUMN])
-                    if index%steps_to_aggregate == 0:
-                        output_dict[treatment][row['TIMESTAMP']] = aggregate_flow/settings.TIME_STEP_REPORTING/60/60*35.3147
-                        aggregate_flow = 0
+            steps_to_aggregate = settings.TIME_STEP_REPORTING/settings.TIME_STEP_HOURS
+            aggregate_volume = 0
+            sept_flow = 0
+            sept_records = 0
+            for index, row in enumerate(csvReader):
+                time_object = datetime.strptime(row['TIMESTAMP'], '%m.%d.%Y-%H:%M:%S')
+                # Get volume of flow for timestep in Cubic Feet
+                timestep_volume = float(row[settings.NN_CSV_FLOW_COLUMN]) * 35.3147
+                aggregate_volume += timestep_volume
+                annual_water_volume[treatment] = annual_water_volume[treatment] + timestep_volume
+                if index%steps_to_aggregate == 0:
+                    output_dict[treatment][row['TIMESTAMP']] = aggregate_volume/settings.TIME_STEP_REPORTING/60/60
+                    aggregate_volume = 0
+                if time_object.month == 9:
+                    sept_flow += timestep_volume/settings.TIME_STEP_HOURS/60/60
+                    sept_records += 1
+        sept_avg_flow[treatment] = str(round(sept_flow/sept_records, 2))
 
-    return output_dict
+    return (output_dict, annual_water_volume, sept_avg_flow)
 
 def get_basin_input_dict(basin_data, basin_geom, treatment_geom, row_id, treatment='baseline'):
     from ucsrb import project_settings as ucsrb_settings
@@ -481,9 +492,7 @@ def get_hydro_results_by_pour_point_id(request):
     treatment_id = request.GET.get('treatment_id')
     treatment = TreatmentScenario.objects.get(pk=treatment_id)
     overlap_basin = FocusArea.objects.get(unit_type='PourPointOverlap', unit_id=pourpoint_id)
-    # basin_geom = overlap_basin.geometry.clone()
-    # basin_geom.transform(2163)
-    # basin_acres = int(basin_geom.area/4046.86)
+
     # RDH 09/03/2018
     # Some of the data I need is at the Overlapping Ppt Basin level, while some is aggregated to
     # the PourPointBasin, which I am discovering was calculated to the Discrete Ppt Basins.
@@ -494,7 +503,6 @@ def get_hydro_results_by_pour_point_id(request):
     if pourpoint_id not in upslope_ppts:
         upslope_ppts.append(pourpoint_id)
     drainage_basins = PourPointBasin.objects.filter(ppt_ID__in=upslope_ppts)
-    # agg_ppt_basin_acres = sum([x.area for x in drainage_basins])
     basin_acres = sum([x.area for x in drainage_basins])
 
     basin_fractional_coverage = {
@@ -529,11 +537,19 @@ def get_hydro_results_by_pour_point_id(request):
     (results_csvs['reduce to 30'], rx_30) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['rx_burn'])
     (results_csvs['reduce to 0'], rx_0) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['catastrophic_fire'])
 
-    flow_output = parse_flow_results(results_csvs, imputed_ppt)
+    (flow_output, annual_water_volume, sept_avg_flow) = parse_flow_results(results_csvs, imputed_ppt)
+    # Baseline water yield (bas_char)
+    # Cubic Feet per year (annual volume) / Square Feet (basin area) * 12 (inches/foot) = x inches/year
+    baseline_water_yield = str(round(annual_water_volume['baseline']/(basin_acres*43560)*12, 2))
+    # Average Annual Flow: Total flow in cubic feet divided by seconds in year - assume year is not Leap.
+    baseline_average_flow = str(round(annual_water_volume['baseline']/(365*24*60*60), 2))
+    r50_average_flow = str(round(annual_water_volume['reduce to 50']/(365*24*60*60), 2))
+    r30_average_flow = str(round(annual_water_volume['reduce to 30']/(365*24*60*60), 2))
+    r0_average_flow = str(round(annual_water_volume['reduce to 0']/(365*24*60*60), 2))
+
 
     absolute_results = sort_output(flow_output)
     # TODO:
-    #     Baseline water yield (bas_char)
     #     Baseline average annual flow (bas_char, hydro_char)
     #     Rx (50, 30, 0) average annual flow (hydro_char)
     #     Baseline September mean flow (bas_char, hydro_char)
@@ -575,20 +591,35 @@ def get_hydro_results_by_pour_point_id(request):
     acres_forested = int(sum([x.acres for x in vus]))
     bas_char_data.append({'key': 'Total forested area upslope', 'value': acres_forested, 'unit': 'acres' })
     # bas_char_data.append({'key': 'Percent Forested', 'value': int(acres_forested/basin_acres*100), 'unit': '%' })
+    bas_char_data.append({'key': 'Baseline water yield', 'value': baseline_water_yield, 'unit': 'inches/year' })
+    bas_char_data.append({'key': 'Baseline average annual flow', 'value': baseline_average_flow, 'unit': 'CFS' })
+    bas_char_data.append({'key': 'Baseline September mean flow', 'value': sept_avg_flow['baseline'], 'unit': 'CFS' })
     if settings.DEBUG:
         # TODO: Calculate these values during chart building
-        bas_char_data.append({'key': 'Baseline water yield', 'value': 'TBD', 'unit': 'inches/year' })
-        bas_char_data.append({'key': 'Baseline average annual flow', 'value': 'TBD', 'unit': 'CFS' })
-        bas_char_data.append({'key': 'Baseline September mean flow', 'value': 'TBD', 'unit': 'CFS' })
         bas_char_data.append({'key': 'Baseline September median 7 day avg low flow', 'value': 'TBD', 'unit': 'CFS' })
 
     hydro_char_data = []
+    hydro_char_data.append({'key': '<b>Change in average annual flow from proposed management</b>', 'value': '', 'unit': '' })
+    r50_change_val = float(r50_average_flow) - float(baseline_average_flow)
+    if r50_change_val > 0:
+        r50_change = "+%s" % str(round(r50_change_val,2))
+    else:
+        r50_change = str(round(r50_change_val,2))
+    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_change, 'unit': 'CFS' }) #Baseline annl flow - 50 annl flow
+    r30_change_val = float(r30_average_flow) - float(baseline_average_flow)
+    if r30_change_val > 0:
+        r30_change = "+%s" % str(round(r30_change_val,2))
+    else:
+        r30_change = str(round(r30_change_val,2))
+    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_change, 'unit': 'CFS' }) #Baseline annl flow - 30 annl flow
+    r0_change_val = float(r0_average_flow) - float(baseline_average_flow)
+    if r0_change_val > 0:
+        r0_change = "+%s" % str(round(r0_change_val,2))
+    else:
+        r0_change = str(round(r0_change_val,2))
+    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_change, 'unit': 'CFS' }) #Baseline annl flow - 0 annl flow
     if settings.DEBUG:
-        hydro_char_data.append({'key': '<b>Change in avg annual flow from management</b>', 'value': '', 'unit': '' })
-        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline annl flow - 50 annl flow
-        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline annl flow - 30 annl flow
-        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline annl flow - 0 annl flow
-        hydro_char_data.append({'key': '<b>Change in avg Sept. flow from proposed management </b>', 'value': '', 'unit': '' })
+        hydro_char_data.append({'key': '<b>Change in average September flow from proposed management </b>', 'value': '', 'unit': '' })
         hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
         hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
         hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': 'TBD', 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
