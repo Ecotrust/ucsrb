@@ -291,46 +291,57 @@ def sort_output(flow_output):
 def get_results_delta(flow_output):
     from copy import deepcopy
     out_dict = deepcopy(flow_output)
-    for timestep in out_dict['baseline'].keys():
-        baseflow = deepcopy(out_dict['baseline'][timestep])
+    if type(out_dict['baseline']) == dict:
+        for timestep in out_dict['baseline'].keys():
+            baseflow = flow_output['baseline'][timestep]
+            for rx in out_dict.keys():
+                out_dict[rx][timestep] -= baseflow
+        return sort_output(out_dict)
+    elif type(out_dict['baseline']) == list:
         for rx in out_dict.keys():
-            out_dict[rx][timestep] -= baseflow
+            for index, timestep in enumerate(out_dict[rx]):
+                # Testing has shown that this logic is sound - chronological order is maintained across rx.
+                # if not flow_output['baseline'][index]['timestep'] == out_dict[rx][index]['timestep']:
+                #     print('ERROR: Mismatch Timesteps: %s --- %s' % (flow_output['baseline'][index]['timestep'], out_dict[rx][index]['timestep']))
+                baseflow = flow_output['baseline'][index]['flow']
+                out_dict[rx][index]['flow'] -= baseflow
 
-    return sort_output(out_dict)
+    return out_dict
 
-def get_results_7d_low(flow_output, sorted_results):
+def get_results_xd_low(flow_output, sorted_results, days):
     from copy import deepcopy
     from datetime import datetime
     from statistics import median
     out_dict = deepcopy(flow_output)
-    sept_median_7_day_low = {}
+    sept_median_x_day_low = {}
     for rx in sorted_results.keys():
         sept_list = []
         for index, treatment_result in enumerate(sorted_results[rx]):
             timestep = treatment_result['timestep']
             time_object = datetime.strptime(timestep, "%m.%d.%Y-%H:%M:%S")
-            seven_day_timestep_count = int(7*(24/settings.TIME_STEP_HOURS))
-            if index < seven_day_timestep_count:
-                flows = [x['flow'] for x in sorted_results[rx][0:seven_day_timestep_count]]
+            x_day_timestep_count = int(days*(24/settings.TIME_STEP_REPORTING))
+            if index < x_day_timestep_count:
+                flows = [x['flow'] for x in sorted_results[rx][0:x_day_timestep_count]]
             else:
-                flows = [x['flow'] for x in sorted_results[rx][index-(seven_day_timestep_count-1):index+1]]
+                flows = [x['flow'] for x in sorted_results[rx][index-(x_day_timestep_count-1):index+1]]
             low_flow = min(float(x) for x in flows)
             out_dict[rx][timestep] = low_flow
             if time_object.month == 9:
                 sept_list.append(low_flow)
-        sept_median_7_day_low[rx] = median(sept_list)
-    return (sort_output(out_dict), sept_median_7_day_low)
+        sept_median_x_day_low[rx] = median(sept_list)
+    return (sort_output(out_dict), sept_median_x_day_low)
 
-def get_results_7d_mean(flow_output, sorted_results):
+def get_results_xd_mean(flow_output, sorted_results, days):
     from copy import deepcopy
     out_dict = deepcopy(flow_output)
     for rx in sorted_results.keys():
         for index, treatment_result in enumerate(sorted_results[rx]):
             timestep = treatment_result['timestep']
-            if index < 7*8:
-                flows = [x['flow'] for x in sorted_results[rx][0:56]]
+            x_day_timestep_count = int(days*(24/settings.TIME_STEP_REPORTING))
+            if index < x_day_timestep_count:
+                flows = [x['flow'] for x in sorted_results[rx][0:x_day_timestep_count]]
             else:
-                flows = [x['flow'] for x in sorted_results[rx][index-55:index+1]]
+                flows = [x['flow'] for x in sorted_results[rx][index-(x_day_timestep_count-1):index+1]]
             mean_flow = sum(flows)/float(len(flows))
             out_dict[rx][timestep] = mean_flow
     return sort_output(out_dict)
@@ -430,7 +441,7 @@ def get_basin_input_dict(basin_data, basin_geom, treatment_geom, row_id, treatme
 
     return out_dict
 
-
+#TODO: Delete this function - left over from old regression modelling approach.
 def run_hydro_model(in_csv):
     from ucsrb import project_settings as ucsrb_settings
     import subprocess
@@ -577,27 +588,30 @@ def get_hydro_results_by_pour_point_id(request):
     delta_results = get_results_delta(flow_output)
 
     #   7-day low-flow (needs sort_by_time)
-    (seven_d_low_results, sept_median_7_day_low) = get_results_7d_low(flow_output, absolute_results)
+    (seven_d_low_results, sept_median_7_day_low) = get_results_xd_low(flow_output, absolute_results, 7)
+    #   1-day low-flow
+    (one_d_low_results, sept_median_1_day_low) = get_results_xd_low(flow_output, absolute_results, 1)
 
-    seven_d_mean_results = get_results_7d_mean(flow_output, absolute_results)
+    seven_d_mean_results = get_results_xd_mean(flow_output, absolute_results, 7)
+    one_d_mean_results = get_results_xd_mean(flow_output, absolute_results, 1)
+
+    delta_1_d_low_results = get_results_delta(one_d_low_results)
+    delta_1_d_mean_results = get_results_delta(one_d_mean_results)
+    delta_7_d_low_results = get_results_delta(seven_d_low_results)
+    delta_7_d_mean_results = get_results_delta(seven_d_mean_results)
+
 
     charts = [
-        {
-            'title': 'Absolute Flow Rate',
-            'data': absolute_results
-        },
-        {
-            'title': 'Seven Day Low Flow',
-            'data': seven_d_low_results
-        },
-        {
-            'title': 'Seven Day Mean Flow',
-            'data': seven_d_mean_results
-        },
-        {
-        'title': 'Change in Flow Rate',
-        'data': delta_results
-        },
+        {'title': 'Absolute Flow Rate','data': absolute_results},
+        {'title': 'Seven Day Low Flow','data': seven_d_low_results},
+        {'title': 'Seven Day Mean Flow','data': seven_d_mean_results},
+        {'title': 'One Day Low Flow','data': one_d_low_results},
+        {'title': 'One Day Mean Flow','data': one_d_mean_results},
+        {'title': 'Change in Flow Rate','data': delta_results},
+        {'title': 'Change in 7 Day Low Flow Rate','data': delta_7_d_low_results},
+        {'title': 'Change in 7 Day Mean Flow Rate','data': delta_7_d_mean_results},
+        {'title': 'Change in 1 Day Low Flow Rate','data': delta_1_d_low_results},
+        {'title': 'Change in 1 Day Mean Flow Rate','data': delta_1_d_mean_results},
     ]
 
     bas_char_data = []
@@ -699,9 +713,10 @@ def get_results_by_scenario_id(request):
         return get_json_error_response('Treatment with given ID (%s) does not exist' % scenario_id, 500, {})
 
     veg_units = treatment.veg_units
+    all_ppt_ids = [x.id for x in PourPoint.objects.all()]
     impacted_pourpoint_ids = [x.dwnstream_ppt_id for x in veg_units]
     intermediate_downstream_ppts = PourPoint.objects.filter(id__in=impacted_pourpoint_ids)
-    overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap')
+    overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap', unit_id__in=all_ppt_ids)
     for ppt in intermediate_downstream_ppts:
         overlap_basins = overlap_basins.filter(geometry__intersects=ppt.geometry)
     containing_basin = sorted(overlap_basins, key= lambda x: x.geometry.area)[0]
