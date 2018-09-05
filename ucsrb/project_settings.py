@@ -277,6 +277,7 @@ HYDRO_INPUT_HEADERS = [
 
 ANALYSIS_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'ucsrb', 'analysis'))
 
+# TIME_STEP values MUST be factors of 24, and REPORTING must be a multiple of HOURS.
 TIME_STEP_HOURS = 3
 TIME_STEP_REPORTING = 6
 

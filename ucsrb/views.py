@@ -517,6 +517,15 @@ def get_hydro_results_by_pour_point_id(request):
     import time
     import os
 
+    # from datetime import datetime
+    # start = datetime.now()
+    # previous_stamp = datetime.now()
+    # checkpoint = 0
+    # #1
+    # checkpoint += 1
+    # print("Checkpoint %d: total - %d, step - %d" % (checkpoint, (datetime.now()-start).total_seconds(), (datetime.now()-previous_stamp).total_seconds()))
+    # previous_stamp = datetime.now()
+
     # Get pourpoint_id from request or API
     pourpoint_id = request.GET.get('pourpoint_id')
     ppt = PourPoint.objects.get(id=pourpoint_id)
@@ -537,6 +546,8 @@ def get_hydro_results_by_pour_point_id(request):
     drainage_basins = PourPointBasin.objects.filter(ppt_ID__in=upslope_ppts)
     basin_acres = sum([x.area for x in drainage_basins])
 
+
+    # TUNING: For large basins, this can take over 1 minute to run.
     basin_fractional_coverage = {
         'baseline': calculate_basin_fc(ppt, basin_acres, upslope_ppts),
         'reduce to 50': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 50),
@@ -599,7 +610,6 @@ def get_hydro_results_by_pour_point_id(request):
     delta_1_d_mean_results = get_results_delta(one_d_mean_results)
     delta_7_d_low_results = get_results_delta(seven_d_low_results)
     delta_7_d_mean_results = get_results_delta(seven_d_mean_results)
-
 
     charts = [
         {'title': 'Absolute Flow Rate','data': absolute_results},
@@ -669,7 +679,6 @@ def get_hydro_results_by_pour_point_id(request):
     flow_est_data.append({'key': 'Baseline Confidence', 'value': "TBD", 'unit': 'plus/minus x'})
     flow_est_data.append({'key': 'Change in Flow Confidence', 'value': "TBD", 'unit': 'plus/minus x'})
 
-
     summary_reports = []
     # if settings.DEBUG:
     #     summary_reports.append(
@@ -703,8 +712,9 @@ def get_hydro_results_by_pour_point_id(request):
 
 @cache_page(60 * 60) # 1 hour of caching
 def get_results_by_scenario_id(request):
-    from ucsrb.models import TreatmentScenario, FocusArea, PourPoint, PourPointBasin
+    from ucsrb.models import TreatmentScenario, FocusArea, PourPoint, PourPointBasin, ScenarioNNLookup
     from features.registry import get_feature_by_uid
+
     scenario_id = request.GET.get('id')
     export = request.GET.get('export')
     try:
@@ -713,17 +723,28 @@ def get_results_by_scenario_id(request):
         return get_json_error_response('Treatment with given ID (%s) does not exist' % scenario_id, 500, {})
 
     veg_units = treatment.veg_units
-    all_ppt_ids = [x.id for x in PourPoint.objects.all()]
-    impacted_pourpoint_ids = [x.dwnstream_ppt_id for x in veg_units]
+    impacted_pourpoint_ids = list(set([x.dwnstream_ppt_id for x in veg_units]))
     intermediate_downstream_ppts = PourPoint.objects.filter(id__in=impacted_pourpoint_ids)
-    overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap', unit_id__in=all_ppt_ids)
+
+    imputation_ids = []
+    for lookup in ScenarioNNLookup.objects.all():
+        if lookup.ppt_id not in imputation_ids:
+            imputation_ids.append(lookup.ppt_id)
+    viable_reporting_ppt_ids = [x.id for x in PourPoint.objects.filter(imputed_ppt__in=imputation_ids)]
+
+    overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap', unit_id__in=viable_reporting_ppt_ids)
     for ppt in intermediate_downstream_ppts:
         overlap_basins = overlap_basins.filter(geometry__intersects=ppt.geometry)
-    containing_basin = sorted(overlap_basins, key= lambda x: x.geometry.area)[0]
-    impacted_pourpoint_ids.append(containing_basin.unit_id)
 
-    downstream_ppts = PourPoint.objects.filter(id__in=impacted_pourpoint_ids)
+    reportable_ppts = list(set(viable_reporting_ppt_ids).intersection(impacted_pourpoint_ids))
+    try:
+        containing_basin = sorted(overlap_basins, key= lambda x: x.geometry.area)[0]
+        reportable_ppts.append(containing_basin.unit_id)
+    except:
+        # In case there are no reportable downstream ppts.
+        pass
 
+    downstream_ppts = PourPoint.objects.filter(id__in=reportable_ppts)
     if export:
         print("Export %s" % export)
     else:
@@ -737,9 +758,7 @@ def get_results_by_scenario_id(request):
                 'acres': aggregate_results['total_acres']
             },
             'aggregate_results': aggregate_results['results_list'],
-            # 'treatment_areas': [], # This was dummy data, I don't think it's used. RDH 2018-07-31
             'pourpoints': [ {'id': x.pk, 'name': '', 'geometry': json.loads(x.geometry.json) } for x in downstream_ppts ]
-
         }
         return JsonResponse(return_json)
 
