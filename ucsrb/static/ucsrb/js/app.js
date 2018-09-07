@@ -424,7 +424,7 @@ app.panel = {
                         }
                     },
                     zoom: {
-                        enabled: false,
+                        enabled: true,
                         rescale: true,
                     },
                     subchart: {
