@@ -708,7 +708,10 @@ def get_hydro_results_by_pour_point_id(request):
          }
     ]
 
-    return JsonResponse({'results': results})
+    return JsonResponse({
+        'results': results,
+        'basin': overlap_basin.geometry.json
+    })
 
 @cache_page(60 * 60) # 1 hour of caching
 def get_results_by_scenario_id(request):
@@ -758,7 +761,8 @@ def get_results_by_scenario_id(request):
                 'acres': aggregate_results['total_acres']
             },
             'aggregate_results': aggregate_results['results_list'],
-            'pourpoints': [ {'id': x.pk, 'name': '', 'geometry': json.loads(x.geometry.json) } for x in downstream_ppts ]
+            'pourpoints': [ {'id': x.pk, 'name': '', 'geometry': json.loads(x.geometry.json) } for x in downstream_ppts ],
+            'focus_area': json.loads(treatment.focus_area_input.geometry.json)
         }
         return JsonResponse(return_json)
 

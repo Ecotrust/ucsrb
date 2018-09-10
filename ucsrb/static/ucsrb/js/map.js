@@ -102,6 +102,19 @@ app.map.styles = {
         }),
         zIndex: 4
     }),
+    'ReportArea': new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: '#67B8C6',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            width: 3,
+            miterLimit: 2
+        }),
+        fill: new ol.style.Fill({
+            color: 'rgba(0, 0, 0, 0)'
+        }),
+        zIndex: 4
+    }),
     'Streams': function(feature, resolution) {
         var width = 2.25;
         if (resolution < 6) {
@@ -297,6 +310,8 @@ setFilter = function(feat, layer) {
   app.map.zoomToExtent(feat.getGeometry().getExtent());
 }
 
+app.map.setFilter = setFilter;
+
 removeFilter = function() {
   app.map.mask.set('active', false);
 }
@@ -416,6 +431,9 @@ pourPointResultSelection = function(feat) {
   app.request.get_hydro_results_by_pour_point_id(feat)
     .done(function(response) {
       app.init['hydro']();
+      if (response.hasOwnProperty('basin')) {
+        app.map.addDrainageBasinToMap(response.basin);
+      }
       app.panel.results.loadHydroResult(response);
     })
 }
@@ -886,7 +904,18 @@ app.map.addScenario = function(vectors) {
       zIndex: 6
     }))
   });
-  app.map.draw.source.addFeatures(vectors);
+  if (!app.map.hasOwnProperty('scenarioLayer')) {
+    app.map.scenarioLayer = app.map.draw;
+    app.map.scenarioLayer.removeAllFeatures = function() {
+      app.map.scenarioLayer.source.clear();
+      // app.map.scenarioLayer.source.clear;
+    }
+    app.map.scenarioLayer.getSource = function() {
+      return app.map.scenarioLayer.source;
+    }
+  }
+  app.map.scenarioLayer.removeAllFeatures();
+  app.map.scenarioLayer.getSource().addFeatures(vectors);
 };
 
 app.map.dropPin = function(coords) {
@@ -918,4 +947,23 @@ app.map.addDownstreamPptsToMap = function(pptsArray) {
     app.map.layer.resultPoints.layer.getSource().addFeature(feature);
   }
   app.map.selection.setSelect(app.map.selection.selectResultsPourPoint);
+};
+
+app.map.addFocusAreaToMap = function(focus_area) {
+  app.map.focus_area_feature = (new ol.format.GeoJSON()).readFeature(focus_area);
+  app.map.scenarioLayer.getSource().addFeature(app.map.focus_area_feature);
+  app.map.focus_area_feature.setStyle(app.map.styles.ReportArea);
+  if (app.map.mask) {
+    layer.removeFilter(app.map.mask);
+  }
+  // setFilter(app.map.focus_area_feature, app.map.layer.resultPoints.layer);
+}
+
+app.map.addDrainageBasinToMap = function(basin_geom) {
+  if (app.map.hasOwnProperty('drainage_basin') && app.map.scenarioLayer.getSource().getFeatures().indexOf(app.map.drainage_basin) != -1) {
+    app.map.scenarioLayer.getSource().removeFeature(app.map.drainage_basin);
+  }
+  app.map.drainage_basin = (new ol.format.GeoJSON()).readFeature(basin_geom);
+  app.map.scenarioLayer.getSource().addFeature(app.map.drainage_basin);
+  app.map.drainage_basin.setStyle(app.map.styles.FocusArea);
 }

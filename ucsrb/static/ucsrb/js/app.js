@@ -124,6 +124,7 @@ app.resultsInit = function(id) {
             }
             // run this after function is called for performance
             window.setTimeout(function() {
+              app.map.addFocusAreaToMap(response.focus_area);
               app.map.addDownstreamPptsToMap(response.pourpoints);
             }, 500);
         })
@@ -1042,6 +1043,9 @@ app.request = {
                     dataProjection: 'EPSG:3857',
                     featureProjection: 'EPSG:3857'
                 });
+                // Remove drawing from layer
+                var draw_source = app.map.layer.draw.layer.getSource();
+                draw_source.removeFeature(draw_source.getFeatures()[0]);
                 app.map.addScenario(vectors);
                 app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
                 app.resultsInit('ucsrb_treatmentscenario_' + response.id);
