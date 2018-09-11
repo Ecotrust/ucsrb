@@ -11,7 +11,7 @@ $(document).ready(function() {
 
     // set init mask of watershed
     window.setTimeout(function() {
-      app.map.setBoundaryLayer(app.map.layer.boundary.layer)
+      app.map.setBoundaryLayer(app.map.layer.boundary.layer);
     }, 100);
 
     // Set initial panel content

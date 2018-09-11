@@ -104,7 +104,7 @@ app.map.styles = {
     }),
     'ReportArea': new ol.style.Style({
         stroke: new ol.style.Stroke({
-            color: '#67B8C6',
+            color: '#3A5675',
             lineCap: 'butt',
             lineJoin: 'miter',
             width: 3,
@@ -313,7 +313,9 @@ setFilter = function(feat, layer) {
 app.map.setFilter = setFilter;
 
 removeFilter = function() {
-  app.map.mask.set('active', false);
+  if (app.map.mask) {
+    app.map.mask.set('active', false);
+  }
 }
 
 confirmationReceived = function() {
@@ -953,9 +955,7 @@ app.map.addFocusAreaToMap = function(focus_area) {
   app.map.focus_area_feature = (new ol.format.GeoJSON()).readFeature(focus_area);
   app.map.scenarioLayer.getSource().addFeature(app.map.focus_area_feature);
   app.map.focus_area_feature.setStyle(app.map.styles.ReportArea);
-  if (app.map.mask) {
-    layer.removeFilter(app.map.mask);
-  }
+  removeFilter();
   // setFilter(app.map.focus_area_feature, app.map.layer.resultPoints.layer);
 }
 

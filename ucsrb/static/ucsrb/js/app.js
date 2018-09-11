@@ -124,6 +124,8 @@ app.resultsInit = function(id) {
             }
             // run this after function is called for performance
             window.setTimeout(function() {
+              app.map.setBoundaryLayer(app.map.layer.boundary.layer);
+              app.map.layer.boundary.layer.setVisible(true);
               app.map.addFocusAreaToMap(response.focus_area);
               app.map.addDownstreamPptsToMap(response.pourpoints);
             }, 500);
