@@ -45,6 +45,7 @@ class PourPoint(models.Model):
     imputed_ppt = models.ForeignKey('self', null=True, blank=True, default=None, verbose_name='Nearest Neighbor Match')
     streammap_id = models.IntegerField(null=True, blank=True, default=None)
     watershed_id = models.CharField(max_length=3, null=True, blank=True, default=None, choices=settings.WATERSHED_CHOICES, verbose_name="Modeled Watershed Identifier")
+    confidence = models.IntegerField(default=0)
 
     objects = gismodels.GeoManager()
 

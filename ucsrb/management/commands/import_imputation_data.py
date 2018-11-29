@@ -19,11 +19,14 @@ class Command(BaseCommand):
         except IndexError:
             self.stdout.write('--- ERROR: You must provide the csv pointing pourpoint ids at nearest neighbor ids! ---')
             sys.exit()
+
         try:
             nn_lookup_in = options['nn_lookup']
         except IndexError:
-            self.stdout.write('--- ERROR: You must provide the csv for looking up ppt/scenario by delta FC! ---')
-            sys.exit()
+            # self.stdout.write('--- ERROR: You must provide the csv for looking up ppt/scenario by delta FC! ---')
+            # sys.exit()
+            nn_lookup_in = False
+            self.stdout.write('--- NO NN_LOOKUP_GIVEN: Creating new lookups will be skipped ---')
 
         with open(ppt_impute_in) as csvfile:
             csvReader = csv.DictReader(csvfile)
@@ -32,6 +35,8 @@ class Command(BaseCommand):
                     ppt = PourPoint.objects.get(id=int(row['ppt_ID']))
                     ppt.imputed_ppt = PourPoint.objects.get(id=int(row['imputedPpt']))
                     ppt.streammap_id = int(row['strmMap_id'])
+                    if 'conf' in row.keys():
+                        ppt.confidence = int(row['conf'])
                     if row['wshed_name'] == 'Upper Methow':     #Methow
                         ppt.watershed_id = 'met'
                     elif row['wshed_name'] == 'Upper Entiat':   #Entiat
@@ -43,14 +48,15 @@ class Command(BaseCommand):
                     # There's some junk data in the CSV. Just skip it when the ppt doesn't exist.
                     pass
 
-        with open(nn_lookup_in) as csvfile:
-            csvReader = csv.DictReader(csvfile)
-            for row in csvReader:
-                record_dict = {
-                    'ppt_id': int(row['ppt_ID']),
-                    'scenario_id': int(row['scen']),
-                    'treatment_target': int(row['treatment']),
-                    'fc_delta': float(row['delta']),
-                }
-                record, created = ScenarioNNLookup.objects.get_or_create(**record_dict)
-                record.save()
+        if nn_lookup_in:
+            with open(nn_lookup_in) as csvfile:
+                csvReader = csv.DictReader(csvfile)
+                for row in csvReader:
+                    record_dict = {
+                        'ppt_id': int(row['ppt_ID']),
+                        'scenario_id': int(row['scen']),
+                        'treatment_target': int(row['treatment']),
+                        'fc_delta': float(row['delta']),
+                    }
+                    record, created = ScenarioNNLookup.objects.get_or_create(**record_dict)
+                    record.save()
