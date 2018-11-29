@@ -1173,6 +1173,10 @@ Panel
         width: 100%;
     }
 
+    #chartResult div table tbody tr td:nth-of-type(2) {
+      text-align: right;
+    }
+
     .result-section dl {
         font-weight: 500;
         font-size: .75em;
