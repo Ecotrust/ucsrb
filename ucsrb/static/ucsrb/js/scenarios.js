@@ -221,7 +221,6 @@ function scenarioFormModel(options) {
             param_widget.css('display', 'block');
             self.updateFilters(param);
         }
-
         self.updateFilterCount(param);
     };
 
@@ -354,56 +353,58 @@ function scenarioFormModel(options) {
     };
 
     self.getUpdatedFilterResults = function() {
+      if (app.allowUpdates()) {
         self.updatedFilterResultsLayer.setVisibility(false);
         self.showButtonSpinner(true);
 
         (function() {
-            var request = $.ajax({
-                url: '/scenario/get_filter_results',
-                type: 'GET',
-                data: self.filters,
-                dataType: 'json',
-                success: function(data) {
-                    if (self.currentGridRequest() === request) {
-                        var wkt = data[0].wkt,
-                            featureCount = data[0].count,
-                            area_m2 = data[0].area_m2;
-                            area_acres = data[0].area_acres;
-                            if (data[0].notes.length > 0) {
-                              self.filterNotesMessage(data[0].notes);
-                              self.filterNotesExist(true);
-                            }
-                        self.updatedFilterResultsLayer.removeAllFeatures();
-                        if (featureCount && wkt) {
-                            self.updatedFilterResultsLayer.addWKTFeatures(wkt);
-                        }
-                        self.updatedFilterResultsLayer.setVisibility(true);
-                        acres = area_acres;
-                        self.gridCellsRemaining(parseInt(acres) + ' acres');
-
-                      if (parseInt(acres) < parseInt(app.map.draw.maxAcres)) {
-                          $('.submit_button').removeClass('disabled');
-                          $('#scenarios-form .alert').addClass('d-none');
-                      } else {
-                          if ($('#scenarios-form .alert').length > 0) {
-                              $('#scenarios-form .alert').removeClass('d-none');
-                          } else {
-                              $('#scenarios-form').append(`<div class="alert alert-warning" role="alert">Too large of area. Filter to less than ${app.map.draw.maxAcres} acres.`);
-                          }
-                      }
-
-                        self.showButtonSpinner(false);
-                    }
-                },
-                error: function(result) {
-                    self.showButtonSpinner(false);
-                    self.showingFilteringResults(false);
-                    console.log('%cerror in getUpdatedFilterResults: %o', 'color: red', result);
+          var request = $.ajax({
+            url: '/scenario/get_filter_results',
+            type: 'GET',
+            data: self.filters,
+            dataType: 'json',
+            success: function(data) {
+              if (self.currentGridRequest() === request) {
+                var wkt = data[0].wkt,
+                featureCount = data[0].count,
+                area_m2 = data[0].area_m2;
+                area_acres = data[0].area_acres;
+                if (data[0].notes.length > 0) {
+                  self.filterNotesMessage(data[0].notes);
+                  self.filterNotesExist(true);
                 }
-            });
-            self.currentGridRequest(request);
-            var request = request;
+                self.updatedFilterResultsLayer.removeAllFeatures();
+                if (featureCount && wkt) {
+                  self.updatedFilterResultsLayer.addWKTFeatures(wkt);
+                }
+                self.updatedFilterResultsLayer.setVisibility(true);
+                acres = area_acres;
+                self.gridCellsRemaining(parseInt(acres) + ' acres');
+
+                if (parseInt(acres) < parseInt(app.map.draw.maxAcres)) {
+                  $('.submit_button').removeClass('disabled');
+                  $('#scenarios-form .alert').addClass('d-none');
+                } else {
+                  if ($('#scenarios-form .alert').length > 0) {
+                    $('#scenarios-form .alert').removeClass('d-none');
+                  } else {
+                    $('#scenarios-form').append(`<div class="alert alert-warning" role="alert">Too large of area. Filter to less than ${app.map.draw.maxAcres} acres.`);
+                  }
+                }
+
+                self.showButtonSpinner(false);
+              }
+            },
+            error: function(result) {
+              self.showButtonSpinner(false);
+              self.showingFilteringResults(false);
+              console.log('%cerror in getUpdatedFilterResults: %o', 'color: red', result);
+            }
+          });
+          self.currentGridRequest(request);
+          var request = request;
         })();
+      }
     };
 
     self.updateFilters = function(param) {

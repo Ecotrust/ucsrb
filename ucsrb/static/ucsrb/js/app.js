@@ -43,6 +43,7 @@ scenario_type_selection_made = function(selectionType) {
 }
 
 baseInit = function() {
+    app.allowUpdates = ko.observable(true);
     app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
     app.map.closePopup();
     app.map.draw.disable();
@@ -141,9 +142,13 @@ app.resultsInit = function(id) {
 initFiltering = function() {
     setTimeout(function() {
         if ($('#focus_area_accordion').length > 0) {
+            app.allowUpdates(false);
             $('#id_focus_area').prop('checked', true);
             $('#id_focus_area_input').val(app.state.focusAreaState.id);
             $('#focus_area_accordion').hide();
+            $('#id_has_wilderness_area').prop('checked', true);
+            app.viewModel.scenarios.scenarioFormModel.toggleParameter('has_wilderness_area');
+            app.allowUpdates(true);
             app.viewModel.scenarios.scenarioFormModel.toggleParameter('focus_area');
         } else {
             initFiltering();
