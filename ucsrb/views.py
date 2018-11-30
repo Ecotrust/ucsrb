@@ -676,7 +676,19 @@ def get_hydro_results_by_pour_point_id(request):
         flow_est_data.append({'key': 'Imputed veg mgmt scenario (50)','value': rx_50,'unit': ''})
         flow_est_data.append({'key': 'Imputed veg mgmt scenario (30)','value': rx_30,'unit': ''})
         flow_est_data.append({'key': 'Imputed veg mgmt scenario (0)','value': rx_0,'unit': ''})
-    flow_est_data.append({'key': 'Baseline Confidence', 'value': str(ppt.confidence*10), 'unit': '%'})
+    if ppt.confidence > 9:
+        confidence = 'NA'
+    elif ppt.confidence > 6:
+        confidence = 'extremely high'
+    elif ppt.confidence > 4:
+        confidence = 'high'
+    elif ppt.confidence > 2:
+        confidence = 'moderate'
+    elif ppt.confidence > 1:
+        confidence = 'low'
+    else:
+        confidence = 'extremely low'
+    flow_est_data.append({'key': 'Baseline Confidence', 'value': confidence, 'unit': ''})
     # flow_est_data.append({'key': 'Change in Flow Confidence', 'value': "TBD", 'unit': '%'})
 
     summary_reports = []
