@@ -161,7 +161,7 @@ function scenarioFormModel(options) {
     self.landform_type_checkboxes_include_3 = ko.observable(true); //floors
     self.landform_type_checkboxes_include_4 = ko.observable(true); //east/west
     self.has_burned = ko.observable(false);
-    self.has_wilderness_area = ko.observable(true);
+    self.has_wilderness_area = ko.observable(false);
 
     self.lastChange = (new Date()).getTime();
 
