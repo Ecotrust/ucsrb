@@ -199,6 +199,20 @@ class TreatmentScenarioForm(ScenarioForm):
         help_text="Uncheck any topo types that you don't want included in your treatment",
     )
 
+    has_burned = HiddenScenarioBooleanField(
+        # initial=False,
+        label="Exclude areas burned in fire since 2012",
+        help_text="Vegetation data is from 2012. It is not accurate for planning management impacts in areas that have burned since.",
+        required=False,
+    )
+
+    has_wilderness_area = HiddenScenarioBooleanField(
+        initial=True,
+        label="Exclude Wilderness Areas",
+        help_text="Exclude Wilderness Areas",
+        required=False,
+    )
+
     def get_step_0_fields(self):
         names = [
             ('focus_area', None, None, 'focus_area_input'),
@@ -206,6 +220,7 @@ class TreatmentScenarioForm(ScenarioForm):
             # ('percent_roadless', None, None, None),
             ('pub_priv_own', None, None, 'pub_priv_own_input'),
             ('private_own', None, None, None),
+            ('has_wilderness_area', None, None, None),
         ]
         return self._get_fields(names)
 
@@ -214,6 +229,7 @@ class TreatmentScenarioForm(ScenarioForm):
             ('percent_riparian', None, None, None),
             ('percent_wetland', None, None, None),
             ('has_critical_habitat', None, None, None),
+            ('has_burned', None, None, None),
         ]
         return self._get_fields(names)
 

@@ -859,6 +859,12 @@ def run_filter_query(filters):
     # 14 and 24 = valley bottoms
     # 15 and 25 = east and west facing slopes
 
+    if 'has_burned' in filters.keys() and filters['has_burned']:
+        exclude_dicts.append({'has_burned':True})
+
+    if 'has_wilderness_area' in filters.keys() and filters['has_wilderness_area']:
+        exclude_dicts.append({'has_wilderness_area':True})
+
     exclusion_list = []
     if 'landform_type' in filters.keys() and filters['landform_type']:
         if not 'landform_type_checkboxes_0' in filters.keys():
@@ -968,7 +974,9 @@ def get_planningunits(request):
             'mgmt_description': p_unit.mgmt_description,
             'mgmt_unit_id': p_unit.mgmt_unit_id,
             'dwnstream_ppt_id': p_unit.dwnstream_ppt_id,
-            'topo_height_class_majority': p_unit.topo_height_class_majority
+            'topo_height_class_majority': p_unit.topo_height_class_majority,
+            'has_burned': p_unit.has_burned,
+            'has_wilderness_area': p_unit.has_wilderness_area
         })
     return HttpResponse(dumps(json))
 

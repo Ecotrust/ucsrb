@@ -205,6 +205,12 @@ class TreatmentScenario(Scenario):
     landform_type_checkboxes_include_east_west = models.BooleanField(default=True)
     landform_type_checkboxes = models.TextField(null=True, blank=True, default=None)
 
+    # exclude Burned?
+    has_burned = models.BooleanField(default=False)           #burn2012
+
+    # Avoid Wilderness Areas?
+    has_wilderness_area = models.BooleanField(default=True)           #Wilderness
+
     def run_filters(self, query):
         from ucsrb.views import run_filter_query
         filters = {}
@@ -264,6 +270,12 @@ class TreatmentScenario(Scenario):
             filters['landform_type_include_ridgetop'] = self.landform_type_checkboxes_include_ridgetop
             filters['landform_type_include_floors'] = self.landform_type_checkboxes_include_floor
             filters['landform_type_include_east_west'] = self.landform_type_checkboxes_include_east_west
+
+        if self.has_burned:
+            filters['has_burned'] = True
+
+        if self.has_wilderness_area:
+            filters['has_wilderness_area'] = True
 
         (query, notes) = run_filter_query(filters)
 
@@ -420,6 +432,9 @@ class VegPlanningUnit(models.Model):
     mgmt_unit_id = models.IntegerField(null=True, blank=True, default=None)                     #FSmgt_etid
     dwnstream_ppt_id = models.IntegerField(null=True, blank=True, default=None)                 #ppt_ID
     topo_height_class_majority = models.IntegerField(null=True, blank=True, default=None)       #thzonmaj
+
+    has_wilderness_area = models.BooleanField(default=False)    #Wilderness
+    has_burned = models.BooleanField(default=False)             #burn2012
 
     # geometry = gismodels.MultiPolygonField(srid=settings.GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Veg Unit Geometry")
     geometry = gismodels.PolygonField(srid=settings.GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Veg Unit Geometry")

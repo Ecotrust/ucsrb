@@ -129,6 +129,9 @@ class Command(BaseCommand):
         ppt_id = fieldsArray.index('ppt_ID') - 1    # Nearest Downstream Pour Point Basin ID
         thc_zm = fieldsArray.index('thzonmaj') - 1  # Topo height class zonal majority
 
+        has_wilderness_area_index = fieldsArray.index('Wilderness') - 1     #wilderness area presence/absence (not % or proportion)
+        has_burned_index = fieldsArray.index('burn2012') - 1     #burned since 2012 presence/absence (not % or proportion)
+
         # Ignore these if possible
         grid_id = fieldsArray.index('GRID_ID') - 1       # Hex ID for the fishnetting
 
@@ -172,6 +175,9 @@ class Command(BaseCommand):
                     road_distance = shapeRecord.record[road_distance_index],
                     percent_fractional_coverage = shapeRecord.record[mean_fractional_coverage_index],
                     percent_high_fire_risk_area = shapeRecord.record[percent_high_fire_risk_area_index],
+
+                    has_wilderness_area = shapeRecord.record[has_wilderness_area_index],
+                    has_burned = shapeRecord.record[has_burned_index],
 
                     # Fields to add to model
                     # mgmt_alloc_code = shapeRecord.record[mgmt_allocation_code],
