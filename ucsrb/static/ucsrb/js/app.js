@@ -147,6 +147,7 @@ initFiltering = function() {
             $('#id_focus_area_input').val(app.state.focusAreaState.id);
             $('#focus_area_accordion').hide();
             $('#id_has_wilderness_area').prop('checked', true);
+            app.viewModel.scenarios.scenarioFormModel.updateFilters('has_wilderness_area');
             app.viewModel.scenarios.scenarioFormModel.toggleParameter('has_wilderness_area');
             app.allowUpdates(true);
             app.viewModel.scenarios.scenarioFormModel.toggleParameter('focus_area');

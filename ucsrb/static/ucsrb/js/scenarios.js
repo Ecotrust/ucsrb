@@ -205,7 +205,7 @@ function scenarioFormModel(options) {
 
         if (param_bool()) {
             param_bool(false);
-            param_element.removeAttr('checked');
+            param_element.prop('checked', false);
             param_widget.css('display', 'none');
             self.removeFilter(param);
         } else {
@@ -217,7 +217,7 @@ function scenarioFormModel(options) {
                 }
             }
             param_bool(true);
-            param_element.attr('checked', 'checked');
+            param_element.prop('checked', true);
             param_widget.css('display', 'block');
             self.updateFilters(param);
         }
