@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^app/?$', views.app, name="app"),
     url(r'^help/$', flat_views.flatpage, {'url': '/help/'}, name="help"),
     url(r'^methods/$', flat_views.flatpage, {'url': '/methods/'}, name='methods'),
+    url(r'^thankyou/$', flat_views.flatpage, {'url': '/thankyou/'}, name='thankyou'),
 
     ### API urls
     url(r'^get_veg_unit_by_bbox', views.get_veg_unit_by_bbox),
