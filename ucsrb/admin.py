@@ -62,8 +62,8 @@ admin.site.unregister(Association)
 admin.site.unregister(Nonce)
 admin.site.unregister(UserSocialAuth)
 
-admin.site.unregister(Bookmark)
-admin.site.unregister(Content)
+# admin.site.unregister(Bookmark)
+# admin.site.unregister(Content)
 
 # class VegPlanningUnitAdmin(OSMGeoAdmin):
 #     map_template = DATABASE_GEOGRAPHY['map_template']
