@@ -5,6 +5,12 @@ from .models import *
 from django.contrib.gis import admin as geoadmin
 from django.contrib.gis.admin import GeoModelAdmin, OSMGeoAdmin
 
+from accounts.models import EmailVerification, PasswordDictionary, UserData
+from data_manager.models import AttributeInfo, DataNeed, Layer, LookupInfo, Theme
+from drawing.models import AOI, WindEnergySite
+from social_django.models import Association, Nonce, UserSocialAuth
+from visualize.models import Bookmark, Content
+
 class VegPlanningUnitAdmin(OSMGeoAdmin):
     list_display = ('pk', 'pub_priv_own', 'topo_height_class_majority')
 
@@ -39,6 +45,25 @@ admin.site.register(ScenarioState)
 geoadmin.site.register(FocusArea, FocusAreaAdmin)
 geoadmin.site.register(PourPoint, PourPointAdmin)
 
+admin.site.unregister(EmailVerification)
+admin.site.unregister(PasswordDictionary)
+admin.site.unregister(UserData)
+
+admin.site.unregister(AttributeInfo)
+admin.site.unregister(DataNeed)
+admin.site.unregister(Layer)
+admin.site.unregister(LookupInfo)
+admin.site.unregister(Theme)
+
+geoadmin.site.unregister(AOI)
+geoadmin.site.unregister(WindEnergySite)
+
+admin.site.unregister(Association)
+admin.site.unregister(Nonce)
+admin.site.unregister(UserSocialAuth)
+
+admin.site.unregister(Bookmark)
+admin.site.unregister(Content)
 
 # class VegPlanningUnitAdmin(OSMGeoAdmin):
 #     map_template = DATABASE_GEOGRAPHY['map_template']

@@ -191,7 +191,6 @@ INSTALLED_APPS = [
     'manipulators',
     'accounts',
     'data_manager',
-    'ucsrb',
     'visualize',
     'nursery',
     'drawing',
@@ -199,6 +198,7 @@ INSTALLED_APPS = [
     'analysistools',
     'scenarios',
     # 'filter',
+    'ucsrb',
     ### END INSERTED INSTALLED APPS ###
     'ckeditor',
 ]
