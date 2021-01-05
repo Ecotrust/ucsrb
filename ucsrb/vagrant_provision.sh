@@ -3,7 +3,7 @@ PROJECT_NAME=$1
 APP_NAME=$2
 
 PROJECT_DIR=/usr/local/apps/$PROJECT_NAME
-VIRTUALENV_DIR=$PROJECT_DIR/env
+VIRTUALENV_DIR=/usr/local/apps/env
 
 APP_DB_NAME=$3
 
@@ -26,15 +26,24 @@ echo "setting up virtualenvs"
     echo "installing project dependencies"
     $PIP install --upgrade pip
     $PIP install --src ./deps -r requirements.txt
+    $PIP install -r $PROJECT_DIR/requirements.txt
     ### INSERT PROJECT PROVISION FILES HERE ###
     $PIP install -e $PROJECT_DIR/apps/madrona-features && \
+    #$PIP install -r $PROJECT_DIR/apps/madrona-features/requirements.txt && \
     $PIP install -e $PROJECT_DIR/apps/madrona-manipulators && \
     $PIP install -e $PROJECT_DIR/apps/mp-accounts && \
+    $PIP install -r $PROJECT_DIR/apps/mp-accounts/requirements.txt && \
     $PIP install -e $PROJECT_DIR/apps/mp-data-manager && \
+    $PIP install -r $PROJECT_DIR/apps/mp-data-manager/requirements.txt && \
     $PIP install -e $PROJECT_DIR/apps/mp-visualize && \
+    $PIP install -r $PROJECT_DIR/apps/mp-visualize/requirements.txt && \
     $PIP install -e $PROJECT_DIR/apps/p97-nursery && \
+    # $PIP install -r $PROJECT_DIR/apps/p97-nursery/requirements.txt && \
     $PIP install -e $PROJECT_DIR/apps/madrona-analysistools && \
     $PIP install -e $PROJECT_DIR/apps/madrona-scenarios && \
+    $PIP install -r $PROJECT_DIR/apps/madrona-scenarios/requirements.txt && \
+    $PIP install -e $PROJECT_DIR/apps/mp-drawing && \
+    $PIP install -r $PROJECT_DIR/apps/mp-drawing/requirements.txt && \
     # $PIP install -e $PROJECT_DIR/apps/mp-filter && \
     $PIP install -e $PROJECT_DIR/apps/ucsrb && \
     ### END PROJECT PROVISION FILES ###
@@ -46,9 +55,9 @@ $PROJECT_DIR/scripts/reset_db.sh $APP_DB_NAME #$USER
 chmod a+x $PROJECT_DIR/$APP_NAME/manage.py
 
 # Add a couple of aliases to manage.py into .bashrc
-# cat << EOF >> ~/.bashrc
-# alias dj="$PYTHON $PROJECT_DIR/$APP_NAME/manage.py"
-# alias djrun="dj runserver 0.0.0.0:8000"
-# EOF
+cat << EOF >> /etc/bash.bashrc
+alias dj="$PYTHON $PROJECT_DIR/$APP_NAME/manage.py"
+alias djrun="dj runserver 0.0.0.0:8000"
+EOF
 
 echo "Initial provision complete: next is module-level provisioning"

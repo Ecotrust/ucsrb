@@ -24,7 +24,7 @@ class FocusArea(models.Model):
     geometry = gismodels.MultiPolygonField(srid=GEOMETRY_DB_SRID,
             null=True, blank=True, verbose_name="Focus Area Geometry")
 
-    objects = gismodels.GeoManager()
+    objects = gismodels.Manager()
 
     def __str__(self):
         if self.description:
@@ -42,12 +42,12 @@ class PourPoint(models.Model):
     id = models.IntegerField(primary_key=True, verbose_name='Pour Point ID')
     geometry = gismodels.PointField(srid=GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Pour Point")
 
-    imputed_ppt = models.ForeignKey('self', null=True, blank=True, default=None, verbose_name='Nearest Neighbor Match')
+    imputed_ppt = models.ForeignKey('self', null=True, blank=True, default=None, verbose_name='Nearest Neighbor Match', on_delete=models.SET_NULL)
     streammap_id = models.IntegerField(null=True, blank=True, default=None)
     watershed_id = models.CharField(max_length=3, null=True, blank=True, default=None, choices=settings.WATERSHED_CHOICES, verbose_name="Modeled Watershed Identifier")
     confidence = models.IntegerField(default=0)
 
-    objects = gismodels.GeoManager()
+    objects = gismodels.Manager()
 
     def __str__(self):
         return 'Virtual Gauging Station Number %s' % (self.id)
@@ -141,7 +141,7 @@ class ClimateData(models.Model):
 
 class ScenarioState(models.Model):
     name = models.CharField(max_length=255)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     SCENARIO_TYPE_CHOICES = [
         ('Stream', 'Stream'),
         ('Forest', 'Forest'),
@@ -152,8 +152,8 @@ class ScenarioState(models.Model):
 @register
 class TreatmentScenario(Scenario):
     focus_area = models.BooleanField(default=False)
-    focus_area_input = models.ForeignKey(FocusArea, null=True, blank=True, default=None)#, models.SET_NULL)
-    scenario = models.ForeignKey(ScenarioState, null=True, blank=True, default=None)#, models.CASCADE)
+    focus_area_input = models.ForeignKey(FocusArea, null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    scenario = models.ForeignKey(ScenarioState, null=True, blank=True, default=None, on_delete=models.CASCADE)
     aggregate_report = models.TextField(null=True, blank=True, default=None)
 
     # Avoid Private land? (USE PUB_PRIV_OWN!)
@@ -438,7 +438,7 @@ class VegPlanningUnit(models.Model):
 
     # geometry = gismodels.MultiPolygonField(srid=settings.GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Veg Unit Geometry")
     geometry = gismodels.PolygonField(srid=settings.GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Veg Unit Geometry")
-    objects = gismodels.GeoManager()
+    objects = gismodels.Manager()
 
     def is_private(self):
         return self.pub_priv_own == 'private'
