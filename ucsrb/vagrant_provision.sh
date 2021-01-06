@@ -26,7 +26,6 @@ echo "setting up virtualenvs"
     echo "installing project dependencies"
     $PIP install --upgrade pip
     $PIP install --src ./deps -r requirements.txt
-    $PIP install -r $PROJECT_DIR/requirements.txt
     ### INSERT PROJECT PROVISION FILES HERE ###
     $PIP install -e $PROJECT_DIR/apps/madrona-features && \
     #$PIP install -r $PROJECT_DIR/apps/madrona-features/requirements.txt && \
@@ -46,6 +45,7 @@ echo "setting up virtualenvs"
     $PIP install -r $PROJECT_DIR/apps/mp-drawing/requirements.txt && \
     # $PIP install -e $PROJECT_DIR/apps/mp-filter && \
     $PIP install -e $PROJECT_DIR/apps/ucsrb && \
+    $PIP install -r $PROJECT_DIR/apps/ucsrb/requirements.txt
     ### END PROJECT PROVISION FILES ###
 
 echo "resetting DB"

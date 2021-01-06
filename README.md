@@ -104,9 +104,9 @@ python manage.py migrate
 python manage.py collectstatic
 
 python manage.py import_veg_units /usr/local/apps/marineplanner-core/data/__YOUR_VEG_FILE___
-python manage.py import_focus_areas HUC10 /usr/local/apps/marineplanner-core/data/__YOUR_HUC_10_FILE__
-python manage.py import_focus_areas HUC12 /usr/local/apps/marineplanner-core/data/__YOUR_HUC_12_FILE__
-python manage.py import_focus_area RMU /usr/local/apps/marineplanner-core/data/__YOUR_RMU_FILE
+python manage.py import_focus_areas /usr/local/apps/marineplanner-core/data/__YOUR_HUC_10_FILE__ HUC10
+python manage.py import_focus_areas /usr/local/apps/marineplanner-core/data/__YOUR_HUC_12_FILE__ HUC12
+python manage.py import_focus_area /usr/local/apps/marineplanner-core/data/__YOUR_RMU_FILE RMU
 python manage.py import_pourpoints /usr/local/apps/marineplanner-core/data/__YOUR_POUR_POINT_BASIN_FILE__
 python manage.py import_climate_data /usr/local/apps/marineplanner-core/data/__YOUR_CLIMATE_DATA_FILE__
 
@@ -123,10 +123,10 @@ python manage.py runserver 0:8000
 ```
 Navigate to your site's port 8000 and log in to your sites `/admin/` page.
 Create a new user (let's call her 'Anonymous').
-Note the ID created for the user 
+Note the ID created for the user
 * this can be found in the URL which might look something like `/adminauth/user/2/change/`
    * The `2` would be the id in this case (it will be numeric)
-   
+
 Update your local settings with something like:
 ```
 ALLOW_ANONYMOUS_DRAW = True
@@ -158,9 +158,9 @@ sudo cp /usr/local/apps/marineplanner-core/deployment/rc.local /etc/rc.local
 #### Install and Configure Email
 `sudo apt-get install postfix `
 configuration:  
-     Internet Site 
-System mail name : 
-     enter the domain name you plan to use, i.e.: s2f.ucsrb.org 
+     Internet Site
+System mail name :
+     enter the domain name you plan to use, i.e.: s2f.ucsrb.org
 
 Then set Django settings to look something like this:
 ```
@@ -175,7 +175,7 @@ DEFAULT_FROM_EMAIL = 'MarinePlanner<marineplanner@your.domain>'
 Configure DNS for secure delivery (see internal documentation)
 
 #### Configure ReCaptcha and Registration
-**NOTE: This does not seem required for the signup popup, only if user finds /account/** 
+**NOTE: This does not seem required for the signup popup, only if user finds /account/**
 * pip install django-recaptcha
 * Install with [these directions]https://github.com/praekelt/django-recaptcha#installation
 * Use the 'NOCAPTCHA' setting (True)

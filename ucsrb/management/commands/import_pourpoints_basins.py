@@ -153,7 +153,9 @@ class Command(BaseCommand):
                     description = str(shapeRecord.record[unit_desc_index])
                 else:
                     description = None
-                geometry = GEOSGeometry(json.dumps(shapeRecord.shape.__geo_interface__), srid=settings.IMPORT_SRID)
+                shape_dict = shapeRecord.shape.__geo_interface__.copy()
+                shape_dict['crs'] = settings.IMPORT_SRID
+                geometry = GEOSGeometry(json.dumps(shape_dict))
                 if geometry.geom_type == 'Polygon':
                     multiGeometry = MultiPolygon((geometry))
                 elif geometry.geom_type == 'MultiPolygon':

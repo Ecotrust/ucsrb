@@ -1,3 +1,4 @@
+import sys
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
@@ -145,7 +146,9 @@ class Command(BaseCommand):
 
         self.stdout.write('Writing new Veg Planning Units...')
         for shapeRecord in shape.shapeRecords():
-            geometry = GEOSGeometry(json.dumps(shapeRecord.shape.__geo_interface__), srid=settings.IMPORT_SRID)
+            shape_dict = shapeRecord.shape.__geo_interface__.copy()
+            shape_dict['crs'] = settings.IMPORT_SRID
+            geometry = GEOSGeometry(json.dumps(shape_dict))
             if geometry.geom_type == 'Polygon':
                 # multiGeometry = MultiPolygon((geometry))
                 multiGeometry = geometry.union(geometry).buffer(0)
