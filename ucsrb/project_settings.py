@@ -387,6 +387,7 @@ MAPBOX_ACCESS_TOKEN = 'set_in_local_settings'
 
 EMAIL_HOST_USER = 'noreply@s2fdemo.ecotrust.org'
 DEFAULT_FROM_EMAIL = 'noreply@s2fdemo.ecotrust.org'
+EMAIL_HOST_ADDRESS = 'https://s2fdemo.ecotrust.org'
 SERVER_EMAIL = 'noreply@s2fdemo.ecotrust.org'
 PROJECT_SITE = 'http://s2fdemo.ecotrust.org'
 PROJECT_NAME = 'Snow2Flow'
