@@ -38,8 +38,32 @@ class RegisteredUserTest(TestCase):
         self.browser.quit()
 
     # Reminder: This listerally has to start with the word "test_"
+    def test_anonymous_user_can_select_basin_to_define_treatment(self):
+        print("Running Anonymous User Select Basin")
+        print("TODO...")
+
+    def test_registered_user_can_select_basin_to_define_treatment(self):
+        print("Running Registered User Select Basin")
+        print("TODO...")
+
+    def test_anonymous_user_can_select_pour_point_to_define_treatment(self):
+        print("Running Anonymous User Select Pour Point")
+        print("TODO...")
+
+    def test_registered_user_can_select_pour_point_to_define_treatment(self):
+        print("Running Registered User Select Pour Point")
+        print("TODO...")
+
+    def test_anonymous_user_can_draw_polygon_to_define_treatment(self):
+        print("Running Anonymous User Draw")
+        print("TODO...")
+
+    def test_registered_user_can_draw_polygon_to_define_treatment(self):
+        print("Running Registered User Draw")
+        print("TODO...")
+
     def test_registered_user_can_upload_a_shapefile_to_define_treatment(self):
-        print("Running RegisteredUserTest")
+        print("Running Registered User Upload")
 
         # Alice has a pre-existing shapefile of a plot she'd like to treat
         # She saved it to her hard drive
