@@ -19,6 +19,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'assets'))
 STYLES_DIR = os.path.realpath(os.path.join(ASSETS_DIR, 'styles'))
 
+MEDIA_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'apps', 'ucsrb', 'ucsrb', 'media'))
+
 SITE_ID = 1
 
 # Quick-start development settings - unsuitable for production

@@ -58,6 +58,10 @@ def app(request):
     context['MAP_TECH'] = 'ol4'
     return HttpResponse(template.render(context, request))
 
+###########################################################
+###             API Calls                                 #
+###########################################################
+
 def get_user_scenario_list(request):
     user_scenarios_list = []
     user_scenarios = TreatmentScenario.objects.filter(user=request.user)
@@ -76,9 +80,6 @@ def get_json_error_response(error_msg="Error", status_code=500, context={}):
     response.status_code = status_code
     return response
 
-###########################################################
-###             API Calls                                 #
-###########################################################
 def build_bbox(minX, minY, maxX, maxY):
     from django.contrib.gis.geos import Polygon, Point
     bbox = Polygon( ((minX,minY), (minX,maxY), (maxX,maxY), (maxX,minY), (minX,minY)) )
@@ -105,39 +106,6 @@ def get_veg_unit_by_bbox(request):
     # TODO: build context and return.
 
     return JsonResponse(json.loads(retVegUnit))
-
-# def get_segment_by_bbox(request):
-#     [minX, minY, maxX, maxY] = [float(x) for x in request.GET.getlist('bbox_coords[]')]
-#     bbox, bboxCenter = build_bbox(minX, minY, maxX, maxY)
-#     # TODO: Get all stream segments that intersect bbox
-#     # from .models import StreamSegment
-#     # segments = StreamSegments.objects.filter(geometry__intersect=bbox)
-#
-#     # TODO: Select first returned stream segment (handle 0)
-#     # if segments.count() > 1:
-#     #     centerSegment = StreamSegment.objects.filter(geometry__intersects=bboxCenter)
-#     #     if centerSegment.count() == 1:
-#     #         retSegment = centerSegment[0]
-#     #     else:
-#     #         retSegment = segments[0]
-#     # elif segments.count() ==1:
-#     #     retSegment = segments[0]
-#     # else:
-#     #     retSegment = {}
-#     # TODO: build context and return.
-#     return_json = {
-#
-#     }
-#     return JsonResponse(return_json)
-
-# def get_segment_by_id(request, id):
-#     print('Segment ID: %s' % str(id))
-#     # TODO: query for stream segment with given ID
-#     # TODO: get list of Pourpoints associated with stream segment
-#     # TODO: build context and return.
-#     return_json = {
-#     }
-#     return JsonResponse(return_json)
 
 def get_pourpoint_by_id(request, id):
     print('Pour Point ID: %s' % str(id))
@@ -222,6 +190,10 @@ def save_drawing(request):
         return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (scenario.pk, scenario.geometry_dissolved.geojson)))
     return get_json_error_response('Unable to save drawing.', 500, context)
 
+def upload_treatment_shapefile(request):
+    context = {}
+    return get_json_error_response('Upload not implemented yet.', 500, context)
+
 '''
 Take a point in 3857 and return the feature at that point for a given FocusArea type
 Primarily developed as a failsafe for not having pour point basin data.
@@ -246,9 +218,6 @@ def get_focus_area(request):
         focus_area = FocusArea.objects.get(unit_type=layer.upper(), unit_id=unit_id)
 
     return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (focus_area.pk, focus_area.geometry.geojson)))
-
-
-# def filter_results(request):
 
 
 # NEEDS:
@@ -927,7 +896,6 @@ def parse_filter_checkboxes(request):
             filter_dict[landform_checkboxes[checkbox_key]] = False
     return filter_dict
 
-
 '''
 '''
 @cache_page(60 * 60) # 1 hour of caching
@@ -954,7 +922,6 @@ def get_filter_results(request, query=False, notes=[]):
         area_acres += pu.acres
     from scenarios import views as scenarioViews
     return scenarioViews.get_filter_results(request, query, notes, {'area_acres': area_acres})
-
 
 @cache_page(60 * 60) # 1 hour of caching
 def get_planningunits(request):
@@ -994,7 +961,6 @@ def get_planningunits(request):
             'has_wilderness_area': p_unit.has_wilderness_area
         })
     return HttpResponse(dumps(json))
-
 
 def get_scenarios(request, scenario_model='treatmentscenario'):
     from scenarios.views import get_scenarios as scenarios_get_scenarios

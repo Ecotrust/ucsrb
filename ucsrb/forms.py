@@ -14,6 +14,11 @@ class HiddenScenarioBooleanField(forms.BooleanField):
         }
     )
 
+class UploadShapefileForm(forms.Form):
+    zipped_shapefile = forms.FileField(label='Zipped Shapefile')
+    shp_projection = forms.CharField(max_length=255, label='Shapefile Projection (Optional)')
+
+
 class TreatmentScenarioForm(ScenarioForm):
     from ucsrb.models import FocusArea
 

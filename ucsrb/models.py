@@ -138,7 +138,6 @@ class ClimateData(models.Model):
     def __unicode__(self):
         return 'Climate for %s at %s' % (self.ppt_id, str(self.datetime))
 
-
 class ScenarioState(models.Model):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
