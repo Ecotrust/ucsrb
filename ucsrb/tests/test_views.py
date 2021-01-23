@@ -1,11 +1,14 @@
 from django.test import TestCase
-from django.urls import reverse
+from django.urls import reverse, resolve
 from django.http import HttpRequest
 
 from ucsrb.models import FocusArea, TreatmentScenario
 from ucsrb.views import home
 
 class HomePageTest(TestCase):
+    def test_home_view_kickoff(self):
+        print("Testing Home View")
+
     def test_root_url_resolves_to_home_view(self):
         found = resolve('/')
         self.assertEqual(found.func, home)
@@ -22,6 +25,9 @@ class upload_treatment_shapefileTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         pass
+
+    def test_upload_treatment_shapefile_kickoff(self):
+        print("Testing Treatment Shapefile Upload")
 
     def test_view_url_exists_at_desired_location(self):
         response = self.client.get('/ucsrb/upload_treatment_shapefile/')

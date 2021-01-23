@@ -40,6 +40,7 @@ cd $CORE/apps
     if [ ! -d mp-visualize ]; then git clone https://github.com/Ecotrust/mp-visualize.git; fi
     if [ ! -d mp-data-manager ]; then git clone https://github.com/Ecotrust/mp-data-manager.git; fi
     if [ ! -d p97-nursery ]; then git clone https://github.com/Ecotrust/p97-nursery.git; fi
+    if [ ! -d madrona-gis ]; then git clone https://github.com/Ecotrust/madrona-gis.git; fi
   fi
   if [ $MODULES == "ucsrb" ]; then
     if [ ! -d madrona-features ]; then git clone https://github.com/Ecotrust/madrona-features.git; fi
@@ -52,6 +53,7 @@ cd $CORE/apps
     if [ ! -d madrona-analysistools ]; then git clone https://github.com/Ecotrust/madrona-analysistools.git; fi
     if [ ! -d madrona-scenarios ]; then git clone https://github.com/Ecotrust/madrona-scenarios.git; fi
     if [ ! -d mp-filter ]; then git clone https://github.com/Ecotrust/mp-filter.git; fi
+    if [ ! -d madrona-gis ]; then git clone https://github.com/Ecotrust/madrona.git; fi
   fi
   # if [ ! -d madrona-features ]; then git clone https://github.com/Ecotrust/madrona-features.git; fi
   # if [ ! -d madrona-forms ]; then git clone https://github.com/Ecotrust/madrona-forms.git; fi

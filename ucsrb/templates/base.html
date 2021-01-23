@@ -71,6 +71,11 @@
                 {% include 'ucsrb/blocks/login_modal.html' %}
             </div>
         {% endblock login_modal %}
+        {% block define_modal %}
+          <div class="modal fade" id="define-modal" tabindex="-1" role="dialog" aria-labelledby="define-modal" aria-hidden="true">
+                {% include 'ucsrb/blocks/define_modal.html' %}
+          </div>
+        {% endblock define_modal %}
     {% endblock modal %}
 
     {% block js %}

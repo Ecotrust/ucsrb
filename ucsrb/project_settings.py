@@ -201,6 +201,7 @@ INSTALLED_APPS = [
     'analysistools',
     'scenarios',
     # 'filter',
+    'geodata',
     ### END INSERTED INSTALLED APPS ###
     'ckeditor',
 ]

@@ -44,6 +44,8 @@ echo "setting up virtualenvs"
     $PIP install -e $PROJECT_DIR/apps/madrona-scenarios && \
     $PIP install --src ./deps -r $PROJECT_DIR/apps/madrona-scenarios/requirements.txt && \
     # $PIP install -e $PROJECT_DIR/apps/mp-filter && \
+    $PIP install -e $PROJECT_DIR/apps/madrona-gis && \
+    $PIP install --src ./deps -r $PROJECT_DIR/apps/madrona-gis/requirements.txt && \
     $PIP install -e $PROJECT_DIR/apps/ucsrb && \
     $PIP install --src ./deps -r $PROJECT_DIR/apps/ucsrb/requirements.txt && \
     ### END PROJECT PROVISION FILES ###

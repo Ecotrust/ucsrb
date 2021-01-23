@@ -1,0 +1,24 @@
+{% load static %}
+
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">Draw or Upload?</div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+              <div class="col-6 define-treatment-modal-button method-nav">
+                <!-- Draw -->
+                <button class="btn-method-draw" data-method="draw" data-toggle="tooltip" data-placement="bottom" title="Draw treatment areas then see the impact on stream flows."><img src="{% static 'ucsrb/img/icon/draw_area.svg' %}" alt="draw treatments" /><h3>Draw treatments</h3></button>
+              </div>
+              <div class="col-6 define-treatment-modal-button method-nav">
+                <!-- Upload -->
+                <button class="btn-method-upload" data-method="upload" data-toggle="tooltip" data-placement="bottom" title="Upload a zipped shapefile of your treatment."><img src="{% static 'ucsrb/img/icon/i_folder.svg' %}" alt="upload treatments" /><h3>Upload treatments</h3></button>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>

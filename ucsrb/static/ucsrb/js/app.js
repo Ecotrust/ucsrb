@@ -86,6 +86,20 @@ app.init = {
         app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
         scenario_type_selection_made('draw');
     },
+    'define': function() {
+        setInit();
+        app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
+        // If logged in: Show buttons for draw or upload
+        scenario_type_selection_made('define');
+    },
+    'upload': function() {
+        setInit();
+        app.map.selection.setSelect(app.map.selection.selectNoneSingleClick);
+        scenario_type_selection_made('upload');
+        // Provide user with form to attach a zipped shapefile
+        // hand it over to madrona-gis to get geopandas GeoDataFrame
+        // Convert to same format/projection as drawings would be
+    },
     'hydro': function() {
         reportInit();
         app.state.setStep = 'hydro';
@@ -586,6 +600,10 @@ app.panel = {
     }
 }
 
+showDefineSelectionOptions = function() {
+    $('#define-modal').modal('show');
+}
+
 enableDrawing = function() {
     app.map.draw.enable();
     app.map.geoSearch.openSearchBox();
@@ -713,6 +731,9 @@ app.nav = {
             false,
             false,
             app.panel.form.init
+        ],
+        define: [
+            showDefineSelectionOptions
         ],
         draw: [
             enableDrawing,

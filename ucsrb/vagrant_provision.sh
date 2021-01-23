@@ -44,6 +44,8 @@ echo "setting up virtualenvs"
     $PIP install -e $PROJECT_DIR/apps/mp-drawing && \
     $PIP install -r $PROJECT_DIR/apps/mp-drawing/requirements.txt && \
     # $PIP install -e $PROJECT_DIR/apps/mp-filter && \
+    $PIP install -e $PROJECT_DIR/apps/mp-gis && \
+    $PIP install -r $PROJECT_DIR/apps/mp-gis/requirements.txt && \
     $PIP install -e $PROJECT_DIR/apps/ucsrb && \
     $PIP install -r $PROJECT_DIR/apps/ucsrb/requirements.txt
     ### END PROJECT PROVISION FILES ###
