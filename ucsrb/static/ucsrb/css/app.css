@@ -242,11 +242,16 @@ Nav with scenario options (select, filter, draw)
 Files Nav and Modals for app (load saved, save, start over/reset)
 ===========================================================================
 */
+.modal-content {
+  width: max-content;
+}
+
 .username-wrap {
     flex-start: end;
 }
 
 .define-treatment-modal-button {
+  /* margin: 1rem; */
 }
 
 .define-treatment-modal-button.method-nav button {
@@ -260,6 +265,14 @@ Files Nav and Modals for app (load saved, save, start over/reset)
   border-radius: 1rem;
 }
 
+.define-treatment-modal-button.method-nav button img {
+  max-height: 50%;
+}
+
+.define-treatment-modal-button.method-nav button h3 {
+  font-size: 100%;
+}
+
 .define-treatment-modal-button:hover  {
 }
 
@@ -267,6 +280,14 @@ Files Nav and Modals for app (load saved, save, start over/reset)
   background-color: #CCC;
   padding: 0.8rem;
   /* margin: 0.5rem; */
+}
+
+.define-treatment-modal-button.method-nav:hover button img {
+  max-height: 60%;
+}
+
+.define-treatment-modal-button.method-nav:hover button h3 {
+  font-size: 110%;
 }
 
 /**
