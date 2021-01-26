@@ -586,7 +586,7 @@ app.panel = {
         }
     },
     element: function() { // returns a function. to edit dom element don't forget to invoke: element()
-    return this.getElement;
+      return this.getElement;
     },
 
     panelContentElement: function() { // returns a function. to edit dom element don't forget to invoke: panelContentElement()
@@ -605,6 +605,7 @@ showDefineSelectionOptions = function() {
 }
 
 enableDrawing = function() {
+    $('#define-modal').modal('hide');
     app.map.draw.enable();
     app.map.geoSearch.openSearchBox();
 }
@@ -705,6 +706,8 @@ app.nav = {
             `Select forest unit to filter or change selection: ${app.filterDropdownContent}`,
             'Select filters to narrow your treatment area',
         ],
+        define: [''],
+        upload: [''],
         draw: [
             'Zoom in to area of interest or use the geocoder to search for places by name.<br />Click on the map to start drawing the boundary of your management area.',
             'Add additional points then double-click to finish; Re-select point to edit',
@@ -1093,6 +1096,41 @@ app.request = {
                 console.log(`%cfail @ save drawing: %o`, 'color: red', response);
                 alert(response.responseJSON.error_msg);
                 app.panel.draw.finishDrawing();
+            }
+        })
+    },
+    uploadTreatment: function() {
+        var form = $("#upload-treatment-form")[0];
+        var formData = new FormData(form);
+        formData.append('zipped_shapefile', $("#id_zipped_shapefile").val());
+        formData.append('file', $("#id_zipped_shapefile")[0].files[0]);
+
+        return $.ajax({
+            url: '/ucsrb/upload_treatment_shapefile/',
+            data: formData,
+            method: 'POST',
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                $("#treatment-upload-modal").modal('hide');
+                if (app.state.nav !== 'short') {
+                    app.state.navHeight = 'short';
+                    app.state.setStep = 'results'; // go to results
+                }
+                var vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
+                    dataProjection: 'EPSG:3857',
+                    featureProjection: 'EPSG:3857'
+                });
+                // TODO: add features and selected veg units to map. (This works when loading saved scenarios).
+                app.map.addScenario(vectors);
+                app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
+                app.resultsInit('ucsrb_treatmentscenario_' + response.id);
+                app.state.scenarioId = response.id;
+                app.state.setStep = 'results';
+            },
+            error: function(response, status) {
+                console.log(`%cfail @ upload treatment: %o`, 'color: red', response);
+                alert(response.responseJSON.error_msg);
             }
         })
     },
