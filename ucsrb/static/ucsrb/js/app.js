@@ -1121,8 +1121,10 @@ app.request = {
                     dataProjection: 'EPSG:3857',
                     featureProjection: 'EPSG:3857'
                 });
-                // TODO: add features and selected veg units to map. (This works when loading saved scenarios).
+                var draw_source = app.map.layer.draw.layer.getSource();
+                app.map.layer.draw.layer.setVisible(true);
                 app.map.addScenario(vectors);
+                app.map.zoomToExtent(vectors[0].getGeometry().getExtent());
                 app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
                 app.resultsInit('ucsrb_treatmentscenario_' + response.id);
                 app.state.scenarioId = response.id;
