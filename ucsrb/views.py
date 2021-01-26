@@ -10,6 +10,12 @@ from ucsrb.models import TreatmentScenario
 from django.conf import settings
 from django.views.decorators.cache import cache_page
 from accounts.forms import LogInForm, SignUpForm
+from ucsrb.forms import UploadShapefileForm
+from django.contrib.gis.geos import MultiPolygon, Polygon, GEOSGeometry, Point
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.temp import NamedTemporaryFile
+from geodata.geodata import GeoData
+from .models import FocusArea, TreatmentScenario
 
 def accounts_context():
     context = {
@@ -56,6 +62,7 @@ def app(request):
     context['HERE_TOKEN'] = settings.HERE_API_TOKEN
     context['HERE_APP_CODE'] = settings.HERE_APP_CODE
     context['MAP_TECH'] = 'ol4'
+    context['UPLOAD_FORM'] = UploadShapefileForm
     return HttpResponse(template.render(context, request))
 
 ###########################################################
@@ -81,7 +88,6 @@ def get_json_error_response(error_msg="Error", status_code=500, context={}):
     return response
 
 def build_bbox(minX, minY, maxX, maxY):
-    from django.contrib.gis.geos import Polygon, Point
     bbox = Polygon( ((minX,minY), (minX,maxY), (maxX,maxY), (maxX,minY), (minX,minY)) )
     bboxCenter = Point( ((minX + maxX)/2,(minY+maxY)/2))
     return (bbox, bboxCenter)
@@ -130,76 +136,107 @@ def get_basin(request):
 def save_drawing(request):
     context = {}
     if request.method == 'POST':
-        from .models import FocusArea, TreatmentScenario
         featJson = request.POST['drawing']
-        from django.contrib.gis.geos import MultiPolygon, Polygon, GEOSGeometry
-        polys = []
-        for feature in json.loads(featJson)['features']:
-            polys.append(GEOSGeometry(json.dumps(feature['geometry'])))
-
-        if polys[0].geom_type == 'MultiPolygon' and len(polys) == 1:
-            geometry = polys[0]
-        else:
-            try:
-                geometry = MultiPolygon(polys)
-            except TypeError:
-                for poly in polys:
-                    if poly.geom_type == 'MultiPolygon':
-                        poly = poly.union(poly) #RDH: in tests this seems to
-                                # result in a Polygon - I'm not sure that this
-                                # is always true, but I don't know that this
-                                # is a real use case anyway...
-                geometry = MultiPolygon(polys)
-                print('ucsrb.views.save drawing: List of polygons may contain an illegal multipolygon.')
-        layer = 'Drawing'
-        focus_area = FocusArea.objects.create(unit_type=layer, geometry=geometry)
-        focus_area.save()
-
         scenario_name = request.POST['name']
         description = request.POST['description']
 
-        user = request.user
-        if not user.is_authenticated:
-            if settings.ALLOW_ANONYMOUS_DRAW == True:
-                from django.contrib.auth.models import User
-                user = User.objects.get(pk=settings.ANONYMOUS_USER_PK)
-            else:
-                return get_json_error_response('Anonymous Users Not Allowed. Please log in.', 401, context)
-
-        try:
-            scenario = TreatmentScenario.objects.create(
-                user=user,
-                name=scenario_name,
-                description=None,
-                focus_area=True,
-                focus_area_input=focus_area
-            )
-        except:
-            # Technically we're testing for psycopg2's InternalError GEOSIntersects TopologyException
-            return get_json_error_response('Drawings overlap. Please start over.', 500, context)
-
-        if not scenario.geometry_dissolved:
-            return get_json_error_response('Drawing does not cover any forested land in the Upper Columbia', 500, context)
-        final_geometry = scenario.geometry_dissolved
-        # EPSG:2163 = US National Atlas Equal Area
-        final_geometry.transform(2163)
-        if final_geometry.area/4046.86 < settings.MIN_TREATMENT_ACRES:
-            return get_json_error_response('Treatment does not cover enough forested land to make a difference', 500, context)
-        # return geometry to web mercator
-        final_geometry.transform(3857)
-        return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (scenario.pk, scenario.geometry_dissolved.geojson)))
+        return define_scenario(request, featJson, scenario_name, description)
     return get_json_error_response('Unable to save drawing.', 500, context)
 
 def upload_treatment_shapefile(request):
     context = {}
-    return get_json_error_response('Upload not implemented yet.', 500, context)
+    if request.method == 'POST':
+        form = UploadShapefileForm(request.POST, request.FILES)
+        if form.is_valid():
+            tmp_zip_file = NamedTemporaryFile(mode='wb+',delete=True, suffix='.zip')
+            for chunk in request.FILES['zipped_shapefile'].chunks():
+                tmp_zip_file.write(chunk)
+            tmp_zip_file.seek(0)
+            projection = request.POST['shp_projection']
+            geodata = GeoData()
+            if projection and len(projection) > 1:
+                geodata.read(tmp_zip_file.name, projection=projection)
+            else:
+                geodata.read(tmp_zip_file.name)
+            tmp_zip_file.close()
+            featJson = geodata.getGeoJSON('EPSG:3857')
+            scenario_name = request.POST['treatment_name']
+            if len(scenario_name) < 1:
+                scenario_name = '.'.join(request.FILES['zipped_shapefile'].name.split('.')[:-1])
+            description = request.POST['treatment_description']
+
+            return define_scenario(request, featJson, scenario_name, description)
+        else:
+            message = "Errors: "
+            for key in form.errors.keys():
+                message += "\n %s: %s" % (key, form.errors[key])
+
+            return get_json_error_response(message, 400, context)
+    else:
+        form = UploadShapefileForm()
+
+    return render(request, 'upload_modal.html', {'UPLOAD_FORM':form})
+
+def define_scenario(request, featJson, scenario_name, description):
+    context = {}
+    polys = []
+    for feature in json.loads(featJson)['features']:
+        polys.append(GEOSGeometry(json.dumps(feature['geometry'])))
+
+    if polys[0].geom_type == 'MultiPolygon' and len(polys) == 1:
+        geometry = polys[0]
+    else:
+        try:
+            geometry = MultiPolygon(polys)
+        except TypeError:
+            for poly in polys:
+                if poly.geom_type == 'MultiPolygon':
+                    poly = poly.union(poly) #RDH: in tests this seems to
+                            # result in a Polygon - I'm not sure that this
+                            # is always true, but I don't know that this
+                            # is a real use case anyway...
+            geometry = MultiPolygon(polys)
+            print('ucsrb.views.save drawing: List of polygons may contain an illegal multipolygon.')
+    layer = 'Drawing'
+    focus_area = FocusArea.objects.create(unit_type=layer, geometry=geometry)
+    focus_area.save()
+
+    user = request.user
+    if not user.is_authenticated:
+        if settings.ALLOW_ANONYMOUS_DRAW == True:
+            from django.contrib.auth.models import User
+            user = User.objects.get(pk=settings.ANONYMOUS_USER_PK)
+        else:
+            return get_json_error_response('Anonymous Users Not Allowed. Please log in.', 401, context)
+
+    try:
+        scenario = TreatmentScenario.objects.create(
+            user=user,
+            name=scenario_name,
+            description=None,
+            focus_area=True,
+            focus_area_input=focus_area
+        )
+    except:
+        # Technically we're testing for psycopg2's InternalError GEOSIntersects TopologyException
+        return get_json_error_response('Drawings overlap. Please start over.', 500, context)
+
+    if not scenario.geometry_dissolved:
+        return get_json_error_response('Drawing does not cover any forested land in the Upper Columbia', 500, context)
+    final_geometry = scenario.geometry_dissolved
+    # EPSG:2163 = US National Atlas Equal Area
+    final_geometry.transform(2163)
+    if final_geometry.area/4046.86 < settings.MIN_TREATMENT_ACRES:
+        return get_json_error_response('Treatment does not cover enough forested land to make a difference', 500, context)
+    # return geometry to web mercator
+    final_geometry.transform(3857)
+    return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (scenario.pk, scenario.geometry_dissolved.geojson)))
 
 '''
 Take a point in 3857 and return the feature at that point for a given FocusArea type
 Primarily developed as a failsafe for not having pour point basin data.
 '''
 def get_focus_area_at(request):
-    from django.contrib.gis.geos import Point
     focus_area = {"id": None, "geojson": None}
     if request.method == 'GET':
         from .models import FocusArea

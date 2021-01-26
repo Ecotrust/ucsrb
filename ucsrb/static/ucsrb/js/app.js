@@ -609,6 +609,11 @@ enableDrawing = function() {
     app.map.geoSearch.openSearchBox();
 }
 
+showUploadForm = function() {
+  $('#define-modal').modal('hide');
+  $('#treatment-upload-modal').modal('show');
+}
+
 app.filterDropdownContent = `<div class="dropdown">
         <button class="btn btn-sm ml-2 btn-outline-light dropdown-toggle" type="button" id="forestUnit" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select unit</button>
         <div class="dropdown-menu forest-unit-dropdown" aria-labelledby="forestUnit">
@@ -738,6 +743,9 @@ app.nav = {
         draw: [
             enableDrawing,
             false     //TODO: ??? enable editing?
+        ],
+        upload: [
+            showUploadForm
         ],
         results: function() {
             app.nav.hideSave();

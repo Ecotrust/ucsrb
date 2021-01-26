@@ -76,6 +76,11 @@
                 {% include 'ucsrb/blocks/define_modal.html' %}
           </div>
         {% endblock define_modal %}
+        {% block upload_modal %}
+          <div class="modal fade" id="treatment-upload-modal" tabindex="-1" role="dialog" aria-labelledby="upload-modal" aria-hidden="true">
+                {% include 'ucsrb/blocks/upload_modal.html' %}
+          </div>
+        {% endblock upload_modal %}
     {% endblock modal %}
 
     {% block js %}
