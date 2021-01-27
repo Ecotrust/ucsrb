@@ -158,8 +158,9 @@ def upload_treatment_shapefile(request):
                 geodata.read(tmp_zip_file.name, projection=projection)
             else:
                 geodata.read(tmp_zip_file.name)
+
             tmp_zip_file.close()
-            featJson = geodata.getGeoJSON('EPSG:3857')
+            featJson = geodata.getUnion(format='geojson', projection='EPSG:3857')
             scenario_name = request.POST['treatment_name']
             if len(scenario_name) < 1:
                 scenario_name = '.'.join(request.FILES['zipped_shapefile'].name.split('.')[:-1])
@@ -177,11 +178,28 @@ def upload_treatment_shapefile(request):
 
     return render(request, 'upload_modal.html', {'UPLOAD_FORM':form})
 
+def break_up_multipolygons(multipolygon, polygon_list=[]):
+    if multipolygon.geom_type == 'MultiPolygon':
+        if multipolygon.num_geom > 0:
+            new_poly = multipolygon.pop()
+            polygon_list = break_up_multipolygons(new_poly, polygon_list)
+            polygon_list = break_up_multipolygons(multipolygon, polygon_list)
+    elif multipolygon.geom_type == 'Polygon':
+            polygon_list.append(multipolygon)
+    return polygon_list
+
+
 def define_scenario(request, featJson, scenario_name, description):
     context = {}
     polys = []
     for feature in json.loads(featJson)['features']:
-        polys.append(GEOSGeometry(json.dumps(feature['geometry'])))
+        geos_geom = GEOSGeometry(json.dumps(feature['geometry']))
+        # GEOS assumes 4326 when given GeoJSON (by definition this should be true)
+        # However, we've always used 3857, even in GeoJSON.
+        # Fixing this would be great, but without comprehensive testing, it's safer
+        # to perpetuate this breach of standards.
+        geos_geom.srid = settings.GEOMETRY_DB_SRID
+        polys.append(geos_geom)
 
     if polys[0].geom_type == 'MultiPolygon' and len(polys) == 1:
         geometry = polys[0]
@@ -189,14 +207,11 @@ def define_scenario(request, featJson, scenario_name, description):
         try:
             geometry = MultiPolygon(polys)
         except TypeError:
+            new_polys = []
             for poly in polys:
-                if poly.geom_type == 'MultiPolygon':
-                    poly = poly.union(poly) #RDH: in tests this seems to
-                            # result in a Polygon - I'm not sure that this
-                            # is always true, but I don't know that this
-                            # is a real use case anyway...
-            geometry = MultiPolygon(polys)
-            print('ucsrb.views.save drawing: List of polygons may contain an illegal multipolygon.')
+                new_polys = break_up_multipolygons(poly, new_polys)
+
+            geometry = MultiPolygon(new_polys)
     layer = 'Drawing'
     focus_area = FocusArea.objects.create(unit_type=layer, geometry=geometry)
     focus_area.save()
@@ -219,7 +234,7 @@ def define_scenario(request, featJson, scenario_name, description):
         )
     except:
         # Technically we're testing for psycopg2's InternalError GEOSIntersects TopologyException
-        return get_json_error_response('Drawings overlap. Please start over.', 500, context)
+        return get_json_error_response('Treatment Areas overlap. Please review your data and start over.', 500, context)
 
     if not scenario.geometry_dissolved:
         return get_json_error_response('Drawing does not cover any forested land in the Upper Columbia', 500, context)
