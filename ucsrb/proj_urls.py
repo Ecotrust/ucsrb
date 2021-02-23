@@ -18,27 +18,21 @@ from django.contrib import admin
 ### INSERT ADDITIONAL IMPORTS HERE ###
 import accounts.urls
 ### END PROJECT URL IMPORTS ###
-from ucsrb.views import demo, get_planningunits, get_filter_count, get_filter_results
 
 urlpatterns = [
     url(r'^admin/?', admin.site.urls),
     ### INSERT PROJECT URL INCLUDES HERE ###
-    url(r'^features/', include('features.urls')),
-    url(r'^manipulators/', include('manipulators.urls')),
-    url('^account/auth/', include('social.apps.django_app.urls', namespace='social')),
-    url(r'^account/', include('accounts.urls', namespace="account")),
-    url(r'^data_manager/', include('data_manager.urls')),
-    url(r'^visualize/', include('visualize.urls')),
-    url(r'^scenario/demo$', demo),
-    url(r'^scenario/get_planningunits$', get_planningunits),
-    url(r'^scenario/get_filter_count$', get_filter_count),
-    url(r'^scenario/get_filter_results$', get_filter_results),
-    url(r'^scenario/', include('scenarios.urls')),
-    # url(r'^filter/', include('filter.urls')),
-    url(r'^ucsrb/', include('ucsrb.urls')),
-    url(r'^drawing/', include('drawing.urls')),
-    url(r'^api/', include('ucsrb.urls')),
-    url(r'', include('ucsrb.urls')),
+    url(r'^analysistools/', include('analysistools.urls')), 
+    url(r'^features/', include('features.urls')), 
+    url(r'^manipulators/', include('manipulators.urls')), 
+    url(r'^scenarios/', include('scenarios.urls')), 
+    url('^account/auth/', include('social.apps.django_app.urls', namespace='social')), 
+    url(r'^account/', include('accounts.urls', namespace="account")), 
+    url(r'^data_manager/', include('data_manager.urls')), 
+    url(r'^filter/', include('filter.urls')), 
+    url(r'^visualize/', include('visualize.urls')), 
+    url(r'^ucsrb/', include('ucsrb.urls')), 
+    url(r'^$', include('ucsrb.urls')), 
     ### END PROJECT URL INCLUDES ###
     # url(r'^visualize/', include('visualize.urls')),
     # url(r'^account/auth/', include('social.apps.django_app.urls', namespace='social')),

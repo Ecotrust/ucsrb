@@ -57,7 +57,7 @@ chmod +x configure_project.sh
 cp configure_project.sh /usr/local/apps/marineplanner-core/scripts/configure_project.sh
 cd /usr/local/apps/marineplanner-core/scripts/
 ./configure_project.sh ucsrb
-cd /usr/local/apps/marineplanner-core/apps/ucsrb/
+cd /usr/local/apps/marineplanner-core/apps/ucsrb/ucsrb/
 ./vagrant_provision.sh marineplanner-core marineplanner marineplanner /usr/local/apps/marineplanner-core/apps/ucsrb/ucsrb
 /usr/local/apps/marineplanner-core/apps/mp-accounts/scripts/vagrant_provision.sh marineplanner-core
 /usr/local/apps/marineplanner-core/apps/mp-visualize/scripts/vagrant_provision.sh marineplanner-core
