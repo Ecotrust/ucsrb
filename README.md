@@ -94,7 +94,7 @@ From your workstation, locate input files for the following:
 * Veg Units
 * climate data
 
-upload them to the data file you just created
+upload them to the data folder you just created
 
 #### Wrap up the tool installation
 
@@ -102,16 +102,30 @@ upload them to the data file you just created
 cd /usr/local/apps/marineplanner-core/marineplanner
 python manage.py migrate
 python manage.py collectstatic
+````
 
+#### Import your data
+
+```
 python manage.py import_veg_units /usr/local/apps/marineplanner-core/data/__YOUR_VEG_FILE___
+
+# import_focus_areas <path to data> <data category HUC10, HUC12, or RMU>
 python manage.py import_focus_areas /usr/local/apps/marineplanner-core/data/__YOUR_HUC_10_FILE__ HUC10
 python manage.py import_focus_areas /usr/local/apps/marineplanner-core/data/__YOUR_HUC_12_FILE__ HUC12
-python manage.py import_focus_area /usr/local/apps/marineplanner-core/data/__YOUR_RMU_FILE RMU
+python manage.py import_focus_areas /usr/local/apps/marineplanner-core/data/__YOUR_RMU_FILE RMU
 python manage.py import_pourpoints /usr/local/apps/marineplanner-core/data/__YOUR_POUR_POINT_BASIN_FILE__
 python manage.py import_climate_data /usr/local/apps/marineplanner-core/data/__YOUR_CLIMATE_DATA_FILE__
+```
 
+```
 python manage.py createsuperuser
+```
 
+* `enter` to use default option, or enter your own email
+* add a password for your superuser
+
+
+```
 python manage.py enable_sharing --all
 
 ```
