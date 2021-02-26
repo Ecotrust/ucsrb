@@ -1102,7 +1102,8 @@ app.request = {
     uploadTreatment: function() {
         var form = $("#upload-treatment-form")[0];
         var formData = new FormData(form);
-        formData.append('zipped_shapefile', $("#id_zipped_shapefile").val());
+        var zipped_file_name = document.getElementById('id_zipped_shapefile').files[0].name;
+        formData.append('zipped_shapefile', zipped_file_name);
         formData.append('file', $("#id_zipped_shapefile")[0].files[0]);
 
         return $.ajax({
