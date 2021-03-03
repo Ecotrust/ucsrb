@@ -307,10 +307,10 @@ WATERSHED_CHOICES = [
 
 PRESCRIPTION_TREATMENT_CHOICES = [
     ('notr', 'No Treatment scenario'),
-    ('mb16', 'No Treatment scenario'),
-    ('mb25', 'No Treatment scenario'),
-    ('burn', 'No Treatment scenario'),
-    ('flow', 'No Treatment scenario'),
+    ('mb16', 'Maximum Biomass 16 inch scenario'),
+    ('mb25', 'Maximum Biomass 25 inch scenario'),
+    ('burn', 'Burn Only scenario'),
+    ('flow', 'Ideal Water scenario'),
 ]
 
 

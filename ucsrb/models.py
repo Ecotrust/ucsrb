@@ -210,6 +210,10 @@ class TreatmentScenario(Scenario):
     # Avoid Wilderness Areas?
     has_wilderness_area = models.BooleanField(default=True)           #Wilderness
 
+    # Prescription (Rx) applied
+    PRESCRIPTION_TREATMENT_CHOICES = settings.PRESCRIPTION_TREATMENT_CHOICES
+    prescription_treatment_selection = models.CharField(max_length=255, null=True, blank=True, default=None, choices=PRESCRIPTION_TREATMENT_CHOICES)
+
     def run_filters(self, query):
         from ucsrb.views import run_filter_query
         filters = {}

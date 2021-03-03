@@ -49,8 +49,8 @@ class TreatmentScenarioForm(ScenarioForm):
 
     pub_priv_own_input = forms.ChoiceField(
         required=False,
-        widget=forms.RadioSelect(
-            attrs={'class': 'prescription-choices'}
+        widget=forms.Select(
+            attrs={'class': 'parameters'}
         ),
         choices= settings.OWNERSHIP_CHOICES,
     )
@@ -220,10 +220,16 @@ class TreatmentScenarioForm(ScenarioForm):
     )
 
     # Prescriptions
+    apply_prescription = HiddenScenarioBooleanField(
+        label="Apply a prescription scenario",
+        help_text="Choose a prescription",
+        required=False,
+    )
+
     prescription_treatment_selection = forms.ChoiceField(
         required=False,
-        widget=forms.Select(
-            attrs={'class': 'parameters'}
+        widget=forms.RadioSelect(
+            attrs={'class': 'prescription-choices'}
         ),
         choices= settings.PRESCRIPTION_TREATMENT_CHOICES,
     )
@@ -263,8 +269,14 @@ class TreatmentScenarioForm(ScenarioForm):
         ]
         return self._get_fields(names)
 
+    def get_step_3_fields(self):
+        names = [
+            ('apply_prescription', None, None, 'prescription_treatment_selection'),
+        ]
+        return self._get_fields(names)
+
     def get_steps(self):
-        return self.get_step_0_fields(), self.get_step_1_fields(), self.get_step_2_fields(),
+        return self.get_step_0_fields(), self.get_step_1_fields(), self.get_step_2_fields(), self.get_step_3_fields(),
 
     def clean_focus_area_input(self):
         return FocusArea.objects.get(pk=self.cleaned_data['focus_area_input'])
