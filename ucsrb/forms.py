@@ -225,7 +225,7 @@ class TreatmentScenarioForm(ScenarioForm):
         widget=forms.Select(
             attrs={'class': 'parameters'}
         ),
-        choices= settings.PRESCRIPTION_TREATMENT_OPTIONS,
+        choices= settings.PRESCRIPTION_TREATMENT_CHOICES,
     )
 
     def get_step_0_fields(self):
