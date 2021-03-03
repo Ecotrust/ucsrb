@@ -49,8 +49,8 @@ class TreatmentScenarioForm(ScenarioForm):
 
     pub_priv_own_input = forms.ChoiceField(
         required=False,
-        widget=forms.Select(
-            attrs={'class': 'parameters'}
+        widget=forms.RadioSelect(
+            attrs={'class': 'prescription-choices'}
         ),
         choices= settings.OWNERSHIP_CHOICES,
     )
@@ -217,6 +217,15 @@ class TreatmentScenarioForm(ScenarioForm):
         label="Exclude Wilderness Areas",
         help_text="Exclude Wilderness Areas",
         required=False,
+    )
+
+    # Prescriptions
+    prescription_treatment_selection = forms.ChoiceField(
+        required=False,
+        widget=forms.Select(
+            attrs={'class': 'parameters'}
+        ),
+        choices= settings.PRESCRIPTION_TREATMENT_OPTIONS,
     )
 
     def get_step_0_fields(self):
