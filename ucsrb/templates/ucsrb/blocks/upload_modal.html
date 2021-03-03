@@ -11,7 +11,7 @@
         <div class="modal-body">
             <div class="row">
               <!-- <form enctype="multipart/form-data" action="/ucsrb/upload_treatment_shapefile/" method="post"> -->
-              <form id="upload-treatment-form" enctype="multipart/form-data" onsubmit="app.request.uploadTreatment(); return false;">
+              <form id="upload-treatment-form" enctype="multipart/form-data" method="POST" novalidate="">
                 {% csrf_token %}
                 {{ UPLOAD_FORM.as_p }}
                 <input type="submit" value="Upload" id="upload-submit-btn">

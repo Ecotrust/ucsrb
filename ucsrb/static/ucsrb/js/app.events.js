@@ -148,4 +148,12 @@ $(document).ready(function() {
             return;
         }
     });
+
+    /**
+     * [Upload treatment form listener]
+     */
+    $('#upload-treatment-form').submit(function(e) {
+        e.preventDefault();
+        app.request.uploadTreatment();
+    })
 });
