@@ -5,4 +5,5 @@ ucsrb.egg-info
 ucsrb/local_settings.py
 layers/*
 ubuntu-*
+ucsrb/.vagrant/
 analysis/input_csvs/*
