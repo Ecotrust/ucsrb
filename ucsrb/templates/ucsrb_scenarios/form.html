@@ -23,11 +23,11 @@
         <div id="error_bar"></div>
 
         {% for step in form.get_steps %}
-        <div id="step{{ forloop.counter }}" class="step max{{ form.get_steps|length|add:"1" }} bg-light">
+        <div id="step{{ forloop.counter }}" class="step max{{ form.get_steps|length|add:"2" }} bg-light">
             <div class="progress">
-              <div class="progress-bar" aria-valuenow="{{ forloop.counter }}" aria-valuemin="0" aria-valuemax="{{ form.get_steps|length|add:"1" }}"></div>
+              <div class="progress-bar" aria-valuenow="{{ forloop.counter }}" aria-valuemin="0" aria-valuemax="{{ form.get_steps|length|add:"2" }}"></div>
             </div>
-            {# <p class="step-text"><i>Step  of {{ form.get_steps|length|add:"1" }} </i></p> #}
+            {# <p class="step-text"><i>Step  of {{ form.get_steps|length|add:"2" }} </i></p> #}
             <div id="step{{ forloop.counter }}_inputs" class="step-inputs">
                 <div class="form-group">
                     <p class="instructions">Select criteria to filter forested areas</p>
@@ -198,8 +198,41 @@
               <div class="progress-bar" aria-valuenow="step{{ form.get_steps|length|add:"1" }}" aria-valuemin="0" aria-valuemax="{{ form.get_steps|length|add:"1" }}"></div>
             </div>
             <div data-bind="css: { 'disabled': gridCellsRemaining()==0 }">
-                {# <p class="instructions">Provide a <b>Name</b> to identify your Grid Filtering design</p> #}
+                {# <p class="instructions">Choose a Prescription Treatment Scenario</p> #}
+                <div class="form-group">
+                    <p class="instructions">{{ form.prescription_treatment_selection.label }}</p>
+                </div>
                 <div id="step{{ form.get_steps|length|add:"1" }}-inputs" class="step-inputs">
+                    <div class="form-group">
+                        <div class="accordion row" id="{{ form.prescription_treatment_selection.html_name }}_accordion">
+                            <div class="accordion-heading col" data-bind="click: function() {app.viewModel.scenarios.scenarioFormModel.toggleParameter('{{ form.prescription_treatment_selection.html_name }}'); }">
+                                <label class="accordion-toggle">
+                                    {{ form.prescription_treatment_selection.as_widget }}
+                                    <i class="check icon-large icon-check" data-bind="visible: app.viewModel.scenarios.scenarioFormModel.{{ form.prescription_treatment_selection.html_name }}()"></i>
+                                    <!-- <i class="check icon-large icon-check" data-bind="visible: app.viewModel.scenarios.scenarioFormModel.avoid_private()"></i> -->
+                                    <i class="check icon-large icon-check-empty"></i>
+                                </label>
+                            </div>
+                            <div class="col-2 text-right">
+                                <i class="info-icon icon-info-sign field-tooltip"
+                                   data-toggle="tooltip"
+                                   data-original-title="{{ form.prescription_treatment_selection.help_text }}"
+                                   data-placement="top">
+                                </i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="step{{ form.get_steps|length|add:"2" }}" class="step max{{ form.get_steps|length|add:"2" }} bg-light">
+            <div class="progress">
+              <div class="progress-bar" aria-valuenow="step{{ form.get_steps|length|add:"2" }}" aria-valuemin="0" aria-valuemax="{{ form.get_steps|length|add:"2" }}"></div>
+            </div>
+            <div data-bind="css: { 'disabled': gridCellsRemaining()==0 }">
+                {# <p class="instructions">Provide a <b>Name</b> to identify your Grid Filtering design</p> #}
+                <div id="step{{ form.get_steps|length|add:"2" }}-inputs" class="step-inputs">
                     <div class="last-step-param">
                         <div class="form-group">
                             <label for="name">Name <small id="nameHelp" class="form-text text-muted">Choose a name to identify this design</small></label>
@@ -253,7 +286,7 @@
     </div>
 
     <script type="text/javascript">
-      var max_step = {{ form.get_steps|length|add:"1" }};
+      var max_step = {{ form.get_steps|length|add:"2" }};
 
       jQuery.getScript("{% static 'scenarios/js/scenarios_form.js' %}", function () {
           console.debug("Loaded: {% static 'scenarios/js/scenarios_form.js' %}");

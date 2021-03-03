@@ -163,6 +163,8 @@ function scenarioFormModel(options) {
     self.has_burned = ko.observable(false);
     self.has_wilderness_area = ko.observable(false);
 
+    self.prescription_treatment_selection = ko.observable(false);
+
     self.lastChange = (new Date()).getTime();
 
     try {

@@ -19,6 +19,13 @@ class UploadShapefileForm(forms.Form):
     treatment_name = forms.CharField(max_length=255, required=False, label='Treatment Name')
     treatment_description = forms.CharField(max_length=255, required=False, label='Treatment Description')
     shp_projection = forms.CharField(max_length=255, required=False, label='Shapefile Projection (Optional)')
+    prescription_treatment_selection = forms.ChoiceField(
+        required=False,
+        widget=forms.RadioSelect(
+            attrs={'class': 'prescription-choices'}
+        ),
+        choices= settings.PRESCRIPTION_TREATMENT_CHOICES,
+    )
 
 class TreatmentScenarioForm(ScenarioForm):
     from ucsrb.models import FocusArea
@@ -220,12 +227,6 @@ class TreatmentScenarioForm(ScenarioForm):
     )
 
     # Prescriptions
-    apply_prescription = HiddenScenarioBooleanField(
-        label="Apply a prescription scenario",
-        help_text="Choose a prescription",
-        required=False,
-    )
-
     prescription_treatment_selection = forms.ChoiceField(
         required=False,
         widget=forms.RadioSelect(
@@ -269,14 +270,14 @@ class TreatmentScenarioForm(ScenarioForm):
         ]
         return self._get_fields(names)
 
-    def get_step_3_fields(self):
+    def get_steps(self):
+        return self.get_step_0_fields(), self.get_step_1_fields(), self.get_step_2_fields(),
+
+    def get_prescription_selection(self):
         names = [
-            ('apply_prescription', None, None, 'prescription_treatment_selection'),
+            ('prescription_treatment_selection', None, None, None),
         ]
         return self._get_fields(names)
-
-    def get_steps(self):
-        return self.get_step_0_fields(), self.get_step_1_fields(), self.get_step_2_fields(), self.get_step_3_fields(),
 
     def clean_focus_area_input(self):
         return FocusArea.objects.get(pk=self.cleaned_data['focus_area_input'])

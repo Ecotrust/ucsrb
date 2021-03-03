@@ -525,6 +525,13 @@ app.panel = {
                 '<label for="treat_desc">Description:</label>' +
                 '<textarea rows="2" columns="35" name="treat_desc"></textarea><br>' +
                 '<br>' +
+                '<ul id="id_prescription_treatment_selection" class="prescription-choices">' +
+                '<li><label for="id_prescription_treatment_selection_0"><input type="radio" name="prescription_treatment_selection" value="notr" class="prescription-choices" id="id_prescription_treatment_selection_0">No Treatment scenario</label></li>' +
+                '<li><label for="id_prescription_treatment_selection_1"><input type="radio" name="prescription_treatment_selection" value="mb16" class="prescription-choices" id="id_prescription_treatment_selection_1">Maximum Biomass 16 inch scenario</label></li>' +
+                '<li><label for="id_prescription_treatment_selection_2"><input type="radio" name="prescription_treatment_selection" value="mb25" class="prescription-choices" id="id_prescription_treatment_selection_2">Maximum Biomass 25 inch scenario</label></li>' +
+                '<li><label for="id_prescription_treatment_selection_3"><input type="radio" name="prescription_treatment_selection" value="burn" class="prescription-choices" id="id_prescription_treatment_selection_3">Burn Only scenario</label></li>' +
+                '<li><label for="id_prescription_treatment_selection_4"><input type="radio" name="prescription_treatment_selection" value="flow" class="prescription-choices" id="id_prescription_treatment_selection_4">Ideal Water scenario</label></li>' +
+                '</ul><br />' +
                 '<div class="btn-toolbar justify-content-between drawing-buttons">' +
                 '<button type="submit" class="btn btn-primary ' + saveDisable + '" >Begin Evaluation</button>' +
                 '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
