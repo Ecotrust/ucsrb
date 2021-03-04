@@ -204,22 +204,13 @@
                 </div>
                 <div id="step{{ form.get_steps|length|add:"1" }}-inputs" class="step-inputs">
                     <div class="form-group">
-                        <div class="accordion row" id="{{ form.prescription_treatment_selection.html_name }}_accordion">
-                            <div class="accordion-heading col" data-bind="click: function() {app.viewModel.scenarios.scenarioFormModel.toggleParameter('{{ form.prescription_treatment_selection.html_name }}'); }">
-                                <label class="accordion-toggle">
-                                    {{ form.prescription_treatment_selection.as_widget }}
-                                    <i class="check icon-large icon-check" data-bind="visible: app.viewModel.scenarios.scenarioFormModel.{{ form.prescription_treatment_selection.html_name }}()"></i>
-                                    <!-- <i class="check icon-large icon-check" data-bind="visible: app.viewModel.scenarios.scenarioFormModel.avoid_private()"></i> -->
-                                    <i class="check icon-large icon-check-empty"></i>
-                                </label>
-                            </div>
-                            <div class="col-2 text-right">
-                                <i class="info-icon icon-info-sign field-tooltip"
-                                   data-toggle="tooltip"
-                                   data-original-title="{{ form.prescription_treatment_selection.help_text }}"
-                                   data-placement="top">
-                                </i>
-                            </div>
+                        {{ form.prescription_treatment_selection.as_widget }}
+                        <div class="col-2 text-right">
+                            <i class="info-icon icon-info-sign field-tooltip"
+                               data-toggle="tooltip"
+                               data-original-title="{{ form.prescription_treatment_selection.help_text }}"
+                               data-placement="top">
+                            </i>
                         </div>
                     </div>
                 </div>
