@@ -202,6 +202,7 @@ INSTALLED_APPS = [
     'scenarios',
     # 'filter',
     'geodata',
+    'dhsvm_harness',
     ### END INSERTED INSTALLED APPS ###
     'ckeditor',
 ]
@@ -313,6 +314,22 @@ PRESCRIPTION_TREATMENT_CHOICES = [
     ('flow', 'Ideal Water scenario'),
 ]
 
+########################################
+#####  FLOW METRIC CHOICES  ############
+########################################
+
+FLOW_METRIC_CHOICES = [
+    ('abs_rate', 'Absolute Flow Rate'),
+    ('delta_abs_rate', 'Change in Flow Rate'),
+    ('seven_low', 'Seven Day Low Flow'),
+    ('seven_mean', 'Seven Day Mean Flow'),
+    ('one_low', 'One Day Low Flow'),
+    ('one_mean', 'One Day Mean Flow'),
+    ('delta_seven_low', 'Change in 7 Day Low Flow'),
+    ('delta_seven_mean', 'Change in 7 Day Mean Flow'),
+    ('delta_one_low', 'Change in 1 Day Low Flow'),
+    ('delta_one_mean', 'Change in 1 Day Mean Flow')
+]
 
 ########################################
 ######      FILTER CHOICES      ########

@@ -465,3 +465,10 @@ class VegPlanningUnit(models.Model):
               )
 
 # class Report(models.Model):
+class StreamFlowReading(models.Model):
+    timestamp = models.CharField(max_length=30, verbose_name="Reading Timestamp")
+    basin = models.ForeignKey(PourPointBasin, on_delete=models.CASCADE, verbose_name="Stream Segment Basin") # RDH 3/3/2021 -- Careful! This assumes we can derive basin from segment ID!
+    metric = models.CharField(max_length=30, choices=settings.FLOW_METRIC_CHOICES, verbose_name="Measurement Metric")
+    is_baseline = models.BooleanField(default=False, verbose_name="This is a baseline reading")
+    treatment = models.ForeignKey(TreatmentScenario, null=True, blank=True, default=None, on_delete=models.CASCADE, verbose_name="Treatment Scenario")
+    value = models.FloatField(verbose_name="Reading in m^3/hr")
