@@ -25,6 +25,7 @@ class UploadShapefileForm(forms.Form):
             attrs={'class': 'prescription-choices'}
         ),
         choices= settings.PRESCRIPTION_TREATMENT_CHOICES,
+        label='Prescription Choices'
     )
 
 class TreatmentScenarioForm(ScenarioForm):
