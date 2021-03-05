@@ -49,7 +49,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'marineplanner.urls'
 
+# using async login, LOGIN_REDIRECT_URL may be ineffective
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 TEMPLATES = [
     {

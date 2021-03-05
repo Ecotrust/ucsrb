@@ -78,7 +78,7 @@ var main = {
         },
         logOut: function() {
             $.ajax({
-                url: '/account/logout/',
+                url: '/account/logout_async/',
                 success: function (response) {
                     alert('You have been signed out of your account')
                     document.location.reload();
