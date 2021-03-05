@@ -70,6 +70,7 @@ class ScenarioNNLookup(models.Model):
 
 class PourPointBasin(models.Model):
     ppt_ID = models.IntegerField(primary_key=True, verbose_name='Pour Point ID')
+    segment_ID = models.CharField(max_length=255, blank=True, null=True, default=None, verbose_name="Stream Segment ID")
     area = models.FloatField(null=True, blank=True, default=None, verbose_name='Area in Acres')
     mean_elev = models.IntegerField(null=True, blank=True, default=None, verbose_name='Mean Elevation')
     avg_slp = models.FloatField(null=True, blank=True, default=None, verbose_name='Average Slope')
