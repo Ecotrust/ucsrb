@@ -76,6 +76,13 @@ cp local_settings.py.template local_settings.py
 vim local_settings.py
 ```
 
+#### NEW: Install dhsvm_harness
+```
+cd /usr/local/apps/marineplanner-core/apps
+git clone https://github.com/Ecotrust/uc-dhsvm-harness.git
+pip install -e /usr/local/apps/marineplanner-core/apps/uc-dhsvm-harness
+```
+
 #### Set your local settings:
 * Add your mapbox access token tp `MAPBOX_ACCESS_TOKEN`
 * `COMPRESS_ENABLED = False` (for now)

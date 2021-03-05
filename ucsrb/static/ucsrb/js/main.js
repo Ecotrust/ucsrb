@@ -76,11 +76,15 @@ var main = {
                 }
             })
         },
-        logOut: function(event) {
+        logOut: function() {
             $.ajax({
-                url: '/account/logout/',
-                success: function (data) {
-                    document.location.href = '/';
+                url: '/account/logout_async/',
+                success: function (response) {
+                    alert('You have been signed out of your account')
+                    document.location.reload();
+                },
+                error: function(response) {
+                    console.log('%cerror while logging out user', 'color:red');
                 }
             })
         },
@@ -101,23 +105,26 @@ var main = {
                     }
                 },
                 error: function(response) {
-                    console.log('%error registering in user', 'color:red;');
+                    console.log('%cerror registering in user', 'color:red;');
                 }
             })
         },
         success: function(data) {
-            // set new csrf token
-            csrftoken = getCookie('csrftoken');
-            $('#login-modal').modal('hide');
-            if (app) {
-              $('#nav-load-save').removeClass('hide');
-              $('#subnav-sign-in-modal').addClass('hide');
+            var docLocation = document.location.pathname;
+            // set new csrf token'
+            if (docLocation.includes('app')) {
+                csrftoken = getCookie('csrftoken');
+                if (app) {
+                    $('#nav-load-save').removeClass('hide');
+                    $('#subnav-sign-in-modal').addClass('hide');
+                }
             }
+            $('#login-modal').modal('hide');
             // show alert
-            $('body').prepend(`<div class="alert alert-success fade show" role="alert" style="position: fixed; top: 10px; left: 50%; transform: translate(-50%,0); min-width: 200px; z-index: 3; text-align: center; font-size: .875em;">SUCCESS</div>`);
+            $('body').prepend(`<div class="alert alert-success fade show" role="alert" style="position: fixed; top: 30px; left: 50%; padding: 1em 1.5em; transform: translate(-50%,0); min-width: 20%; z-index: 9999; text-align: center; font-size: 1em;">Success! <br />Welcome Back ${data.username}</div>`);
             window.setTimeout(function() {
                 $('.alert').alert('close');
-            }, 1500);
+            }, 5000);
             // menu navicon hide login  &
             // add account link + sign out link
             $('#menu #sign-in-modal').before(`<a href="/account/" class="list-group-item list-group-item-action">${data.username}</a><button id="sign-out" data-action="sign-out" class="list-group-item list-group-item-action">Sign out</button>`);
