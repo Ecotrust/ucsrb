@@ -373,6 +373,10 @@ FIRE_RISK_THRESHOLD = 30
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 4000
 
+########################################
+######      BASIN SETTINGS      ########
+########################################
+
 # RDH 3/18/2019 - pour point IDs that we couldn't model or impute
 PROBLEMATIC_POUR_POINTS = [
     259,247,302,310,378,311,438,463,870,910,945,976,1068,1122,1153,1150,1242,
@@ -394,6 +398,32 @@ PROBLEMATIC_POUR_POINTS = [
     8139,8136,8175,8194,8272,8273,8280,8353,8399,8396,8415,8599,8584,8608,8701,
     8813,8845,8852,8873,8953,8991,9013
 ]
+
+# These two may best be set in Local Settings...
+BASINS_DIR = '/usr/local/apps/basins'
+
+SUPERBASINS = {
+    'enti': {
+        'name': 'Entiat',
+        'inputs': os.path.join(BASINS_DIR, 'entiat')
+    },
+    'metw': {
+        'name': 'Methow',
+        'inputs': os.path.join(BASINS_DIR, 'methow')
+    },
+    'okan': {
+        'name': 'Okanogan',
+        'inputs': os.path.join(BASINS_DIR, 'okan')
+    },
+    'wena': {
+        'name': 'Wenatchee',
+        'inputs': os.path.join(BASINS_DIR, 'wena')
+    }
+}
+
+########################################
+######      MAP SETTINGS        ########
+########################################
 
 MAP_TECH = 'ol4'
 
