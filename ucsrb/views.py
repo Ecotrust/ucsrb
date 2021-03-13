@@ -605,9 +605,9 @@ def get_hydro_results_by_pour_point_id(request):
     from collections import OrderedDict
     results_csvs = OrderedDict({})
     results_csvs['baseline'] = os.path.join(ucsrb_settings.NN_DATA_DIR,"veg%s" % imputed_ppt.watershed_id,"_base","%s.csv" % imputed_ppt.streammap_id)
-    (results_csvs['reduce to 50'], rx_50) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 50'])
-    (results_csvs['reduce to 30'], rx_30) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 30'])
-    (results_csvs['reduce to 0'], rx_0) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 0'])
+    # (results_csvs['reduce to 50'], rx_50) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 50'])
+    # (results_csvs['reduce to 30'], rx_30) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 30'])
+    # (results_csvs['reduce to 0'], rx_0) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 0'])
 
     (flow_output, annual_water_volume, sept_avg_flow) = parse_flow_results(results_csvs, imputed_ppt)
     # Baseline water yield (bas_char)
@@ -753,7 +753,7 @@ def get_hydro_results_by_pour_point_id(request):
 
 @cache_page(60 * 60) # 1 hour of caching
 def get_results_by_scenario_id(request):
-    from ucsrb.models import TreatmentScenario, FocusArea, PourPoint, PourPointBasin, ScenarioNNLookup
+    from ucsrb.models import TreatmentScenario, FocusArea, PourPoint, PourPointBasin #, ScenarioNNLookup
     from features.registry import get_feature_by_uid
 
     scenario_id = request.GET.get('id')
@@ -768,9 +768,9 @@ def get_results_by_scenario_id(request):
     intermediate_downstream_ppts = PourPoint.objects.filter(id__in=impacted_pourpoint_ids)
 
     imputation_ids = []
-    for lookup in ScenarioNNLookup.objects.all():
-        if lookup.ppt_id not in imputation_ids:
-            imputation_ids.append(lookup.ppt_id)
+    # for lookup in ScenarioNNLookup.objects.all():
+    #     if lookup.ppt_id not in imputation_ids:
+    #         imputation_ids.append(lookup.ppt_id)
 
     # RDH: Again, some ppts we thought we had modeled, but couldn't - A few of those we couldn't even impute, so skip 'em.
     imputation_ids = [x for x in imputation_ids if x not in settings.PROBLEMATIC_POUR_POINTS]
