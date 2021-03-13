@@ -127,7 +127,7 @@ class Command(BaseCommand):
         mgmt_allocation_code = fieldsArray.index('MgmtAlloca') - 1  # Forest Plan Land Management Allocation Code (for RMAs)
         mgmt_description = fieldsArray.index('MgmtDescri') - 1  # Forest Plan Land Management Description (for RMAs)
         rma_id_et = fieldsArray.index('FSmgt_etid') - 1  # Forest plan land management unique ID, created by Ecotrust
-        ppt_id = fieldsArray.index('ppt_ID') - 1    # Nearest Downstream Pour Point Basin ID
+        ppt_id = fieldsArray.index('seg_id') - 1    # Nearest Downstream Pour Point Basin ID
         thc_zm = fieldsArray.index('thzonmaj') - 1  # Topo height class zonal majority
 
         has_wilderness_area_index = fieldsArray.index('Wilderness') - 1     #wilderness area presence/absence (not % or proportion)

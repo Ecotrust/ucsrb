@@ -81,9 +81,9 @@ class Command(BaseCommand):
                     )
             fieldsArray = [x[0] for x in shape.fields]
 
-            ppt_IDIdx = fieldsArray.index('ppt_ID')-1
+            ppt_IDIdx = fieldsArray.index('seg_ID')-1
 
-            id_field = 'ppt_ID'
+            id_field = 'seg_ID'
             desc_field = None
 
             from django.contrib.gis.geos import GEOSGeometry, Point
@@ -94,18 +94,19 @@ class Command(BaseCommand):
 
             self.stdout.write('Writing new pour points...')
             for shapeRecord in shape.shapeRecords():
-                if desc_field:
-                    description = str(shapeRecord.record[unit_desc_index])
-                else:
-                    description = None
-                shape_dict = shapeRecord.shape.__geo_interface__.copy()
-                shape_dict['crs'] = settings.IMPORT_SRID
-                geometry = GEOSGeometry(json.dumps(shape_dict))
-                PourPoint.objects.create(
-                    id = shapeRecord.record[ppt_IDIdx],
-                    geometry = geometry
-                )
-                import_count += 1
+                if not shapeRecord.record[ppt_IDIdx] in [0, "0"]:
+                    if desc_field:
+                        description = str(shapeRecord.record[unit_desc_index])
+                    else:
+                        description = None
+                    shape_dict = shapeRecord.shape.__geo_interface__.copy()
+                    shape_dict['crs'] = settings.IMPORT_SRID
+                    geometry = GEOSGeometry(json.dumps(shape_dict))
+                    PourPoint.objects.create(
+                        id = shapeRecord.record[ppt_IDIdx],
+                        geometry = geometry
+                    )
+                    import_count += 1
 
 
         self.stdout.write('Successfully added %s Pour Points' % import_count)

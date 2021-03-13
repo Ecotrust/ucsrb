@@ -39,7 +39,7 @@ class FocusArea(models.Model):
             return u'%s: %s' % (self.unit_type, self.unit_id)
 
 class PourPoint(models.Model):
-    id = models.IntegerField(primary_key=True, verbose_name='Pour Point ID')
+    id = models.CharField(primary_key=True, max_length=30, verbose_name='Pour Point ID')
     geometry = gismodels.PointField(srid=GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="Pour Point")
 
     imputed_ppt = models.ForeignKey('self', null=True, blank=True, default=None, verbose_name='Nearest Neighbor Match', on_delete=models.SET_NULL)
@@ -55,23 +55,23 @@ class PourPoint(models.Model):
     def __unicode__(self):
         return 'Virtual Gauging Station Number %s' % (self.id)
 
-class ScenarioNNLookup(models.Model):
-    ppt_id = models.IntegerField(verbose_name='Pour Point ID')
-    # watershed_id = models.CharField(max_length=3, null=True, blank=True, default=None, choices=settings.WATERSHED_CHOICES, verbose_name="Modeled Watershed Identifier")
-    scenario_id = models.IntegerField(verbose_name="Harvest Scenario Identifier")
-    treatment_target = models.IntegerField()
-    fc_delta = models.FloatField(verbose_name="Percent Change in Fractional Coverage")
-
-    def __str__(self):
-        return "Nearest Neighbor Pour Point %d, Scenario %d" % (self.ppt_id, self.scenario_id)
-
-    def __unicode__(self):
-        return "Nearest Neighbor Pour Point %d, Scenario %d" % (self.ppt_id, self.scenario_id)
+# class ScenarioNNLookup(models.Model):
+#     ppt_id = models.IntegerField(verbose_name='Pour Point ID')
+#     # watershed_id = models.CharField(max_length=3, null=True, blank=True, default=None, choices=settings.WATERSHED_CHOICES, verbose_name="Modeled Watershed Identifier")
+#     scenario_id = models.IntegerField(verbose_name="Harvest Scenario Identifier")
+#     treatment_target = models.IntegerField()
+#     fc_delta = models.FloatField(verbose_name="Percent Change in Fractional Coverage")
+#
+#     def __str__(self):
+#         return "Nearest Neighbor Pour Point %d, Scenario %d" % (self.ppt_id, self.scenario_id)
+#
+#     def __unicode__(self):
+#         return "Nearest Neighbor Pour Point %d, Scenario %d" % (self.ppt_id, self.scenario_id)
 
 class PourPointBasin(models.Model):
     superbasin_choices = [(x, settings.SUPERBASINS[x]['name']) for x in settings.SUPERBASINS.keys()]
 
-    ppt_ID = models.IntegerField(primary_key=True, verbose_name='Pour Point ID')
+    ppt_ID = models.CharField(primary_key=True, max_length=30, verbose_name='Pour Point ID')
     segment_ID = models.CharField(max_length=255, blank=True, null=True, default=None, verbose_name="Stream Segment ID")
     area = models.FloatField(null=True, blank=True, default=None, verbose_name='Area in Acres')
     superbasin = models.CharField(max_length=40, null=True, blank=True, default=None, choices=superbasin_choices)
@@ -82,20 +82,20 @@ class PourPointBasin(models.Model):
     def __unicode__(self):
         return 'Pour Point Basin %s' % (self.ppt_ID)
 
-class ClimateData(models.Model):
-    ppt_id = models.IntegerField()
-    datetime = models.DateTimeField(auto_now=False,auto_now_add=False)
-    temp = models.IntegerField(verbose_name='temperature')
-    pcp = models.FloatField(verbose_name='precipitation')
-    albedo = models.FloatField()
-    wind = models.FloatField()
-    rh = models.FloatField(verbose_name='relative humidity')
-
-    def __str__(self):
-        return 'Climate for %s at %s' % (self.ppt_id, str(self.datetime))
-
-    def __unicode__(self):
-        return 'Climate for %s at %s' % (self.ppt_id, str(self.datetime))
+# class ClimateData(models.Model):
+#     ppt_id = models.IntegerField()
+#     datetime = models.DateTimeField(auto_now=False,auto_now_add=False)
+#     temp = models.IntegerField(verbose_name='temperature')
+#     pcp = models.FloatField(verbose_name='precipitation')
+#     albedo = models.FloatField()
+#     wind = models.FloatField()
+#     rh = models.FloatField(verbose_name='relative humidity')
+#
+#     def __str__(self):
+#         return 'Climate for %s at %s' % (self.ppt_id, str(self.datetime))
+#
+#     def __unicode__(self):
+#         return 'Climate for %s at %s' % (self.ppt_id, str(self.datetime))
 
 class ScenarioState(models.Model):
     name = models.CharField(max_length=255)
@@ -392,7 +392,7 @@ class VegPlanningUnit(models.Model):
     mgmt_alloc_code = models.CharField(max_length=255, null=True, blank=True, default=None)     #MgmtAlloca
     mgmt_description = models.CharField(max_length=255, null=True, blank=True, default=None)    #MgmtDescri
     mgmt_unit_id = models.IntegerField(null=True, blank=True, default=None)                     #FSmgt_etid
-    dwnstream_ppt_id = models.IntegerField(null=True, blank=True, default=None)                 #ppt_ID
+    dwnstream_ppt_id = models.CharField(max_length=30, null=True, blank=True, default=None)     #ppt_ID/seg_id
     topo_height_class_majority = models.IntegerField(null=True, blank=True, default=None)       #thzonmaj
 
     has_wilderness_area = models.BooleanField(default=False)    #Wilderness
