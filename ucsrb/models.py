@@ -55,48 +55,6 @@ class PourPoint(models.Model):
     def __unicode__(self):
         return 'Virtual Gauging Station Number %s' % (self.id)
 
-# class ScenarioNNLookup(models.Model):
-#     ppt_id = models.IntegerField(verbose_name='Pour Point ID')
-#     # watershed_id = models.CharField(max_length=3, null=True, blank=True, default=None, choices=settings.WATERSHED_CHOICES, verbose_name="Modeled Watershed Identifier")
-#     scenario_id = models.IntegerField(verbose_name="Harvest Scenario Identifier")
-#     treatment_target = models.IntegerField()
-#     fc_delta = models.FloatField(verbose_name="Percent Change in Fractional Coverage")
-#
-#     def __str__(self):
-#         return "Nearest Neighbor Pour Point %d, Scenario %d" % (self.ppt_id, self.scenario_id)
-#
-#     def __unicode__(self):
-#         return "Nearest Neighbor Pour Point %d, Scenario %d" % (self.ppt_id, self.scenario_id)
-
-class PourPointBasin(models.Model):
-    superbasin_choices = [(x, settings.SUPERBASINS[x]['name']) for x in settings.SUPERBASINS.keys()]
-
-    ppt_ID = models.CharField(primary_key=True, max_length=30, verbose_name='Pour Point ID')
-    segment_ID = models.CharField(max_length=255, blank=True, null=True, default=None, verbose_name="Stream Segment ID")
-    area = models.FloatField(null=True, blank=True, default=None, verbose_name='Area in Acres')
-    superbasin = models.CharField(max_length=40, null=True, blank=True, default=None, choices=superbasin_choices)
-
-    def __str__(self):
-        return 'Pour Point Basin %s' % (self.ppt_ID)
-
-    def __unicode__(self):
-        return 'Pour Point Basin %s' % (self.ppt_ID)
-
-# class ClimateData(models.Model):
-#     ppt_id = models.IntegerField()
-#     datetime = models.DateTimeField(auto_now=False,auto_now_add=False)
-#     temp = models.IntegerField(verbose_name='temperature')
-#     pcp = models.FloatField(verbose_name='precipitation')
-#     albedo = models.FloatField()
-#     wind = models.FloatField()
-#     rh = models.FloatField(verbose_name='relative humidity')
-#
-#     def __str__(self):
-#         return 'Climate for %s at %s' % (self.ppt_id, str(self.datetime))
-#
-#     def __unicode__(self):
-#         return 'Climate for %s at %s' % (self.ppt_id, str(self.datetime))
-
 class ScenarioState(models.Model):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -427,7 +385,7 @@ class VegPlanningUnit(models.Model):
 class StreamFlowReading(models.Model):
     timestamp = models.CharField(max_length=30, verbose_name="Reading Timestamp")
     time = models.DateTimeField(verbose_name="Reading DateTime")
-    basin = models.ForeignKey(PourPointBasin, on_delete=models.CASCADE, verbose_name="Stream Segment Basin") # RDH 3/3/2021 -- Careful! This assumes we can derive basin from segment ID!
+    basin = models.ForeignKey(FocusArea, on_delete=models.CASCADE, verbose_name="Stream Segment Basin")
     metric = models.CharField(max_length=30, choices=settings.FLOW_METRIC_CHOICES, verbose_name="Measurement Metric")
     is_baseline = models.BooleanField(default=False, verbose_name="This is a baseline reading")
     treatment = models.ForeignKey(TreatmentScenario, null=True, blank=True, default=None, on_delete=models.CASCADE, verbose_name="Treatment Scenario")
