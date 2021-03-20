@@ -1,21 +1,22 @@
-from django.shortcuts import render
-
 # Create your views here.
-from django.http import HttpResponse, JsonResponse
-from django.template import loader
+from collections import OrderedDict
+from datetime import datetime
+import json
+
+from accounts.forms import LogInForm, SignUpForm
+from geodata.geodata import GeoData
+from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-import json
-from ucsrb.models import TreatmentScenario
-from django.conf import settings
-from django.views.decorators.cache import cache_page
-from accounts.forms import LogInForm, SignUpForm
-from ucsrb.forms import UploadShapefileForm
 from django.contrib.gis.geos import MultiPolygon, Polygon, GEOSGeometry, Point
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.temp import NamedTemporaryFile
-from geodata.geodata import GeoData
-from .models import FocusArea, TreatmentScenario
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render
+from django.template import loader
+from django.views.decorators.cache import cache_page
+from ucsrb.forms import UploadShapefileForm
+from ucsrb.models import FocusArea, TreatmentScenario, StreamFlowReading
 
 def accounts_context():
     context = {
@@ -304,14 +305,13 @@ def get_downstream_pour_points(request):
     return JsonResponse(downstream_ppts, safe=False)
 
 def sort_output(flow_output):
-    from collections import OrderedDict
     results = OrderedDict({})
     def get_timestamp_from_string(time_string):
-        from datetime import datetime
         return datetime.strptime(time_string, "%m.%d.%Y-%H:%M:%S")
     for rx in flow_output.keys():
-        time_keys = sorted(list(flow_output[rx].keys()), key=get_timestamp_from_string)
-        results[rx] = [{'timestep':time_key, 'flow': flow_output[rx][time_key]} for time_key in time_keys]
+        time_keys = sorted([x for x in flow_output[rx].keys() if not x == 'records_available'], key=get_timestamp_from_string)
+        if len(time_keys) > 0:
+            results[rx] = [{'timestep':time_key, 'flow': flow_output[rx][time_key]} for time_key in time_keys]
     return results
 
 def get_results_delta(flow_output):
@@ -336,7 +336,6 @@ def get_results_delta(flow_output):
 
 def get_results_xd_low(flow_output, sorted_results, days):
     from copy import deepcopy
-    from datetime import datetime
     from statistics import median
     out_dict = deepcopy(flow_output)
     sept_median_x_day_low = {}
@@ -372,144 +371,192 @@ def get_results_xd_mean(flow_output, sorted_results, days):
             out_dict[rx][timestep] = mean_flow
     return sort_output(out_dict)
 
-def parse_flow_results(csv_dict, ppt):
-    import csv
-    from datetime import datetime
-    from copy import deepcopy
-    from ucsrb import project_settings as ucsrb_settings
-    from collections import OrderedDict
+def parse_flow_results(overlap_basin, treatment):
+    flow_results = {}
+    steps_to_aggregate = settings.TIME_STEP_REPORTING/settings.TIME_STEP_HOURS
 
-    output_dict = OrderedDict({})
-    annual_water_volume = {}
-    sept_avg_flow = {}
+    for model_year in settings.MODEL_YEARS.keys():
 
-    for treatment in csv_dict.keys():
-        if treatment not in output_dict.keys():
-            output_dict[treatment] = {}
-        if treatment not in annual_water_volume.keys():
-            annual_water_volume[treatment] = 0
+        output_dict = OrderedDict({})
+        annual_water_volume = {}
+        sept_avg_flow = {}
+        flow_results[model_year] = {}
 
-        with open(csv_dict[treatment]) as csvfile:
-            csvReader = csv.DictReader(csvfile)
-            steps_to_aggregate = settings.TIME_STEP_REPORTING/settings.TIME_STEP_HOURS
+        baseline_readings = StreamFlowReading.objects.filter(
+            basin=overlap_basin,
+            is_baseline=True,
+            time__gte=settings.MODEL_YEARS[model_year]['start'],
+            time__lte=settings.MODEL_YEARS[model_year]['end'],
+            ).order_by('time')
+        treated_readings = StreamFlowReading.objects.filter(
+            basin=overlap_basin,
+            treatment=treatment,
+            time__gte=settings.MODEL_YEARS[model_year]['start'],
+            time__lte=settings.MODEL_YEARS[model_year]['end'],
+            ).order_by('time')
+
+        for (treatment_type, readings_data) in [('baseline', baseline_readings), ('treated', treated_readings)]:
+            record_count = len(readings_data)
             aggregate_volume = 0
             sept_flow = 0
             sept_records = 0
-            for index, row in enumerate(csvReader):
-                time_object = datetime.strptime(row['TIMESTAMP'], '%m.%d.%Y-%H:%M:%S')
+            annual_water_volume[treatment_type] = 0
+            output_dict[treatment_type] = OrderedDict({})
+            for index, reading in enumerate(readings_data):
+                time_object = reading.time
                 # Get volume of flow for timestep in Cubic Feet
-                timestep_volume = float(row[settings.NN_CSV_FLOW_COLUMN]) * 35.3147
+                timestep_volume = reading.value * 35.3147 * settings.TIME_STEP_HOURS # readings are in m^3/hr
                 aggregate_volume += timestep_volume
-                annual_water_volume[treatment] = annual_water_volume[treatment] + timestep_volume
+                annual_water_volume[treatment_type] = annual_water_volume[treatment_type] + timestep_volume
                 if index%steps_to_aggregate == 0:
-                    output_dict[treatment][row['TIMESTAMP']] = aggregate_volume/settings.TIME_STEP_REPORTING/60/60
+                    output_dict[treatment_type][reading.timestamp] = aggregate_volume/settings.TIME_STEP_REPORTING/60/60 #get ft^3/s
                     aggregate_volume = 0
                 if time_object.month == 9:
                     sept_flow += timestep_volume/settings.TIME_STEP_HOURS/60/60
                     sept_records += 1
-        sept_avg_flow[treatment] = str(round(sept_flow/sept_records, 2))
+            if sept_records > 0:
+                sept_avg_flow[treatment_type] = str(round(sept_flow/sept_records, 2))
+            else:
+                sept_avg_flow[treatment_type] = 'unknown'
+            if record_count > 0:
+                output_dict[treatment_type]['records_available'] = True
+            else:
+                output_dict[treatment_type]['records_available'] = False
+        flow_results[model_year] = {
+            'flow_output': output_dict,
+            'annual_water_volume': annual_water_volume,
+            'sept_avg_flow': sept_avg_flow
+        }
+    return flow_results
 
-    return (output_dict, annual_water_volume, sept_avg_flow)
 
-#TODO: Delete this function - left over from old regression modelling approach.
-def get_basin_input_dict(basin_data, basin_geom, treatment_geom, row_id, treatment='baseline'):
-    from ucsrb import project_settings as ucsrb_settings
-    from ucsrb.models import VegPlanningUnit
-    out_dict = {}
-    vpus = VegPlanningUnit.objects.filter(geometry__intersects=basin_geom)
 
-    for field in ucsrb_settings.HYDRO_INPUT_HEADERS:
-        if 'thc_' in field:
-            thc_id = int(field.split('_')[1])
-            thc_veg_units = vpus.filter(topo_height_class_majority=thc_id)
-            thc_acres = 0
-            for veg_unit in thc_veg_units:
-                # Reduce fractional coverage TO treatment target (take lowest val)
-                if veg_unit.geometry.intersects(treatment_geom) and ucsrb_settings.TREATMENT_TARGETS[treatment] < veg_unit.percent_fractional_coverage:
-                    thc_acres += veg_unit.acres*(ucsrb_settings.TREATMENT_TARGETS[treatment]/100)
-                else:
-                    thc_acres += veg_unit.acres*(veg_unit.percent_fractional_coverage/100)
-            out_dict[field] = thc_acres
-        else:
-            if hasattr(basin_data, field):
-                out_dict[field] = basin_data.__getattribute__(field)
 
-    # we don't care about just basin id, but treatment, too. Using custom IDs.
-    out_dict['ppt_ID'] = row_id
+    # for treatment in csv_dict.keys():
+    # for treatment in StreamFlowReading.objects.filter(basin=overlap_basin, treatment=treatment):
+    #     if treatment not in output_dict.keys():
+    #         output_dict[treatment] = {}
+    #     if treatment not in annual_water_volume.keys():
+    #         annual_water_volume[treatment] = 0
+    #
+    #     with open(csv_dict[treatment]) as csvfile:
+    #         csvReader = csv.DictReader(csvfile)
+    #         steps_to_aggregate = settings.TIME_STEP_REPORTING/settings.TIME_STEP_HOURS
+    #         aggregate_volume = 0
+    #         sept_flow = 0
+    #         sept_records = 0
+    #         for index, row in enumerate(csvReader):
+    #             time_object = datetime.strptime(row['TIMESTAMP'], '%m.%d.%Y-%H:%M:%S')
+    #             # Get volume of flow for timestep in Cubic Feet
+    #             timestep_volume = float(row[settings.NN_CSV_FLOW_COLUMN]) * 35.3147
+    #             aggregate_volume += timestep_volume
+    #             annual_water_volume[treatment] = annual_water_volume[treatment] + timestep_volume
+    #             if index%steps_to_aggregate == 0:
+    #                 output_dict[treatment][row['TIMESTAMP']] = aggregate_volume/settings.TIME_STEP_REPORTING/60/60
+    #                 aggregate_volume = 0
+    #             if time_object.month == 9:
+    #                 sept_flow += timestep_volume/settings.TIME_STEP_HOURS/60/60
+    #                 sept_records += 1
+    #     sept_avg_flow[treatment] = str(round(sept_flow/sept_records, 2))
 
-    # have the weather station fields been added to the ppbasin?
-    has_weather_key = False
-    # weather_key = 'mazama'
-    #       (@ basin 2174, @ basin 2293)
-    #       (20, 300k)
-    weather_key = 'trinity'
-    #       (20, 300k)
-    # weather_key = 'poperidge'
-    #       (15, 2M)
-    # weather_key = 'plain'
-    #       (20, 300k)
-    # weather_key = 'winthrop'
-    #       (billions, 5Q)
-    for key in ucsrb_settings.WEATHER_STATIONS.keys():
-        if not hasattr(basin_data, key):
-            out_dict[key] = 0
-        elif basin_data[key] > 0:
-            has_weather_key = True
-            weather_key = key
-
-    if not has_weather_key:
-        # NOTE: currently we only have climate data to support certain dates for certain weather station data.
-        #   Due to this, we cannot 'weight' our stations, but must treat them as a binary: 0 or 100%.
-        out_dict[weather_key] = 1
-
-    out_dict['start_time'] = ucsrb_settings.WEATHER_STATIONS[weather_key]['start']
-    out_dict['end_time'] = ucsrb_settings.WEATHER_STATIONS[weather_key]['end']
-
-    return out_dict
+    # return (output_dict, annual_water_volume, sept_avg_flow)
 
 #TODO: Delete this function - left over from old regression modelling approach.
-def run_hydro_model(in_csv):
-    from ucsrb import project_settings as ucsrb_settings
-    import subprocess
-    import os
+# def get_basin_input_dict(basin_data, basin_geom, treatment_geom, row_id, treatment='baseline'):
+#     from ucsrb.models import VegPlanningUnit
+#     out_dict = {}
+#     vpus = VegPlanningUnit.objects.filter(geometry__intersects=basin_geom)
+#
+#     for field in settings.HYDRO_INPUT_HEADERS:
+#         if 'thc_' in field:
+#             thc_id = int(field.split('_')[1])
+#             thc_veg_units = vpus.filter(topo_height_class_majority=thc_id)
+#             thc_acres = 0
+#             for veg_unit in thc_veg_units:
+#                 # Reduce fractional coverage TO treatment target (take lowest val)
+#                 if veg_unit.geometry.intersects(treatment_geom) and settings.TREATMENT_TARGETS[treatment] < veg_unit.percent_fractional_coverage:
+#                     thc_acres += veg_unit.acres*(settings.TREATMENT_TARGETS[treatment]/100)
+#                 else:
+#                     thc_acres += veg_unit.acres*(veg_unit.percent_fractional_coverage/100)
+#             out_dict[field] = thc_acres
+#         else:
+#             if hasattr(basin_data, field):
+#                 out_dict[field] = basin_data.__getattribute__(field)
+#
+#     # we don't care about just basin id, but treatment, too. Using custom IDs.
+#     out_dict['ppt_ID'] = row_id
+#
+#     # have the weather station fields been added to the ppbasin?
+#     has_weather_key = False
+#     # weather_key = 'mazama'
+#     #       (@ basin 2174, @ basin 2293)
+#     #       (20, 300k)
+#     weather_key = 'trinity'
+#     #       (20, 300k)
+#     # weather_key = 'poperidge'
+#     #       (15, 2M)
+#     # weather_key = 'plain'
+#     #       (20, 300k)
+#     # weather_key = 'winthrop'
+#     #       (billions, 5Q)
+#     for key in settings.WEATHER_STATIONS.keys():
+#         if not hasattr(basin_data, key):
+#             out_dict[key] = 0
+#         elif basin_data[key] > 0:
+#             has_weather_key = True
+#             weather_key = key
+#
+#     if not has_weather_key:
+#         # NOTE: currently we only have climate data to support certain dates for certain weather station data.
+#         #   Due to this, we cannot 'weight' our stations, but must treat them as a binary: 0 or 100%.
+#         out_dict[weather_key] = 1
+#
+#     out_dict['start_time'] = settings.WEATHER_STATIONS[weather_key]['start']
+#     out_dict['end_time'] = settings.WEATHER_STATIONS[weather_key]['end']
+#
+#     return out_dict
 
-    command = '/usr/bin/Rscript'
-    script_location = "%s/%s" % (ucsrb_settings.ANALYSIS_DIR, 'DHSVMe.R')
-    out_csv = "%s_out.csv" % ''.join(in_csv.lower().split('.csv'))
+#TODO: Delete this function - left over from old regression modelling approach.
+# def run_hydro_model(in_csv):
+#     import subprocess
+#     import os
+#
+#     command = '/usr/bin/Rscript'
+#     script_location = "%s/%s" % (settings.ANALYSIS_DIR, 'DHSVMe.R')
+#     out_csv = "%s_out.csv" % ''.join(in_csv.lower().split('.csv'))
+#
+#     location = "/usr/local/apps/marineplanner-core/apps/ucsrb/ucsrb/data/" % (settings.ANALYSIS_DIR, 'DHSVMe.R')
+#
+#     r_output = subprocess.call([
+#         command, script_location,           # call the script with R
+#         '-i', in_csv,                       # location of input csv
+#         '-o', out_csv,                      # location to write csv output - comment out to get as a stream
+#         '-c', settings.ANALYSIS_DIR,  # Where the coefficient input files live
+#         '-t', "Coeff_*"                     # format to use to identify necessary coefficient files by year
+#     ])
+#
+#     if settings.DELETE_CSVS:
+#         os.remove(in_csv)
+#
+#     return out_csv
 
-    location = "/usr/local/apps/marineplanner-core/apps/ucsrb/ucsrb/data/" % (ucsrb_settings.ANALYSIS_DIR, 'DHSVMe.R')
-
-    r_output = subprocess.call([
-        command, script_location,           # call the script with R
-        '-i', in_csv,                       # location of input csv
-        '-o', out_csv,                      # location to write csv output - comment out to get as a stream
-        '-c', ucsrb_settings.ANALYSIS_DIR,  # Where the coefficient input files live
-        '-t', "Coeff_*"                     # format to use to identify necessary coefficient files by year
-    ])
-
-    if ucsrb_settings.DELETE_CSVS:
-        os.remove(in_csv)
-
-    return out_csv
-
-def get_flow_csv_match(ppt, delta):
-    import os
-    from ucsrb.models import ScenarioNNLookup
-    from ucsrb import project_settings as ucsrb_settings
-    candidates = [x for x in ScenarioNNLookup.objects.filter(ppt_id=ppt.id)]
-    best_match = min(candidates, key=lambda x:abs(x.fc_delta-delta))
-    # IF Baseline run is more accurate than NN:
-    if delta < 0.5*best_match.fc_delta:
-        rx_dir = "_base"
-    else:
-        rx_dir = "%d_%d" % (best_match.scenario_id, best_match.treatment_target)
-    return (
-        os.path.join(ucsrb_settings.NN_DATA_DIR,"veg%s" % ppt.watershed_id,rx_dir, "%s.csv" % str(ppt.streammap_id)),
-        rx_dir
-    )
+# def get_flow_csv_match(ppt, delta):
+#     import os
+#     from ucsrb.models import ScenarioNNLookup
+#     candidates = [x for x in ScenarioNNLookup.objects.filter(ppt_id=ppt.id)]
+#     best_match = min(candidates, key=lambda x:abs(x.fc_delta-delta))
+#     # IF Baseline run is more accurate than NN:
+#     if delta < 0.5*best_match.fc_delta:
+#         rx_dir = "_base"
+#     else:
+#         rx_dir = "%d_%d" % (best_match.scenario_id, best_match.treatment_target)
+#     return (
+#         os.path.join(settings.NN_DATA_DIR,"veg%s" % ppt.watershed_id,rx_dir, "%s.csv" % str(ppt.streammap_id)),
+#         rx_dir
+#     )
 
 def calculate_basin_fc(ppt, basin_area, included_ppts, scenario=None, target_fc=-1):
-    from ucsrb.models import FocusArea, PourPoint, PourPointBasin, VegPlanningUnit
+    from ucsrb.models import FocusArea, PourPoint, VegPlanningUnit
 
     if scenario and target_fc >= 0:
         planning_units = [int(x) for x in scenario.planning_units.split(',')]
@@ -536,14 +583,12 @@ def get_float_change_as_rounded_string(rx_val,baseline):
 #   pourpoint_id
 #   treatment_id
 @cache_page(60 * 60) # 1 hour of caching
-def get_hydro_results_by_pour_point_id(request):
-    from ucsrb.models import PourPointBasin, TreatmentScenario, FocusArea, PourPoint, VegPlanningUnit
-    from ucsrb import project_settings as ucsrb_settings
+def get_hydro_results_by_pour_point_id(request, year='baseline'):
+    from ucsrb.models import TreatmentScenario, FocusArea, PourPoint, VegPlanningUnit
     import csv
     import time
     import os
 
-    # from datetime import datetime
     # start = datetime.now()
     # previous_stamp = datetime.now()
     # checkpoint = 0
@@ -569,21 +614,53 @@ def get_hydro_results_by_pour_point_id(request):
     upslope_ppts = [x.id for x in PourPoint.objects.filter(geometry__intersects=overlap_basin.geometry)]
     if pourpoint_id not in upslope_ppts:
         upslope_ppts.append(pourpoint_id)
-    drainage_basins = PourPointBasin.objects.filter(ppt_ID__in=upslope_ppts)
-    basin_acres = sum([x.area for x in drainage_basins])
+    # drainage_basins = FocusArea.objects.filter(unit_id__in=upslope_ppts, unit_type="PourPointOverlap")
+    # basin_acres = sum([x.area for x in drainage_basins])
+    overlap_geometry = overlap_basin.geometry
+    overlap_geometry.transform(2163)
+    basin_acres = overlap_geometry.area/4046.86
+    # return geometry to web mercator
+    overlap_geometry.transform(3857)
 
+    # if ppt.imputed_ppt:
+    #     imputed_ppt = ppt.imputed_ppt
+    # else:
+    #     imputed_ppt = PourPoint.objects.get(id=settings.DEFAULT_NN_PPT)
+    #
+    # if ppt == imputed_ppt:
+    est_type = 'Modeled'
+    # else:
+    #     est_type = 'Imputed'
+    # impute_id = str(imputed_ppt.pk)
+    impute_id = ppt.id
+
+    # results_csvs = OrderedDict({})
+    # results_csvs['baseline'] = os.path.join(settings.NN_DATA_DIR,"veg%s" % imputed_ppt.watershed_id,"_base","%s.csv" % imputed_ppt.streammap_id)
+    # (results_csvs['reduce to 50'], rx_50) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 50'])
+    # (results_csvs['reduce to 30'], rx_30) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 30'])
+    # (results_csvs['reduce to 0'], rx_0) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 0'])
+
+    # (flow_output, annual_water_volume, sept_avg_flow) = parse_flow_results(overlap_basin, treatment)
+    flow_results = parse_flow_results(overlap_basin, treatment)
+
+    flow_output = flow_results[year]['flow_output']
+    annual_water_volume = flow_results[year]['annual_water_volume']
+    sept_avg_flow = flow_results[year]['sept_avg_flow']
 
     # TUNING: For large basins, this can take over 1 minute to run.
     basin_fractional_coverage = {
         'baseline': calculate_basin_fc(ppt, basin_acres, upslope_ppts),
-        'reduce to 50': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 50),
-        'reduce to 30': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 30),
-        'reduce to 0': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 0)
+        # 'treated': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, treatment_id)
+
+        # 'reduce to 50': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 50),
+        # 'reduce to 30': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 30),
+        # 'reduce to 0': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 0)
     }
 
     rx_fc_pct_delta = {}
     rx_fc_delta = {}
-    for rx in ['reduce to 50', 'reduce to 30', 'reduce to 0']:
+    # for rx in ['reduce to 50', 'reduce to 30', 'reduce to 0']:
+    for rx in [x for x in basin_fractional_coverage.keys() if not x == 'baseline']:
         if basin_fractional_coverage['baseline'] == 0:
             rx_fc_delta[rx] = 0
             rx_fc_pct_delta[rx] = 0
@@ -591,33 +668,20 @@ def get_hydro_results_by_pour_point_id(request):
             rx_fc_delta[rx] = basin_fractional_coverage['baseline'] - basin_fractional_coverage[rx]
             rx_fc_pct_delta[rx] = rx_fc_delta[rx]/basin_fractional_coverage['baseline']*100
 
-    if ppt.imputed_ppt:
-        imputed_ppt = ppt.imputed_ppt
-    else:
-        imputed_ppt = PourPoint.objects.get(id=settings.DEFAULT_NN_PPT)
 
-    if ppt == imputed_ppt:
-        est_type = 'Modeled'
-    else:
-        est_type = 'Imputed'
-    impute_id = str(imputed_ppt.pk)
-
-    from collections import OrderedDict
-    results_csvs = OrderedDict({})
-    results_csvs['baseline'] = os.path.join(ucsrb_settings.NN_DATA_DIR,"veg%s" % imputed_ppt.watershed_id,"_base","%s.csv" % imputed_ppt.streammap_id)
-    # (results_csvs['reduce to 50'], rx_50) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 50'])
-    # (results_csvs['reduce to 30'], rx_30) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 30'])
-    # (results_csvs['reduce to 0'], rx_0) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 0'])
-
-    (flow_output, annual_water_volume, sept_avg_flow) = parse_flow_results(results_csvs, imputed_ppt)
     # Baseline water yield (bas_char)
     # Cubic Feet per year (annual volume) / Square Feet (basin area) * 12 (inches/foot) = x inches/year
     baseline_water_yield = str(round(annual_water_volume['baseline']/(basin_acres*43560)*12, 2))
     # Average Annual Flow: Total flow in cubic feet divided by seconds in year - assume year is not Leap.
-    baseline_average_flow = str(round(annual_water_volume['baseline']/(365*24*60*60), 2))
-    r50_average_flow = str(round(annual_water_volume['reduce to 50']/(365*24*60*60), 2))
-    r30_average_flow = str(round(annual_water_volume['reduce to 30']/(365*24*60*60), 2))
-    r0_average_flow = str(round(annual_water_volume['reduce to 0']/(365*24*60*60), 2))
+    avg_flow_results = {
+        'baseline': str(round(annual_water_volume['baseline']/(365*24*60*60), 2))
+    }
+    for treatment_type in annual_water_volume.keys():
+        if not treatment_type == 'baseline' and flow_output[treatment_type]['records_available']:
+            avg_flow_results[treatment_type] = str(round(annual_water_volume[treatment_type]/(365*24*60*60), 2))
+    # r50_average_flow = str(round(annual_water_volume['reduce to 50']/(365*24*60*60), 2))
+    # r30_average_flow = str(round(annual_water_volume['reduce to 30']/(365*24*60*60), 2))
+    # r0_average_flow = str(round(annual_water_volume['reduce to 0']/(365*24*60*60), 2))
 
     absolute_results = sort_output(flow_output)
 
@@ -657,64 +721,81 @@ def get_hydro_results_by_pour_point_id(request):
     bas_char_data.append({'key': 'Total forested area upslope', 'value': acres_forested, 'unit': 'acres' })
     # bas_char_data.append({'key': 'Percent Forested', 'value': int(acres_forested/basin_acres*100), 'unit': '%' })
     bas_char_data.append({'key': 'Baseline water yield', 'value': baseline_water_yield, 'unit': 'inches/year' })
-    bas_char_data.append({'key': 'Baseline average annual flow', 'value': baseline_average_flow, 'unit': 'CFS' })
+    bas_char_data.append({'key': 'Baseline average annual flow', 'value': avg_flow_results['baseline'], 'unit': 'CFS' })
     bas_char_data.append({'key': 'Baseline September mean flow', 'value': sept_avg_flow['baseline'], 'unit': 'CFS' })
     bas_char_data.append({'key': 'Baseline September median 7 day avg low flow', 'value': round(sept_median_7_day_low['baseline'], 2), 'unit': 'CFS' })
 
     hydro_char_data = []
     hydro_char_data.append({'key': '<b>Change in average annual flow from proposed management</b>', 'value': '', 'unit': '' })
-    r50_change = get_float_change_as_rounded_string(r50_average_flow,baseline_average_flow)
-    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_change, 'unit': 'CFS' }) #Baseline annl flow - 50 annl flow
-    r30_change = get_float_change_as_rounded_string(r30_average_flow,baseline_average_flow)
-    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_change, 'unit': 'CFS' }) #Baseline annl flow - 30 annl flow
-    r0_change = get_float_change_as_rounded_string(r0_average_flow,baseline_average_flow)
-    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_change, 'unit': 'CFS' }) #Baseline annl flow - 0 annl flow
+    for treatment_type in avg_flow_results.keys():
+        if not treatment_type == 'baseline':
+            treatment_type_change = get_float_change_as_rounded_string(avg_flow_results[treatment_type],avg_flow_results['baseline'])
+            hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % treatment_type, 'value': treatment_type_change, 'unit': 'CFS' }) #Baseline annl flow - 50 annl flow
+
+    # r50_change = get_float_change_as_rounded_string(r50_average_flow,avg_flow_results['baseline'])
+    # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_change, 'unit': 'CFS' }) #Baseline annl flow - 50 annl flow
+    # r30_change = get_float_change_as_rounded_string(r30_average_flow,avg_flow_results['baseline'])
+    # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_change, 'unit': 'CFS' }) #Baseline annl flow - 30 annl flow
+    # r0_change = get_float_change_as_rounded_string(r0_average_flow,avg_flow_results['baseline'])
+    # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_change, 'unit': 'CFS' }) #Baseline annl flow - 0 annl flow
 
     hydro_char_data.append({'key': '<b>Change in average September flow from proposed management </b>', 'value': '', 'unit': '' })
-    r50_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow['reduce to 50'],sept_avg_flow['baseline'])
-    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
-    r30_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow['reduce to 30'],sept_avg_flow['baseline'])
-    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
-    r0_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow['reduce to 0'],sept_avg_flow['baseline'])
-    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
+    for treatment_type in [x for x in sept_avg_flow.keys() if not x == 'baseline']:
+        if flow_output[treatment_type]['records_available']:
+            treatment_type_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow[treatment_type],sept_avg_flow['baseline'])
+        else:
+            treatment_type_sept_avg_change = 'Data not yet available'
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % treatment_type, 'value': treatment_type_sept_avg_change, 'unit': 'CFS' })
+
+        # r50_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow['reduce to 50'],sept_avg_flow['baseline'])
+        # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
+        # r30_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow['reduce to 30'],sept_avg_flow['baseline'])
+        # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
+        # r0_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow['reduce to 0'],sept_avg_flow['baseline'])
+        # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
 
     hydro_char_data.append({'key': '<b>Change in Sept. 7-day low flow from proposed management </b>', 'value': '', 'unit': '' })
-    r50_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low['reduce to 50'],sept_median_7_day_low['baseline'])
-    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
-    r30_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low['reduce to 30'],sept_median_7_day_low['baseline'])
-    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
-    r0_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low['reduce to 0'],sept_median_7_day_low['baseline'])
-    hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
+    for treatment_type in [x for x in sept_median_7_day_low.keys() if not x == 'baseline']:
+        treatment_type_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low[treatment_type],sept_median_7_day_low['baseline'])
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % treatment_type, 'value': treatment_type_sept_7_day_low_diff, 'unit': 'CFS' })
+    # r50_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low['reduce to 50'],sept_median_7_day_low['baseline'])
+    # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
+    # r30_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low['reduce to 30'],sept_median_7_day_low['baseline'])
+    # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
+    # r0_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low['reduce to 0'],sept_median_7_day_low['baseline'])
+    # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
 
     prop_mgmt_data = []
     basin_veg_units = treatment.veg_units.filter(geometry__intersects=overlap_basin.geometry) #within may be more accurate, but slower
     treatment_acres = sum([x.acres for x in basin_veg_units])
     prop_mgmt_data.append({'key': 'Total forested area in proposed treatment', 'value': int(treatment_acres), 'unit': 'acres' })
     prop_mgmt_data.append({'key': '<b>Reduction in avg fractional coverage from proposed management</b>', 'value': '', 'unit': '' })
-    prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': str(round(rx_fc_delta['reduce to 50'],2)), 'unit': '%' }) #Baseline avg fc - 50 avg fc
-    prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': str(round(rx_fc_delta['reduce to 30'],2)), 'unit': '%' }) #Baseline avg fc - 30 avg fc
-    prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': str(round(rx_fc_delta['reduce to 0'],2)), 'unit': '%' }) #Baseline avg fc - 0 avg fc
+    for treatment_type in [x for x in rx_fc_delta.keys() if not x == 'baseline']:
+        prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % treatment_type, 'value': str(round(rx_fc_delta[treatment_type],2)), 'unit': '%' })
+    # prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': str(round(rx_fc_delta['reduce to 50'],2)), 'unit': '%' }) #Baseline avg fc - 50 avg fc
+    # prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': str(round(rx_fc_delta['reduce to 30'],2)), 'unit': '%' }) #Baseline avg fc - 30 avg fc
+    # prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': str(round(rx_fc_delta['reduce to 0'],2)), 'unit': '%' }) #Baseline avg fc - 0 avg fc
 
-    flow_est_data = []
-    flow_est_data.append({'key': 'Estimation Type','value': est_type,'unit': ''})
-    if settings.DEBUG:
-        flow_est_data.append({'key': 'Imputed ppt_ID','value': impute_id,'unit': ''})
-        flow_est_data.append({'key': 'Imputed veg mgmt scenario (50)','value': rx_50,'unit': ''})
-        flow_est_data.append({'key': 'Imputed veg mgmt scenario (30)','value': rx_30,'unit': ''})
-        flow_est_data.append({'key': 'Imputed veg mgmt scenario (0)','value': rx_0,'unit': ''})
-    if ppt.confidence > 9:
-        confidence = 'NA'
-    elif ppt.confidence > 6:
-        confidence = 'extremely high'
-    elif ppt.confidence > 4:
-        confidence = 'high'
-    elif ppt.confidence > 2:
-        confidence = 'moderate'
-    elif ppt.confidence > 1:
-        confidence = 'low'
-    else:
-        confidence = 'extremely low'
-    flow_est_data.append({'key': 'Baseline Confidence', 'value': confidence, 'unit': ''})
+    # flow_est_data = []
+    # flow_est_data.append({'key': 'Estimation Type','value': est_type,'unit': ''})
+    # if settings.DEBUG:
+    #     flow_est_data.append({'key': 'Imputed ppt_ID','value': impute_id,'unit': ''})
+    #     flow_est_data.append({'key': 'Imputed veg mgmt scenario (50)','value': rx_50,'unit': ''})
+    #     flow_est_data.append({'key': 'Imputed veg mgmt scenario (30)','value': rx_30,'unit': ''})
+    #     flow_est_data.append({'key': 'Imputed veg mgmt scenario (0)','value': rx_0,'unit': ''})
+    # if ppt.confidence > 9:
+    #     confidence = 'NA'
+    # elif ppt.confidence > 6:
+    #     confidence = 'extremely high'
+    # elif ppt.confidence > 4:
+    #     confidence = 'high'
+    # elif ppt.confidence > 2:
+    #     confidence = 'moderate'
+    # elif ppt.confidence > 1:
+    #     confidence = 'low'
+    # else:
+    #     confidence = 'extremely low'
+    # flow_est_data.append({'key': 'Baseline Confidence', 'value': confidence, 'unit': ''})
     # flow_est_data.append({'key': 'Change in Flow Confidence', 'value': "TBD", 'unit': '%'})
 
     summary_reports = []
@@ -733,7 +814,7 @@ def get_hydro_results_by_pour_point_id(request):
     summary_reports.append({'title': 'Basin Characteristics','data': bas_char_data})
     summary_reports.append({'title': 'Hydrologic Characteristics','data': hydro_char_data})
     summary_reports.append({'title': 'Proposed Management','data': prop_mgmt_data})
-    summary_reports.append({'title': 'Flow Estimation Confidence','data': flow_est_data})
+    # summary_reports.append({'title': 'Flow Estimation Confidence','data': flow_est_data})
 
     results = [
         {
@@ -747,13 +828,13 @@ def get_hydro_results_by_pour_point_id(request):
     ]
 
     return JsonResponse({
-        'results': results,
+        'results': results, # TODO: Support 3 years in Hydro reports
         'basin': overlap_basin.geometry.json
     })
 
 @cache_page(60 * 60) # 1 hour of caching
 def get_results_by_scenario_id(request):
-    from ucsrb.models import TreatmentScenario, FocusArea, PourPoint, PourPointBasin #, ScenarioNNLookup
+    from ucsrb.models import TreatmentScenario, FocusArea, PourPoint
     from features.registry import get_feature_by_uid
 
     scenario_id = request.GET.get('id')
@@ -817,9 +898,7 @@ def get_results_by_state(request):
 '''
 '''
 def run_filter_query(filters):
-    from collections import OrderedDict
     from ucsrb.models import VegPlanningUnit, FocusArea, PourPoint
-    # from ucsrb import project_settings as ucsrb_settings
     # TODO: This would be nicer if it generically knew how to filter fields
     # by name, and what kinds of filters they were. For now, hard code.
     notes = []

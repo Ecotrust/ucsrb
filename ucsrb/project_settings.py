@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-
 import os
+from datetime import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -228,31 +228,13 @@ GET_SCENARIOS_URL = '/ucsrb/get_scenarios/'
 SCENARIO_FORM_URL = '/features/treatmentscenario/form/'
 SCENARIO_LINK_BASE = '/features/treatmentscenario/ucsrb_treatmentscenario'
 
-METHOW_YEAR = 1997
-ENTIAT_YEAR = 1997
-WENATCHEE_YEAR = 1997
-
-WEATHER_STATIONS = {
-    'mazama': {   #
-        'start': '10.01.1996-00:00:00',
-        'end': '09.30.1997-23:00:00'
+MODEL_YEARS = {
+    # 'dry': ????,
+    'baseline': {
+        'start': datetime.strptime("10.01.2001-00:00:00", "%m.%d.%Y-%H:%M:%S"),
+        'end': datetime.strptime("10.01.2002-00:00:00", "%m.%d.%Y-%H:%M:%S")
     },
-    'plain': {   #
-        'start': '10.01.1996-00:00:00',
-        'end': '09.30.1997-23:00:00'
-    },
-    'poperidge': {   #
-        'start': '10.01.1996-00:00:00',
-        'end': '09.30.1997-23:00:00'
-    },
-    'trinity': {   #
-        'start': '10.01.1996-00:00:00',
-        'end': '09.30.1997-23:00:00'
-    },
-    'winthrop': {   # METHOW Valley
-    'start': '10.01.1996-00:00:00',
-    'end': '09.30.1997-23:00:00'
-    }
+    # 'wet': ???
 }
 
 ########################################
@@ -281,7 +263,7 @@ HYDRO_INPUT_HEADERS = [
     'max_inf','center_x','center_y','normal_x','normal_y','normal_z','SDsphrical'
 ]
 
-ANALYSIS_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'ucsrb', 'analysis'))
+ANALYSIS_DIR = os.path.realpath(os.path.join(BASE_DIR, 'ucsrb', 'analysis'))
 
 # TIME_STEP values MUST be factors of 24, and REPORTING must be a multiple of HOURS.
 TIME_STEP_HOURS = 3
@@ -289,7 +271,7 @@ TIME_STEP_REPORTING = 6
 
 CSV_DIR = os.path.realpath(os.path.join(ANALYSIS_DIR, 'input_csvs'))
 
-NN_DATA_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'ucsrb', 'ucsrb', 'data'))
+NN_DATA_DIR = os.path.realpath(os.path.join(BASE_DIR, 'ucsrb', 'ucsrb', 'data'))
 NN_CSV_FLOW_COLUMN = 'C'
 DEFAULT_NN_PPT = 114
 
