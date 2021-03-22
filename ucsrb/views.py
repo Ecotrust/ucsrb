@@ -383,13 +383,13 @@ def parse_flow_results(overlap_basin, treatment):
         flow_results[model_year] = {}
 
         baseline_readings = StreamFlowReading.objects.filter(
-            basin=overlap_basin,
+            segment_id=overlap_basin.unit_id,
             is_baseline=True,
             time__gte=settings.MODEL_YEARS[model_year]['start'],
             time__lte=settings.MODEL_YEARS[model_year]['end'],
             ).order_by('time')
         treated_readings = StreamFlowReading.objects.filter(
-            basin=overlap_basin,
+            segment_id=overlap_basin.unit_id,
             treatment=treatment,
             time__gte=settings.MODEL_YEARS[model_year]['start'],
             time__lte=settings.MODEL_YEARS[model_year]['end'],
@@ -603,7 +603,7 @@ def get_hydro_results_by_pour_point_id(request, year='baseline'):
     # Get treatment_id from request or API
     treatment_id = request.GET.get('treatment_id')
     treatment = TreatmentScenario.objects.get(pk=treatment_id)
-    overlap_basin = FocusArea.objects.get(unit_type='PourPointOverlap', unit_id=pourpoint_id)
+    overlap_basin = FocusArea.objects.filter(unit_type='PourPointOverlap', unit_id=pourpoint_id)[0]
 
     # RDH 09/03/2018
     # Some of the data I need is at the Overlapping Ppt Basin level, while some is aggregated to
