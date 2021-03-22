@@ -305,6 +305,8 @@ class TreatmentScenario(Scenario):
     def set_report(self):
         self.aggregate_report = self.aggregate_results()
         self.save()
+        from dhsvm_harness.utils import runHarnessConfig
+        runHarnessConfig(self)
 
     @property
     def veg_units(self):
