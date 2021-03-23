@@ -6,6 +6,7 @@ from features.registry import register
 from features.models import MultiPolygonFeature
 # from scenarios.models import Scenario, PlanningUnit
 from scenarios.models import Scenario
+from threading import Thread
 
 GEOMETRY_DB_SRID = settings.GEOMETRY_DB_SRID
 
@@ -306,7 +307,7 @@ class TreatmentScenario(Scenario):
         self.aggregate_report = self.aggregate_results()
         self.save()
         from dhsvm_harness.utils import runHarnessConfig
-        runHarnessConfig(self)
+        Thread(target=runHarnessConfig, args=(self,)).start()
 
     @property
     def veg_units(self):
