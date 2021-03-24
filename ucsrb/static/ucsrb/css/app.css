@@ -290,6 +290,14 @@ Files Nav and Modals for app (load saved, save, start over/reset)
   font-size: 110%;
 }
 
+#upload-treatment-form {
+    padding: 10px;
+}
+
+#id_prescription_treatment_selection {
+    list-style: none;
+}
+
 /**
 * =========================================================================
 Map
