@@ -1100,6 +1100,14 @@ app.request = {
                 app.resultsInit('ucsrb_treatmentscenario_' + response.id);
                 app.state.scenarioId = response.id;
                 app.state.setStep = 'results';
+
+                // Hide treated veg units by removing all features
+                //  then redraw drawn feature
+                app.map.scenarioLayer.removeAllFeatures();
+                // Show drawn polying
+                var mapScenarioLayer = app.map.scenarioLayer.getSource();
+                // Redraw drawn shape
+                mapScenarioLayer.addFeature(app.map.focus_area_feature);
             },
             error: function(response, status) {
                 console.log(`%cfail @ save drawing: %o`, 'color: red', response);
@@ -1139,6 +1147,14 @@ app.request = {
                 app.resultsInit('ucsrb_treatmentscenario_' + response.id);
                 app.state.scenarioId = response.id;
                 app.state.setStep = 'results';
+
+                // Hide treated veg units by removing all features
+                //  then redraw drawn feature
+                app.map.scenarioLayer.removeAllFeatures();
+                // Show drawn polying
+                var mapScenarioLayer = app.map.scenarioLayer.getSource();
+                // Redraw drawn shape
+                mapScenarioLayer.addFeature(app.map.focus_area_feature);
             },
             error: function(response, status) {
                 console.log(`%cfail @ upload treatment: %o`, 'color: red', response);
