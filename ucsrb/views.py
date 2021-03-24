@@ -618,7 +618,7 @@ def get_hydro_results_by_pour_point_id(request, year='baseline'):
     # basin_acres = sum([x.area for x in drainage_basins])
     overlap_geometry = overlap_basin.geometry
     overlap_geometry.transform(2163)
-    basin_acres = overlap_geometry.area/4046.86
+    basin_acres = round(overlap_geometry.area/4046.86, 2)
     # return geometry to web mercator
     overlap_geometry.transform(3857)
 
