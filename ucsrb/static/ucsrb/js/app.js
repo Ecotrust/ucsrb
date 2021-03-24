@@ -141,6 +141,11 @@ app.resultsInit = function(id) {
             window.setTimeout(function() {
               app.map.setBoundaryLayer(app.map.layer.boundary.layer);
               app.map.layer.boundary.layer.setVisible(true);
+
+              // Hide treated polygons
+              app.map.scenarioLayer.removeAllFeatures();
+
+              // Show drawn polying
               app.map.addFocusAreaToMap(response.focus_area);
               app.map.addDownstreamPptsToMap(response.pourpoints);
             }, 500);
@@ -1097,17 +1102,14 @@ app.request = {
                 draw_source.removeFeature(draw_source.getFeatures()[0]);
                 app.map.addScenario(vectors);
                 app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
+
+                // Hide treated veg units by removing all features
+                //  the drawn polygon will be added in resultsInit()
+                app.map.scenarioLayer.removeAllFeatures();
+
                 app.resultsInit('ucsrb_treatmentscenario_' + response.id);
                 app.state.scenarioId = response.id;
                 app.state.setStep = 'results';
-
-                // Hide treated veg units by removing all features
-                //  then redraw drawn feature
-                app.map.scenarioLayer.removeAllFeatures();
-                // Show drawn polying
-                var mapScenarioLayer = app.map.scenarioLayer.getSource();
-                // Redraw drawn shape
-                mapScenarioLayer.addFeature(app.map.focus_area_feature);
             },
             error: function(response, status) {
                 console.log(`%cfail @ save drawing: %o`, 'color: red', response);
@@ -1144,17 +1146,14 @@ app.request = {
                 app.map.addScenario(vectors);
                 app.map.zoomToExtent(vectors[0].getGeometry().getExtent());
                 app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
+
+                // Hide treated veg units by removing all features
+                //  the drawn polygon will be added in resultsInit()
+                app.map.scenarioLayer.removeAllFeatures();
+
                 app.resultsInit('ucsrb_treatmentscenario_' + response.id);
                 app.state.scenarioId = response.id;
                 app.state.setStep = 'results';
-
-                // Hide treated veg units by removing all features
-                //  then redraw drawn feature
-                app.map.scenarioLayer.removeAllFeatures();
-                // Show drawn polying
-                var mapScenarioLayer = app.map.scenarioLayer.getSource();
-                // Redraw drawn shape
-                mapScenarioLayer.addFeature(app.map.focus_area_feature);
             },
             error: function(response, status) {
                 console.log(`%cfail @ upload treatment: %o`, 'color: red', response);
