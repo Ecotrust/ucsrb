@@ -233,7 +233,7 @@ def define_scenario(request, featJson, scenario_name, description, prescription_
         scenario = TreatmentScenario.objects.create(
             user=user,
             name=scenario_name,
-            description=None,
+            description=description,
             focus_area=True,
             focus_area_input=focus_area,
             prescription_treatment_selection=prescription_selection
