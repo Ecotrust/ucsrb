@@ -1,5 +1,6 @@
 # Create your views here.
 from collections import OrderedDict
+from copy import deepcopy
 from datetime import datetime
 import json
 
@@ -315,22 +316,25 @@ def sort_output(flow_output):
     return results
 
 def get_results_delta(flow_output):
-    from copy import deepcopy
-    out_dict = deepcopy(flow_output)
-    if type(out_dict['baseline']) == dict:
-        for timestep in out_dict['baseline'].keys():
-            baseflow = flow_output['baseline'][timestep]
+    if type(flow_output) == OrderedDict:
+        out_dict = json.loads(json.dumps(flow_output))
+    else:
+        out_dict = deepcopy(flow_output)
+    for treatment in out_dict.keys():
+        if type(out_dict[treatment]) == dict:
+            for timestep in out_dict[treatment].keys():
+                baseflow = flow_output[treatment][timestep]
+                for rx in out_dict.keys():
+                    out_dict[rx][timestep] -= baseflow
+            return sort_output(out_dict)
+        elif type(out_dict[treatment]) == list:
             for rx in out_dict.keys():
-                out_dict[rx][timestep] -= baseflow
-        return sort_output(out_dict)
-    elif type(out_dict['baseline']) == list:
-        for rx in out_dict.keys():
-            for index, timestep in enumerate(out_dict[rx]):
-                # Testing has shown that this logic is sound - chronological order is maintained across rx.
-                # if not flow_output['baseline'][index]['timestep'] == out_dict[rx][index]['timestep']:
-                #     print('ERROR: Mismatch Timesteps: %s --- %s' % (flow_output['baseline'][index]['timestep'], out_dict[rx][index]['timestep']))
-                baseflow = flow_output['baseline'][index]['flow']
-                out_dict[rx][index]['flow'] -= baseflow
+                for index, timestep in enumerate(out_dict[rx]):
+                    # Testing has shown that this logic is sound - chronological order is maintained across rx.
+                    # if not flow_output['baseline'][index]['timestep'] == out_dict[rx][index]['timestep']:
+                    #     print('ERROR: Mismatch Timesteps: %s --- %s' % (flow_output['baseline'][index]['timestep'], out_dict[rx][index]['timestep']))
+                    baseflow = flow_output['baseline'][index]['flow']
+                    out_dict[rx][index]['flow'] -= baseflow
 
     return out_dict
 
@@ -582,7 +586,7 @@ def get_float_change_as_rounded_string(rx_val,baseline):
 # NEEDS:
 #   pourpoint_id
 #   treatment_id
-@cache_page(60 * 60) # 1 hour of caching
+# @cache_page(60 * 60) # 1 hour of caching
 def get_hydro_results_by_pour_point_id(request, year='baseline'):
     from ucsrb.models import TreatmentScenario, FocusArea, PourPoint, VegPlanningUnit
     import csv
