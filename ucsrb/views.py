@@ -317,6 +317,9 @@ def sort_output(flow_output):
 
 def get_results_delta(flow_output):
     if type(flow_output) == OrderedDict:
+        # while OrderedDict seems appropriate, the logic is written for an object with a list.
+        # Rather than haveing to write and maintain to pieces of code to do the
+        # same job, just convert it:
         out_dict = json.loads(json.dumps(flow_output))
     else:
         out_dict = deepcopy(flow_output)
@@ -325,7 +328,9 @@ def get_results_delta(flow_output):
             for timestep in out_dict[treatment].keys():
                 baseflow = flow_output[treatment][timestep]
                 for rx in out_dict.keys():
-                    out_dict[rx][timestep] -= baseflow
+                    # be sure not to process the 'records_available' key:
+                    if timestep in out_dict[rx].keys():
+                        out_dict[rx][timestep] -= baseflow
             return sort_output(out_dict)
         elif type(out_dict[treatment]) == list:
             for rx in out_dict.keys():
