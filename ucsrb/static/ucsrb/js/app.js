@@ -128,6 +128,8 @@ app.resultsInit = function(id) {
         .done(function(response) {
             app.panel.results.responseResultById(response);
             app.map.layer.resultPoints.layer.getSource().clear();
+            // Check if the results Points layer exits
+                // if not, add it
             var layerAdded = false;
             app.map.getLayers().forEach(function(i) {
                 if (i.get('id') === 'resultPoints') {
@@ -1137,21 +1139,26 @@ app.request = {
                     app.state.navHeight = 'short';
                     app.state.setStep = 'results'; // go to results
                 }
+                // Read respons json
                 var vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
                     dataProjection: 'EPSG:3857',
                     featureProjection: 'EPSG:3857'
                 });
+                // Show user's polygons from drawing, upload, or basin selection
                 var draw_source = app.map.layer.draw.layer.getSource();
                 app.map.layer.draw.layer.setVisible(true);
+                // Style features response geojson and add to map
                 app.map.addScenario(vectors);
                 app.map.zoomToExtent(vectors[0].getGeometry().getExtent());
+                // Reset and move panel
+                // TODO: comment out to see if safe to remove
                 app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
-
                 // Hide treated veg units by removing all features
                 //  the drawn polygon will be added in resultsInit()
                 app.map.scenarioLayer.removeAllFeatures();
-
+                // Kick off results processing
                 app.resultsInit('ucsrb_treatmentscenario_' + response.id);
+                // move state forward
                 app.state.scenarioId = response.id;
                 app.state.setStep = 'results';
             },
