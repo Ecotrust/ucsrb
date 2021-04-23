@@ -15,7 +15,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template import loader
 from django.views.decorators.cache import cache_page
-from ucsrb.forms import UploadShapefileForm
+from ucsrb.forms import UploadShapefileForm, RxApplicationForm
 from ucsrb.models import FocusArea, TreatmentScenario, StreamFlowReading
 
 def accounts_context():
@@ -143,8 +143,20 @@ def save_drawing(request):
         prescription_selection = request.POST['prescription_treatment_selection']
 
 
-        return define_scenario(request, featJson, scenario_name, description, prescription_selection)
+        return define_scenario(request, featJson, scenario_name, description)
     return get_json_error_response('Unable to save drawing.', 500, context)
+
+def rx_application(request):
+    context = {}
+    if request.method == 'POST':
+        form = RxApplicationForm(request.POST)
+        if form.is_valid():
+            prescription_selection = request.POST['prescription_treatment_selection']
+            # Add rx to map features
+    else:
+        form = RxApplicationForm()
+
+    return render(request, 'rx_application.html', {'RX_FORM': form})
 
 def upload_treatment_shapefile(request):
     context = {}
@@ -169,9 +181,7 @@ def upload_treatment_shapefile(request):
                 scenario_name = '.'.join(request.FILES['zipped_shapefile'].name.split('.')[:-1])
             description = request.POST['treatment_description']
 
-            prescription_selection = request.POST['prescription_treatment_selection']
-
-            return define_scenario(request, featJson, scenario_name, description, prescription_selection)
+            return define_scenario(request, featJson, scenario_name, description)
         else:
             message = "Errors: "
             for key in form.errors.keys():
@@ -194,7 +204,7 @@ def break_up_multipolygons(multipolygon, polygon_list=[]):
     return polygon_list
 
 
-def define_scenario(request, featJson, scenario_name, description, prescription_selection):
+def define_scenario(request, featJson, scenario_name, description):
     context = {}
     polys = []
     for feature in json.loads(featJson)['features']:

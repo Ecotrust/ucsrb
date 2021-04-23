@@ -14,11 +14,7 @@ class HiddenScenarioBooleanField(forms.BooleanField):
         }
     )
 
-class UploadShapefileForm(forms.Form):
-    zipped_shapefile = forms.FileField(label='Zipped Shapefile')
-    treatment_name = forms.CharField(max_length=255, required=False, label='Treatment Name')
-    treatment_description = forms.CharField(max_length=255, required=False, label='Treatment Description')
-    shp_projection = forms.CharField(max_length=255, required=False, label='Shapefile Projection (Optional)')
+class RxApplicationForm(forms.Form):
     prescription_treatment_selection = forms.ChoiceField(
         required=False,
         widget=forms.RadioSelect(
@@ -27,6 +23,13 @@ class UploadShapefileForm(forms.Form):
         choices= settings.PRESCRIPTION_TREATMENT_CHOICES,
         label='Prescription Choices'
     )
+
+class UploadShapefileForm(forms.Form):
+    zipped_shapefile = forms.FileField(label='Zipped Shapefile')
+    treatment_name = forms.CharField(max_length=255, required=False, label='Treatment Name')
+    treatment_description = forms.CharField(max_length=255, required=False, label='Treatment Description')
+    shp_projection = forms.CharField(max_length=255, required=False, label='Shapefile Projection (Optional)')
+
 
 class TreatmentScenarioForm(ScenarioForm):
     from ucsrb.models import FocusArea

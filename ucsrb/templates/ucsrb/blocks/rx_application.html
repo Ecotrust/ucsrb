@@ -1,0 +1,11 @@
+{% load static %}
+
+<div class="featurepanel">
+    <h4>Apply Prescription</h4>
+
+    <form id="rx-application-form" action="/landmapper/rx_application" method="post" name="scenarios-form">
+        {% csrf_token %}
+        {{ RX_FORM.as_p }}
+        <input type="submit" value="Apply Prescription" id="rx-application-submit-btn">
+    </form>
+</div>
