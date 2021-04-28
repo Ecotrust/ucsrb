@@ -132,6 +132,11 @@ class TreatmentScenario(Scenario):
     PRESCRIPTION_TREATMENT_CHOICES = settings.PRESCRIPTION_TREATMENT_CHOICES
     prescription_treatment_selection = models.CharField(max_length=255, null=True, blank=True, default=None, choices=PRESCRIPTION_TREATMENT_CHOICES)
 
+    # Geometry of original treatment defined by user
+    scenario_geometry = gismodels.GeometryCollectionField(srid=settings.GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="User Defined Geometries")
+    # Confrimation if user has explicitly defined prescriptions (Rx)
+    rx_applied = models.BooleanField(default=False)
+
     def run_filters(self, query):
         from ucsrb.views import run_filter_query
         filters = {}
