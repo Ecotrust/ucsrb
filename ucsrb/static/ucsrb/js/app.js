@@ -537,6 +537,7 @@ app.panel = {
                 '<li><label for="draw_id_prescription_treatment_selection_3"><input type="radio" name="draw_prescription_treatment_selection" value="burn" class="prescription-choices" id="draw_id_prescription_treatment_selection_3">Burn Only scenario</label></li>' +
                 '<li><label for="draw_id_prescription_treatment_selection_4"><input type="radio" name="draw_prescription_treatment_selection" value="flow" class="prescription-choices" id="draw_id_prescription_treatment_selection_4">Ideal Water scenario</label></li>' +
                 '</ul><br />' +
+                '<input type="hidden" name="geocollection" value="" />'
                 '<div class="btn-toolbar justify-content-between drawing-buttons">' +
                 '<button type="submit" class="btn btn-primary ' + saveDisable + '" >Begin Evaluation</button>' +
                 '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
@@ -586,7 +587,7 @@ app.panel = {
             if (drawingIsSmallEnough(totalArea)) {
                 var drawing_name = $('#draw_submit_form').find('[name=treat_name]').val();
                 var drawing_desc = $('#draw_submit_form').find('[name=treat_desc]').val();
-                var drawing_rx = $('input[name="draw_prescription_treatment_selection"]:checked').val();
+                // var drawing_rx = $('input[name="draw_prescription_treatment_selection"]:checked').val();
                 app.request.saveDrawing(drawing_name, drawing_desc, drawing_rx);
             } else {
                 areaInAcres = totalArea/4046.86;

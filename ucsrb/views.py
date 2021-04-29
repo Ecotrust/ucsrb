@@ -140,10 +140,8 @@ def save_drawing(request):
         featJson = request.POST['drawing']
         scenario_name = request.POST['name']
         description = request.POST['description']
-        prescription_selection = request.POST['prescription_treatment_selection']
-
-
-        return define_scenario(request, featJson, scenario_name, description, prescription_selection)
+        scenario_geometry = request.POST['geocollection']
+        return define_scenario(request, featJson, scenario_name, description, scenario_geometry)
     return get_json_error_response('Unable to save drawing.', 500, context)
 
 def upload_treatment_shapefile(request):
@@ -169,9 +167,9 @@ def upload_treatment_shapefile(request):
                 scenario_name = '.'.join(request.FILES['zipped_shapefile'].name.split('.')[:-1])
             description = request.POST['treatment_description']
 
-            prescription_selection = request.POST['prescription_treatment_selection']
+            scenario_geometry = request.POST['prescription_treatment_selection']
 
-            return define_scenario(request, featJson, scenario_name, description, prescription_selection)
+            return define_scenario(request, featJson, scenario_name, description, scenario_geometry)
         else:
             message = "Errors: "
             for key in form.errors.keys():
@@ -194,7 +192,7 @@ def break_up_multipolygons(multipolygon, polygon_list=[]):
     return polygon_list
 
 
-def define_scenario(request, featJson, scenario_name, description, prescription_selection):
+def define_scenario(request, featJson, scenario_name, description, scenario_geometry):
     context = {}
     polys = []
     for feature in json.loads(featJson)['features']:
@@ -236,7 +234,7 @@ def define_scenario(request, featJson, scenario_name, description, prescription_
             description=None,
             focus_area=True,
             focus_area_input=focus_area,
-            prescription_treatment_selection=prescription_selection
+            scenario_geometry=geometry
         )
     except:
         # Technically we're testing for psycopg2's InternalError GEOSIntersects TopologyException

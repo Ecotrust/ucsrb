@@ -505,6 +505,7 @@ app.map.draw.draw.on('drawstart', function(e) {
 
 app.map.draw.draw.on('drawend', function(e) {
   app.map.draw.enableEdit();
+  app.map.draw.collectGeoJSON();
   app.panel.draw.finishDrawing();
 });
 
@@ -514,8 +515,16 @@ app.map.draw.toolTipListener;
 
 app.map.draw.modify.on('modifyend', function(e) {
   console.log('change');
+  app.map.draw.collectGeoJSON();
   app.panel.draw.finishDrawing();
 });
+
+app.map.draw.collectGeoJSON = function() {
+    var drawFeatures = app.map.draw.source.getFeatures()
+    var geojsonFormat = new ol.format.GeoJSON();
+    var featureJson = geojsonFormat.writeFeatures(drawFeatures);
+    document.querySelector('input[name="geocollection"]').value = featureJson;
+}
 
 /**
  * Handle pointer move for drawing
