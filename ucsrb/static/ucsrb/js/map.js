@@ -505,8 +505,12 @@ app.map.draw.draw.on('drawstart', function(e) {
 
 app.map.draw.draw.on('drawend', function(e) {
   app.map.draw.enableEdit();
-  app.map.draw.collectGeoJSON();
   app.panel.draw.finishDrawing();
+  // needs to run after finishDrawing
+  // finishDrawing has a timeout of 300
+  window.setTimeout(function() {
+      app.map.draw.collectGeoJSON();
+  }, 500);
 });
 
 app.map.draw.measureTooltipElement;
@@ -515,15 +519,21 @@ app.map.draw.toolTipListener;
 
 app.map.draw.modify.on('modifyend', function(e) {
   console.log('change');
-  app.map.draw.collectGeoJSON();
   app.panel.draw.finishDrawing();
+  // needs to run after finishDrawing
+  // finishDrawing has a timeout of 300
+  window.setTimeout(function() {
+      app.map.draw.collectGeoJSON();
+  }, 500);
 });
 
 app.map.draw.collectGeoJSON = function() {
     var drawFeatures = app.map.draw.source.getFeatures()
     var geojsonFormat = new ol.format.GeoJSON();
     var featureJson = geojsonFormat.writeFeatures(drawFeatures);
-    document.querySelector('input[name="featurecollection"]').value = featureJson;
+    var featureCollectionInput = document.querySelector('input[name="featurecollection"]');
+    featureCollectionInput.value = featureJson;
+    console.log(featureCollectionInput)
 }
 
 /**
