@@ -20,7 +20,7 @@ class UploadShapefileFormTest(TestCase):
         form = UploadShapefileForm()
         self.assertTrue(form.fields['shp_projection'].label == 'Shapefile Projection (Optional)')
 
-class GeoCollectionTest(TestCase):
+class FeaturecCollectionTest(TestCase):
     def setUp(self):
         try:
             webdriver.DesiredCapabilities.FIREFOX["unexpectedAlertBehaviour"] = "accept"
@@ -81,4 +81,4 @@ class GeoCollectionTest(TestCase):
         self.selenium.find_element(By.NAME, "treat_name").send_keys("Draw Test")
         # 19 | type | name=treat_desc | Draw Test
         self.selenium.find_element(By.NAME, "treat_desc").send_keys("Draw Test")
-        self.assertTrue(self.selenium.find_element(By.NAME, "geocollection").value != "")
+        self.assertTrue(self.selenium.find_element(By.NAME, "featurecollection").value != "")

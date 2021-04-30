@@ -140,7 +140,7 @@ def save_drawing(request):
         featJson = request.POST['drawing']
         scenario_name = request.POST['name']
         description = request.POST['description']
-        scenario_geometry = request.POST['geocollection']
+        scenario_geometry = request.POST['featurecollection']
         return define_scenario(request, featJson, scenario_name, description, scenario_geometry)
     return get_json_error_response('Unable to save drawing.', 500, context)
 

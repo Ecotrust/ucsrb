@@ -523,7 +523,7 @@ app.map.draw.collectGeoJSON = function() {
     var drawFeatures = app.map.draw.source.getFeatures()
     var geojsonFormat = new ol.format.GeoJSON();
     var featureJson = geojsonFormat.writeFeatures(drawFeatures);
-    document.querySelector('input[name="geocollection"]').value = featureJson;
+    document.querySelector('input[name="featurecollection"]').value = featureJson;
 }
 
 /**
