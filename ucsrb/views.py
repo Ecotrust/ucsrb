@@ -8,7 +8,7 @@ from geodata.geodata import GeoData
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django.contrib.gis.geos import MultiPolygon, Polygon, GEOSGeometry, Point
+from django.contrib.gis.geos import MultiPolygon, Polygon, GEOSGeometry, Point, GeometryCollection
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.temp import NamedTemporaryFile
 from django.http import HttpResponse, JsonResponse
@@ -140,8 +140,9 @@ def save_drawing(request):
         featJson = request.POST['drawing']
         scenario_name = request.POST['name']
         description = request.POST['description']
-        scenario_geometry = request.POST['featurecollection']
-        return define_scenario(request, featJson, scenario_name, description, scenario_geometry)
+        scenario_geometry = request.POST['scenario_geometry']
+        rx_applied = request.POST['rx_applied']
+        return define_scenario(request, featJson, scenario_name, description, scenario_geometry, rx_applied)
     return get_json_error_response('Unable to save drawing.', 500, context)
 
 def upload_treatment_shapefile(request):
@@ -191,8 +192,19 @@ def break_up_multipolygons(multipolygon, polygon_list=[]):
             polygon_list.append(multipolygon)
     return polygon_list
 
+def convert_feature_to_multipolygon(feature):
+    try:
+        geometry = MultiPolygon(feature)
+    except TypeError:
+        new_polys = []
+        for poly in feature:
+            new_polys = break_up_multipolygons(poly, new_polys)
 
-def define_scenario(request, featJson, scenario_name, description, scenario_geometry):
+        geometry = MultiPolygon(new_polys)
+
+    return geometry
+
+def define_scenario(request, featJson, scenario_name, description, scenario_geometry, rx_applied):
     context = {}
     polys = []
     for feature in json.loads(featJson)['features']:
@@ -207,17 +219,26 @@ def define_scenario(request, featJson, scenario_name, description, scenario_geom
     if polys[0].geom_type == 'MultiPolygon' and len(polys) == 1:
         geometry = polys[0]
     else:
-        try:
-            geometry = MultiPolygon(polys)
-        except TypeError:
-            new_polys = []
-            for poly in polys:
-                new_polys = break_up_multipolygons(poly, new_polys)
+        geometry = convert_feature_to_multipolygon(polys)
 
-            geometry = MultiPolygon(new_polys)
-    layer = 'Drawing'
-    focus_area = FocusArea.objects.create(unit_type=layer, geometry=geometry)
+    layer_type = 'Drawing'
+    focus_area = FocusArea.objects.create(unit_type=layer_type, geometry=geometry)
     focus_area.save()
+
+    featurecollection_features = []
+    for feature in json.loads(scenario_geometry)['features']:
+        geos_geom = GEOSGeometry(json.dumps(feature['geometry']))
+        # GEOS assumes 4326 when given GeoJSON (by definition this should be true)
+        # However, we've always used 3857, even in GeoJSON.
+        # Fixing this would be great, but without comprehensive testing, it's safer
+        # to perpetuate this breach of standards.
+        geos_geom.srid = settings.GEOMETRY_DB_SRID
+        featurecollection_features.append(convert_feature_to_multipolygon(geos_geom))
+
+    # possible ways
+    geometry_collection = GeometryCollection(featurecollection_features)
+    # Argument of scenario_geometry should be a GeoJSON FeatureCollection
+    # geometry_collection = GeometryCollection(scenario_geometry)
 
     user = request.user
     if not user.is_authenticated:
@@ -234,7 +255,8 @@ def define_scenario(request, featJson, scenario_name, description, scenario_geom
             description=None,
             focus_area=True,
             focus_area_input=focus_area,
-            scenario_geometry=geometry
+            scenario_geometry=geometry_collection,
+            rx_applied=rx_applied
         )
     except:
         # Technically we're testing for psycopg2's InternalError GEOSIntersects TopologyException
