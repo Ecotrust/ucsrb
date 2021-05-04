@@ -168,9 +168,13 @@ def upload_treatment_shapefile(request):
                 scenario_name = '.'.join(request.FILES['zipped_shapefile'].name.split('.')[:-1])
             description = request.POST['treatment_description']
 
-            scenario_geometry = request.POST['prescription_treatment_selection']
+            rx_applied = request.POST['rx_applied']
+            scenario_geometry = featJson
 
-            return define_scenario(request, featJson, scenario_name, description, scenario_geometry)
+            # use featJson twice in define_scenario
+            #   once to create focus area
+            #   once to create scenario gemetry geocollection
+            return define_scenario(request, featJson, scenario_name, description, scenario_geometry, rx_applied)
         else:
             message = "Errors: "
             for key in form.errors.keys():

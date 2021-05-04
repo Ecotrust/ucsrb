@@ -19,14 +19,23 @@ class UploadShapefileForm(forms.Form):
     treatment_name = forms.CharField(max_length=255, required=False, label='Treatment Name')
     treatment_description = forms.CharField(max_length=255, required=False, label='Treatment Description')
     shp_projection = forms.CharField(max_length=255, required=False, label='Shapefile Projection (Optional)')
-    prescription_treatment_selection = forms.ChoiceField(
+    featurecollection = forms.CharField(
+        widget=forms.HiddenInput(),
         required=False,
-        widget=forms.RadioSelect(
-            attrs={'class': 'prescription-choices'}
-        ),
-        choices= settings.PRESCRIPTION_TREATMENT_CHOICES,
-        label='Prescription Choices'
     )
+    rx_applied = forms.BooleanField(
+        widget=forms.HiddenInput(),
+        required=False,
+        initial=False,
+    )
+    # prescription_treatment_selection = forms.ChoiceField(
+    #     required=False,
+    #     widget=forms.RadioSelect(
+    #         attrs={'class': 'prescription-choices'}
+    #     ),
+    #     choices= settings.PRESCRIPTION_TREATMENT_CHOICES,
+    #     label='Prescription Choices'
+    # )
 
 class TreatmentScenarioForm(ScenarioForm):
     from ucsrb.models import FocusArea

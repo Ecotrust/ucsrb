@@ -533,7 +533,6 @@ app.map.draw.collectGeoJSON = function() {
     var featureJson = geojsonFormat.writeFeatures(drawFeatures);
     var featureCollectionInput = document.querySelector('input[name="featurecollection"]');
     featureCollectionInput.value = featureJson;
-    console.log(featureCollectionInput)
 }
 
 /**

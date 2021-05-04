@@ -24,7 +24,7 @@ class UploadShapefileFormTest(TestCase):
         self.assertTrue(form.fields['shp_projection'].label == 'Shapefile Projection (Optional)')
 
 
-class FeaturecCollectionTest(StaticLiveServerTestCase):
+class FeatureCollectionTest(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(self):
         super().setUpClass()
