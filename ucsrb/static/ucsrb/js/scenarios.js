@@ -367,10 +367,11 @@ function scenarioFormModel(options) {
             dataType: 'json',
             success: function(data) {
               if (self.currentGridRequest() === request) {
-                var wkt = data[0].wkt,
-                featureCount = data[0].count,
-                area_m2 = data[0].area_m2;
-                area_acres = data[0].area_acres;
+                console.log(data[0]);
+                var wkt = data[0].wkt;
+                var featureCount = data[0].count;
+                var area_m2 = data[0].area_m2;
+                var area_acres = data[0].area_acres;
                 if (data[0].notes.length > 0) {
                   self.filterNotesMessage(data[0].notes);
                   self.filterNotesExist(true);
@@ -393,6 +394,14 @@ function scenarioFormModel(options) {
                     $('#scenarios-form').append(`<div class="alert alert-warning" role="alert">Too large of area. Filter to less than ${app.map.draw.maxAcres} acres.`);
                   }
                 }
+
+                // Convert WKT to GeoJSON
+                var wktFeature = new ol.format.WKT().readFeatures(wkt);
+                var geojsonFeatureCollection = new ol.format.GeoJSON({
+                    dataProjection: 'EPSG:3857',
+                    featureProjection: 'EPSG:3857'
+                }).writeFeatures(wktFeature);
+                console.log(geojsonFeatureCollection);
 
                 self.showButtonSpinner(false);
               }
