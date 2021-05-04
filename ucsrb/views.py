@@ -169,6 +169,9 @@ def upload_treatment_shapefile(request):
             description = request.POST['treatment_description']
 
             rx_applied = request.POST['rx_applied']
+            # featJson is a GeoJSON featureCollection created using madrona-gis
+            #   featJson already equals what we need
+            #   creating a new var scenario_geometry for clarity
             scenario_geometry = featJson
 
             # use featJson twice in define_scenario
