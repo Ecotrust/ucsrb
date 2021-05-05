@@ -367,7 +367,6 @@ function scenarioFormModel(options) {
             dataType: 'json',
             success: function(data) {
               if (self.currentGridRequest() === request) {
-                console.log(data[0]);
                 var wkt = data[0].wkt;
                 var featureCount = data[0].count;
                 var area_m2 = data[0].area_m2;
@@ -401,8 +400,8 @@ function scenarioFormModel(options) {
                     dataProjection: 'EPSG:3857',
                     featureProjection: 'EPSG:3857'
                 }).writeFeatures(wktFeature);
-                console.log(geojsonFeatureCollection);
 
+                document.getElementById('id_featurecollection').value = geojsonFeatureCollection;
                 self.showButtonSpinner(false);
               }
             },

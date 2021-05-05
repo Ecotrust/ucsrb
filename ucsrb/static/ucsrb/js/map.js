@@ -518,7 +518,6 @@ app.map.draw.measureTooltip;
 app.map.draw.toolTipListener;
 
 app.map.draw.modify.on('modifyend', function(e) {
-  console.log('change');
   app.panel.draw.finishDrawing();
   // needs to run after finishDrawing
   // finishDrawing has a timeout of 300

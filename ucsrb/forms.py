@@ -245,6 +245,18 @@ class TreatmentScenarioForm(ScenarioForm):
         choices= settings.PRESCRIPTION_TREATMENT_CHOICES,
     )
 
+    # TreatmentScenario scenario_geometry GeometryCollection
+    featurecollection = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+    # tracking if user has chosen an Rx yet
+    rx_applied = forms.BooleanField(
+        widget=forms.HiddenInput(),
+        required=False,
+        initial=False,
+    )
+
     def get_step_0_fields(self):
         names = [
             ('focus_area', None, None, 'focus_area_input'),
@@ -282,12 +294,6 @@ class TreatmentScenarioForm(ScenarioForm):
 
     def get_steps(self):
         return self.get_step_0_fields(), self.get_step_1_fields(), self.get_step_2_fields(),
-
-    def get_prescription_selection(self):
-        names = [
-            ('prescription_treatment_selection', None, None, None),
-        ]
-        return self._get_fields(names)
 
     def clean_focus_area_input(self):
         return FocusArea.objects.get(pk=self.cleaned_data['focus_area_input'])
