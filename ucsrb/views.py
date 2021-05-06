@@ -1103,10 +1103,12 @@ def get_filter_results(request, query=False, notes=[]):
         geos_geom = GEOSGeometry(pu.geometry)
         polygon_features.append(convert_feature_to_multipolygon(geos_geom))
 
-    polygon_collection = GeometryCollection(featurecollection)
+    polygon_collection = GeometryCollection(polygon_features)
 
     from scenarios import views as scenarioViews
-    return scenarioViews.get_filter_results(request, query, notes, {'area_acres': area_acres})
+    filter_json = scenarioViews.get_filter_results(request, query, notes, {'area_acres': area_acres})
+    # import ipdb; ipdb.set_trace()
+    return filter_json
 
 @cache_page(60 * 60) # 1 hour of caching
 def get_planningunits(request):
