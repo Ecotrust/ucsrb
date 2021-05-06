@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.gis.geos import MultiPolygon, Polygon, GEOSGeometry, Point, GeometryCollection
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.temp import NamedTemporaryFile
+from django.core.serializers import serialize
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template import loader
@@ -1061,6 +1062,9 @@ def parse_filter_checkboxes(request):
     return filter_dict
 
 '''
+* get_filter_count over rides scenario.get_filter_count
+* ucsrb.proj_urls.py intercepts requests to http.../scenario/get_filter_count
+    and assigns view ucsrb.get_filter_count
 '''
 @cache_page(60 * 60) # 1 hour of caching
 def get_filter_count(request, query=False, notes=[]):
@@ -1075,6 +1079,9 @@ def get_filter_count(request, query=False, notes=[]):
     return HttpResponse("%d acres" % int(area_acres), status=200)
 
 '''
+* get_filter_results over rides scenario.get_filter_results
+* ucsrb.proj_urls.py intercepts requests to http.../scenario/get_filter_results
+    and uses view ucsrb.get_filter_results
 '''
 @cache_page(60 * 60) # 1 hour of caching
 def get_filter_results(request, query=False, notes=[]):
@@ -1082,8 +1089,22 @@ def get_filter_results(request, query=False, notes=[]):
         filter_dict = parse_filter_checkboxes(request)
         (query, notes) = run_filter_query(filter_dict)
     area_acres = 0
+    # use the following loop to capture geojson. fields:
+    #   geometry
+    #   veg unit id
+    #   defualt treatment="baseline"
+
+    # featurecollection = serialize('geojson', query,
+    #         geometry_field='geometry',
+    #         fields=('veg_unit_id',))
+    polygon_features = []
     for pu in query:
         area_acres += pu.acres
+        geos_geom = GEOSGeometry(pu.geometry)
+        polygon_features.append(convert_feature_to_multipolygon(geos_geom))
+
+    polygon_collection = GeometryCollection(featurecollection)
+
     from scenarios import views as scenarioViews
     return scenarioViews.get_filter_results(request, query, notes, {'area_acres': area_acres})
 

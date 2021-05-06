@@ -402,6 +402,7 @@ function scenarioFormModel(options) {
                 }).writeFeatures(wktFeature);
 
                 document.getElementById('id_featurecollection').value = geojsonFeatureCollection;
+                
                 self.showButtonSpinner(false);
               }
             },
