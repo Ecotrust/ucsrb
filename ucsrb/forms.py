@@ -4,7 +4,10 @@ from scenarios.forms import ScenarioForm
 from django import forms
 from django.conf import settings
 from django.forms.widgets import *
+from django.contrib.gis.geos import MultiPolygon, Polygon, GEOSGeometry, GeometryCollection
 from analysistools.widgets import SliderWidget, DualSliderWidget
+from . import views
+import json
 
 class HiddenScenarioBooleanField(forms.BooleanField):
     # initial=False,
@@ -246,7 +249,7 @@ class TreatmentScenarioForm(ScenarioForm):
     )
 
     # TreatmentScenario scenario_geometry GeometryCollection
-    featurecollection = forms.CharField(
+    scenario_geometry = forms.CharField(
         widget=forms.HiddenInput(),
         required=False,
     )
@@ -312,6 +315,21 @@ class TreatmentScenarioForm(ScenarioForm):
             '3': 'include_floor',
             '4': 'include_east_west',
         }
+
+        if self.cleaned_data.get('scenario_geometry'):
+            featurecollection = self.cleaned_data.get('scenario_geometry')
+            featurecollection_features = []
+            for feature in json.loads(featurecollection)['features']:
+                geos_geom = GEOSGeometry(json.dumps(feature['geometry']))
+                # GEOS assumes 4326 when given GeoJSON (by definition this should be true)
+                # However, we've always used 3857, even in GeoJSON.
+                # Fixing this would be great, but without comprehensive testing, it's safer
+                # to perpetuate this breach of standards.
+                geos_geom.srid = settings.GEOMETRY_DB_SRID
+                featurecollection_features.append(views.convert_feature_to_multipolygon(geos_geom))
+
+            geometry_collection = GeometryCollection(featurecollection_features)
+            self.cleaned_data['scenario_geometry'] = geometry_collection
 
         super(FeatureForm, self).clean()
         try:

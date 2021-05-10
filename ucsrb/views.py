@@ -279,7 +279,7 @@ def define_scenario(request, featJson, scenario_name, description, scenario_geom
         return get_json_error_response('Treatment does not cover enough forested land to make a difference', 500, context)
     # return geometry to web mercator
     final_geometry.transform(3857)
-    return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (scenario.pk, scenario.geometry_dissolved.geojson)))
+    return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (scenario.pk, scenario.geometry_dissolved.geojson)))    
 
 '''
 Take a point in 3857 and return the feature at that point for a given FocusArea type
@@ -1094,19 +1094,23 @@ def get_filter_results(request, query=False, notes=[]):
     #   veg unit id
     #   defualt treatment="baseline"
 
-    # featurecollection = serialize('geojson', query,
-    #         geometry_field='geometry',
-    #         fields=('veg_unit_id',))
-    polygon_features = []
+    featurecollection = serialize('geojson', query,
+            geometry_field='geometry',
+            fields=('veg_unit_id',))
+
+    # polygon_features = []
     for pu in query:
         area_acres += pu.acres
-        geos_geom = GEOSGeometry(pu.geometry)
-        polygon_features.append(convert_feature_to_multipolygon(geos_geom))
+        # geos_geom = GEOSGeometry(pu.geometry)
+        # polygon_features.append(convert_feature_to_multipolygon(geos_geom))
 
-    polygon_collection = GeometryCollection(polygon_features)
+    # polygon_collection = GeometryCollection(polygon_features)
 
     from scenarios import views as scenarioViews
-    filter_json = scenarioViews.get_filter_results(request, query, notes, {'area_acres': area_acres})
+    filter_json = scenarioViews.get_filter_results(request, query, notes, {
+        'area_acres': area_acres,
+        'scenario_geometry': featurecollection
+    })
     # import ipdb; ipdb.set_trace()
     return filter_json
 

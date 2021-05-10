@@ -86,6 +86,11 @@ var madrona = {
                         $.each($input[0].files, function(i, file) {
                             data.append('file-'+i, file);
                         });
+                    } else if ($input.attr('name') == 'scenario_geometry') {
+                        //  TODO slugify
+                        data.append('scenario_geometry', $input.attr('value'));
+                    } else if ($input.attr('name') == 'rx_applied') {
+                        data.append($input.attr('name'), $input.attr('value'));
                     } else {
                         data.append($input.attr('name'), $input.val());
                     }
@@ -368,6 +373,7 @@ function scenarioFormModel(options) {
             success: function(data) {
               if (self.currentGridRequest() === request) {
                 var wkt = data[0].wkt;
+                var featureCollection = data[0].scenario_geometry;
                 var featureCount = data[0].count;
                 var area_m2 = data[0].area_m2;
                 var area_acres = data[0].area_acres;
@@ -394,15 +400,9 @@ function scenarioFormModel(options) {
                   }
                 }
 
-                // Convert WKT to GeoJSON
-                var wktFeature = new ol.format.WKT().readFeatures(wkt);
-                var geojsonFeatureCollection = new ol.format.GeoJSON({
-                    dataProjection: 'EPSG:3857',
-                    featureProjection: 'EPSG:3857'
-                }).writeFeatures(wktFeature);
+                // Add geojson to form input value
+                document.getElementById('id_scenario_geometry').value = featureCollection;
 
-                document.getElementById('id_featurecollection').value = geojsonFeatureCollection;
-                
                 self.showButtonSpinner(false);
               }
             },
