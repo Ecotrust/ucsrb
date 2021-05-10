@@ -229,12 +229,18 @@ SCENARIO_FORM_URL = '/features/treatmentscenario/form/'
 SCENARIO_LINK_BASE = '/features/treatmentscenario/ucsrb_treatmentscenario'
 
 MODEL_YEARS = {
-    # 'dry': ????,
-    'baseline': {
-        'start': datetime.strptime("10.01.2001-00:00:00", "%m.%d.%Y-%H:%M:%S"),
-        'end': datetime.strptime("10.01.2002-00:00:00", "%m.%d.%Y-%H:%M:%S")
+    'dry': {
+        'start': datetime.strptime("10.01.2000-00:00:00", "%m.%d.%Y-%H:%M:%S"),
+        'end': datetime.strptime("10.01.2001-00:00:00", "%m.%d.%Y-%H:%M:%S")
     },
-    # 'wet': ???
+    'baseline': {
+        'start': datetime.strptime("10.01.2005-00:00:00", "%m.%d.%Y-%H:%M:%S"),
+        'end': datetime.strptime("10.01.2006-00:00:00", "%m.%d.%Y-%H:%M:%S")
+    },
+    'wet': {
+        'start': datetime.strptime("10.01.1998-00:00:00", "%m.%d.%Y-%H:%M:%S"),
+        'end': datetime.strptime("10.01.1999-00:00:00", "%m.%d.%Y-%H:%M:%S")
+    },
 }
 
 ########################################
@@ -266,7 +272,7 @@ HYDRO_INPUT_HEADERS = [
 ANALYSIS_DIR = os.path.realpath(os.path.join(BASE_DIR, 'ucsrb', 'analysis'))
 
 # TIME_STEP values MUST be factors of 24, and REPORTING must be a multiple of HOURS.
-TIME_STEP_HOURS = 3
+TIME_STEP_HOURS = 6
 TIME_STEP_REPORTING = 6
 
 CSV_DIR = os.path.realpath(os.path.join(ANALYSIS_DIR, 'input_csvs'))

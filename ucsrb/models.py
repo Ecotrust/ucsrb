@@ -353,12 +353,12 @@ class VegPlanningUnit(models.Model):
     percent_riparian = models.FloatField()                  #NWIrippct
     slope = models.FloatField()                             #SlopeMean
     road_distance = models.FloatField()                     #RdDstEucMn ("Euclidean mean distance to roads")
-    percent_fractional_coverage = models.FloatField()       #FrctCvg
-    percent_high_fire_risk_area = models.FloatField()       #HRFApct
+    percent_fractional_coverage = models.FloatField()       #fczonmean (was 'FrctCvg')
+    percent_high_fire_risk_area = models.FloatField()       #WHPhvhPCT (was 'HRFApct')
     mgmt_alloc_code = models.CharField(max_length=255, null=True, blank=True, default=None)     #MgmtAlloca
     mgmt_description = models.CharField(max_length=255, null=True, blank=True, default=None)    #MgmtDescri
     mgmt_unit_id = models.IntegerField(null=True, blank=True, default=None)                     #FSmgt_etid
-    dwnstream_ppt_id = models.CharField(max_length=30, null=True, blank=True, default=None)     #ppt_ID/seg_id
+    dwnstream_ppt_id = models.CharField(max_length=30, null=True, blank=True, default=None)     #seg_id (was 'ppt_ID')
     topo_height_class_majority = models.IntegerField(null=True, blank=True, default=None)       #thzonmaj
 
     has_wilderness_area = models.BooleanField(default=False)    #Wilderness

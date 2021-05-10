@@ -103,7 +103,7 @@ class Command(BaseCommand):
             if in_type == 'PourPointOverlap':
                 id_field = 'seg_ID'
             if in_type == 'PourPointDiscrete':
-                id_field = 'seg_id'
+                id_field = 'seg_ID'
 
             if not id_field:
                 self.stdout.write('--- ERROR: ID Field unknown. Check your file type argument. ---')
