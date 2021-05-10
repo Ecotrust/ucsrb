@@ -409,6 +409,21 @@ SUPERBASINS = {
     }
 }
 
+BASIN_RESET_LOOKUP = {
+    'entiat': {
+        'UNIT_ID': 'enti_1065',
+    },
+    'methow': {
+        'UNIT_ID': 'metw_5074',
+    },
+    'okanogan': {
+        'UNIT_ID': 'okan_4700',
+    },
+    'wenatchee': {
+        'UNIT_ID': 'wena_3466',
+    }
+}
+
 ########################################
 ######      MAP SETTINGS        ########
 ########################################
