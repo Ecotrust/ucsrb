@@ -109,6 +109,10 @@ app.init = {
         reportInit();
         app.state.setStep = 'aggregate';
         app.panel.results.showAggregate();
+    },
+    'prescription': function() {
+        app.state.setStep = 'prescription';
+        app.panel.showPrescriptionSelection();
     }
 }
 
@@ -532,13 +536,6 @@ app.panel = {
                 '<label for="treat_desc">Description:</label>' +
                 '<textarea rows="2" columns="35" name="treat_desc"></textarea><br>' +
                 '<br>' +
-                '<ul id="draw_id_prescription_treatment_selection" class="prescription-choices">' +
-                '<li><label for="draw_id_prescription_treatment_selection_0"><input type="radio" name="draw_prescription_treatment_selection" value="notr" class="prescription-choices" id="draw_id_prescription_treatment_selection_0">No Treatment scenario</label></li>' +
-                '<li><label for="draw_id_prescription_treatment_selection_1"><input type="radio" name="draw_prescription_treatment_selection" value="mb16" class="prescription-choices" id="draw_id_prescription_treatment_selection_1">Maximum Biomass 16 inch scenario</label></li>' +
-                '<li><label for="draw_id_prescription_treatment_selection_2"><input type="radio" name="draw_prescription_treatment_selection" value="mb25" class="prescription-choices" id="draw_id_prescription_treatment_selection_2">Maximum Biomass 25 inch scenario</label></li>' +
-                '<li><label for="draw_id_prescription_treatment_selection_3"><input type="radio" name="draw_prescription_treatment_selection" value="burn" class="prescription-choices" id="draw_id_prescription_treatment_selection_3">Burn Only scenario</label></li>' +
-                '<li><label for="draw_id_prescription_treatment_selection_4"><input type="radio" name="draw_prescription_treatment_selection" value="flow" class="prescription-choices" id="draw_id_prescription_treatment_selection_4">Ideal Water scenario</label></li>' +
-                '</ul><br />' +
                 '<input type="hidden" name="featurecollection" value="" />' +
                 '<input type="hidden" name="rx_applied" value="False" />' +
                 '<div class="btn-toolbar justify-content-between drawing-buttons">' +
@@ -606,6 +603,10 @@ app.panel = {
     },
     element: function() { // returns a function. to edit dom element don't forget to invoke: element()
       return this.getElement;
+    },
+
+    showPrescriptionSelection: function() {
+        app.panel.setContent('Show Rx Choice');
     },
 
     panelContentElement: function() { // returns a function. to edit dom element don't forget to invoke: panelContentElement()
@@ -734,6 +735,7 @@ app.nav = {
         result: 'Explore evaluation results',
         aggregate: 'Select virtual gauging station ( <span style="height: 20px; background: #fff; border: 2px solid #67b8c6; border-radius: 50%; box-shadow: 0 0 4px #333, 0 0 4px #999; width: 20px; margin: 4px 10px; display: inline-block;"></span> ) to view predicted changes in flow.',
         hydro: 'Your hydrologic results',
+        prescription: 'Apply your prescriptions',
     },
     stepActions: {
         initial: '<div id="scenarios"></div><div id="scenario_form"></div><div id="draw_form"></div><div id="results"></div>',
@@ -782,6 +784,9 @@ app.nav = {
         },
         hydro: function() {
             $('button[data-method=hydro]').click()
+        },
+        prescription: function() {
+
         }
     }
 }
@@ -831,6 +836,12 @@ $.ajaxSetup({
         }
     }
 });
+
+async function prescriptionApplication() {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  return 10;
+}
 
 /**
 * Application AJAX requests object and methods
@@ -1152,15 +1163,18 @@ app.request = {
                 app.map.layer.draw.layer.setVisible(true);
                 app.map.addScenario(vectors);
                 app.map.zoomToExtent(vectors[0].getGeometry().getExtent());
-                app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
 
-                // Hide treated veg units by removing all features
-                //  the drawn polygon will be added in resultsInit()
-                app.map.scenarioLayer.removeAllFeatures();
+                prescriptionApplication().then(resolve => {
+                    alert('yoooo');
+                    app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
+                    // Hide treated veg units by removing all features
+                    //  the drawn polygon will be added in resultsInit()
+                    app.map.scenarioLayer.removeAllFeatures();
 
-                app.resultsInit('ucsrb_treatmentscenario_' + response.id);
-                app.state.scenarioId = response.id;
-                app.state.setStep = 'results';
+                    app.resultsInit('ucsrb_treatmentscenario_' + response.id);
+                    app.state.scenarioId = response.id;
+                    app.state.setStep = 'results';
+                });
             },
             error: function(response, status) {
                 console.log(`%cfail @ upload treatment: %o`, 'color: red', response);

@@ -116,10 +116,11 @@ var madrona = {
                 dataType: 'json',
                 success: function(result) {
                     app.loadingAnimation.hide();
-                    app.state.setStep = 'result'; // go to results
-                    app.resultsInit(result['X-Madrona-Show']);
-                    app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
-                    app.viewModel.scenarios.loadingMessage(false);
+                    // app.state.setStep = 'result'; // go to results
+                    app.state.setStep = 'prescription';
+                    // app.resultsInit(result['X-Madrona-Show']);
+                    // app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
+                    // app.viewModel.scenarios.loadingMessage(false);
                     // clearInterval(barTimer);
                     // app.viewModel.scenarios.loadCollectionsFromServer();
                     console.log(`%c form submitted: %o`, 'color: green;', result);
