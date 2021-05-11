@@ -117,12 +117,13 @@ var madrona = {
                 success: function(result) {
                     app.loadingAnimation.hide();
                     // app.state.setStep = 'result'; // go to results
-                    app.state.setStep = 'prescription';
-                    // app.resultsInit(result['X-Madrona-Show']);
-                    // app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
-                    // app.viewModel.scenarios.loadingMessage(false);
-                    // clearInterval(barTimer);
-                    // app.viewModel.scenarios.loadCollectionsFromServer();
+                    prescriptionApplication().then(resolve => {
+                        app.resultsInit(result['X-Madrona-Show']);
+                        app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
+                        app.viewModel.scenarios.loadingMessage(false);
+                        clearInterval(barTimer);
+                        app.viewModel.scenarios.loadCollectionsFromServer();
+                    });
                     console.log(`%c form submitted: %o`, 'color: green;', result);
                 },
                 error: function(result) {

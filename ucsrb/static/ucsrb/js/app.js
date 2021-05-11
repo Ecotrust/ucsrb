@@ -838,9 +838,12 @@ $.ajaxSetup({
 });
 
 async function prescriptionApplication() {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  return 10;
+    let promise = new Promise(function(resolve, reject) {
+        app.state.setStep = 'prescription';
+        setTimeout(() => resolve(), 5000)
+    });
+    let result = await promise;
+    return result;
 }
 
 /**
@@ -1165,7 +1168,6 @@ app.request = {
                 app.map.zoomToExtent(vectors[0].getGeometry().getExtent());
 
                 prescriptionApplication().then(resolve => {
-                    alert('yoooo');
                     app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
                     // Hide treated veg units by removing all features
                     //  the drawn polygon will be added in resultsInit()
