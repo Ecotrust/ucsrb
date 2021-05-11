@@ -137,6 +137,15 @@ python manage.py enable_sharing --all
 
 ```
 
+#### Generate baseline flow data:
+Run each of the following commands, some may take several hours:
+```
+python manage.py set_baseline_flow Entiat
+python manage.py set_baseline_flow Methow
+python manage.py set_baseline_flow Okanogan
+python manage.py set_baseline_flow Wenatchee
+```
+
 #### Enable Anonymous User
 Use your admin user to create an anonymous user (this assumes port 8000 is open)
 ```
