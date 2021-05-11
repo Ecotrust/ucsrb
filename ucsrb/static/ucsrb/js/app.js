@@ -1110,27 +1110,30 @@ app.request = {
             success: function(response) {
                 app.map.draw.disable();
                 app.nav.hideSave();
-                if (app.state.nav !== 'short') {
-                    app.state.navHeight = 'short';
-                    app.state.setStep = 'results'; // go to results
-                }
-                var vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
-                    dataProjection: 'EPSG:3857',
-                    featureProjection: 'EPSG:3857'
+
+                prescriptionApplication().then(resolve => {
+                    if (app.state.nav !== 'short') {
+                        app.state.navHeight = 'short';
+                        app.state.setStep = 'results'; // go to results
+                    }
+                    var vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
+                        dataProjection: 'EPSG:3857',
+                        featureProjection: 'EPSG:3857'
+                    });
+                    // Remove drawing from layer
+                    var draw_source = app.map.layer.draw.layer.getSource();
+                    draw_source.removeFeature(draw_source.getFeatures()[0]);
+                    app.map.addScenario(vectors);
+                    app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
+
+                    // Hide treated veg units by removing all features
+                    //  the drawn polygon will be added in resultsInit()
+                    app.map.scenarioLayer.removeAllFeatures();
+
+                    app.resultsInit('ucsrb_treatmentscenario_' + response.id);
+                    app.state.scenarioId = response.id;
+                    app.state.setStep = 'results';
                 });
-                // Remove drawing from layer
-                var draw_source = app.map.layer.draw.layer.getSource();
-                draw_source.removeFeature(draw_source.getFeatures()[0]);
-                app.map.addScenario(vectors);
-                app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
-
-                // Hide treated veg units by removing all features
-                //  the drawn polygon will be added in resultsInit()
-                app.map.scenarioLayer.removeAllFeatures();
-
-                app.resultsInit('ucsrb_treatmentscenario_' + response.id);
-                app.state.scenarioId = response.id;
-                app.state.setStep = 'results';
             },
             error: function(response, status) {
                 console.log(`%cfail @ save drawing: %o`, 'color: red', response);
