@@ -1111,6 +1111,7 @@ app.request = {
                 app.map.draw.disable();
                 app.nav.hideSave();
 
+                // apply prescription before resultsInit
                 prescriptionApplication().then(resolve => {
                     if (app.state.nav !== 'short') {
                         app.state.navHeight = 'short';
@@ -1170,6 +1171,7 @@ app.request = {
                 app.map.addScenario(vectors);
                 app.map.zoomToExtent(vectors[0].getGeometry().getExtent());
 
+                // apply prescription before resultsInit
                 prescriptionApplication().then(resolve => {
                     app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
                     // Hide treated veg units by removing all features

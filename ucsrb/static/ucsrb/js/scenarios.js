@@ -116,8 +116,9 @@ var madrona = {
                 dataType: 'json',
                 success: function(result) {
                     app.loadingAnimation.hide();
-                    // app.state.setStep = 'result'; // go to results
+                    // apply prescription before resultsInit
                     prescriptionApplication().then(resolve => {
+                        app.state.setStep = 'result'; // go to results
                         app.resultsInit(result['X-Madrona-Show']);
                         app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
                         app.viewModel.scenarios.loadingMessage(false);
