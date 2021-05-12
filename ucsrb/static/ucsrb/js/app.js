@@ -851,8 +851,7 @@ async function prescriptionApplication(treatment_scenario_id = null) {
         '<p>Apply A Single Prescription To All Polygons By Choosing a Prescription & Saving.</p>' +
         '<form id="prescription_application_form" onsubmit="app.panel.prescription.applyPrescription(); return false;">' +
         '<ul id="id_prescription_treatment_selection" class="prescription-choices">' +
-        '<li><label for="id_prescription_treatment_selection_0">' +
-        '<input type="radio" name="prescription_treatment_selection" value="notr" class="prescription-choices" id="id_prescription_treatment_selection_0">No Treatment scenario</label></li>' +
+        '<li><label for="id_prescription_treatment_selection_0"><input checked type="radio" name="prescription_treatment_selection" value="notr" class="prescription-choices" id="id_prescription_treatment_selection_0">No Treatment scenario</label></li>' +
         '<li><label for="id_prescription_treatment_selection_1"><input type="radio" name="prescription_treatment_selection" value="mb16" class="prescription-choices" id="id_prescription_treatment_selection_1">Maximum Biomass 16 inch scenario</label></li>' +
         '<li><label for="id_prescription_treatment_selection_2"><input type="radio" name="prescription_treatment_selection" value="mb25" class="prescription-choices" id="id_prescription_treatment_selection_2">Maximum Biomass 25 inch scenario</label></li>' +
         '<li><label for="id_prescription_treatment_selection_3"><input type="radio" name="prescription_treatment_selection" value="burn" class="prescription-choices" id="id_prescription_treatment_selection_3">Burn Only scenario</label></li>' +
