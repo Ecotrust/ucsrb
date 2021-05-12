@@ -136,6 +136,41 @@ def get_basin(request):
         focus_area = FocusArea.objects.get(unit_type=layer, unit_id=unit_id)
     return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (focus_area.pk, focus_area.geometry.geojson)))
 
+
+def apply_prescription(request):
+    context = {}
+    if request.method == 'POST':
+        prescription_choice = request.POST['prescription_choice']
+
+        user = request.user
+        if not user.is_authenticated:
+            if settings.ALLOW_ANONYMOUS_DRAW == True:
+                from django.contrib.auth.models import User
+                user = User.objects.get(pk=settings.ANONYMOUS_USER_PK)
+            else:
+                return get_json_error_response('Anonymous Users Not Allowed. Please log in.', 401, context)
+
+        try:
+            scenario = TreatmentScenario.objects.get(user=user,
+                name=scenario_name,
+                description=description,
+                focus_area=True,
+                focus_area_input=focus_area,
+                scenario_geometry=geometry_collection,
+                rx_applied=rx_applied
+            )
+        except:
+            # Technically we're testing for psycopg2's InternalError GEOSIntersects TopologyException
+            return get_json_error_response('Treatment Areas overlap. Please review your data and start over.', 500, context)
+    else:
+
+        form = PrescriptionSelectionForm()
+
+    return render(request, 'prescription_application.html', {
+        'prescription_application_form': form
+    })
+
+
 def save_drawing(request):
     context = {}
     if request.method == 'POST':
@@ -280,7 +315,7 @@ def define_scenario(request, featJson, scenario_name, description, scenario_geom
         return get_json_error_response('Treatment does not cover enough forested land to make a difference', 500, context)
     # return geometry to web mercator
     final_geometry.transform(3857)
-    return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (scenario.pk, scenario.geometry_dissolved.geojson)))    
+    return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (scenario.pk, scenario.geometry_dissolved.geojson)))
 
 '''
 Take a point in 3857 and return the feature at that point for a given FocusArea type

@@ -31,14 +31,16 @@ class UploadShapefileForm(forms.Form):
         required=False,
         initial=False,
     )
-    # prescription_treatment_selection = forms.ChoiceField(
-    #     required=False,
-    #     widget=forms.RadioSelect(
-    #         attrs={'class': 'prescription-choices'}
-    #     ),
-    #     choices= settings.PRESCRIPTION_TREATMENT_CHOICES,
-    #     label='Prescription Choices'
-    # )
+
+class PrescriptionSelectionForm(forms.Form):
+    prescription_treatment_selection = forms.ChoiceField(
+        widget=forms.RadioSelect(
+            attrs={'class': 'prescription-choices'}
+        ),
+        choices=settings.PRESCRIPTION_TREATMENT_CHOICES,
+        initial='notr',
+        label='Prescription Choices',
+    )
 
 class TreatmentScenarioForm(ScenarioForm):
     from ucsrb.models import FocusArea
@@ -237,15 +239,6 @@ class TreatmentScenarioForm(ScenarioForm):
         label="Exclude Wilderness Areas",
         help_text="Exclude Wilderness Areas",
         required=False,
-    )
-
-    # Prescriptions
-    prescription_treatment_selection = forms.ChoiceField(
-        required=False,
-        widget=forms.RadioSelect(
-            attrs={'class': 'prescription-choices'}
-        ),
-        choices= settings.PRESCRIPTION_TREATMENT_CHOICES,
     )
 
     # TreatmentScenario scenario_geometry GeometryCollection

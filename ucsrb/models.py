@@ -130,7 +130,7 @@ class TreatmentScenario(Scenario):
 
     # Prescription (Rx) applied
     PRESCRIPTION_TREATMENT_CHOICES = settings.PRESCRIPTION_TREATMENT_CHOICES
-    prescription_treatment_selection = models.CharField(max_length=255, null=True, blank=True, default=None, choices=PRESCRIPTION_TREATMENT_CHOICES)
+    prescription_treatment_selection = models.CharField(max_length=255, null=True, blank=True, default='notr', choices=PRESCRIPTION_TREATMENT_CHOICES)
 
     # Geometry of original treatment defined by user
     scenario_geometry = gismodels.GeometryCollectionField(srid=settings.GEOMETRY_DB_SRID, null=True, blank=True, verbose_name="User Defined Geometries")

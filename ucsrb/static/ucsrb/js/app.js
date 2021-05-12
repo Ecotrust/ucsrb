@@ -242,6 +242,9 @@ app.panel = {
             initFiltering();
         },
     },
+    applyPrescription: function(prescription_choice) {
+        alert('Assing rx to a polygon. chosen:' + prescription_choice)
+    },
     summary: {
         init: function() {
             document.getElementById('chartResult').innerHTML = app.panel.results.styleSummaryResultsAsRows(app.panel.results.summary);
@@ -539,8 +542,8 @@ app.panel = {
                 '<input type="hidden" name="featurecollection" value="" />' +
                 '<input type="hidden" name="rx_applied" value="False" />' +
                 '<div class="btn-toolbar justify-content-between drawing-buttons">' +
-                '<button type="submit" class="btn btn-primary ' + saveDisable + '" >Begin Evaluation</button>' +
                 '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
+                '<button type="submit" class="btn btn-primary ' + saveDisable + '" >Begin Evaluation</button>' +
                 '</div>' +
                 '</form>' +
                 '</div>';
@@ -837,10 +840,30 @@ $.ajaxSetup({
     }
 });
 
-async function prescriptionApplication() {
+async function prescriptionApplication(treatment_scenario_id = null) {
     let promise = new Promise(function(resolve, reject) {
         app.state.setStep = 'prescription';
-        setTimeout(() => resolve(), 5000)
+        app.state.scenarioId = treatment_scenario_id;
+        var html = '<div class="featurepanel">' +
+        '<p class="display"><span class="bb">Choose a Prescription</span></p>' +
+        '<p><small>Select a polygon<br />Then Choose a Prescription & Save.<br />Repeat Until All Polygons Have A Prescription Applied.</p>' +
+        '<p>- OR -</p>' +
+        '<p>Apply A Single Prescription To All Polygons By Choosing a Prescription & Saving.</p>' +
+        '<form id="prescription_application_form" onsubmit="app.panel.prescription.applyPrescription(); return false;">' +
+        '<ul id="id_prescription_treatment_selection" class="prescription-choices">' +
+        '<li><label for="id_prescription_treatment_selection_0">' +
+        '<input type="radio" name="prescription_treatment_selection" value="notr" class="prescription-choices" id="id_prescription_treatment_selection_0">No Treatment scenario</label></li>' +
+        '<li><label for="id_prescription_treatment_selection_1"><input type="radio" name="prescription_treatment_selection" value="mb16" class="prescription-choices" id="id_prescription_treatment_selection_1">Maximum Biomass 16 inch scenario</label></li>' +
+        '<li><label for="id_prescription_treatment_selection_2"><input type="radio" name="prescription_treatment_selection" value="mb25" class="prescription-choices" id="id_prescription_treatment_selection_2">Maximum Biomass 25 inch scenario</label></li>' +
+        '<li><label for="id_prescription_treatment_selection_3"><input type="radio" name="prescription_treatment_selection" value="burn" class="prescription-choices" id="id_prescription_treatment_selection_3">Burn Only scenario</label></li>' +
+        '<li><label for="id_prescription_treatment_selection_4"><input type="radio" name="prescription_treatment_selection" value="flow" class="prescription-choices" id="id_prescription_treatment_selection_4">Ideal Water scenario</label></li>' +
+        '</ul>' +
+        '<button type="submit" class="btn btn-primary">Apply</button>' +
+        '</div>' +
+        '</form>' +
+        '</div>';
+        app.panel.setContent(html);
+        // setTimeout(() => resolve(), 5000)
     });
     let result = await promise;
     return result;
@@ -1112,7 +1135,8 @@ app.request = {
                 app.nav.hideSave();
 
                 // apply prescription before resultsInit
-                prescriptionApplication().then(resolve => {
+                let ts_id = 'ucsrb_treatmentscenario_' + response.id;
+                prescriptionApplication(ts_id).then(resolve => {
                     if (app.state.nav !== 'short') {
                         app.state.navHeight = 'short';
                         app.state.setStep = 'results'; // go to results
@@ -1172,7 +1196,8 @@ app.request = {
                 app.map.zoomToExtent(vectors[0].getGeometry().getExtent());
 
                 // apply prescription before resultsInit
-                prescriptionApplication().then(resolve => {
+                let ts_id = 'ucsrb_treatmentscenario_' + response.id;
+                prescriptionApplication(ts_id).then(resolve => {
                     app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
                     // Hide treated veg units by removing all features
                     //  the drawn polygon will be added in resultsInit()

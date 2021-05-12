@@ -1,0 +1,22 @@
+{% load static %}
+<p class="instructions">Choose a Prescription Treatment Scenario</p>
+<form id="prescription-application-form" method="POST" action="">
+    {% csrf_token %}
+    {{ prescription_application_form.as_p }}
+    {# <div class="form-group">
+        <p class="instructions">{{ form.prescription_treatment_selection.label }}</p>
+    </div>
+    <div id="step{{ form.get_steps|length|add:"1" }}-inputs" class="step-inputs">
+        <div class="form-group">
+            {{ form.prescription_treatment_selection.as_widget }}
+            <div class="col-2 text-right">
+                <i class="info-icon icon-info-sign field-tooltip"
+                   data-toggle="tooltip"
+                   data-original-title="{{ form.prescription_treatment_selection.help_text }}"
+                   data-placement="top">
+                </i>
+            </div>
+        </div>
+    </div> #}
+    <input type="submit" value="Apply" id="apply-prescription">
+</form>

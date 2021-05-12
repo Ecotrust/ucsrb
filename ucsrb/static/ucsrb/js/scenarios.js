@@ -117,7 +117,7 @@ var madrona = {
                 success: function(result) {
                     app.loadingAnimation.hide();
                     // apply prescription before resultsInit
-                    prescriptionApplication().then(resolve => {
+                    prescriptionApplication(result['X-Madrona-Show']).then(resolve => {
                         app.state.setStep = 'result'; // go to results
                         app.resultsInit(result['X-Madrona-Show']);
                         app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
