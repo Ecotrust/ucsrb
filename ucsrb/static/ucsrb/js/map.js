@@ -220,6 +220,7 @@ app.map.prescription_colors = [
     ['rx3', [239, 175, 184, 0.5]],
     ['rx4', [201, 133, 86, 0.5]]
 ];
+
 app.map.prescription_colors.forEach(function(rx) {
     app.map.styles[rx[0]] = new ol.style.Style({
         fill: new ol.style.Fill({
@@ -963,6 +964,10 @@ app.map.addPrescriptionApplication = function(features) {
         let rx_id = feature.get('prescription_id').toString().substr(-1);
         feature.setStyle(app.map.styles[rx_id]);
     })
+    app.map.layer.prescriptionApplication.source.clear();
+    app.map.layer.prescriptionApplication.getSource().addFeatures(features);
+    app.map.layer.prescriptionApplication.layer.setVisible(true);
+    app.map.zoomToExtent(app.map.layer.prescriptionApplication.layer.getSource().getExtent());
 }
 
 app.map.dropPin = function(coords) {

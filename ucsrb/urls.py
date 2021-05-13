@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^save_drawing', views.save_drawing),
     url(r'^upload_treatment_shapefile/', views.upload_treatment_shapefile, name='shp_upload'),
     url(r'^apply_prescription/', views.apply_prescription, name='apply_prescription'),
+    url(r'^get_scenario_by_id/(?P<ts_id>[\w_]+)', views.get_scenario_by_id, name='get_scenario_by_id'),
 
     ### Filter/Scenarios Work
     url(r'get_scenarios/(?P<scenario_model_name>[\w_]+)/$', views.get_scenarios),

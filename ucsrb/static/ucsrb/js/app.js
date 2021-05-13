@@ -842,8 +842,17 @@ $.ajaxSetup({
 
 async function prescriptionApplication(treatment_scenario_id = null) {
     let promise = new Promise(function(resolve, reject) {
+        // Update the state
         app.state.setStep = 'prescription';
         app.state.scenarioId = treatment_scenario_id;
+
+        // Get Treatment Scenario
+        ts = app.request.get_scenario_by_id(treatment_scenario_id)
+
+        // Add prescriptions to map
+        app.map.addPrescriptionApplication(ts.geojson);
+
+        // Rx form
         var html = '<div class="featurepanel">' +
         '<p class="display"><span class="bb">Choose a Prescription</span></p>' +
         '<p><small>Select a polygon<br />Then Choose a Prescription & Save.<br />Repeat Until All Polygons Have A Prescription Applied.</small></p>' +
@@ -981,6 +990,15 @@ app.request = {
         .fail(function(response) {
             console.log(`%cfail @ get scenarios: %o`, 'color: red', response);
         });
+    },
+    get_scenario_by_id: function(id) {
+        return $.ajax(`/ucsrb/get_scenario_by_id/${id}`)
+        .done(function(response) {
+            return response;
+        })
+        .fail(function(response) {
+            console.log(`%cfailed to get scenario by id: %o`, 'color: red', response);
+        })
     },
     /**
     * get stream segments by bounding box

@@ -1201,6 +1201,15 @@ def get_scenarios(request, scenario_model='treatmentscenario'):
     from scenarios.views import get_scenarios as scenarios_get_scenarios
     return scenarios_get_scenarios(request, scenario_model, 'ucsrb')
 
+def get_scenario_by_id(request, ts_id):
+    if request.method == 'GET':
+        from .models import TreatmentScenario
+        from features.registry import get_feature_by_uid
+
+        ts = get_feature_by_uid(ts_id)
+
+    return JsonResponse(json.loads('{"id":%s, "rx_applied":%s, "prescription_treatment_selection":%s, "scenario_geometry":%s}' % (ts.ts_id, ts.rx_applied, ts.prescription_treatment_selection, ts.scenario_geometry.geojson)))
+
 def demo(request, template='ucsrb/demo.html'):
     from scenarios import views as scenarios_views
     return scenarios_views.demo(request, template)
