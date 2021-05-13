@@ -1069,6 +1069,14 @@ Panel
     opacity: 1;
 }
 
+.panel #prescription_application_form label {
+    font-size: .875em;
+}
+
+.panel #prescription_application_form .form-check {
+    padding-left: 2em;
+}
+
 #id_landform_type_checkboxes {
     list-style: none;
     text-align: left;
