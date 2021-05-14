@@ -847,12 +847,12 @@ async function prescriptionApplication(treatment_scenario_id = null) {
         app.state.scenarioId = treatment_scenario_id;
 
         // Get Treatment Scenario
-        app.request.get_scenario_by_id(treatment_scenario_id)
-            .then(function(response) {
-                // Add prescriptions to map
-                app.map.addPrescriptionApplication(response.scenario_geometry);
-            })
+        var rx_info = app.request.get_scenario_by_id(treatment_scenario_id)
 
+        // Add prescriptions to map
+        rx_info.then(function(response) {
+            app.map.addPrescriptionApplication(response);
+        });
 
         // Rx form
         var html = '<div class="featurepanel">' +
@@ -876,7 +876,7 @@ async function prescriptionApplication(treatment_scenario_id = null) {
         '</form>' +
         '</div>';
         app.panel.setContent(html);
-        // setTimeout(() => resolve(), 5000)
+            // setTimeout(() => resolve(), 5000)
     });
     let result = await promise;
     return result;
@@ -996,7 +996,6 @@ app.request = {
     get_scenario_by_id: function(id) {
         return $.ajax({
             url: `/ucsrb/get_scenario_by_id/${id}`,
-            dataType: 'json',
             success: function(response) {
                 return response;
             },

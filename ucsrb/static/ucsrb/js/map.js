@@ -214,17 +214,26 @@ app.map.styles = {
 };
 
 app.map.prescription_colors = [
-    ['rx0', [158, 176, 141, 0.5]],
-    ['rx1', [167, 157, 177, 0.5]],
-    ['rx2', [178, 175, 169, 0.5]],
-    ['rx3', [239, 175, 184, 0.5]],
-    ['rx4', [201, 133, 86, 0.5]]
+    ['notr', [158, 176, 141, 0.5]],
+    ['mb16', [167, 157, 177, 0.5]],
+    ['mb25', [178, 175, 169, 0.5]],
+    ['burn', [239, 175, 184, 0.5]],
+    ['flow', [201, 133, 86, 0.5]]
 ];
 
 app.map.prescription_colors.forEach(function(rx) {
     app.map.styles[rx[0]] = new ol.style.Style({
         fill: new ol.style.Fill({
             color: rx[1]
+        }),
+        image: new ol.style.Circle({
+          radius: 8,
+          stroke: new ol.style.Stroke({
+            color: 'rgba(0, 0, 0, 0.7)'
+          }),
+          fill: new ol.style.Fill({
+            color: rx[1]
+          })
         }),
         zIndex: 2
     })
@@ -736,7 +745,10 @@ app.map.layer = {
     },
     prescriptionApplication: {
         layer: new ol.layer.Vector({
+            name: 'prescription_application',
+            id: 'prescription_application',
             source: new ol.source.Vector(),
+            visible: true,
         })
     },
     resultPoints: {
@@ -849,6 +861,7 @@ for (var i=0; i < app.map.getLayers().getArray().length; i++) {
 
 if (app.map.overlays) {
   app.map.overlays.getLayers().push(app.map.layer.draw.layer);
+  app.map.overlays.getLayers().push(app.map.layer.prescriptionApplication.layer);
   app.map.overlays.getLayers().push(app.map.layer.huc12.layer);
   app.map.overlays.getLayers().push(app.map.layer.huc10.layer);
   app.map.overlays.getLayers().push(app.map.layer.RMU.layer);
@@ -959,15 +972,28 @@ app.map.addScenario = function(vectors) {
   app.map.scenarioLayer.getSource().addFeatures(vectors);
 }
 
-app.map.addPrescriptionApplication = function(features) {
-    features.forEach(function(feature) {
-        let rx_id = feature.get('prescription_treatment_selection').toString().substr(-1);
-        feature.setStyle(app.map.styles[rx_id]);
-    })
-    app.map.layer.prescriptionApplication.source.clear();
-    app.map.layer.prescriptionApplication.getSource().addFeatures(features);
+app.map.addPrescriptionApplication = function(prescription_info) {
+    var geojson = prescription_info.scenario_geometry;
+    var treatment = prescription_info.prescription_treatment_selection;
+    var id =  prescription_info['id'];
+    var source = app.map.layer.prescriptionApplication.layer.getSource();
+
+    for (var i = 0; i < geojson.features[0].geometry[0].length; i++) {
+        var feat = new ol.Feature({
+            geometry: geojson.features[0].geometry[i],
+            name: id
+        });
+        app.map.layer.prescriptionApplication.layer.getSource().addFeatures(feat);
+        feat.setStyle(app.map.styles[treatment]);
+    }
     app.map.layer.prescriptionApplication.layer.setVisible(true);
-    app.map.zoomToExtent(app.map.layer.prescriptionApplication.layer.getSource().getExtent());
+    app.map.prescription_select = new ol.interaction.Select({
+        source: source,
+        style: app.map.styles[treatment]
+    });
+
+    app.map.addInteraction(app.map.prescription_select);
+    // app.map.zoomToExtent(app.map.layer.prescriptionApplication.layer.getSource().getExtent());
 }
 
 app.map.dropPin = function(coords) {
