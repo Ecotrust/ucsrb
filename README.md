@@ -83,6 +83,30 @@ git clone https://github.com/Ecotrust/uc-dhsvm-harness.git
 pip install -e /usr/local/apps/marineplanner-core/apps/uc-dhsvm-harness
 ```
 
+#### NEW: Install Celery and Broker
+```
+sudo apt-get install rabbitmq-server -y
+pip install celery
+
+ln -s /usr/local/apps/marineplanner-core/apps/ucsrb/ucsrb/celery.py /usr/local/apps/marineplanner-core/marineplanner/marineplanner/celery.py
+cat /usr/local/apps/marineplanner-core/apps/ucsrb/ucsrb/__init__.py >> /usr/local/apps/marineplanner-core/marineplanner/marineplanner/__init__.py
+
+sudo adduser celery
+sudo mkdir /var/log/celery
+sudo chown celery:celery /var/log/celery
+sudo mkdir /var/run/celery
+sudo chown celery:celery /var/run/celery
+sudo mkdir /etc/conf.d
+
+cp /usr/local/apps/marineplanner-core/apps/ucsrb/deployment/celery.conf /usr/lib/tmpfiles.d/celery.conf
+cp /usr/local/apps/marineplanner-core/apps/ucsrb/deployment/celery.service /etc/systemd/system/celery.service
+cp /usr/local/apps/marineplanner-core/apps/ucsrb/deployment/celery /etc/conf.d/celery
+
+sudo systemctl enable celery.service
+sudo systemctl daemon-reload
+sudo systemctl start celery.service
+```
+
 #### Set your local settings:
 * Add your mapbox access token tp `MAPBOX_ACCESS_TOKEN`
 * `COMPRESS_ENABLED = False` (for now)
