@@ -1206,9 +1206,26 @@ def get_scenario_by_id(request, ts_id):
         from .models import TreatmentScenario
         from features.registry import get_feature_by_uid
 
-        ts = get_feature_by_uid(ts_id)
-
-    return JsonResponse(json.loads('{"id":%s, "rx_applied":%s, "prescription_treatment_selection":%s, "scenario_geometry":%s}' % (ts.ts_id, ts.rx_applied, ts.prescription_treatment_selection, ts.scenario_geometry.geojson)))
+        ts = get_feature_by_uid(ts_id);
+        geojson = {
+            "type": "FeatureCollection",
+            "features": [{
+                "type": "Feature",
+                "properties": {},
+                "geometry": [
+                    eval(ts.scenario_geometry.geojson)
+                ]
+            }]
+        }
+        return_dict = {
+            "id": ts.id,
+            "rx_applied": ts.rx_applied,
+            "prescription_treatment_selection": ts.prescription_treatment_selection,
+            "scenario_geometry": geojson,
+        }
+        return JsonResponse(return_dict)
+    else:
+        return JsonResponse('Only GET requests allowed')
 
 def demo(request, template='ucsrb/demo.html'):
     from scenarios import views as scenarios_views

@@ -847,10 +847,13 @@ async function prescriptionApplication(treatment_scenario_id = null) {
         app.state.scenarioId = treatment_scenario_id;
 
         // Get Treatment Scenario
-        ts = app.request.get_scenario_by_id(treatment_scenario_id)
+        app.request.get_scenario_by_id(treatment_scenario_id)
+            .then(function(response) {
+                console.log(response)
+                // Add prescriptions to map
+                app.map.addPrescriptionApplication(ts.geojson);
+            })
 
-        // Add prescriptions to map
-        app.map.addPrescriptionApplication(ts.geojson);
 
         // Rx form
         var html = '<div class="featurepanel">' +
@@ -992,12 +995,15 @@ app.request = {
         });
     },
     get_scenario_by_id: function(id) {
-        return $.ajax(`/ucsrb/get_scenario_by_id/${id}`)
-        .done(function(response) {
-            return response;
-        })
-        .fail(function(response) {
-            console.log(`%cfailed to get scenario by id: %o`, 'color: red', response);
+        return $.ajax({
+            url: `/ucsrb/get_scenario_by_id/${id}`,
+            dataType: 'json',
+            success: function(response) {
+                return response;
+            },
+            error: function(response) {
+                console.log(`%cfailed to get scenario by id: %o`, 'color: red', response);
+            }
         })
     },
     /**
