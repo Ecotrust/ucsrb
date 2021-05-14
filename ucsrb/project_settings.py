@@ -207,6 +207,7 @@ INSTALLED_APPS = [
     'dhsvm_harness',
     ### END INSERTED INSTALLED APPS ###
     'ckeditor',
+    'django_celery_results',
 ]
 
 ########################################
@@ -443,7 +444,8 @@ USE_TZ = False
 # CELERY_TIMEZONE = "America/LosAngeles"
 CELERY_TIMEZONE = "US/Pacific"
 CELERY_TASK_TRACK_STARTED = True
-CELERY_RESULT_BACKEND = 'rpc://'
+# CELERY_RESULT_BACKEND = 'rpc://'
+CELERY_RESULT_BACKEND = 'django-db' # Django-Celery-Results
 CELERY_BROKER = 'amqp://localhost'
 # CELERY_RESULT_PERSISTENT = False
 # CELERY_TASK_TIME_LIMIT = 30 * 60
@@ -451,6 +453,7 @@ CELERY_BROKER = 'amqp://localhost'
 #     'ucsrb',
 #     'dhsvm_harness'
 # ]
+MAX_DHSVM_RUN_DURATION = 9000 # in seconds -- 9000 = 2.5 hours
 
 
 try:

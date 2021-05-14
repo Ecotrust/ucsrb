@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.contrib.auth.models import User
 from ucsrb.models import FocusArea, TreatmentScenario
-from dhsvm_harness.utils import runHarnessConfig
+from time import sleep
 
 class Command(BaseCommand):
     help = 'Set Baseline Data. 1 argument - the name of the basin to reset: Entiat, Methow, Okanogan, or Wenatchee'
@@ -49,7 +49,10 @@ class Command(BaseCommand):
             prescription_treatment_selection='notr'
         )
         reset_treatment.save()
-
-        runHarnessConfig(reset_treatment)
-
-        reset_treatment.delete()
+        reset_treatment.run_dhsvm()
+        sleep(1)
+        job = reset_treatment.active_job
+        if job == None:
+            print("Job scheduled for treatment {}".format(reset_treatment.id))
+        else:
+            print("Job running: {}".format(job.task_id))

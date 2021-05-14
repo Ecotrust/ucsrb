@@ -1,12 +1,16 @@
+from celery.task.control import revoke
+from datetime import datetime
 from django.conf import settings
 from django.db import models
 from django.contrib.gis.db import models as gismodels
 from django.contrib.auth.models import User
+from django_celery_results.models import TaskResult
 from features.registry import register
 from features.models import MultiPolygonFeature
 # from scenarios.models import Scenario, PlanningUnit
 from scenarios.models import Scenario
 from threading import Thread
+from ucsrb.tasks import runTreatment
 
 GEOMETRY_DB_SRID = settings.GEOMETRY_DB_SRID
 
@@ -211,6 +215,72 @@ class TreatmentScenario(Scenario):
             return super(type(self), self).run(result)
         return result
 
+    @property
+    def jobs(self):
+        return TaskResult.objects.filter(task_args='"({treatment_id},)"'.format(treatment_id=self.id))
+
+    @property
+    def active_job(self):
+        active_states = [
+            'PENDING',
+            'RECEIVED',
+            'STARTED',
+        ]
+        incomplete_jobs = self.jobs.filter(status__in=active_states)
+        if incomplete_jobs.count() > 1:
+            incomplete_jobs_count = incomplete_jobs.count()
+            for index, job in enumerate(incomplete_jobs.order_by('date_created')):
+                if index < (incomplete_jobs_count - 1):
+                    # Kill Job
+                    revoke(job.task_id, terminate=True)
+                else:
+                    active_job = job
+        elif incomplete_jobs.count() == 1:
+            active_job = incomplete_jobs[0]
+        else: # count == 0
+            active_job = None
+        return active_job
+
+    @property
+    def job(self):
+        active_job = self.active_job
+        if not active_job == None:
+            return active_job
+        else:
+            jobs = self.jobs.order_by('date_created')
+            if jobs.count() > 0:
+                job = jobs[jobs.count()-1]  #get most recently created job
+                return job
+            else:
+                return None
+
+    @property
+    def job_status(self):
+        job = self.job
+        if not job == None:
+            return job.status
+        else:
+            return "None"
+
+    @property
+    def job_age(self):
+        job = self.job
+        if not job == None:
+            return datetime.now() - job.date_created
+        else:
+            return 0
+
+    def run_dhsvm(self):
+        active_job = self.active_job
+        if not active_job == None:
+            if self.job_age.total_seconds() > settings.MAX_DHSVM_RUN_DURATION:
+                revoke(job.task_id, terminate=True)
+                active_job = None
+            # else:
+            #     # TODO: give user option to restart task?
+        if active_job == None:
+            runTreatment.delay(self.id)
+
     def aggregate_results(self):
         vpus = self.run_filters(None) # There seems to be no need for passing a query here.
         # pu_ids = [int(x) for x in self.planning_units.split(',')]
@@ -306,8 +376,7 @@ class TreatmentScenario(Scenario):
     def set_report(self):
         self.aggregate_report = self.aggregate_results()
         self.save()
-        from dhsvm_harness.utils import runHarnessConfig
-        Thread(target=runHarnessConfig, args=(self,)).start()
+        self.run_dhsvm()
 
     @property
     def veg_units(self):
