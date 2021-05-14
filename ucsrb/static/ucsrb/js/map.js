@@ -978,19 +978,19 @@ app.map.addPrescriptionApplication = function(prescription_info) {
     var id =  prescription_info['id'];
     var source = app.map.layer.prescriptionApplication.layer.getSource();
 
-    for (var i = 0; i < geojson.features[0].geometry[0].length; i++) {
-        var feat = new ol.Feature({
-            geometry: geojson.features[0].geometry[i],
+    for (var i = 0; i < geojson.features[0].geometry[0].geometries.length; i++) {
+        app.map.rx_feature = new ol.Feature({
+            geometry: new ol.geom.MultiPolygon(geojson.features[0].geometry[0].geometries[i].coordinates),
             name: id
         });
-        app.map.layer.prescriptionApplication.layer.getSource().addFeatures(feat);
-        feat.setStyle(app.map.styles[treatment]);
     }
-    app.map.layer.prescriptionApplication.layer.setVisible(true);
+    app.map.rx_feature.setStyle(app.map.styles[treatment]);
+    app.map.layer.prescriptionApplication.layer.getSource().addFeatures(app.map.rx_feature);
     app.map.prescription_select = new ol.interaction.Select({
         source: source,
         style: app.map.styles[treatment]
     });
+    app.map.layer.prescriptionApplication.layer.setVisible(true);
 
     app.map.addInteraction(app.map.prescription_select);
     // app.map.zoomToExtent(app.map.layer.prescriptionApplication.layer.getSource().getExtent());
