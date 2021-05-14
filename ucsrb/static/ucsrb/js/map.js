@@ -961,7 +961,7 @@ app.map.addScenario = function(vectors) {
 
 app.map.addPrescriptionApplication = function(features) {
     features.forEach(function(feature) {
-        let rx_id = feature.get('prescription_id').toString().substr(-1);
+        let rx_id = feature.get('prescription_treatment_selection').toString().substr(-1);
         feature.setStyle(app.map.styles[rx_id]);
     })
     app.map.layer.prescriptionApplication.source.clear();

@@ -1211,7 +1211,11 @@ def get_scenario_by_id(request, ts_id):
             "type": "FeatureCollection",
             "features": [{
                 "type": "Feature",
-                "properties": {},
+                "properties": {
+                    "id": ts.id,
+                    "prescription_treatment_selection": ts.prescription_treatment_selection,
+                    "rx_applied": ts.rx_applied,
+                },
                 "geometry": [
                     eval(ts.scenario_geometry.geojson)
                 ]

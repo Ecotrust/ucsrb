@@ -849,9 +849,8 @@ async function prescriptionApplication(treatment_scenario_id = null) {
         // Get Treatment Scenario
         app.request.get_scenario_by_id(treatment_scenario_id)
             .then(function(response) {
-                console.log(response)
                 // Add prescriptions to map
-                app.map.addPrescriptionApplication(ts.geojson);
+                app.map.addPrescriptionApplication(response.scenario_geometry);
             })
 
 
