@@ -853,7 +853,9 @@ async function prescriptionApplication(treatment_scenario_id = null) {
         rx_info.then(function(response) {
             app.map.addPrescriptionApplication(response);
         });
-
+        rx_info.then(function(response) {
+            app.map.addPrescriptionSelection(response);
+        });
         rx_info.then(function(response) {
             // Rx form
             var html = '<div class="featurepanel">' + response.id +

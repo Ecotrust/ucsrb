@@ -214,11 +214,11 @@ app.map.styles = {
 };
 
 app.map.prescription_colors = [
-    ['notr', [158, 176, 141, 0.5]],
-    ['mb16', [167, 157, 177, 0.5]],
-    ['mb25', [178, 175, 169, 0.5]],
-    ['burn', [239, 175, 184, 0.5]],
-    ['flow', [201, 133, 86, 0.5]]
+    ['notr', [158, 176, 141, 0.8]],
+    ['mb16', [167, 157, 177, 0.8]],
+    ['mb25', [178, 175, 169, 0.8]],
+    ['burn', [239, 175, 184, 0.8]],
+    ['flow', [201, 133, 86, 0.8]]
 ];
 
 app.map.prescription_colors.forEach(function(rx) {
@@ -743,14 +743,6 @@ app.map.layer = {
         style: app.map.styles.LineStringSelected
       })
     },
-    prescriptionApplication: {
-        layer: new ol.layer.Vector({
-            name: 'prescription_application',
-            id: 'prescription_application',
-            source: new ol.source.Vector(),
-            visible: true,
-        })
-    },
     resultPoints: {
       layer: new ol.layer.Vector({
         source: new ol.source.Vector({
@@ -861,7 +853,6 @@ for (var i=0; i < app.map.getLayers().getArray().length; i++) {
 
 if (app.map.overlays) {
   app.map.overlays.getLayers().push(app.map.layer.draw.layer);
-  app.map.overlays.getLayers().push(app.map.layer.prescriptionApplication.layer);
   app.map.overlays.getLayers().push(app.map.layer.huc12.layer);
   app.map.overlays.getLayers().push(app.map.layer.huc10.layer);
   app.map.overlays.getLayers().push(app.map.layer.RMU.layer);
@@ -976,24 +967,48 @@ app.map.addPrescriptionApplication = function(prescription_info) {
     var geojson = prescription_info.scenario_geometry;
     var treatment = prescription_info.prescription_treatment_selection;
     var id =  prescription_info['id'];
-    var source = app.map.layer.prescriptionApplication.layer.getSource();
+
+    app.map.rx_feature = [];
+    app.map.rxFeatures = new ol.Collection();
+
+    var source = new ol.source.Vector({
+        features: app.map.rxFeatures
+    });
 
     for (var i = 0; i < geojson.features[0].geometry[0].geometries.length; i++) {
-        app.map.rx_feature = new ol.Feature({
+        app.map.rx_feature[i] = new ol.Feature({
             geometry: new ol.geom.MultiPolygon(geojson.features[0].geometry[0].geometries[i].coordinates),
             name: id
         });
+        app.map.stylePrescriptionPolygon(app.map.rx_feature[i], treatment)
+        app.map.rxFeatures.push(app.map.rx_feature[i]);
     }
-    app.map.rx_feature.setStyle(app.map.styles[treatment]);
-    app.map.layer.prescriptionApplication.layer.getSource().addFeatures(app.map.rx_feature);
-    app.map.prescription_select = new ol.interaction.Select({
+
+    var mapPrescriptionLayer = new ol.layer.Vector({
         source: source,
+        name: 'prescription_application',
+        id: 'prescription_application',
+        visible: true,
+        zIndex: 8
+    });
+    app.map.addLayer(mapPrescriptionLayer);
+    mapPrescriptionLayer.setVisible(true);
+    app.map.zoomToExtent(source.getExtent());
+}
+
+app.map.stylePrescriptionPolygon = function(rx_feature, treatment) {
+    return rx_feature.setStyle(app.map.styles[treatment]);
+}
+
+app.map.addPrescriptionSelection = function(prescription_info) {
+    var treatment = prescription_info.prescription_treatment_selection;
+
+    app.map.prescription_select = new ol.interaction.Select({
+        source: app.map.rxSource,
         style: app.map.styles[treatment]
     });
-    app.map.layer.prescriptionApplication.layer.setVisible(true);
 
     app.map.addInteraction(app.map.prescription_select);
-    // app.map.zoomToExtent(app.map.layer.prescriptionApplication.layer.getSource().getExtent());
 }
 
 app.map.dropPin = function(coords) {
