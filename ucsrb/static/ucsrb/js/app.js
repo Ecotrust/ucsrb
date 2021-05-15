@@ -242,7 +242,9 @@ app.panel = {
             initFiltering();
         },
     },
-    applyPrescription: function(prescription_choice) {
+    applyPrescription: function(e, prescription_choice) {
+        e.preventDefault();
+        console.log(this);
         alert('Assing rx to a polygon. chosen:' + prescription_choice)
     },
     summary: {
@@ -863,7 +865,7 @@ async function prescriptionApplication(treatment_scenario_id = null) {
             '<p><small>Select a polygon<br />Then Choose a Prescription & Save.<br />Repeat Until All Polygons Have A Prescription Applied.</small></p>' +
             '<p>- OR -</p>' +
             '<p><small>Apply A Single Prescription To All Polygons By Choosing a Prescription & Saving.</small></p>' +
-            '<form id="prescription_application_form" onsubmit="app.panel.prescription.applyPrescription(); return false;">' +
+            '<form id="prescription_application_form" onsubmit="event.preventDefault(); app.panel.prescription.applyPrescription();">' +
             '<fieldset class="form-group"><div class="row"><legend class="col-form-label col-sm-12 pt-0">Prescription</legend></div>' +
             '<div class="row"><div id="id_prescription_treatment_selection" class="prescription-choices col-sm-10">' +
             '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_0" value="notr" checked><label class="form-check-label" for="id_prescription_treatment_selection_0">No Treatment scenario</label></div>' +
