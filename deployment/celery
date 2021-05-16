@@ -18,7 +18,8 @@ CELERY_APP="marineplanner"
 CELERYD_MULTI="multi"
 
 # Extra command-line arguments to the worker
-CELERYD_OPTS="--time-limit=9000 --concurrency=0"
+CELERYD_OPTS="--time-limit=9000 --concurrency=0 --pool=solo"
+CELERY_BROKER_POOL_LIMIT=1
 
 # - %n will be replaced with the first part of the nodename.
 # - %I will be replaced with the current child process index
