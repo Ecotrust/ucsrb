@@ -971,10 +971,6 @@ app.map.addPrescriptionApplication = function(prescription_info) {
     app.map.rx_feature = [];
     app.map.rxFeatures = new ol.Collection();
 
-    var source = new ol.source.Vector({
-        features: app.map.rxFeatures
-    });
-
     for (var i = 0; i < geojson.features[0].geometry[0].geometries.length; i++) {
         app.map.rx_feature[i] = new ol.Feature({
             geometry: new ol.geom.MultiPolygon(geojson.features[0].geometry[0].geometries[i].coordinates),
@@ -984,27 +980,37 @@ app.map.addPrescriptionApplication = function(prescription_info) {
         app.map.rxFeatures.push(app.map.rx_feature[i]);
     }
 
-    var mapPrescriptionLayer = new ol.layer.Vector({
-        source: source,
+    app.map.prescriptionSource = new ol.source.Vector({
+        features: app.map.rxFeatures
+    });
+
+    app.map.mapPrescriptionLayer = new ol.layer.Vector({
+        source: app.map.prescriptionSource,
         name: 'prescription_application',
         id: 'prescription_application',
         visible: true,
         zIndex: 8
     });
-    app.map.addLayer(mapPrescriptionLayer);
-    mapPrescriptionLayer.setVisible(true);
-    app.map.zoomToExtent(source.getExtent());
+    app.map.addLayer(app.map.mapPrescriptionLayer);
+    app.map.zoomToExtent(app.map.prescriptionSource.getExtent());
 }
 
 app.map.stylePrescriptionPolygon = function(rx_feature, treatment) {
     return rx_feature.setStyle(app.map.styles[treatment]);
 }
 
+// Prescription application select interaction reference
+app.map.selectPrescriptionApplication = null;
+
 app.map.addPrescriptionSelection = function(prescription_info) {
+    if (app.map.selectPrescriptionApplication !== null) {
+        app.map.removeInteraction(app.map.selectPrescriptionApplication)
+    }
     var treatment = prescription_info.prescription_treatment_selection;
 
     app.map.prescription_select = new ol.interaction.Select({
-        source: app.map.rxSource,
+        source: app.map.prescriptionSource,
+        condition: ol.events.condition.click,
         style: app.map.styles[treatment]
     });
 

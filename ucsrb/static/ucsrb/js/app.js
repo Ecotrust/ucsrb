@@ -242,10 +242,11 @@ app.panel = {
             initFiltering();
         },
     },
-    applyPrescription: function(e, prescription_choice) {
-        e.preventDefault();
-        console.log(this);
-        alert('Assing rx to a polygon. chosen:' + prescription_choice)
+    prescription: {
+        applyPrescription: function(prescription_choice) {
+            console.log(this);
+            alert('Assing rx to a polygon. chosen:' + prescription_choice)
+        }
     },
     summary: {
         init: function() {
@@ -865,7 +866,7 @@ async function prescriptionApplication(treatment_scenario_id = null) {
             '<p><small>Select a polygon<br />Then Choose a Prescription & Save.<br />Repeat Until All Polygons Have A Prescription Applied.</small></p>' +
             '<p>- OR -</p>' +
             '<p><small>Apply A Single Prescription To All Polygons By Choosing a Prescription & Saving.</small></p>' +
-            '<form id="prescription_application_form" onsubmit="event.preventDefault(); app.panel.prescription.applyPrescription();">' +
+            '<form id="prescription_application_form">' +
             '<fieldset class="form-group"><div class="row"><legend class="col-form-label col-sm-12 pt-0">Prescription</legend></div>' +
             '<div class="row"><div id="id_prescription_treatment_selection" class="prescription-choices col-sm-10">' +
             '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_0" value="notr" checked><label class="form-check-label" for="id_prescription_treatment_selection_0">No Treatment scenario</label></div>' +
@@ -875,16 +876,23 @@ async function prescriptionApplication(treatment_scenario_id = null) {
             '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_4" value="flow"><label class="form-check-label" for="id_prescription_treatment_selection_4">Ideal Water scenario</label></div>' +
             '</div></fieldset>' +
             '<div class="btn-toolbar justify-content-between drawing-buttons">' +
+            '<button type="submit" class="btn btn-primary">Apply</button>' +
             // '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
             '<button type="submit" class="btn btn-primary">Apply</button>' +
             '</div>' +
             '</form>' +
             '</div>';
             app.panel.setContent(html);
-                // setTimeout(() => resolve(), 5000)
-        })
 
+            $('#prescription_application_form').on('submit', function(e) {
+                e.preventDefault();
+                chosen_prescription = this.elements['prescription_treatment_selection'].value;
+                app.panel.prescription.applyPrescription(chosen_prescription);
+            });
+            // setTimeout(() => resolve(), 5000)
+        })
     });
+
     let result = await promise;
     return result;
 }
