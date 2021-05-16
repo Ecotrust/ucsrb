@@ -974,7 +974,11 @@ app.map.addPrescriptionApplication = function(prescription_info) {
     for (var i = 0; i < geojson.features[0].geometry[0].geometries.length; i++) {
         app.map.rx_feature[i] = new ol.Feature({
             geometry: new ol.geom.MultiPolygon(geojson.features[0].geometry[0].geometries[i].coordinates),
-            name: id
+            name: id,
+            properties: {
+                treatment: treatment,
+                id: id
+            }
         });
         app.map.stylePrescriptionPolygon(app.map.rx_feature[i], treatment)
         app.map.rxFeatures.push(app.map.rx_feature[i]);
@@ -1006,6 +1010,7 @@ app.map.addPrescriptionSelection = function(prescription_info) {
     if (app.map.selectPrescriptionApplication !== null) {
         app.map.removeInteraction(app.map.selectPrescriptionApplication)
     }
+
     var treatment = prescription_info.prescription_treatment_selection;
 
     app.map.prescription_select = new ol.interaction.Select({
