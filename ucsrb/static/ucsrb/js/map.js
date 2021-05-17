@@ -1023,7 +1023,7 @@ app.map.addPrescriptionSelection = function(treatment) {
 
     // Add rx interaction
     app.map.addInteraction(app.map.prescription_select);
-    app.map,prescription_select.setActive(true);
+    app.map.prescription_select.setActive(true);
 
 
     app.map.prescription_select.on('select', function(e) {
@@ -1032,6 +1032,12 @@ app.map.addPrescriptionSelection = function(treatment) {
 }
 
 app.map.applyPrescription = function(chosen_prescription) {
+    // Get current chosen polygon
+    app.map.prescription_select.getFeatures().array_.forEach(function(feature) {
+        feature.getProperties().properties.treatment = chosen_prescription;
+        app.map.stylePrescriptionPolygon(feature, chosen_prescription)
+    });
+
     // Make sure the rx selection layer is active
     if (app.map.prescription_select === null) {
         app.map.addPrescriptionSelection(chosen_prescription);

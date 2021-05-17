@@ -244,7 +244,6 @@ app.panel = {
     },
     prescription: {
         applyPrescription: function(prescription_choice) {
-            console.log(this);
             alert('Assing rx to a polygon. chosen:' + prescription_choice)
         },
         addPrescriptionForm: function(applyToAll) {
@@ -892,6 +891,24 @@ async function prescriptionApplication(treatment_scenario_id = null) {
             app.map.addPrescriptionApplication(response);
         });
         rx_info.then(function(response) {
+            window.setTimeout(function() {
+                var html = '<div class="featurepanel">'+
+                '<p class="display"><span class="bb">Select A Polygon</span></p>' +
+                '<p>Click a polygon to choose a prescription application</p>' +
+                '<button id="apply-prescription-to-all" class="btn btn-primary">Apply Single Prescription To All</button>' +
+                '</div>';
+
+                app.panel.setContent(html);
+
+                $('#apply-prescription-to-all').on('click', function(e) {
+                    e.preventDefault();
+                    applyToAll = True;
+                    app.panel.prescription.addPrescriptionForm(applyToAll);
+                });
+            }, 500);
+
+        });
+        rx_info.then(function(response) {
             if (response.prescription_treatment_selection.length > 0) { // Use chosen Rx for styling rx applications
                 var prescription_chosen = response.prescription_treatment_selection;
             } else { // If no chosen Rx available use the notr style
@@ -900,18 +917,8 @@ async function prescriptionApplication(treatment_scenario_id = null) {
             app.map.addPrescriptionSelection(prescription_chosen);
         });
         rx_info.then(function(response) {
-            var html = '<div class="featurepanel">'+
-            '<p class="display"><span class="bb">Select A Polygon</span></p>' +
-            '<p>Click a polygon to choose a prescription application</p>' +
-            '<button id="apply-prescription-to-all">Apply Single Prescription To All</button>';
-
-            $('#apply-prescription-to-all').on('click', function(e) {
-                e.preventDefault();
-                applyToAll = True;
-                app.panel.prescription.addPrescriptionForm(applyToAll);
-            });
             // setTimeout(() => resolve(), 5000)
-        })
+        });
     });
 
     let result = await promise;
