@@ -247,7 +247,10 @@ app.panel = {
             console.log(this);
             alert('Assing rx to a polygon. chosen:' + prescription_choice)
         },
-        addPrescriptionForm: function() {
+        addPrescriptionForm: function(applyToAll) {
+            if (applyToAll) {
+                var applyToAll = 'checked';
+            }
             // Rx form
             var html = '<div class="featurepanel">'+
             '<p class="display"><span class="bb">Choose a Prescription</span></p>' +
@@ -263,6 +266,7 @@ app.panel = {
             '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_3" value="burn"><label class="form-check-label" for="id_prescription_treatment_selection_3">Burn Only scenario</label></div>' +
             '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_4" value="flow"><label class="form-check-label" for="id_prescription_treatment_selection_4">Ideal Water scenario</label></div>' +
             '</div></fieldset>' +
+            '<input id="apply-to-all" name="apply_to_all" style="visibility: hidden;" ' + applyToAll + ' />' +
             '<div class="btn-toolbar justify-content-between drawing-buttons">' +
             '<button type="submit" class="btn btn-primary">Apply</button>' +
             // '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
@@ -896,7 +900,16 @@ async function prescriptionApplication(treatment_scenario_id = null) {
             app.map.addPrescriptionSelection(prescription_chosen);
         });
         rx_info.then(function(response) {
+            var html = '<div class="featurepanel">'+
+            '<p class="display"><span class="bb">Select A Polygon</span></p>' +
+            '<p>Click a polygon to choose a prescription application</p>' +
+            '<button id="apply-prescription-to-all">Apply Single Prescription To All</button>';
 
+            $('#apply-prescription-to-all').on('click', function(e) {
+                e.preventDefault();
+                applyToAll = True;
+                app.panel.prescription.addPrescriptionForm(applyToAll);
+            });
             // setTimeout(() => resolve(), 5000)
         })
     });

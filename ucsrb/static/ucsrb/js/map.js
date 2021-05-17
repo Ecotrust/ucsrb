@@ -963,13 +963,25 @@ app.map.addScenario = function(vectors) {
   app.map.scenarioLayer.getSource().addFeatures(vectors);
 }
 
+const prescriptionFeatures = new ol.Collection();
+const prescriptionSource = new ol.source.Vector({
+    features: prescriptionFeatures,
+    projection: 'EPSG:3857'
+});
+const prescriptionLayer = new ol.layer.Vector({
+    source: prescriptionSource,
+    name: 'prescription_application',
+    id: 'prescription_application',
+    visible: true,
+    zIndex: 8
+});
+
 app.map.addPrescriptionApplication = function(prescription_info) {
     var geojson = prescription_info.scenario_geometry;
     var treatment = prescription_info.prescription_treatment_selection;
     var id =  prescription_info['id'];
 
     app.map.rx_feature = [];
-    app.map.rxFeatures = new ol.Collection();
 
     for (var i = 0; i < geojson.features[0].geometry[0].geometries.length; i++) {
         app.map.rx_feature[i] = new ol.Feature({
@@ -981,22 +993,11 @@ app.map.addPrescriptionApplication = function(prescription_info) {
             }
         });
         app.map.stylePrescriptionPolygon(app.map.rx_feature[i], treatment)
-        app.map.rxFeatures.push(app.map.rx_feature[i]);
+        prescriptionFeatures.push(app.map.rx_feature[i]);
     }
 
-    app.map.prescriptionSource = new ol.source.Vector({
-        features: app.map.rxFeatures
-    });
-
-    app.map.mapPrescriptionLayer = new ol.layer.Vector({
-        source: app.map.prescriptionSource,
-        name: 'prescription_application',
-        id: 'prescription_application',
-        visible: true,
-        zIndex: 8
-    });
-    app.map.addLayer(app.map.mapPrescriptionLayer);
-    app.map.zoomToExtent(app.map.prescriptionSource.getExtent());
+    app.map.addLayer(prescriptionLayer);
+    // app.map.zoomToExtent(prescriptionSource.getExtent());
 }
 
 app.map.stylePrescriptionPolygon = function(rx_feature, treatment) {
@@ -1012,12 +1013,18 @@ app.map.addPrescriptionSelection = function(treatment) {
     }
 
     app.map.prescription_select = new ol.interaction.Select({
-        source: app.map.prescriptionSource,
+        source: prescriptionSource,
         condition: ol.events.condition.click,
         style: app.map.styles[treatment]
     });
 
+    // deactivate other interactions
+    app.map.selection.select.setActive(false);
+
+    // Add rx interaction
     app.map.addInteraction(app.map.prescription_select);
+    app.map,prescription_select.setActive(true);
+
 
     app.map.prescription_select.on('select', function(e) {
         app.panel.prescription.addPrescriptionForm();
