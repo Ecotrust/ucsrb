@@ -1004,14 +1004,12 @@ app.map.stylePrescriptionPolygon = function(rx_feature, treatment) {
 }
 
 // Prescription application select interaction reference
-app.map.selectPrescriptionApplication = null;
+app.map.prescription_select = null;
 
-app.map.addPrescriptionSelection = function(prescription_info) {
-    if (app.map.selectPrescriptionApplication !== null) {
+app.map.addPrescriptionSelection = function(treatment) {
+    if (app.map.prescription_select !== null) {
         app.map.removeInteraction(app.map.selectPrescriptionApplication)
     }
-
-    var treatment = prescription_info.prescription_treatment_selection;
 
     app.map.prescription_select = new ol.interaction.Select({
         source: app.map.prescriptionSource,
@@ -1020,6 +1018,17 @@ app.map.addPrescriptionSelection = function(prescription_info) {
     });
 
     app.map.addInteraction(app.map.prescription_select);
+
+    app.map.prescription_select.on('select', function(e) {
+        app.panel.prescription.addPrescriptionForm();
+    });
+}
+
+app.map.applyPrescription = function(chosen_prescription) {
+    // Make sure the rx selection layer is active
+    if (app.map.prescription_select === null) {
+        app.map.addPrescriptionSelection(chosen_prescription);
+    }
 }
 
 app.map.dropPin = function(coords) {

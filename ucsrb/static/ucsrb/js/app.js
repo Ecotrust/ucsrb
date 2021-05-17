@@ -246,6 +246,37 @@ app.panel = {
         applyPrescription: function(prescription_choice) {
             console.log(this);
             alert('Assing rx to a polygon. chosen:' + prescription_choice)
+        },
+        addPrescriptionForm: function() {
+            // Rx form
+            var html = '<div class="featurepanel">'+
+            '<p class="display"><span class="bb">Choose a Prescription</span></p>' +
+            '<p><small>Select a polygon<br />Then Choose a Prescription & Save.<br />Repeat Until All Polygons Have A Prescription Applied.</small></p>' +
+            '<p>- OR -</p>' +
+            '<p><small>Apply A Single Prescription To All Polygons By Choosing a Prescription & Saving.</small></p>' +
+            '<form id="prescription_application_form">' +
+            '<fieldset class="form-group"><div class="row"><legend class="col-form-label col-sm-12 pt-0">Prescription</legend></div>' +
+            '<div class="row"><div id="id_prescription_treatment_selection" class="prescription-choices col-sm-10">' +
+            '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_0" value="notr"><label class="form-check-label" for="id_prescription_treatment_selection_0">No Treatment scenario</label></div>' +
+            '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_1" value="mb16"><label class="form-check-label" for="id_prescription_treatment_selection_1">Maximum Biomass 16 inch scenario</label></div>' +
+            '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_2" value="mb25"><label class="form-check-label" for="id_prescription_treatment_selection_2">Maximum Biomass 25 inch scenario</label></div>' +
+            '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_3" value="burn"><label class="form-check-label" for="id_prescription_treatment_selection_3">Burn Only scenario</label></div>' +
+            '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_4" value="flow"><label class="form-check-label" for="id_prescription_treatment_selection_4">Ideal Water scenario</label></div>' +
+            '</div></fieldset>' +
+            '<div class="btn-toolbar justify-content-between drawing-buttons">' +
+            '<button type="submit" class="btn btn-primary">Apply</button>' +
+            // '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
+            '</div>' +
+            '</form>' +
+            '</div>';
+            app.panel.setContent(html);
+
+            $('#prescription_application_form').on('submit', function(e) {
+                e.preventDefault();
+                chosen_prescription = this.elements['prescription_treatment_selection'].value;
+                app.panel.prescription.applyPrescription(chosen_prescription);
+                app.map.applyPrescription(chosen_prescription);
+            });
         }
     },
     summary: {
@@ -857,38 +888,15 @@ async function prescriptionApplication(treatment_scenario_id = null) {
             app.map.addPrescriptionApplication(response);
         });
         rx_info.then(function(response) {
-            app.map.addPrescriptionSelection(response);
+            if (response.prescription_treatment_selection.length > 0) { // Use chosen Rx for styling rx applications
+                var prescription_chosen = response.prescription_treatment_selection;
+            } else { // If no chosen Rx available use the notr style
+                var prescription_chosen = 'notr';
+            }
+            app.map.addPrescriptionSelection(prescription_chosen);
         });
         rx_info.then(function(response) {
-            // Rx form
-            var html = '<div class="featurepanel">' + response.id +
-            '<p class="display"><span class="bb">Choose a Prescription</span></p>' +
-            '<p><small>Select a polygon<br />Then Choose a Prescription & Save.<br />Repeat Until All Polygons Have A Prescription Applied.</small></p>' +
-            '<p>- OR -</p>' +
-            '<p><small>Apply A Single Prescription To All Polygons By Choosing a Prescription & Saving.</small></p>' +
-            '<form id="prescription_application_form">' +
-            '<fieldset class="form-group"><div class="row"><legend class="col-form-label col-sm-12 pt-0">Prescription</legend></div>' +
-            '<div class="row"><div id="id_prescription_treatment_selection" class="prescription-choices col-sm-10">' +
-            '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_0" value="notr" checked><label class="form-check-label" for="id_prescription_treatment_selection_0">No Treatment scenario</label></div>' +
-            '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_1" value="mb16"><label class="form-check-label" for="id_prescription_treatment_selection_1">Maximum Biomass 16 inch scenario</label></div>' +
-            '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_2" value="mb25"><label class="form-check-label" for="id_prescription_treatment_selection_2">Maximum Biomass 25 inch scenario</label></div>' +
-            '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_3" value="burn"><label class="form-check-label" for="id_prescription_treatment_selection_3">Burn Only scenario</label></div>' +
-            '<div class="form-check"><input class="form-check-input prescription-choices" type="radio" name="prescription_treatment_selection" id="id_prescription_treatment_selection_4" value="flow"><label class="form-check-label" for="id_prescription_treatment_selection_4">Ideal Water scenario</label></div>' +
-            '</div></fieldset>' +
-            '<div class="btn-toolbar justify-content-between drawing-buttons">' +
-            '<button type="submit" class="btn btn-primary">Apply</button>' +
-            // '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
-            '<button type="submit" class="btn btn-primary">Apply</button>' +
-            '</div>' +
-            '</form>' +
-            '</div>';
-            app.panel.setContent(html);
 
-            $('#prescription_application_form').on('submit', function(e) {
-                e.preventDefault();
-                chosen_prescription = this.elements['prescription_treatment_selection'].value;
-                app.panel.prescription.applyPrescription(chosen_prescription);
-            });
             // setTimeout(() => resolve(), 5000)
         })
     });
