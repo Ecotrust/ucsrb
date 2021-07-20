@@ -85,8 +85,17 @@ pip install -e /usr/local/apps/marineplanner-core/apps/uc-dhsvm-harness
 
 #### NEW: Install Celery and Broker
 ```
-sudo apt-get install rabbitmq-server -y
+sudo apt install redis-server -y
+sudo vim /etc/redis/redis.conf
+```
+
+Update the `supervised` setting to read: `supervised systemd`
+
+```
+sudo systemctl restart redis.service
+pip install redis
 pip install celery
+pip install django-celery-results
 
 ln -s /usr/local/apps/marineplanner-core/apps/ucsrb/ucsrb/celery.py /usr/local/apps/marineplanner-core/marineplanner/marineplanner/celery.py
 cat /usr/local/apps/marineplanner-core/apps/ucsrb/ucsrb/__init__.py >> /usr/local/apps/marineplanner-core/marineplanner/marineplanner/__init__.py
