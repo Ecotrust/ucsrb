@@ -202,14 +202,14 @@ ANONYMOUS_USER_PK = 2
 sudo apt-get install nginx uwsgi uwsgi-plugin-python3 -y
 pip install uwsgi
 
-sudo cp /usr/local/apps/marineplanner-core/deployment/marineplanner_nginx.conf /etc/nginx/sites-available/marineplanner
+sudo cp /usr/local/apps/marineplanner-core/apps/ucsrb/deployment/marineplanner_nginx.conf /etc/nginx/sites-available/marineplanner
 sudo rm /etc/nginx/sites-enabled/default
 sudo ln -s /etc/nginx/sites-available/marineplanner /etc/nginx/sites-enabled/marineplanner
 sudo cp /usr/local/apps/marineplanner-core/deployment/uwsgi_params /etc/nginx/
 
 sudo cp /usr/local/apps/marineplanner-core/deployment/emperor.ini /etc/uwsgi/
 sudo ln -s /usr/local/apps/marineplanner-core/deployment/uwsgi.service /etc/systemd/system/
-sudo ln -s /usr/local/apps/marineplanner-core/deployment/marineplanner.ini /etc/uwsgi/apps-enabled/
+sudo ln -s /usr/local/apps/marineplanner-core/apps/ucsrb/deployment/marineplanner.ini /etc/uwsgi/apps-enabled/
 
 sudo chmod +x /usr/local/apps/marineplanner-core/deployment/restart_nginx.sh
 
