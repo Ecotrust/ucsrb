@@ -257,7 +257,7 @@ app.panel = {
         responseResultById: function(result) {
             app.panel.results.aggPanel(result);
             app.init['aggregate']();
-            app.panel.results.hydroPanel('Select a gauging station to see hydrologic results.');
+            // app.panel.results.hydroPanel('Select a gauging station to see hydrologic results.');
         },
         loadHydroResult: function(result) {
             app.panel.results.hydroPanel(result);
@@ -878,16 +878,81 @@ app.request = {
         },
         dataType: 'json',
         success: function(response) {
+          if ($('#hydro-note').hasClass('show')) {
+            update_hydro = true;
+          } else {
+            update_hydro = false;
+          }
           if (response.progress == 100) {
             app.panel.results.hydroPanel('<p>Select a gauging station to see hydrologic results.</p>');
           } else {
+            // The job needs about 75 seconds before spitting out results for a small job.
+            if (response.age > 75) {
+              response.age = response.age-75;
+            }
+            var seconds_per_percent = response.age/response.progress;
+            var remaining_percent = 100-response.progress;
+            var seconds_remaining = Math.round(seconds_per_percent*remaining_percent);
+            var days_remaining = 0;
+            var seconds_per_day = 60*60*24;
+            if (seconds_remaining > seconds_per_day) {
+              days_remaining = Math.floor(seconds_remaining/seconds_per_day);
+              seconds_remaining = seconds_remaining - (days_remaining*seconds_per_day)
+            }
+            var hours_remaining = 0;
+            var seconds_per_hour = 60*60;
+            if (seconds_remaining > seconds_per_hour) {
+              hours_remaining = Math.floor(seconds_remaining/seconds_per_hour);
+              seconds_remaining = seconds_remaining - (hours_remaining*seconds_per_hour)
+            }
+            var minutes_remaining = 0;
+            var seconds_per_minute = 60;
+            if (seconds_remaining > seconds_per_minute) {
+              minutes_remaining = Math.floor(seconds_remaining/seconds_per_minute);
+              seconds_remaining = seconds_remaining - (minutes_remaining*seconds_per_minute)
+            }
+            var time_remaining_list = [];
+            if (days_remaining) {
+              time_remaining_list.push(days_remaining + ' Days');
+            }
+            if (hours_remaining) {
+              time_remaining_list.push(hours_remaining + ' Hours');
+            }
+            if (minutes_remaining) {
+              time_remaining_list.push(minutes_remaining + ' Minutes');
+            }
+            if (seconds_remaining && !days_remaining) {
+              time_remaining_list.push(seconds_remaining + ' Seconds');
+            }
+            if (response.progress>1) {
+              var time_remaining = time_remaining_list.join(' ');
+            } else {
+              var time_remaining = 'Calculating...';
+            }
+            if ($('#hydro-note').hasClass('show')) {
+              update_hydro = true;
+            } else {
+              update_hydro = false;
+            }
             app.panel.results.hydroPanel(
-              '<p>Your hyrdological model run is still running with a status of: "' +
-              response.status +
-              '"</p><p>Progress: ' + response.progress + '%</p><button class="btn btn-primary" onclick="app.request.get_job_status(\'' +
-              id + '\')">Refresh</button>');
+              '<h3>Flow Results</h3>' +
+              '<p>' + response.status + '</p>' +
+              '<div class="hydro-progress progress">' +
+              '  <div class="progress-bar progress-bar-striped progress-bar-animated" '+
+              'role="progressbar" style="width: ' +
+              response.progress + '%;" aria-valuenow="' + response.progress +
+              '" aria-valuemin="0" aria-valuemax="100">' + response.progress +
+              '%</div>' +
+              '</div>' +
+              '<p>Estimated time remaining: <br/>' + time_remaining + '</p>'
+            );
+            window.setTimeout(function(){
+              app.request.get_job_status(id);
+            }, 5000);
           }
-          app.panel.results.showHydro();
+          if (update_hydro) {
+            app.panel.results.showHydro();
+          }
         },
         error: function(response) {
           console.log(`%cfail @ get treatment scenario status: %o`, 'color: red', response);

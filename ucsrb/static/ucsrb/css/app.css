@@ -860,6 +860,7 @@ Panel
     background: rgba(255,255,255,1);
     left: .5rem;
     right: auto;
+    overflow-x: hidden;
 }
 #panel.right {
     background: rgba(255,255,255,0.9);
@@ -1245,11 +1246,23 @@ Panel
         margin-bottom: 0;
     }
 
-    #hydro-note div {
+    #hydro-note > div {
       height: 64vh;
       font-size: 1.5em;
       padding: 7vh;
       text-align: center;
+    }
+
+    .hydro-progress.progress {
+      height: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .hydro-progress > .progress-bar {
+      color: white;
+      text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+      text-align: center;
+      padding: 0.5rem;
     }
 
     .dropdown-wrap {
