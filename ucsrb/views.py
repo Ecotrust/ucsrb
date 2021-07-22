@@ -841,12 +841,13 @@ def get_status_by_scenario_id(request):
                 # Streamflow file empty
                 pass
 
+            import_status_file = "/tmp/runs/run_{}/output/dhsvm_status.log".format(treatment.id)
+            if Path(import_status_file).exists():
+                task_status = 'Importing (3/4)'
+                with open(import_status_file, 'r') as f:
+                    inlines=f.readlines()
+                    import_progress = int(inlines[-1])/2
 
-        #
-        # if done (+50%), check out celery task log (can we write this to /tmp/runs/run_{id}/output/?)
-        # latest x/y/2*100+50%
-        # task_status = 'Interpreting Results (3/4)'
-        # print
         progress = round(model_progress) + round(import_progress)
     else:
         task_status = 'Complete'
