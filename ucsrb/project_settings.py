@@ -207,6 +207,7 @@ INSTALLED_APPS = [
     'dhsvm_harness',
     ### END INSERTED INSTALLED APPS ###
     'ckeditor',
+    # 'django_celery_beat',
     'django_celery_results',
 ]
 
@@ -228,6 +229,15 @@ IMPORT_SRID = 3857
 GET_SCENARIOS_URL = '/ucsrb/get_scenarios/'
 SCENARIO_FORM_URL = '/features/treatmentscenario/form/'
 SCENARIO_LINK_BASE = '/features/treatmentscenario/ucsrb_treatmentscenario'
+
+MODEL_YEAR_LOOKUP = {
+    '2000': 'dry',
+    '2001': 'dry',
+    '2005': 'baseline',
+    '2006': 'baseline',
+    '1998': 'wet',
+    '1999': 'wet',
+}
 
 MODEL_YEARS = {
     'dry': {
@@ -444,15 +454,28 @@ USE_TZ = False
 # CELERY_TIMEZONE = "America/LosAngeles"
 CELERY_TIMEZONE = "US/Pacific"
 CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
 # CELERY_RESULT_BACKEND = 'rpc://'
 CELERY_RESULT_BACKEND = 'django-db' # Django-Celery-Results
 CELERY_BROKER = 'amqp://localhost'
 # CELERY_RESULT_PERSISTENT = False
-# CELERY_TASK_TIME_LIMIT = 30 * 60
 # CELERY_IMPORTS = [
 #     'ucsrb',
 #     'dhsvm_harness'
 # ]
+# CELERY_BROKER_POOL_LIMIT = 1
+
+CELERY_ACKS_LATE = True
+CELERYD_PREFETCH_MULTIPLIER = 1
+
+########################################
+######    TASK STATUS SETTINGS   #######
+########################################
+ACTIVE_TASK_STATES = [
+    'PENDING',
+    'RECEIVED',
+    'STARTED',
+]
 MAX_DHSVM_RUN_DURATION = 9000 # in seconds -- 9000 = 2.5 hours
 
 

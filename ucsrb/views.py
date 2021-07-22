@@ -3,6 +3,8 @@ from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
 import json
+import os
+from pathlib import Path
 
 from accounts.forms import LogInForm, SignUpForm
 from geodata.geodata import GeoData
@@ -438,132 +440,6 @@ def parse_flow_results(overlap_basin, treatment):
         }
     return flow_results
 
-
-
-
-    # for treatment in csv_dict.keys():
-    # for treatment in StreamFlowReading.objects.filter(basin=overlap_basin, treatment=treatment):
-    #     if treatment not in output_dict.keys():
-    #         output_dict[treatment] = {}
-    #     if treatment not in annual_water_volume.keys():
-    #         annual_water_volume[treatment] = 0
-    #
-    #     with open(csv_dict[treatment]) as csvfile:
-    #         csvReader = csv.DictReader(csvfile)
-    #         steps_to_aggregate = settings.TIME_STEP_REPORTING/settings.TIME_STEP_HOURS
-    #         aggregate_volume = 0
-    #         sept_flow = 0
-    #         sept_records = 0
-    #         for index, row in enumerate(csvReader):
-    #             time_object = datetime.strptime(row['TIMESTAMP'], '%m.%d.%Y-%H:%M:%S')
-    #             # Get volume of flow for timestep in Cubic Feet
-    #             timestep_volume = float(row[settings.NN_CSV_FLOW_COLUMN]) * 35.3147
-    #             aggregate_volume += timestep_volume
-    #             annual_water_volume[treatment] = annual_water_volume[treatment] + timestep_volume
-    #             if index%steps_to_aggregate == 0:
-    #                 output_dict[treatment][row['TIMESTAMP']] = aggregate_volume/settings.TIME_STEP_REPORTING/60/60
-    #                 aggregate_volume = 0
-    #             if time_object.month == 9:
-    #                 sept_flow += timestep_volume/settings.TIME_STEP_HOURS/60/60
-    #                 sept_records += 1
-    #     sept_avg_flow[treatment] = str(round(sept_flow/sept_records, 2))
-
-    # return (output_dict, annual_water_volume, sept_avg_flow)
-
-#TODO: Delete this function - left over from old regression modelling approach.
-# def get_basin_input_dict(basin_data, basin_geom, treatment_geom, row_id, treatment='baseline'):
-#     from ucsrb.models import VegPlanningUnit
-#     out_dict = {}
-#     vpus = VegPlanningUnit.objects.filter(geometry__intersects=basin_geom)
-#
-#     for field in settings.HYDRO_INPUT_HEADERS:
-#         if 'thc_' in field:
-#             thc_id = int(field.split('_')[1])
-#             thc_veg_units = vpus.filter(topo_height_class_majority=thc_id)
-#             thc_acres = 0
-#             for veg_unit in thc_veg_units:
-#                 # Reduce fractional coverage TO treatment target (take lowest val)
-#                 if veg_unit.geometry.intersects(treatment_geom) and settings.TREATMENT_TARGETS[treatment] < veg_unit.percent_fractional_coverage:
-#                     thc_acres += veg_unit.acres*(settings.TREATMENT_TARGETS[treatment]/100)
-#                 else:
-#                     thc_acres += veg_unit.acres*(veg_unit.percent_fractional_coverage/100)
-#             out_dict[field] = thc_acres
-#         else:
-#             if hasattr(basin_data, field):
-#                 out_dict[field] = basin_data.__getattribute__(field)
-#
-#     # we don't care about just basin id, but treatment, too. Using custom IDs.
-#     out_dict['ppt_ID'] = row_id
-#
-#     # have the weather station fields been added to the ppbasin?
-#     has_weather_key = False
-#     # weather_key = 'mazama'
-#     #       (@ basin 2174, @ basin 2293)
-#     #       (20, 300k)
-#     weather_key = 'trinity'
-#     #       (20, 300k)
-#     # weather_key = 'poperidge'
-#     #       (15, 2M)
-#     # weather_key = 'plain'
-#     #       (20, 300k)
-#     # weather_key = 'winthrop'
-#     #       (billions, 5Q)
-#     for key in settings.WEATHER_STATIONS.keys():
-#         if not hasattr(basin_data, key):
-#             out_dict[key] = 0
-#         elif basin_data[key] > 0:
-#             has_weather_key = True
-#             weather_key = key
-#
-#     if not has_weather_key:
-#         # NOTE: currently we only have climate data to support certain dates for certain weather station data.
-#         #   Due to this, we cannot 'weight' our stations, but must treat them as a binary: 0 or 100%.
-#         out_dict[weather_key] = 1
-#
-#     out_dict['start_time'] = settings.WEATHER_STATIONS[weather_key]['start']
-#     out_dict['end_time'] = settings.WEATHER_STATIONS[weather_key]['end']
-#
-#     return out_dict
-
-#TODO: Delete this function - left over from old regression modelling approach.
-# def run_hydro_model(in_csv):
-#     import subprocess
-#     import os
-#
-#     command = '/usr/bin/Rscript'
-#     script_location = "%s/%s" % (settings.ANALYSIS_DIR, 'DHSVMe.R')
-#     out_csv = "%s_out.csv" % ''.join(in_csv.lower().split('.csv'))
-#
-#     location = "/usr/local/apps/marineplanner-core/apps/ucsrb/ucsrb/data/" % (settings.ANALYSIS_DIR, 'DHSVMe.R')
-#
-#     r_output = subprocess.call([
-#         command, script_location,           # call the script with R
-#         '-i', in_csv,                       # location of input csv
-#         '-o', out_csv,                      # location to write csv output - comment out to get as a stream
-#         '-c', settings.ANALYSIS_DIR,  # Where the coefficient input files live
-#         '-t', "Coeff_*"                     # format to use to identify necessary coefficient files by year
-#     ])
-#
-#     if settings.DELETE_CSVS:
-#         os.remove(in_csv)
-#
-#     return out_csv
-
-# def get_flow_csv_match(ppt, delta):
-#     import os
-#     from ucsrb.models import ScenarioNNLookup
-#     candidates = [x for x in ScenarioNNLookup.objects.filter(ppt_id=ppt.id)]
-#     best_match = min(candidates, key=lambda x:abs(x.fc_delta-delta))
-#     # IF Baseline run is more accurate than NN:
-#     if delta < 0.5*best_match.fc_delta:
-#         rx_dir = "_base"
-#     else:
-#         rx_dir = "%d_%d" % (best_match.scenario_id, best_match.treatment_target)
-#     return (
-#         os.path.join(settings.NN_DATA_DIR,"veg%s" % ppt.watershed_id,rx_dir, "%s.csv" % str(ppt.streammap_id)),
-#         rx_dir
-#     )
-
 def calculate_basin_fc(ppt, basin_area, included_ppts, scenario=None, target_fc=-1):
     from ucsrb.models import FocusArea, PourPoint, VegPlanningUnit
 
@@ -901,6 +777,88 @@ def get_results_by_scenario_id(request):
 def get_results_by_state(request):
     return_json = {
         'response': 'TODO :('
+    }
+    return JsonResponse(return_json)
+
+def get_last_flow_line(flow_outfile):
+    # quick 'get last line' code modified from Eugene Yarmash:
+    #   https://stackoverflow.com/a/54278929
+    with open(flow_outfile, 'rb') as f:
+        f.seek(-2, os.SEEK_END)
+        newline_found = False  # since last_line may still be being written, 2nd-to-last will have to do.
+        current_set = f.read(1)
+        while current_set != b'\n' or not newline_found:
+            if current_set == b'\n':
+                newline_found = True
+            f.seek(-2, os.SEEK_CUR)
+            current_set = f.read(1)
+        last_line = f.readline().decode()
+    return last_line
+
+def get_status_by_scenario_id(request):
+    from ucsrb.models import TreatmentScenario, FocusArea, PourPoint
+    from features.registry import get_feature_by_uid
+
+    scenario_id = request.GET.get('id')
+    try:
+        treatment = get_feature_by_uid(scenario_id)
+    except:
+        return get_json_error_response('Treatment with given ID (%s) does not exist' % scenario_id, 500, {})
+
+    progress = 0
+    model_progress = 0
+    import_progress = 0
+    task_status = 'Initializing (1/4)'
+
+    error = 'None'
+    last_line = ''
+
+    if treatment.job_status != 'SUCCESS':
+        # Attempt to re-run the job - if job is too new, it won't restart, just continue
+        treatment.run_dhsvm()
+        # check out /tmp/runs/run_{id}/output/Streamflow.only
+        flow_outfile = "/tmp/runs/run_{}/output/Streamflow.Only".format(treatment.id)
+        if Path(flow_outfile).exists():
+
+            try:
+                last_line = get_last_flow_line(flow_outfile)
+
+                [month, day, year] = last_line.split('-')[0].split('.')[0:3]
+                model_time = last_line.split(' ')[0].split('-')[1]
+                model_progress_date = datetime.strptime("{}.{}.{}-{}".format(month, day, year, model_time), "%m.%d.%Y-%H:%M:%S")
+                model_year_type = settings.MODEL_YEAR_LOOKUP[str(year)]
+                model_year = settings.MODEL_YEARS[model_year_type]
+                total_time = model_year['end'] - model_year['start']
+                completed_time = model_progress_date - model_year['start']
+                model_progress = (completed_time.total_seconds()/total_time.total_seconds())*100/2   #50% of the progress is modelling, so /2
+                task_status = 'Modelling (2/4)'
+            except (ValueError, IndexError) as e:
+                # Streamflow file doesn't have 2 complete entries yet.
+                error = str(e)
+                print(e)
+                pass
+            except OSError as e:
+                # Streamflow file empty
+                pass
+
+
+        #
+        # if done (+50%), check out celery task log (can we write this to /tmp/runs/run_{id}/output/?)
+        # latest x/y/2*100+50%
+        # task_status = 'Interpreting Results (3/4)'
+        # print
+        progress = progress + model_progress + import_progress
+    else:
+        task_status = 'Complete'
+        progress = 100
+
+    # MAX_ACTIVE_JOB_AGE
+    return_json = {
+        'status': '{} - {}'.format(treatment.job_status, task_status),
+        'progress': progress,
+        'age': treatment.job_age.total_seconds(),
+        'error': error,
+        'last_line': last_line
     }
     return JsonResponse(return_json)
 

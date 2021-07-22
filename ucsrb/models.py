@@ -221,12 +221,7 @@ class TreatmentScenario(Scenario):
 
     @property
     def active_job(self):
-        active_states = [
-            'PENDING',
-            'RECEIVED',
-            'STARTED',
-        ]
-        incomplete_jobs = self.jobs.filter(status__in=active_states)
+        incomplete_jobs = self.jobs.filter(status__in=settings.ACTIVE_TASK_STATES)
         if incomplete_jobs.count() > 1:
             incomplete_jobs_count = incomplete_jobs.count()
             for index, job in enumerate(incomplete_jobs.order_by('date_created')):

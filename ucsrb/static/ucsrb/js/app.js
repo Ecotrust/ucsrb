@@ -156,6 +156,21 @@ app.resultsInit = function(id) {
     app.nav.hideSave();
     app.nav.showResultsNav();
     $('#subnav-sign-in-modal').addClass('d-none');
+    app.request.get_job_status(id)
+      .done(function(response) {
+        if (response.progress == 100) {
+          app.panel.results.hydroPanel('<p>Select a gauging station to see hydrologic results.</p>');
+        } else {
+          app.panel.results.hydroPanel(
+            '<p>Your hyrdological model run is still running with a status of: "' +
+            response.status +
+            '"</p><p>Progress: ' + response.progress + '%</p><button class="btn btn-primary" onclick="app.request.get_job_status(\'' +
+            id + '\')">Refresh</button>');
+        }
+      })
+      .catch(function(response) {
+          console.log('%c failed to get results: %o', 'color: salmon;', response);
+      });
 }
 
 initFiltering = function() {
@@ -318,6 +333,9 @@ app.panel = {
                 var html = `<section class="hydro-results result-section" id="hydro-note">`;
                 html += `<div>${results}</div>`;
                 html += `</section>`;
+                if ($('#hydro-note').length > 0) {
+                  $('#hydro-note').remove();
+                }
                 app.panel.results.addResults(html);
                 return;
             }
@@ -859,6 +877,24 @@ app.request = {
                 console.log(`%cfail @ get planning units response: %o`, 'color: red', response);
             }
         })
+    },
+    get_job_status: function(id) {
+      if (!id) {
+        id = app.selectedFeature.getProperties().ppt_ID;
+      }
+      return $.ajax({
+        url: `/get_status_by_scenario_id`,
+        data: {
+          id: id,
+        },
+        dataType: 'json',
+        success: function(response) {
+          return response;
+        },
+        error: function(response) {
+          console.log(`%cfail @ get treatment scenario status: %o`, 'color: red', response);
+        }
+      })
     },
     get_downstream_pour_points: function(id) {
         if (!id) {
