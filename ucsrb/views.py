@@ -847,7 +847,7 @@ def get_status_by_scenario_id(request):
         # latest x/y/2*100+50%
         # task_status = 'Interpreting Results (3/4)'
         # print
-        progress = progress + model_progress + import_progress
+        progress = round(model_progress) + round(import_progress)
     else:
         task_status = 'Complete'
         progress = 100
