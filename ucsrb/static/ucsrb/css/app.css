@@ -959,7 +959,8 @@ Panel
 }
 
 .progress {
-    background: rgba(230,231,232,0.15);
+    /* background: rgba(230,231,232,0.15); */
+    background: rgba(150,151,152,0.45);
     border-radius: .25rem;
     margin: .5rem 0 0;
     height: 4px;

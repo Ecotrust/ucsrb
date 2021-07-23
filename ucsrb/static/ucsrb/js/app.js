@@ -937,8 +937,7 @@ app.request = {
             } else {
               update_hydro = false;
             }
-            app.panel.results.hydroPanel(
-              '<h3>Flow Results</h3>' +
+            var panel_status_notes = '<h3>Flow Results</h3>' +
               '<p>' + response.status + '</p>' +
               '<div class="hydro-progress progress">' +
               '  <div class="progress-bar progress-bar-striped progress-bar-animated" '+
@@ -946,9 +945,16 @@ app.request = {
               response.progress + '%;" aria-valuenow="' + response.progress +
               '" aria-valuemin="0" aria-valuemax="100">' + response.progress +
               '%</div>' +
-              '</div>' +
-              '<p>Estimated time remaining: <br/>' + time_remaining + '</p>'
-            );
+              '</div>';
+            if (response.progress > 0) {
+              panel_status_notes = panel_status_notes + '<p>Estimated time ' +
+              'remaining: <br/>' + time_remaining + '</p>';
+            } else {
+              panel_status_notes = panel_status_notes + '<p>There is currently' +
+                ' a backlog of models to be run.<br/>Yours will be processed on a ' +
+                'first-come: first-served basis.<br/>Thank you for your patience.';
+            }
+            app.panel.results.hydroPanel(panel_status_notes);
             window.setTimeout(function(){
               if (id == "ucsrb_treatmentscenario_" + app.state.scenarioId) {
                   app.request.get_job_status(id);
