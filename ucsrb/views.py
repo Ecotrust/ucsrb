@@ -813,7 +813,9 @@ def get_status_by_scenario_id(request):
     error = 'None'
     last_line = ''
 
-    if treatment.job_status != 'SUCCESS':
+    if treatment.job_status == 'None':
+        task_status = 'Queued (0/4)'
+    elif treatment.job_status != 'SUCCESS':
         # Attempt to re-run the job - if job is too new, it won't restart, just continue
         treatment.run_dhsvm()
         # check out /tmp/runs/run_{id}/output/Streamflow.only
@@ -853,11 +855,16 @@ def get_status_by_scenario_id(request):
         task_status = 'Complete'
         progress = 100
 
+    try:
+        job_age = treatment.job_age.total_seconds()
+    except AttributeError as e:
+        job_age = 0
+
     # MAX_ACTIVE_JOB_AGE
     return_json = {
-        'status': '{} - {}'.format(treatment.job_status, task_status),
+        'status': 'Status: {}'.format(task_status),
         'progress': progress,
-        'age': treatment.job_age.total_seconds(),
+        'age': job_age,
         'error': error,
         'last_line': last_line
     }

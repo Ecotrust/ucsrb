@@ -430,14 +430,22 @@ pourPointResultSelection = function(feat) {
     feature.setStyle(app.map.styles.PourPoint)
   });
   feat.setStyle(app.map.styles.PourPointSelected);
-  app.request.get_hydro_results_by_pour_point_id(feat)
-    .done(function(response) {
-      app.init['hydro']();
-      if (response.hasOwnProperty('basin')) {
-        app.map.addDrainageBasinToMap(response.basin);
-      }
-      app.panel.results.loadHydroResult(response);
-    })
+
+  if (app.panel.results.hydroModelled) {
+    app.request.get_hydro_results_by_pour_point_id(feat)
+      .done(function(response) {
+        app.init['hydro']();
+        if (response.hasOwnProperty('basin')) {
+          app.map.addDrainageBasinToMap(response.basin);
+        }
+        app.panel.results.loadHydroResult(response);
+      });
+  } else {
+    app.panel.results.showHydro();
+    app.panel.loading.hide();
+    alert('Your treatment has not finished modelling yet...');
+  }
+
 }
 
 var drawSource = new ol.source.Vector();

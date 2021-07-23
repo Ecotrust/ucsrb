@@ -317,6 +317,7 @@ app.panel = {
             html += '</section>';
             app.panel.results.addResults(html);
         },
+        hydroModelled: false,
         hydroPanel: function(results) {
             if (typeof(results) === 'string') {
                 var html = `<section class="hydro-results result-section" id="hydro-note">`;
@@ -884,8 +885,10 @@ app.request = {
             update_hydro = false;
           }
           if (response.progress == 100) {
+            app.panel.results.hydroModelled = true;
             app.panel.results.hydroPanel('<p>Select a gauging station to see hydrologic results.</p>');
           } else {
+            app.panel.results.hydroModelled = false;
             // The job needs about 75 seconds before spitting out results for a small job.
             if (response.age > 75) {
               response.age = response.age-75;
@@ -947,7 +950,9 @@ app.request = {
               '<p>Estimated time remaining: <br/>' + time_remaining + '</p>'
             );
             window.setTimeout(function(){
-              app.request.get_job_status(id);
+              if (id == "ucsrb_treatmentscenario_" + app.state.scenarioId) {
+                  app.request.get_job_status(id);
+              }
             }, 5000);
           }
           if (update_hydro) {
@@ -956,6 +961,11 @@ app.request = {
         },
         error: function(response) {
           console.log(`%cfail @ get treatment scenario status: %o`, 'color: red', response);
+          window.setTimeout(function(){
+            if (id == "ucsrb_treatmentscenario_" + app.state.scenarioId) {
+                  app.request.get_job_status(id);
+            }
+          }, 5000);
         }
       })
     },
@@ -986,9 +996,12 @@ app.request = {
             var pp_id = feature.getProperties().ppt_id
         }
         app.map.selectedPourPoint = feature;
+
         if (!scenarioId) {
-            treatmentId = app.state.scenarioId;
+            scenarioId = app.viewModel.scenarios.scenarioList()[0].uid;
         }
+        treatmentId = app.state.scenarioId;
+
         return $.ajax({
             url: '/get_hydro_results_by_pour_point_id',
             data: {
