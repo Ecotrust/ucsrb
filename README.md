@@ -94,22 +94,35 @@ Update the `supervised` setting to read: `supervised systemd`
 ```
 sudo systemctl restart redis.service
 pip install redis
-pip install celery
-pip install django-celery-results
+pip install "celery<5.0"
+pip install "django-celery-results<2.2"
 
 ln -s /usr/local/apps/marineplanner-core/apps/ucsrb/ucsrb/celery.py /usr/local/apps/marineplanner-core/marineplanner/marineplanner/celery.py
 cat /usr/local/apps/marineplanner-core/apps/ucsrb/ucsrb/__init__.py >> /usr/local/apps/marineplanner-core/marineplanner/marineplanner/__init__.py
+```
 
+Adding celery user -- be sure to come up with a good password and keep it safe.
+```
 sudo adduser celery
 sudo mkdir /var/log/celery
 sudo chown celery:celery /var/log/celery
 sudo mkdir /var/run/celery
 sudo chown celery:celery /var/run/celery
 sudo mkdir /etc/conf.d
+```
+celery settings:
+```
+sudo cp /usr/local/apps/marineplanner-core/apps/ucsrb/deployment/celery.conf /usr/lib/tmpfiles.d/celery.conf
+sudo cp /usr/local/apps/marineplanner-core/apps/ucsrb/deployment/celery.service /etc/systemd/system/celery.service
+sudo cp /usr/local/apps/marineplanner-core/apps/ucsrb/deployment/celery /etc/conf.d/celery
 
-cp /usr/local/apps/marineplanner-core/apps/ucsrb/deployment/celery.conf /usr/lib/tmpfiles.d/celery.conf
-cp /usr/local/apps/marineplanner-core/apps/ucsrb/deployment/celery.service /etc/systemd/system/celery.service
-cp /usr/local/apps/marineplanner-core/apps/ucsrb/deployment/celery /etc/conf.d/celery
+sudo mkdir /var/log/celery/
+sudo chmod 755 /var/log/celery/
+sudo chown celery:celery /var/log/celery/
+
+sudo mkdir /var/run/celery/
+sudo chmod 755 /var/run/celery/
+sudo chown celery:celery /var/run/celery/
 
 sudo systemctl enable celery.service
 sudo systemctl daemon-reload
