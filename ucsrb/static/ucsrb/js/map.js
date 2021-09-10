@@ -480,7 +480,7 @@ focusAreaSelectAction = function(feat) {
 };
 
 treatmentAreaSelectAction = function(feature) {
-  console.log("ID: " + feature.get('id') + ' ; RX: ' + feature.get('prescription') );
+  app.prescription.selectAction(feature);
 };
 
 streamSelectAction = function(feat) {

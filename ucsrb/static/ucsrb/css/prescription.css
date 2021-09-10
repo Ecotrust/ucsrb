@@ -1,0 +1,50 @@
+div#prescription-assignment-panel {
+  width: 33vw;
+  min-width: 350px;
+  padding: 1rem;
+  overflow-x: hidden;
+}
+
+span#selected-treatments-count {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+div#prescription-selection-container {
+  width: 100%;
+}
+
+div#prescription-assignment-panel button {
+  margin: 0.5rem;
+}
+
+div.prescription-selection-row {
+  /* padding: 0.5rem; */
+  width: 100%;
+  height: 100%;
+  margin:0;
+  border: 1px solid #555555;
+  border-radius: 0.2rem;
+  color: black;
+  font-size: medium;
+}
+
+div#notr-row {
+  background-color: rgba(0,255,0,0.3);
+}
+
+div#mb16-row {
+  background-color: rgba(255,255,0,0.3);
+}
+
+div#mb25-row {
+  background-color: rgba(255,155,0,0.3);
+}
+
+div#burn-row {
+  background-color: rgba(255,0,0,0.3);
+}
+
+div#ideal-row {
+  background-color: rgba(0,255,255,0.3);
+}

@@ -174,7 +174,19 @@ app.map.selection.selectTreatmentArea = new ol.interaction.Select(
     layers: [
       app.map.layer.treatmentAreas.layer
     ],
-    style: app.map.styles.SelectedTreatmentArea
+    style: app.map.styles.SelectedTreatmentArea,
+    condition: function(e) {
+      setTimeout(function() {
+        // make sure count gets updated when things are all unselected, too
+        app.prescription.updateTreatmentSectionCount();
+      }, 20);
+      return (e.type == 'click');
+    },
+    toggleCondition: function(e) {
+      // Toggle selection on clicks to features only
+      return (e.type == 'click');
+    },
+
   }
 );
 

@@ -650,24 +650,34 @@ showPrescriptionForm = function(features_object) {
   app.map.addTreatmentAreas(vectors);
   app.map.selection.setSelect(app.map.selection.selectTreatmentArea);
   app.map.zoomToExtent(footprint[0].getGeometry().getExtent());
-  var html = '<div class="featurepanel">' +
-        '<p class="display"><span class="bb">Choose a Prescription</span></p>' +
-        '<p><small>Select a polygon<br />Then Choose a Prescription & Save.<br />Repeat Until All Polygons Have A Prescription Applied.</p>' +
-        '<p>- OR -</p>' +
-        '<p>Apply A Single Prescription To All Polygons By Choosing a Prescription & Saving.</p>' +
-        '<form id="prescription_application_form" onsubmit="app.panel.prescription.applyPrescription(); return false;">' +
-        '<ul id="id_prescription_treatment_selection" class="prescription-choices">' +
-        '<li><label for="id_prescription_treatment_selection_0">' +
-        '<input type="radio" name="prescription_treatment_selection" value="notr" class="prescription-choices" id="id_prescription_treatment_selection_0">No Treatment scenario</label></li>' +
-        '<li><label for="id_prescription_treatment_selection_1"><input type="radio" name="prescription_treatment_selection" value="mb16" class="prescription-choices" id="id_prescription_treatment_selection_1">Maximum Biomass 16 inch scenario</label></li>' +
-        '<li><label for="id_prescription_treatment_selection_2"><input type="radio" name="prescription_treatment_selection" value="mb25" class="prescription-choices" id="id_prescription_treatment_selection_2">Maximum Biomass 25 inch scenario</label></li>' +
-        '<li><label for="id_prescription_treatment_selection_3"><input type="radio" name="prescription_treatment_selection" value="burn" class="prescription-choices" id="id_prescription_treatment_selection_3">Burn Only scenario</label></li>' +
-        '<li><label for="id_prescription_treatment_selection_4"><input type="radio" name="prescription_treatment_selection" value="flow" class="prescription-choices" id="id_prescription_treatment_selection_4">Ideal Water scenario</label></li>' +
-        '</ul>' +
-        '<button type="submit" class="btn btn-primary">Apply</button>' +
+  var html = '<div id="prescription-assignment-panel" class="featurepanel">' +
+        '<p class="display"><span class="bb">Assign Prescriptions</span></p>' +
+        '<p><small>Click to select one or more treatment areas<br />then apply your desired prescription.</p>' +
+
+        '<p><span id="selected-treatments-count">0</span> treatments selected.</p>' +
+
+        '<button class="btn btn-primary" id="select-all-treatments-button" onclick="app.prescription.selectAllTreatments()">Select All</button>' +
+        '<button class="btn btn-primary" id="clear-all-treatments-button" onclick="app.prescription.deselectAllTreatments()" disabled>Clear Selection</button>' +
+
+        '<div id="prescription-selection-container">' +
+          '<div class="prescription-selection-row" id="notr-row">' +
+            '<button id="notr-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyNotr()" disabled>Apply</button> <span class="rx-label">No Treatment</span>' +
+          '</div>' +
+          '<div class="prescription-selection-row" id="mb16-row">' +
+            '<button id="mb16-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyMb16()" disabled>Apply</button> <span class="rx-label">Maximum Biomass 16-inch</span>' +
+          '</div>' +
+          '<div class="prescription-selection-row" id="mb25-row">' +
+            '<button id="mb25-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyMb25()" disabled>Apply</button> <span class="rx-label">Maximum Biomass 25-inch</span>' +
+          '</div>' +
+          '<div class="prescription-selection-row" id="burn-row">' +
+            '<button id="burn-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyBurn()" disabled>Apply</button> <span class="rx-label">Burn Only</span>' +
+          '</div>' +
+          '<div class="prescription-selection-row" id="ideal-row">' +
+            '<button id="ideal-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyIdeal()" disabled>Apply</button> <span class="rx-label">Ideal Water Flow</span>' +
+          '</div>' +
         '</div>' +
-        '</form>' +
-        '</div>';
+        '<button class="btn btn-primary" id="rx-submit-button" onclick="app.prescription.submitTreatments()">Save And Report</button>' +
+      '</div>';
   app.panel.setContent(html);
 
   // RDH 20210909 -- TODO -- run the following after Rx have been applied

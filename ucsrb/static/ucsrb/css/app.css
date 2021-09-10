@@ -866,6 +866,7 @@ Panel
     background: rgba(255,255,255,0.9);
     left: auto;
     right: .5rem;
+    overflow-x: hidden;
 }
 
 #panel #scenario_form,
