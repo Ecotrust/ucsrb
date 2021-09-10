@@ -100,6 +100,9 @@ app.init = {
         // hand it over to madrona-gis to get geopandas GeoDataFrame
         // Convert to same format/projection as drawings would be
     },
+    'prescription': function() {
+      // setInit();
+    },
     'hydro': function() {
         reportInit();
         app.state.setStep = 'hydro';
@@ -636,6 +639,29 @@ showUploadForm = function() {
   $('#treatment-upload-modal').modal('show');
 }
 
+showPrescriptionForm = function(features_object) {
+  var vectors = features_object['vectors'];
+  var footprint = features_object['footprint'];
+  // $('')
+  var draw_source = app.map.layer.draw.layer.getSource();
+  app.map.layer.draw.layer.setVisible(true);
+  app.map.addTreatmentAreas(vectors);
+  app.map.selection.setSelect(app.map.selection.selectTreatmentArea);
+  app.map.zoomToExtent(footprint[0].getGeometry().getExtent());
+
+  // RDH 20210909 -- TODO -- run the following after Rx have been applied
+
+  // app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
+  //
+  // // Hide treated veg units by removing all features
+  // //  the drawn polygon will be added in resultsInit()
+  // app.map.scenarioLayer.removeAllFeatures();
+  //
+  // app.resultsInit('ucsrb_treatmentscenario_' + response.id);
+  // app.state.scenarioId = response.id;
+  // app.state.setStep = 'results';
+}
+
 app.filterDropdownContent = `<div class="dropdown">
         <button class="btn btn-sm ml-2 btn-outline-light dropdown-toggle" type="button" id="forestUnit" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select unit</button>
         <div class="dropdown-menu forest-unit-dropdown" aria-labelledby="forestUnit">
@@ -733,6 +759,9 @@ app.nav = {
             'Zoom in to area of interest or use the geocoder to search for places by name.<br />Click on the map to start drawing the boundary of your management area.',
             'Add additional points then double-click to finish; Re-select point to edit',
         ],
+        prescription: [
+          'Select which areas you wish to change treatment prescriptions for.'
+        ],
         result: 'Explore evaluation results',
         aggregate: 'Select virtual gauging station ( <span style="height: 20px; background: #fff; border: 2px solid #67b8c6; border-radius: 50%; box-shadow: 0 0 4px #333, 0 0 4px #999; width: 20px; margin: 4px 10px; display: inline-block;"></span> ) to view predicted changes in flow.',
         hydro: 'Your hydrologic results',
@@ -770,6 +799,9 @@ app.nav = {
         ],
         upload: [
             showUploadForm
+        ],
+        prescription: [
+            showPrescriptionForm
         ],
         results: function() {
             app.nav.hideSave();
@@ -1259,19 +1291,15 @@ app.request = {
                     dataProjection: 'EPSG:3857',
                     featureProjection: 'EPSG:3857'
                 });
-                var draw_source = app.map.layer.draw.layer.getSource();
-                app.map.layer.draw.layer.setVisible(true);
-                app.map.addScenario(vectors);
-                app.map.zoomToExtent(vectors[0].getGeometry().getExtent());
-                app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
-
-                // Hide treated veg units by removing all features
-                //  the drawn polygon will be added in resultsInit()
-                app.map.scenarioLayer.removeAllFeatures();
-
-                app.resultsInit('ucsrb_treatmentscenario_' + response.id);
+                var footprint = (new ol.format.GeoJSON()).readFeatures(response.footprint, {
+                    dataProjection: 'EPSG:3857',
+                    featureProjection: 'EPSG:3857'
+                });
                 app.state.scenarioId = response.id;
-                app.state.setStep = 'results';
+
+                app.setState('prescription');
+                app.state.setStep = [0, {'vectors': vectors, 'footprint': footprint}];
+
             },
             error: function(response, status) {
                 console.log(`%cfail @ upload treatment: %o`, 'color: red', response);

@@ -19,7 +19,7 @@ from django.shortcuts import render
 from django.template import loader
 from django.views.decorators.cache import cache_page
 from ucsrb.forms import UploadShapefileForm
-from ucsrb.models import FocusArea, TreatmentScenario, StreamFlowReading
+from ucsrb.models import FocusArea, TreatmentScenario, StreamFlowReading, TreatmentArea
 
 def accounts_context():
     context = {
@@ -68,6 +68,26 @@ def app(request):
     context['MAP_TECH'] = 'ol4'
     context['UPLOAD_FORM'] = UploadShapefileForm
     return HttpResponse(template.render(context, request))
+
+# def sandbox(request):
+#     template = loader.get_template('ucsrb/sandbox.html')
+#     context = accounts_context()
+#     context['title'] = 'UCSRB Sandbox'
+#     return HttpResponse(template.render(context, request))
+#
+# def sandbox_json(request, id):
+#     ta_geojson_list = []
+#     geojson_response = {
+#         "type": "FeatureCollection",
+#         "features": []
+#     }
+#     tas = TreatmentArea.objects.filter(scenario__pk=id)
+#     for ta in tas:
+#         geojson_response['features'].append(json.loads(ta.geojson))
+#
+#     return JsonResponse(geojson_response)
+
+
 
 ###########################################################
 ###             API Calls                                 #
@@ -200,6 +220,7 @@ def break_up_multipolygons(multipolygon, polygon_list=[]):
 def define_scenario(request, featJson, scenario_name, description, prescription_selection):
     context = {}
     polys = []
+    split_polys = []
     for feature in json.loads(featJson)['features']:
         geos_geom = GEOSGeometry(json.dumps(feature['geometry']))
         # GEOS assumes 4326 when given GeoJSON (by definition this should be true)
@@ -209,17 +230,10 @@ def define_scenario(request, featJson, scenario_name, description, prescription_
         geos_geom.srid = settings.GEOMETRY_DB_SRID
         polys.append(geos_geom)
 
-    if polys[0].geom_type == 'MultiPolygon' and len(polys) == 1:
-        geometry = polys[0]
-    else:
-        try:
-            geometry = MultiPolygon(polys)
-        except TypeError:
-            new_polys = []
-            for poly in polys:
-                new_polys = break_up_multipolygons(poly, new_polys)
+    for poly in polys:
+        split_polys = break_up_multipolygons(poly, split_polys)
 
-            geometry = MultiPolygon(new_polys)
+    geometry = MultiPolygon(split_polys)
     layer = 'Drawing'
     focus_area = FocusArea.objects.create(unit_type=layer, geometry=geometry)
     focus_area.save()
@@ -254,7 +268,24 @@ def define_scenario(request, featJson, scenario_name, description, prescription_
         return get_json_error_response('Treatment does not cover enough forested land to make a difference', 500, context)
     # return geometry to web mercator
     final_geometry.transform(3857)
-    return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (scenario.pk, scenario.geometry_dissolved.geojson)))
+
+    tas = []
+
+    for new_ta_geom in split_polys:
+        new_ta_geom.transform(3857)
+        new_ta = TreatmentArea.objects.create(
+            scenario=scenario,
+            prescription_treatment_selection=prescription_selection,
+            geometry=new_ta_geom
+        )
+        tas.append(new_ta)
+
+    ta_geojson_list = []
+    for ta in tas:
+        ta_geojson_list.append(ta.geojson)
+    geojson_response = '{"type": "FeatureCollection","features": [%s]}' % ', '.join(ta_geojson_list)
+
+    return JsonResponse(json.loads('{"id":%s,"geojson": %s,"footprint": %s}' % (scenario.pk, geojson_response, scenario.geometry_dissolved.geojson)))
 
 '''
 Take a point in 3857 and return the feature at that point for a given FocusArea type

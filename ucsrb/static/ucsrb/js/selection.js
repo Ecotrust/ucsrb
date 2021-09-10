@@ -169,6 +169,13 @@ app.map.selection.selectResultsPourPoint = new ol.interaction.Select(
     style: app.map.styles.PourPointSelected
   }
 );
+app.map.selection.selectTreatmentArea = new ol.interaction.Select(
+  {
+    layers: [
+      app.map.layer.treatmentAreas.layer
+    ]
+  }
+);
 
 app.map.selection.setSelect = function(selectionInteraction) {
   //Is this line necessary?

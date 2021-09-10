@@ -210,7 +210,68 @@ app.map.styles = {
         })
       }),
       zIndex: 2
-    })
+    }),
+    'TreatmentArea': function(feature, resolution) {
+      var rx_styles = {
+        'notr': new ol.style.Style({
+          stroke: new ol.style.Stroke({
+            color: 'green',
+            width: 3
+          }),
+          fill: new ol.style.Fill({
+            color: 'rgba(0,255,0,0.3)',
+          }),
+          zIndex: 2
+        }),
+        'mb16': new ol.style.Style({
+          stroke: new ol.style.Stroke({
+            color: 'yellow',
+            width: 3
+          }),
+          fill: new ol.style.Fill({
+            color: 'rgba(255,255,0,0.3)',
+          }),
+          zIndex: 2
+        }),
+        'mb25': new ol.style.Style({
+          stroke: new ol.style.Stroke({
+            color: 'orange',
+            width: 3
+          }),
+          fill: new ol.style.Fill({
+            color: 'rgba(255,155,0,0.3)',
+          }),
+          zIndex: 2
+        }),
+        'burn': new ol.style.Style({
+          stroke: new ol.style.Stroke({
+            color: 'red',
+            width: 3
+          }),
+          fill: new ol.style.Fill({
+            color: 'rgba(255,0,0,0.3)',
+          }),
+          zIndex: 2
+        }),
+        'flow': new ol.style.Style({
+          stroke: new ol.style.Stroke({
+            color: 'aqua',
+            width: 3
+          }),
+          fill: new ol.style.Fill({
+            color: 'rgba(0,155,255,0.3)',
+          }),
+          zIndex: 2
+        })
+      };
+
+      var rx = feature.get('prescription');
+      if (rx_styles.hasOwnProperty(rx)){
+        return [rx_styles[rx]]
+      } else {
+        return [rx_styles['notr']]
+      }
+    },
 };
 
 /**
@@ -405,6 +466,10 @@ focusAreaSelectAction = function(feat) {
       app.state.setStep = 2; // step forward in state
     }
   });
+};
+
+treatmentAreaSelectAction = function(feature) {
+  console.log("ID: " + feature.get('id') + ' ; RX: ' + feature.get('prescription') );
 };
 
 streamSelectAction = function(feat) {
@@ -691,6 +756,26 @@ app.map.layer = {
             return app.map.layer.scenarios.layer.getSource();
         }
     },
+    treatmentAreas: {
+        layer: new ol.layer.Vector({
+          name: 'Treatment Areas Layer',
+          title: 'Treatment Areas Layer',
+          id: 'treatmentAreas',
+          source: new ol.source.Vector({
+            attributions: 'Ecotrust',
+            format: new ol.format.GeoJSON({
+              dataProjection: 'EPSG:3857',
+              featureProjection: 'EPSG:3857'
+            })
+          }),
+          style: app.map.styles.TreatmentArea
+
+        }),
+        source: function() {
+          return app.map.layer.treatmentAreas.layer.getSource();
+        },
+        selectAction: treatmentAreaSelectAction
+    },
     planningUnits: {
         layer: mapSettings.getInitFilterResultsLayer('planning units', app.map.styles['Polygon']),
         source: function() {
@@ -898,6 +983,25 @@ app.map.clearLayers = function() {
   for (var i = 0; i < layerNames.length; i++) {
     app.map.disableLayer(layerNames[i]);
   }
+}
+
+app.map.addTreatmentAreas = function(vectors) {
+  if (!app.map.hasOwnProperty('treatmentLayer')) {
+    app.map.treatmentLayer = app.map.layer.treatmentAreas.layer;
+    app.map.addLayer(app.map.treatmentLayer);
+    app.map.treatmentLayer.removeAllFeatures = function() {
+      app.map.treatmentLayer.getSource().clear();
+    }
+  }
+  app.map.treatmentLayer.removeAllFeatures();
+
+  app.map.treatmentLayer.setVisible(true);
+  vectors.forEach(function(vector) {
+    vector.setStyle(app.map.styles.TreatmentArea);
+  });
+
+  app.map.treatmentLayer.getSource().addFeatures(vectors);
+
 }
 
 app.map.addScenario = function(vectors) {

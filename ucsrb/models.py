@@ -11,6 +11,7 @@ from features.models import MultiPolygonFeature
 from scenarios.models import Scenario
 from threading import Thread
 from ucsrb.tasks import runTreatment
+import json
 
 GEOMETRY_DB_SRID = settings.GEOMETRY_DB_SRID
 
@@ -389,6 +390,32 @@ class TreatmentScenario(Scenario):
         # form_template = 'scenarios/form.html'
         form_template = 'ucsrb_scenarios/form.html'
         show_template = 'scenarios/show.html'
+
+class TreatmentArea(models.Model):
+    # focus_area = models.ForeignKey(FocusArea, null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    scenario = models.ForeignKey(TreatmentScenario, null=True, blank=True,
+            default=None, on_delete=models.SET_NULL)
+    # Prescription (Rx) applied
+    PRESCRIPTION_TREATMENT_CHOICES = settings.PRESCRIPTION_TREATMENT_CHOICES
+    prescription_treatment_selection = models.CharField(max_length=255,
+            null=True, blank=True, default=None,
+            choices=PRESCRIPTION_TREATMENT_CHOICES)
+    geometry = gismodels.PolygonField(srid=GEOMETRY_DB_SRID,
+            null=True, blank=True, verbose_name="Treatment Area Geometry")
+
+    objects = gismodels.Manager()
+
+    @property
+    def geojson(self):
+        out_geojson = {
+            'type': "Feature",
+            'geometry': json.loads(self.geometry.geojson),
+            'properties': {
+                'id': self.pk,
+                'prescription': self.prescription_treatment_selection,
+            }
+        }
+        return json.dumps(out_geojson)
 
 class VegPlanningUnit(models.Model):
     # id = models.IntegerField(primary_key=True)

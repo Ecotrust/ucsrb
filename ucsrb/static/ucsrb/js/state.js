@@ -35,24 +35,40 @@ app.state = {
     },
     set setStep(val) {
         // set state step value
-        this.step = val;
-
-        // update navigation based on step
-        // reset, initial, ...
-        if (app.nav.stepActions[val]) {
-            app.nav.stepActions[val]();
-        // select, filter, ...
-        } else if (app.nav.stepActions[app.state.getMethod][val]) {
-            app.nav.stepActions[app.state.getMethod][val]();
+        if (typeof(val) == "number" || typeof(val) == "string" || (val.length == 2 && !val[1])) {
+          if (typeof(val) == "number" || typeof(val) == "string") {
+            this.step = val;
+          } else {
+            this.step = val[0];
+          }
+          // update navigation based on step
+          // reset, initial, ...
+          if (app.nav.stepActions[val]) {
+              app.nav.stepActions[val]();
+          // select, filter, ...
+          } else if (app.nav.stepActions[app.state.getMethod][val]) {
+              app.nav.stepActions[app.state.getMethod][val]();
+          }
+        } else {
+          this.step = val[0];
+          var arguments_obj = val[1];
+          // update navigation based on step
+          // reset, initial, ...
+          if (app.nav.stepActions[this.step]) {
+            app.nav.stepActions[this.step](arguments_obj);
+            // select, filter, ...
+          } else if (app.nav.stepActions[app.state.getMethod][this.step]) {
+            app.nav.stepActions[app.state.getMethod][this.step](arguments_obj);
+          }
         }
 
         // update instructions content based on step
         // reset, initial, ...
-        if (app.nav.instructions[val]) {
-            app.state.instructions = app.nav.instructions[val];
+        if (app.nav.instructions[this.step]) {
+            app.state.instructions = app.nav.instructions[this.step];
         // select, filter, ...
-        } else if (app.nav.instructions[app.state.getMethod][val]) {
-            app.state.instructions = app.nav.instructions[app.state.getMethod][val];
+        } else if (app.nav.instructions[app.state.getMethod][this.step]) {
+            app.state.instructions = app.nav.instructions[app.state.getMethod][this.step];
         }
 
         //TODO: Recognize and trigger filtering/drawing steps.

@@ -9,6 +9,8 @@ urlpatterns = [
     url(r'^home/?$', views.home),
     url(r'^$', views.home),
     url(r'^app/?$', views.app, name="app"),
+    # url(r'^sandbox/$', views.sandbox, name="sandbox"),
+    # url(r'^sandbox/json/(?P<id>[\w_]+)', views.sandbox_json, name="sandbox_json"),
     url(r'^help/$', flat_views.flatpage, {'url': '/help/'}, name="help"),
     url(r'^methods/$', flat_views.flatpage, {'url': '/methods/'}, name='methods'),
     url(r'^thankyou/$', flat_views.flatpage, {'url': '/thankyou/'}, name='thankyou'),
