@@ -173,7 +173,8 @@ app.map.selection.selectTreatmentArea = new ol.interaction.Select(
   {
     layers: [
       app.map.layer.treatmentAreas.layer
-    ]
+    ],
+    style: app.map.styles.SelectedTreatmentArea
   }
 );
 

@@ -211,67 +211,78 @@ app.map.styles = {
       }),
       zIndex: 2
     }),
+    'notr': new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: 'green',
+        width: 3
+      }),
+      fill: new ol.style.Fill({
+        color: 'rgba(0,255,0,0.3)',
+      }),
+      zIndex: 2
+    }),
+    'mb16': new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: 'yellow',
+        width: 3
+      }),
+      fill: new ol.style.Fill({
+        color: 'rgba(255,255,0,0.3)',
+      }),
+      zIndex: 2
+    }),
+    'mb25': new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: 'orange',
+        width: 3
+      }),
+      fill: new ol.style.Fill({
+        color: 'rgba(255,155,0,0.3)',
+      }),
+      zIndex: 2
+    }),
+    'burn': new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: 'red',
+        width: 3
+      }),
+      fill: new ol.style.Fill({
+        color: 'rgba(255,0,0,0.3)',
+      }),
+      zIndex: 2
+    }),
+    'flow': new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: 'aqua',
+        width: 3
+      }),
+      fill: new ol.style.Fill({
+        color: 'rgba(0,155,255,0.3)',
+      }),
+      zIndex: 2
+    }),
     'TreatmentArea': function(feature, resolution) {
-      var rx_styles = {
-        'notr': new ol.style.Style({
-          stroke: new ol.style.Stroke({
-            color: 'green',
-            width: 3
-          }),
-          fill: new ol.style.Fill({
-            color: 'rgba(0,255,0,0.3)',
-          }),
-          zIndex: 2
-        }),
-        'mb16': new ol.style.Style({
-          stroke: new ol.style.Stroke({
-            color: 'yellow',
-            width: 3
-          }),
-          fill: new ol.style.Fill({
-            color: 'rgba(255,255,0,0.3)',
-          }),
-          zIndex: 2
-        }),
-        'mb25': new ol.style.Style({
-          stroke: new ol.style.Stroke({
-            color: 'orange',
-            width: 3
-          }),
-          fill: new ol.style.Fill({
-            color: 'rgba(255,155,0,0.3)',
-          }),
-          zIndex: 2
-        }),
-        'burn': new ol.style.Style({
-          stroke: new ol.style.Stroke({
-            color: 'red',
-            width: 3
-          }),
-          fill: new ol.style.Fill({
-            color: 'rgba(255,0,0,0.3)',
-          }),
-          zIndex: 2
-        }),
-        'flow': new ol.style.Style({
-          stroke: new ol.style.Stroke({
-            color: 'aqua',
-            width: 3
-          }),
-          fill: new ol.style.Fill({
-            color: 'rgba(0,155,255,0.3)',
-          }),
-          zIndex: 2
-        })
-      };
-
       var rx = feature.get('prescription');
-      if (rx_styles.hasOwnProperty(rx)){
-        return [rx_styles[rx]]
+      if (app.map.styles.hasOwnProperty(rx)){
+        return [app.map.styles[rx]]
       } else {
-        return [rx_styles['notr']]
+        return [app.map.styles['notr']]
       }
     },
+    'SelectedTreatmentArea': function(feature, resolution) {
+      var rx = feature.get('prescription');
+      var unselected_style = app.map.styles.TreatmentArea(feature, resolution)[0]
+
+      var selected_style = new ol.style.Style({
+        stroke: new ol.style.Stroke({
+          color: 'white',
+          width: 5
+        }),
+        fill: unselected_style.getFill(),
+        zIndex: 3
+      });
+      return selected_style;
+    }
 };
 
 /**
@@ -996,9 +1007,6 @@ app.map.addTreatmentAreas = function(vectors) {
   app.map.treatmentLayer.removeAllFeatures();
 
   app.map.treatmentLayer.setVisible(true);
-  vectors.forEach(function(vector) {
-    vector.setStyle(app.map.styles.TreatmentArea);
-  });
 
   app.map.treatmentLayer.getSource().addFeatures(vectors);
 
