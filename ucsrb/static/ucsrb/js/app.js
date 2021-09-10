@@ -243,6 +243,9 @@ app.panel = {
             initFiltering();
         },
     },
+    applyPrescription: function(prescription_choice) {
+        alert('Assing rx to a polygon. chosen:' + prescription_choice)
+    },
     summary: {
         init: function() {
             document.getElementById('chartResult').innerHTML = app.panel.results.styleSummaryResultsAsRows(app.panel.results.summary);
@@ -549,8 +552,8 @@ app.panel = {
                 '<li><label for="draw_id_prescription_treatment_selection_4"><input type="radio" name="draw_prescription_treatment_selection" value="flow" class="prescription-choices" id="draw_id_prescription_treatment_selection_4">Ideal Water scenario</label></li>' +
                 '</ul><br />' +
                 '<div class="btn-toolbar justify-content-between drawing-buttons">' +
-                '<button type="submit" class="btn btn-primary ' + saveDisable + '" >Begin Evaluation</button>' +
                 '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
+                '<button type="submit" class="btn btn-primary ' + saveDisable + '" >Begin Evaluation</button>' +
                 '</div>' +
                 '</form>' +
                 '</div>';
@@ -642,12 +645,30 @@ showUploadForm = function() {
 showPrescriptionForm = function(features_object) {
   var vectors = features_object['vectors'];
   var footprint = features_object['footprint'];
-  // $('')
   var draw_source = app.map.layer.draw.layer.getSource();
   app.map.layer.draw.layer.setVisible(true);
   app.map.addTreatmentAreas(vectors);
   app.map.selection.setSelect(app.map.selection.selectTreatmentArea);
   app.map.zoomToExtent(footprint[0].getGeometry().getExtent());
+  var html = '<div class="featurepanel">' +
+        '<p class="display"><span class="bb">Choose a Prescription</span></p>' +
+        '<p><small>Select a polygon<br />Then Choose a Prescription & Save.<br />Repeat Until All Polygons Have A Prescription Applied.</p>' +
+        '<p>- OR -</p>' +
+        '<p>Apply A Single Prescription To All Polygons By Choosing a Prescription & Saving.</p>' +
+        '<form id="prescription_application_form" onsubmit="app.panel.prescription.applyPrescription(); return false;">' +
+        '<ul id="id_prescription_treatment_selection" class="prescription-choices">' +
+        '<li><label for="id_prescription_treatment_selection_0">' +
+        '<input type="radio" name="prescription_treatment_selection" value="notr" class="prescription-choices" id="id_prescription_treatment_selection_0">No Treatment scenario</label></li>' +
+        '<li><label for="id_prescription_treatment_selection_1"><input type="radio" name="prescription_treatment_selection" value="mb16" class="prescription-choices" id="id_prescription_treatment_selection_1">Maximum Biomass 16 inch scenario</label></li>' +
+        '<li><label for="id_prescription_treatment_selection_2"><input type="radio" name="prescription_treatment_selection" value="mb25" class="prescription-choices" id="id_prescription_treatment_selection_2">Maximum Biomass 25 inch scenario</label></li>' +
+        '<li><label for="id_prescription_treatment_selection_3"><input type="radio" name="prescription_treatment_selection" value="burn" class="prescription-choices" id="id_prescription_treatment_selection_3">Burn Only scenario</label></li>' +
+        '<li><label for="id_prescription_treatment_selection_4"><input type="radio" name="prescription_treatment_selection" value="flow" class="prescription-choices" id="id_prescription_treatment_selection_4">Ideal Water scenario</label></li>' +
+        '</ul>' +
+        '<button type="submit" class="btn btn-primary">Apply</button>' +
+        '</div>' +
+        '</form>' +
+        '</div>';
+  app.panel.setContent(html);
 
   // RDH 20210909 -- TODO -- run the following after Rx have been applied
 

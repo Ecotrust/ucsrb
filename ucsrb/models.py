@@ -398,7 +398,7 @@ class TreatmentArea(models.Model):
     # Prescription (Rx) applied
     PRESCRIPTION_TREATMENT_CHOICES = settings.PRESCRIPTION_TREATMENT_CHOICES
     prescription_treatment_selection = models.CharField(max_length=255,
-            null=True, blank=True, default=None,
+            null=True, blank=True, default='notr',
             choices=PRESCRIPTION_TREATMENT_CHOICES)
     geometry = gismodels.PolygonField(srid=GEOMETRY_DB_SRID,
             null=True, blank=True, verbose_name="Treatment Area Geometry")
