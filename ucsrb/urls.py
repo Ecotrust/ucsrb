@@ -41,6 +41,8 @@ urlpatterns = [
 
     url(r'^get_user_scenario_list/$', views.get_user_scenario_list),
 
+    url(r'^set_treatment_prescriptions/$', views.set_treatment_prescriptions),
+
     ### end API urls
     url(r'^', views.index, name='index'),
 ]

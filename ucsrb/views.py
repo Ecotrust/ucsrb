@@ -287,6 +287,54 @@ def define_scenario(request, featJson, scenario_name, description, prescription_
 
     return JsonResponse(json.loads('{"id":%s,"geojson": %s,"footprint": %s}' % (scenario.pk, geojson_response, scenario.geometry_dissolved.geojson)))
 
+
+def set_treatment_prescriptions(request):
+    json_response = {
+        'status': 'Failed',
+        'code': 500,
+        'message': 'Unknown',
+        'records_updated': 0,
+        'records_sent': -9999
+    }
+    if request.method=="POST":
+        try:
+            received_json_data = json.loads(request.body.decode("utf-8"))
+        except Exception as e:
+            json_response['message'] = "Unable to read posted data. {}".format(e)
+            return JsonResponse(json_response)
+        if not 'treatment_prescriptions' in received_json_data.keys():
+            json_response['code'] = 400
+            json_response['message'] = "Required 'treatment_prescriptions' key not found in supplied JSON."
+            return JsonResponse(json_response)
+        json_response['records_sent'] = len(received_json_data['treatment_prescriptions'])
+        for treatment in received_json_data['treatment_prescriptions']:
+            ta = TreatmentArea.objects.get(pk=int(treatment['id']))
+            # check treatment's Scenario's owner matches user
+            if ta.scenario.user == request.user:
+                ta.prescription_treatment_selection = treatment['prescription']
+                ta.save()
+                json_response['records_updated'] = json_response['records_updated']+1
+            else:
+                json_response['code'] = 300
+                json_response['message'] = "User does not have permission to update TreatmentArea with ID: {}".format(treatment['id'])
+                return JsonResponse(json_response)
+        if json_response['records_updated'] > 0 and json_response['records_updated'] == json_response['records_sent']:
+            # return success
+            json_response['status'] = 'Success'
+            json_response['code'] = 200
+            json_response['message'] = "Successfully updated all TreatmentAreas"
+        elif json_response['records_updated'] > 0:
+            json_response['message'] = "Unknown Error: Not all records could be updated."
+        elif json_response['records_updated'] == json_response['records_sent']:
+            json_response['code'] = 400
+            json_response['message'] = "0 records supplied for updated"
+        else:
+            json_response['message'] = "Unknown Error Occurred"
+    else:
+        json_response['code'] = 400
+        json_response['message'] = 'Request Denied: Requests must be of type "POST".'
+    return JsonResponse(json_response)
+
 '''
 Take a point in 3857 and return the feature at that point for a given FocusArea type
 Primarily developed as a failsafe for not having pour point basin data.
