@@ -1268,7 +1268,10 @@ app.request = {
                 app.map.draw.disable();
                 app.nav.hideSave();
 
-                window.alert('TODO: Go to Prescription assignment');
+                // Remove drawings from layer
+                var draw_source = app.map.layer.draw.layer.getSource();
+                draw_source.clear();
+');
                 if (app.state.nav !== 'short') {
                     app.state.navHeight = 'short';
                     app.state.setStep = 'results'; // go to results
@@ -1277,19 +1280,15 @@ app.request = {
                     dataProjection: 'EPSG:3857',
                     featureProjection: 'EPSG:3857'
                 });
-                // Remove drawing from layer
-                var draw_source = app.map.layer.draw.layer.getSource();
-                draw_source.removeFeature(draw_source.getFeatures()[0]);
-                app.map.addScenario(vectors);
-                app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
-
-                // Hide treated veg units by removing all features
-                //  the drawn polygon will be added in resultsInit()
-                app.map.scenarioLayer.removeAllFeatures();
-
-                app.resultsInit('ucsrb_treatmentscenario_' + response.id);
+                var footprint = (new ol.format.GeoJSON()).readFeatures(response.footprint, {
+                    dataProjection: 'EPSG:3857',
+                    featureProjection: 'EPSG:3857'
+                });
                 app.state.scenarioId = response.id;
-                app.state.setStep = 'results';
+
+                app.setState('prescription');
+                app.state.setStep = [0, {'vectors': vectors, 'footprint': footprint}];
+
             },
             error: function(response, status) {
                 console.log(`%cfail @ save drawing: %o`, 'color: red', response);
