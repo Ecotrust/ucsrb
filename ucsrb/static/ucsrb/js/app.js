@@ -122,8 +122,11 @@ app.resultsInit = function(id) {
         id = app.viewModel.scenarios.scenarioList()[0].uid;
     } else if (!id.includes('ucsrb')) {
         id = 'ucsrb_treatmentscenario_' + id;
+    }
+    if (!app.viewModel.scenarios || app.viewModel.scenarios.scenarioList().length < 1) {
         app.viewModel.scenarios.addScenarioToMap(null, {
-            uid: id
+            uid: id,
+            opacity: 0
         });
     }
     app.loadingAnimation.panel.show();
@@ -146,10 +149,15 @@ app.resultsInit = function(id) {
               app.map.layer.boundary.layer.setVisible(true);
 
               // Hide treated polygons
-              app.map.scenarioLayer.removeAllFeatures();
+              if (app.map.scenarioLayer && app.map.scenarioLayer.hasOwnProperty('removeAllFeatures')) {
+                app.map.scenarioLayer.removeAllFeatures();
+              }
 
-              // Show drawn polying
-              app.map.addFocusAreaToMap(response.focus_area);
+              // Show drawn polygon if not previously drawn by treatment area
+              // TODO: remove this (and referenced func) once FA is replaced by TA.
+              if (app.map.scenarioLayer && !app.map.treatmentLayer) {
+                app.map.addFocusAreaToMap(response.focus_area);
+              }
               app.map.addDownstreamPptsToMap(response.pourpoints);
             }, 500);
         })
@@ -680,17 +688,6 @@ showPrescriptionForm = function(features_object) {
       '</div>';
   app.panel.setContent(html);
 
-  // RDH 20210909 -- TODO -- run the following after Rx have been applied
-
-  // app.panel.results.init('ucsrb_treatmentscenario_' + response.id);
-  //
-  // // Hide treated veg units by removing all features
-  // //  the drawn polygon will be added in resultsInit()
-  // app.map.scenarioLayer.removeAllFeatures();
-  //
-  // app.resultsInit('ucsrb_treatmentscenario_' + response.id);
-  // app.state.scenarioId = response.id;
-  // app.state.setStep = 'results';
 }
 
 app.filterDropdownContent = `<div class="dropdown">
@@ -1270,6 +1267,8 @@ app.request = {
             success: function(response) {
                 app.map.draw.disable();
                 app.nav.hideSave();
+
+                window.alert('TODO: Go to Prescription assignment');
                 if (app.state.nav !== 'short') {
                     app.state.navHeight = 'short';
                     app.state.setStep = 'results'; // go to results
@@ -1337,6 +1336,30 @@ app.request = {
                 alert(response.responseJSON.error_msg);
             }
         })
+    },
+    submitPrescriptions: function(treatment_json) {
+      // send AJAX to server
+      $.ajax({
+        type: "POST",
+        url: '/set_treatment_prescriptions/',
+        data: JSON.stringify({treatment_prescriptions: treatment_json}),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(response) {
+          if (response.status == 'Success') {
+            // on success proceed to gather report.
+            app.panel.results.init('ucsrb_treatmentscenario_' + app.state.scenarioId);
+            app.resultsInit('ucsrb_treatmentscenario_' + app.state.scenarioId);
+            app.state.setStep = 'results';
+          } else {
+            alert("Error: " + response.messsage + " -- (CODE:" + response.code + ")");
+          }
+        },
+        error: function(response) {
+          console.log(response);
+          window.alert("Error. Please review your treatment prescriptions and try again.")
+        }
+      });
     },
     filter_results: function(pourpoint) {
         $.ajax({

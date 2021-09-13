@@ -1360,8 +1360,13 @@ function scenariosModel(options) {
 
     //
     self.addScenarioToMap = function(scenario, options) {
+        if (options.hasOwnProperty('opacity')) {
+          opacity = options.opacity;
+        } else {
+          opacity = 0.8;
+        }
         var scenarioId,
-            opacity = .8,
+            // opacity = .8,
             stroke = 1,
             fillColor = "#00A29B",
             strokeColor = "#00827B",
