@@ -1271,7 +1271,7 @@ app.request = {
                 // Remove drawings from layer
                 var draw_source = app.map.layer.draw.layer.getSource();
                 draw_source.clear();
-');
+
                 if (app.state.nav !== 'short') {
                     app.state.navHeight = 'short';
                     app.state.setStep = 'results'; // go to results
