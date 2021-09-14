@@ -153,11 +153,7 @@ app.resultsInit = function(id) {
                 app.map.scenarioLayer.removeAllFeatures();
               }
 
-              // Show drawn polygon if not previously drawn by treatment area
-              // TODO: remove this (and referenced func) once FA is replaced by TA.
-              if (app.map.scenarioLayer && !app.map.treatmentLayer) {
-                app.map.addFocusAreaToMap(response.focus_area);
-              }
+              app.map.addTreatmentAreasToMap(response.treatment_areas);
               app.map.addDownstreamPptsToMap(response.pourpoints);
             }, 500);
         })

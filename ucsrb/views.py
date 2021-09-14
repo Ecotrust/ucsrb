@@ -880,7 +880,8 @@ def get_results_by_scenario_id(request):
             },
             'aggregate_results': aggregate_results['results_list'],
             'pourpoints': [ {'id': x.pk, 'name': '', 'geometry': json.loads(x.geometry.json) } for x in downstream_ppts ],
-            'focus_area': json.loads(treatment.focus_area_input.geometry.json)
+            'focus_area': json.loads(treatment.focus_area_input.geometry.json),
+            'treatment_areas': json.loads(treatment.treatment_areas_geojson())
         }
         return JsonResponse(return_json)
 

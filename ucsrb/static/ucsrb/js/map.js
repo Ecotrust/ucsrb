@@ -1079,6 +1079,16 @@ app.map.addFocusAreaToMap = function(focus_area) {
   // setFilter(app.map.focus_area_feature, app.map.layer.resultPoints.layer);
 }
 
+app.map.addTreatmentAreasToMap = function(treatment_areas) {
+
+  var vectors = (new ol.format.GeoJSON()).readFeatures(treatment_areas, {
+      dataProjection: 'EPSG:3857',
+      featureProjection: 'EPSG:3857'
+  });
+  app.map.addTreatmentAreas(vectors);
+  app.map.zoomToExtent(app.map.treatmentLayer.getSource().getExtent());
+}
+
 app.map.addDrainageBasinToMap = function(basin_geom) {
   if (app.map.hasOwnProperty('drainage_basin') && app.map.scenarioLayer.getSource().getFeatures().indexOf(app.map.drainage_basin) != -1) {
     app.map.scenarioLayer.getSource().removeFeature(app.map.drainage_basin);

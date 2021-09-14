@@ -374,6 +374,14 @@ class TreatmentScenario(Scenario):
         self.save()
         self.run_dhsvm()
 
+    def treatment_areas_geojson(self):
+        tas = self.treatmentarea_set.all()
+        ta_geojson_list = []
+        for ta in tas:
+            ta_geojson_list.append(ta.geojson)
+        geojson_response = '{"type": "FeatureCollection","features": [%s]}' % ', '.join(ta_geojson_list)
+        return geojson_response
+
     @property
     def veg_units(self):
         if len(self.planning_units) == 0:  #empty result
