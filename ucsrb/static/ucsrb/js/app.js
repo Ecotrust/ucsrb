@@ -1336,6 +1336,46 @@ app.request = {
             }
         })
     },
+    createTreatmentAreas: function(scenario_id) {
+      $.ajax({
+          url: '/ucsrb/create_treatment_areas/',
+          data: {
+              scenario: scenario_id,
+          },
+          dataType: 'json',
+          success: function(response) {
+            app.loadingAnimation.hide();
+            app.viewModel.scenarios.loadingMessage(false);
+            var vectors = (new ol.format.GeoJSON()).readFeatures(response.geojson, {
+                dataProjection: 'EPSG:3857',
+                featureProjection: 'EPSG:3857'
+            });
+            var footprint = (new ol.format.GeoJSON()).readFeatures(response.footprint, {
+                dataProjection: 'EPSG:3857',
+                featureProjection: 'EPSG:3857'
+            });
+            app.state.scenarioId = response.id;
+
+            app.setState('prescription');
+            app.state.setStep = [0, {'vectors': vectors, 'footprint': footprint}];
+
+          },
+          error: function(error) {
+            console.log(error);
+            app.loadingAnimation.hide();
+            app.viewModel.scenarios.loadingMessage(null);
+            // clearInterval(barTimer);
+            if (error.status === 400) {
+                $('#'+app.viewModel.currentTocId()+'-scenario-form > div').append(error.responseText);
+                app.viewModel.scenarios.scenarioForm(true);
+            } else {
+                app.viewModel.scenarios.errorMessage(error.responseJSON.error_msg.split('\n\n')[0]);
+            }
+            console.log(`%c form not submitted; %o`, 'color: salmon;', error.responseJSON.error_msg);
+            app.viewModel.scenarios.scenarioForm(true);
+          }
+      });
+    },
     submitPrescriptions: function(treatment_json) {
       // send AJAX to server
       $.ajax({

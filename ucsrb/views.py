@@ -1,7 +1,8 @@
 # Create your views here.
 from collections import OrderedDict
-from copy import deepcopy
+from copy import deepcopy, copy
 from datetime import datetime
+import time
 import json
 import os
 from pathlib import Path
@@ -20,6 +21,7 @@ from django.template import loader
 from django.views.decorators.cache import cache_page
 from ucsrb.forms import UploadShapefileForm
 from ucsrb.models import FocusArea, TreatmentScenario, StreamFlowReading, TreatmentArea
+from features.registry import get_feature_by_uid
 
 def accounts_context():
     context = {
@@ -157,6 +159,24 @@ def get_basin(request):
         focus_area = FocusArea.objects.get(unit_type=layer, unit_id=unit_id)
     return JsonResponse(json.loads('{"id":%s,"geojson": %s}' % (focus_area.pk, focus_area.geometry.geojson)))
 
+def create_treatment_areas(request):
+    if request.method == 'GET':
+        scenario_id = request.GET['scenario']
+        scenario = get_feature_by_uid(scenario_id)
+
+        final_geometry = copy(scenario.geometry_dissolved)
+
+        # Turns out break_up_multipolygons trashes the input value: copy it!
+        split_polys = break_up_multipolygons(copy(final_geometry), [])
+        prescription_selection = scenario.prescription_treatment_selection
+        context = {}
+
+        # if not scenario.geometry_dissolved.num_geom > 0:
+        if len(split_polys) < 1 or final_geometry.num_geom < 1:
+            return get_json_error_response('Drawing does not cover any forested land in the Upper Columbia', 500, context)
+
+        return get_scenario_treatment_areas_geojson(scenario, final_geometry, split_polys, prescription_selection, context)
+
 def save_drawing(request):
     context = {}
     if request.method == 'POST':
@@ -262,6 +282,11 @@ def define_scenario(request, featJson, scenario_name, description, prescription_
     if not scenario.geometry_dissolved:
         return get_json_error_response('Drawing does not cover any forested land in the Upper Columbia', 500, context)
     final_geometry = scenario.geometry_dissolved
+
+
+    return get_scenario_treatment_areas_geojson(scenario, final_geometry, split_polys, prescription_selection, context)
+
+def get_scenario_treatment_areas_geojson(scenario, final_geometry, split_polys, prescription_selection, context):
     # EPSG:2163 = US National Atlas Equal Area
     final_geometry.transform(2163)
     if final_geometry.area/4046.86 < settings.MIN_TREATMENT_ACRES:
@@ -799,7 +824,6 @@ def get_hydro_results_by_pour_point_id(request, year='baseline'):
 @cache_page(60 * 60) # 1 hour of caching
 def get_results_by_scenario_id(request):
     from ucsrb.models import TreatmentScenario, FocusArea, PourPoint
-    from features.registry import get_feature_by_uid
 
     scenario_id = request.GET.get('id')
     export = request.GET.get('export')
@@ -835,13 +859,20 @@ def get_results_by_scenario_id(request):
         pass
 
     downstream_ppts = PourPoint.objects.filter(id__in=reportable_ppts)
+
     if export:
         print("Export %s" % export)
     else:
-        if treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
+        if treatment.job_status == 'None' or treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
             treatment.set_report()
-            treatment = get_feature_by_uid(scenario_id)
-        aggregate_results = eval(treatment.aggregate_report)
+            if treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
+                treatment = get_feature_by_uid(scenario_id)
+
+        # draw/upload seems to have aggregate_report as a string, while
+        # filter wizard sets/gets it as object. This is bad, but for now,
+        # we'll just cast to a string.
+        aggregate_results = eval(str(treatment.aggregate_report))
+
         return_json = {
             'scenario': {
                 'name': treatment.name,
@@ -876,7 +907,6 @@ def get_last_flow_line(flow_outfile):
 
 def get_status_by_scenario_id(request):
     from ucsrb.models import TreatmentScenario, FocusArea, PourPoint
-    from features.registry import get_feature_by_uid
 
     scenario_id = request.GET.get('id')
     try:

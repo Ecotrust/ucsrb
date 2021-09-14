@@ -110,14 +110,8 @@ var madrona = {
                 traditional: true,
                 dataType: 'json',
                 success: function(result) {
-                    app.loadingAnimation.hide();
-                    app.state.setStep = 'result'; // go to results
-                    app.resultsInit(result['X-Madrona-Show']);
-                    app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show']});
-                    app.viewModel.scenarios.loadingMessage(false);
-                    // clearInterval(barTimer);
-                    // app.viewModel.scenarios.loadCollectionsFromServer();
-                    console.log(`%c form submitted: %o`, 'color: green;', result);
+                    app.request.createTreatmentAreas(result['X-Madrona-Show']);
+                    app.viewModel.scenarios.addScenarioToMap(null, {uid: result['X-Madrona-Show'], opacity: 0});
                 },
                 error: function(result) {
                     app.loadingAnimation.hide();
