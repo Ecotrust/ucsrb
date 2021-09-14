@@ -143,6 +143,7 @@ app.resultsInit = function(id) {
             if (!layerAdded) {
                 app.map.addLayer(app.map.layer.resultPoints.layer);
             }
+            app.state.scenarioId = id.split('_')[id.split('_').length-1];
             // run this after function is called for performance
             window.setTimeout(function() {
               app.map.setBoundaryLayer(app.map.layer.boundary.layer);
