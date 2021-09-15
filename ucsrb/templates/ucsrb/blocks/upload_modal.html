@@ -14,6 +14,7 @@
               <form id="upload-treatment-form" enctype="multipart/form-data" method="POST" novalidate="">
                 {% csrf_token %}
                 {{ UPLOAD_FORM.as_p }}
+                <p class="form-disclaimer">You will be able to assign different treatment prescriptions to each treatment area later</p>
                 <input type="submit" value="Upload" id="upload-submit-btn">
               </form>
             </div>

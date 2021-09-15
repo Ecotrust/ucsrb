@@ -549,6 +549,8 @@ app.panel = {
                 '<label for="treat_desc">Description:</label>' +
                 '<textarea rows="2" columns="35" name="treat_desc"></textarea><br>' +
                 '<br>' +
+                '<p class="instructions">Select a default treatment prescription:</p>' +
+                '<p class="form-disclaimer">You will be able to assign different treatment prescriptions to each treatment area later</p>' +
                 '<ul id="draw_id_prescription_treatment_selection" class="prescription-choices">' +
                 '<li><label for="draw_id_prescription_treatment_selection_0"><input type="radio" name="draw_prescription_treatment_selection" value="notr" class="prescription-choices" id="draw_id_prescription_treatment_selection_0">No Treatment scenario</label></li>' +
                 '<li><label for="draw_id_prescription_treatment_selection_1"><input type="radio" name="draw_prescription_treatment_selection" value="mb16" class="prescription-choices" id="draw_id_prescription_treatment_selection_1">Maximum Biomass 16 inch scenario</label></li>' +
@@ -602,7 +604,10 @@ app.panel = {
             for (var i = 0; i < drawFeatures.length; i++) {
                 totalArea += ol.Sphere.getArea(drawFeatures[i].getGeometry());
             }
-            if (drawingIsSmallEnough(totalArea)) {
+            var selected_treatment = $('input[name="draw_prescription_treatment_selection"]:checked');
+            if (selected_treatment.length != 1) {
+              alert('Please select a default treatment prescription.');
+            } else if (drawingIsSmallEnough(totalArea)) {
                 var drawing_name = $('#draw_submit_form').find('[name=treat_name]').val();
                 var drawing_desc = $('#draw_submit_form').find('[name=treat_desc]').val();
                 var drawing_rx = $('input[name="draw_prescription_treatment_selection"]:checked').val();
@@ -610,7 +615,6 @@ app.panel = {
             } else {
                 areaInAcres = totalArea/4046.86;
                 alert('Your treatment area is too large (' + areaInAcres.toFixed(0) + ' acres). Please keep it below ' + app.map.draw.maxAcres.toString() + ' acres');
-                app.panel.draw.acceptDrawing();
             }
         },
         get getDrawContentElement() {
@@ -1289,7 +1293,11 @@ app.request = {
             },
             error: function(response, status) {
                 console.log(`%cfail @ save drawing: %o`, 'color: red', response);
-                alert(response.responseJSON.error_msg);
+                if (response.hasOwnProperty('responseJSON') && response.responseJSON.hasOwnPropety('error_msg')) {
+                  alert(response.responseJSON.error_msg);
+                } else {
+                  alert("Error saving drawing. Please review your form and drawings and try again.");
+                }
                 app.panel.draw.finishDrawing();
             }
         })

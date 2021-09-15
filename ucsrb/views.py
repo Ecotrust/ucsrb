@@ -183,7 +183,10 @@ def save_drawing(request):
         featJson = request.POST['drawing']
         scenario_name = request.POST['name']
         description = request.POST['description']
-        prescription_selection = request.POST['prescription_treatment_selection']
+        if 'prescription_treatment_selection' in request.POST.keys():
+            prescription_selection = request.POST['prescription_treatment_selection']
+        else:
+            prescription_selection = "flow"
 
 
         return define_scenario(request, featJson, scenario_name, description, prescription_selection)
