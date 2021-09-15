@@ -200,7 +200,9 @@
             <div data-bind="css: { 'disabled': gridCellsRemaining()==0 }">
                 {# <p class="instructions">Choose a Prescription Treatment Scenario</p> #}
                 <div class="form-group">
-                    <p class="instructions">{{ form.prescription_treatment_selection.label }}</p>
+                    <!-- <p class="instructions">{{ form.prescription_treatment_selection.label }}</p> -->
+                    <p class="instructions">Select a default treatment prescription:</p>
+                    <p class="form-disclaimer">You will be able to assign different treatment prescriptions to each treatment area later</p>
                 </div>
                 <div id="step{{ form.get_steps|length|add:"1" }}-inputs" class="step-inputs">
                     <div class="form-group">

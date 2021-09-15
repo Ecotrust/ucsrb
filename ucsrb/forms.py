@@ -274,11 +274,11 @@ class TreatmentScenarioForm(ScenarioForm):
     def get_steps(self):
         return self.get_step_0_fields(), self.get_step_1_fields(), self.get_step_2_fields(),
 
-    def get_prescription_selection(self):
-        names = [
-            ('prescription_treatment_selection', None, None, None),
-        ]
-        return self._get_fields(names)
+    # def get_prescription_selection(self):
+    #     names = [
+    #         ('prescription_treatment_selection', None, None, None),
+    #     ]
+    #     return self._get_fields(names)
 
     def clean_focus_area_input(self):
         return FocusArea.objects.get(pk=self.cleaned_data['focus_area_input'])
@@ -319,6 +319,7 @@ class TreatmentScenarioForm(ScenarioForm):
 
     def save(self, commit=True):
         inst = super(TreatmentScenarioForm, self).save(commit=True)
+
         inst.aggregate_report = inst.aggregate_results()
         # if self.data.get('clear_support_file'):
         #     inst.support_file = None

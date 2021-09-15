@@ -28,41 +28,24 @@ var madrona = {
                 $('#invalid-name-message').show();
                 return false;
             }
-            //submitted = true;
-            submitForm($form);
+            var selected_treatment = $("#id_prescription_treatment_selection input:checked").val();
+            if (!selected_treatment) {
+              $("#button_prev").click();
+              window.alert("Please select a default treatment prescription - you will be able to set different prescriptions to all areas later.");
+            } else {
+              $("#id_prescription_treatment_selection").val(selected_treatment);
+              $('#id_prescription_treatment_selection input:not(:checked)').remove();
+              //submitted = true;
+              submitForm($form);
+            }
         });
 
-        //no longer needed...? (if it was going here it meant there was a problem)
-        /*
-        $form.submit( function() {
-            var name = $('#id_name').val();
-            if ($.trim(name) === "") {
-                $('#invalid-name-message').show();
-                return false;
-            }
-            if (!submitted) {
-                submitForm($form);
-            }
-        });
-        */
         submitForm = function($form) {
             // var $form = $(this).closest('.panel').find('form'),
             var url = $form.attr('action'),
                 // $bar = $form.closest('.tab-pane').find('.bar'),
                 data = new FormData();
                 // barTimer;
-
-            //progress bar
-            // barTimer = setInterval(function () {
-            //     var width = parseInt($bar.css('width').replace('px', ''), 10) + 5,
-            //         barWidth = parseInt($bar.parent().css('width').replace('px',''), 10);
-            //
-            //     if (width < barWidth) {
-            //         $bar.css('width', width + "px");
-            //     } else {
-            //         clearInterval(barTimer);
-            //     }
-            // }, 500);
 
             app.checkboxes = {};
             $form.find('input,select,textarea').each( function(index, input) {
