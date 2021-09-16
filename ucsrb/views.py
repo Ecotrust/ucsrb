@@ -338,7 +338,7 @@ def set_treatment_prescriptions(request):
         for treatment in received_json_data['treatment_prescriptions']:
             ta = TreatmentArea.objects.get(pk=int(treatment['id']))
             # check treatment's Scenario's owner matches user
-            if ta.scenario.user == request.user:
+            if ta.scenario.user == request.user or (request.user.is_anonymous and ta.scenario.user.pk == settings.ANONYMOUS_USER_PK):
                 ta.prescription_treatment_selection = treatment['prescription']
                 ta.save()
                 json_response['records_updated'] = json_response['records_updated']+1
