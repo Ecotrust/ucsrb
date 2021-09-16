@@ -1396,7 +1396,7 @@ app.request = {
             app.resultsInit('ucsrb_treatmentscenario_' + app.state.scenarioId);
             app.state.setStep = 'results';
           } else {
-            alert("Error: " + response.messsage + " -- (CODE:" + response.code + ")");
+            alert("Error: " + response.message + " -- (CODE:" + response.code + ")");
           }
         },
         error: function(response) {
