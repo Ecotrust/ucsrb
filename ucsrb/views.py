@@ -839,14 +839,6 @@ def get_results_by_scenario_id(request):
     impacted_pourpoint_ids = list(set([x.dwnstream_ppt_id for x in veg_units]))
     intermediate_downstream_ppts = PourPoint.objects.filter(id__in=impacted_pourpoint_ids)
 
-    # imputation_ids = []
-    # for lookup in ScenarioNNLookup.objects.all():
-    #     if lookup.ppt_id not in imputation_ids:
-    #         imputation_ids.append(lookup.ppt_id)
-
-    # RDH: Again, some ppts we thought we had modeled, but couldn't - A few of those we couldn't even impute, so skip 'em.
-    # imputation_ids = [x for x in imputation_ids if x not in settings.PROBLEMATIC_POUR_POINTS]
-    # viable_reporting_ppt_ids = [x.id for x in PourPoint.objects.filter(imputed_ppt__in=imputation_ids)]
     viable_reporting_ppt_ids = [x.id for x in intermediate_downstream_ppts]
 
     overlap_basins = FocusArea.objects.filter(unit_type='PourPointOverlap', unit_id__in=viable_reporting_ppt_ids)
