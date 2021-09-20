@@ -434,6 +434,7 @@ def get_results_delta(flow_output):
         out_dict = deepcopy(flow_output)
     for treatment in out_dict.keys():
         if type(out_dict[treatment]) == dict:
+            # flow_results
             for timestep in out_dict[treatment].keys():
                 baseflow = flow_output[treatment][timestep]
                 for rx in out_dict.keys():
@@ -442,13 +443,11 @@ def get_results_delta(flow_output):
                         out_dict[rx][timestep] -= baseflow
             return sort_output(out_dict)
         elif type(out_dict[treatment]) == list:
-            for rx in out_dict.keys():
-                for index, timestep in enumerate(out_dict[rx]):
-                    # Testing has shown that this logic is sound - chronological order is maintained across rx.
-                    # if not flow_output['baseline'][index]['timestep'] == out_dict[rx][index]['timestep']:
-                    #     print('ERROR: Mismatch Timesteps: %s --- %s' % (flow_output['baseline'][index]['timestep'], out_dict[rx][index]['timestep']))
-                    baseflow = flow_output['baseline'][index]['flow']
-                    out_dict[rx][index]['flow'] -= baseflow
+            # previously-deltaed data
+            for index, timestep in enumerate(out_dict[treatment]):
+                # Testing has shown that this logic is sound - chronological order is maintained across treatment.
+                baseflow = flow_output['baseline'][index]['flow']
+                out_dict[treatment][index]['flow'] -= baseflow
 
     return out_dict
 
@@ -575,7 +574,7 @@ def get_float_change_as_rounded_string(rx_val,baseline):
 #   pourpoint_id
 #   treatment_id
 # @cache_page(60 * 60) # 1 hour of caching
-def get_hydro_results_by_pour_point_id(request, year='baseline'):
+def get_hydro_results_by_pour_point_id(request):
     from ucsrb.models import TreatmentScenario, FocusArea, PourPoint, VegPlanningUnit
     import csv
     import time
@@ -635,9 +634,9 @@ def get_hydro_results_by_pour_point_id(request, year='baseline'):
     # (flow_output, annual_water_volume, sept_avg_flow) = parse_flow_results(overlap_basin, treatment)
     flow_results = parse_flow_results(overlap_basin, treatment)
 
-    flow_output = flow_results[year]['flow_output']
-    annual_water_volume = flow_results[year]['annual_water_volume']
-    sept_avg_flow = flow_results[year]['sept_avg_flow']
+    flow_output = flow_results['baseline']['flow_output']
+    annual_water_volume = flow_results['baseline']['annual_water_volume']
+    sept_avg_flow = flow_results['baseline']['sept_avg_flow']
 
     # TUNING: For large basins, this can take over 1 minute to run.
     basin_fractional_coverage = {
