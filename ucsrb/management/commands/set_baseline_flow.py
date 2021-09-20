@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.contrib.auth.models import User
 from ucsrb.models import FocusArea, TreatmentScenario
+from dhsvm_harness.utils import runHarnessConfig
 from time import sleep
 
 class Command(BaseCommand):
@@ -26,33 +27,4 @@ class Command(BaseCommand):
             )
             sys.exit()
 
-        basin_lookup = settings.BASIN_RESET_LOOKUP[basin_name.lower()]
-
-        # Get reset_basin
-        reset_basin_template = FocusArea.objects.get(unit_type='PourPointDiscrete', unit_id=basin_lookup['UNIT_ID'])
-        reset_basin = FocusArea.objects.create(
-            unit_type='Drawing',
-            unit_id=reset_basin_template.unit_id,
-            geometry=reset_basin_template.geometry
-        )
-        reset_basin.save()
-
-        super_user = User.objects.filter(is_superuser=True)[0]
-
-        reset_treatment = TreatmentScenario.objects.create(
-            user=super_user,
-            name='Reset {} Treatment'.format(basin_name),
-            description="NOTR",
-            focus_area=True,
-            focus_area_input=reset_basin,
-            # scenario=reset_scenario,
-            prescription_treatment_selection='notr'
-        )
-        reset_treatment.save()
-        reset_treatment.run_dhsvm()
-        sleep(1)
-        job = reset_treatment.active_job
-        if job == None:
-            print("Job scheduled for treatment {}".format(reset_treatment.id))
-        else:
-            print("Job running: {}".format(job.task_id))
+        runHarnessConfig(None, basin=basin_name)

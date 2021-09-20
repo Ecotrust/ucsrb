@@ -423,15 +423,19 @@ SUPERBASINS = {
 BASIN_RESET_LOOKUP = {
     'entiat': {
         'UNIT_ID': 'enti_1065',
+        'BASIN_ID': 'enti',
     },
     'methow': {
         'UNIT_ID': 'metw_5074',
+        'BASIN_ID': 'metw',
     },
     'okanogan': {
         'UNIT_ID': 'okan_4700',
+        'BASIN_ID': 'okan',
     },
     'wenatchee': {
         'UNIT_ID': 'wena_3466',
+        'BASIN_ID': 'wena',
     }
 }
 
