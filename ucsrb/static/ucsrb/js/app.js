@@ -560,7 +560,7 @@ app.panel = {
                 '</ul><br />' +
                 '<div class="btn-toolbar justify-content-between drawing-buttons">' +
                 '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +
-                '<button type="submit" class="btn btn-primary ' + saveDisable + '" >Begin Evaluation</button>' +
+                '<button type="submit" class="btn btn-primary ' + saveDisable + '" >Prescribe Treatments</button>' +
                 '</div>' +
                 '</form>' +
                 '</div>';
