@@ -115,6 +115,15 @@ app.init = {
     }
 }
 
+app.clearScenarioLayer = function() {
+  if (app.map.scenarioLayer && app.map.scenarioLayer.hasOwnProperty('removeAllFeatures')) {
+    app.map.scenarioLayer.removeAllFeatures();
+    app.map.scenarioLayer.setVisibility(false);
+  } else {
+    window.setTimeout(app.clearScenarioLayer(),100);
+  }
+}
+
 app.resultsInit = function(id) {
     app.map.geoSearch.closeSearchBox();
     app.panel.results.init();
@@ -150,9 +159,7 @@ app.resultsInit = function(id) {
               app.map.layer.boundary.layer.setVisible(true);
 
               // Hide treated polygons
-              if (app.map.scenarioLayer && app.map.scenarioLayer.hasOwnProperty('removeAllFeatures')) {
-                app.map.scenarioLayer.removeAllFeatures();
-              }
+              app.clearScenarioLayer();
 
               app.map.addTreatmentAreasToMap(response.treatment_areas);
               app.map.addDownstreamPptsToMap(response.pourpoints);
