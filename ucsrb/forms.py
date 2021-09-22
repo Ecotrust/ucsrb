@@ -215,7 +215,7 @@ class TreatmentScenarioForm(ScenarioForm):
 
     has_burned = HiddenScenarioBooleanField(
         # initial=False,
-        label="Exclude areas burned in fire since 2012",
+        label="Exclude areas burned in fire 2012-2018",
         help_text="Vegetation data is from 2012. It is not accurate for planning management impacts in areas that have burned since.",
         required=False,
     )
