@@ -308,12 +308,35 @@ WATERSHED_CHOICES = [
 ########################################
 
 PRESCRIPTION_TREATMENT_CHOICES = [
-    ('notr', 'No Treatment scenario'),
-    ('mb16', 'Maximum Biomass 16 inch scenario'),
-    ('mb25', 'Maximum Biomass 25 inch scenario'),
-    ('burn', 'Burn Only scenario'),
-    ('flow', 'Ideal Water scenario'),
+    ('notr', 'No Treatment'),
+    ('mb16', 'Maximum Biomass 16 Inch Limit'),
+    ('mb25', 'Maximum Biomass 25 Inch Limit'),
+    ('burn', 'Burn Only'),
+    ('flow', 'Ideal Water'),
 ]
+
+PRESCRIPTION_TREATMENT_CHOICES_LOOKUP = {
+    'notr': {
+        'label': 'No Treatment',
+        'tooltip': 'Baseline vegetation without fire or mechanical treatment.'
+    },
+    'mb16': {
+        'label': 'Maximum Biomass 16 Inch Limit',
+        'tooltip': 'Retaining all ponderosa pine and western larch ≥ 16-in at DBH. Wilderness areas are excluded in practice.'
+    },
+    'mb25': {
+        'label': 'Maximum Biomass 25 Inch Limit',
+        'tooltip': 'Retaining all ponderosa pine and western larch ≥ 25-in at DBH. Wilderness areas are excluded in practice.'
+    },
+    'burn': {
+        'label': 'Burn Only',
+        'tooltip': 'Broadcast burning treatments across all forested pixels with their existing surface and canopy fuel levels, under moderate fire weather conditions. Wilderness areas are included in practice.'
+    },
+    'flow': {
+        'label': 'Ideal Water',
+        'tooltip': 'Treatment consists of creating gaps with gap radii are 1.2 * canopy height.'
+    },
+}
 
 ########################################
 #####  FLOW METRIC CHOICES  ############

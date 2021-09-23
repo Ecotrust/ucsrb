@@ -414,6 +414,15 @@ class TreatmentArea(models.Model):
     objects = gismodels.Manager()
 
     @property
+    def forested_acres(self):
+        vus = VegPlanningUnit.objects.filter(geometry__intersects=self.geometry)
+        acres = 0
+        for vu in vus:
+            acres += vu.acres
+
+        return acres
+
+    @property
     def geojson(self):
         out_geojson = {
             'type': "Feature",
@@ -421,6 +430,8 @@ class TreatmentArea(models.Model):
             'properties': {
                 'id': self.pk,
                 'prescription': self.prescription_treatment_selection,
+                'rx_label': settings.PRESCRIPTION_TREATMENT_CHOICES_LOOKUP[self.prescription_treatment_selection.label],
+                'forested_acres': self.forested_acres
             }
         }
         return json.dumps(out_geojson)
