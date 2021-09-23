@@ -959,28 +959,46 @@ Panel
     line-height: 1.5;
 }
 
+#scenarios-form p.form-disclaimer,
+#scenarios-form p.instructions,
 #draw_submit_form p.form-disclaimer,
 #draw_submit_form p.instructions {
   margin: 0 0 0.5rem;
 }
 
+ul#id_prescription_treatment_selection,
 ul#draw_id_prescription_treatment_selection {
-  background: lightgray;
+  background-color: #E5E5E5;
   border-radius: 0.4rem;
   padding: 0.5rem 0 0.5rem 0.5rem;
 }
 
-#draw_id_prescription_treatment_selection li {
-  list-style: none;
-  /* margin-left: -20px; */
+form#upload-treatment-form ul#id_prescription_treatment_selection {
+  color: rgb(88, 89, 91);
+  background-color: #F0F0FF;
 }
 
+form#upload-treatment-form p {
+  margin-bottom: 0.3rem;
+}
+
+#id_prescription_treatment_selection li,
+#draw_id_prescription_treatment_selection li {
+  list-style: none;
+}
+
+#id_prescription_treatment_selection li label,
 #draw_id_prescription_treatment_selection li label {
   width: 100%;
 }
 
+#id_prescription_treatment_selection div.text-right,
 #draw_id_prescription_treatment_selection div.text-right {
   float: right;
+}
+
+#step4-inputs {
+  padding: 1px;
 }
 
 .progress {

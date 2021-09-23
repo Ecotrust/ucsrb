@@ -45,13 +45,15 @@
                                     <span class="parameter-label form-check-label" style="margin-left: 15px">{{ field.label }}</span>
                                 </label>
                             </div>
-                            <div class="col-2 text-right">
-                                <i class="info-icon icon-info-sign field-tooltip"
-                                   data-toggle="tooltip"
-                                   data-original-title="{{ field.help_text }}"
-                                   data-placement="top">
-                                </i>
-                            </div>
+                            {% if field.help_text and not field.help_text == "" %}
+                              <div class="col-2 text-right">
+                                  <i class="info-icon icon-info-sign field-tooltip"
+                                     data-toggle="tooltip"
+                                     data-original-title="{{ field.help_text }}"
+                                     data-placement="top">
+                                  </i>
+                              </div>
+                            {% endif %}
                             {% if field_min or field_max or field_input or field_checkbox %}
 
                         <!--
@@ -207,13 +209,6 @@
                 <div id="step{{ form.get_steps|length|add:"1" }}-inputs" class="step-inputs">
                     <div class="form-group">
                         {{ form.prescription_treatment_selection.as_widget }}
-                        <div class="col-2 text-right">
-                            <i class="info-icon icon-info-sign field-tooltip"
-                               data-toggle="tooltip"
-                               data-original-title="{{ form.prescription_treatment_selection.help_text }}"
-                               data-placement="top">
-                            </i>
-                        </div>
                     </div>
                 </div>
             </div>

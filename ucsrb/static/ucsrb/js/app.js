@@ -177,6 +177,37 @@ app.resultsInit = function(id) {
       });
 }
 
+applyTooltips = function() {
+  tooltip_start = '<div class="col-2 text-right"><i class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="';
+  tooltip_end = '" data-placement="left"></i></div>';
+  $('ul#id_prescription_treatment_selection label').each(function(index){
+    var label = $( this );
+    switch(label.children('input').val()) {
+      case 'notr':
+        tooltip_html = tooltip_start + 'Baseline vegetation without fire or mechanical treatment.' + tooltip_end;
+        break;
+      case 'mb16':
+        tooltip_html = tooltip_start + 'Retaining all ponderosa pine and western larch ≥ 16-in at DBH. Wilderness areas are excluded in practice.' + tooltip_end;
+        break;
+      case 'mb25':
+        tooltip_html = tooltip_start + 'Retaining all ponderosa pine and western larch ≥ 25-in at DBH. Wilderness areas are excluded in practice.' + tooltip_end;
+        break;
+      case 'burn':
+        tooltip_html = tooltip_start + 'Broadcast burning treatments across all forested pixels with their existing surface and canopy fuel levels, under moderate fire weather conditions.' + tooltip_end;
+        break;
+      case 'flow':
+        tooltip_html = tooltip_start + 'Treatment consists of creating gaps with gap radii are 1.2 * canopy height.' + tooltip_end;
+        break;
+      default:
+        tooltip_html = '';
+    }
+    if (label.children('div.text-right').length == 0) {
+      label.append(tooltip_html);
+    }
+  });
+  $('[data-toggle="tooltip"]').tooltip();
+}
+
 initFiltering = function() {
     setTimeout(function() {
         if ($('#focus_area_accordion').length > 0) {
@@ -189,6 +220,7 @@ initFiltering = function() {
             app.viewModel.scenarios.scenarioFormModel.toggleParameter('has_wilderness_area');
             app.allowUpdates(true);
             app.viewModel.scenarios.scenarioFormModel.toggleParameter('focus_area');
+            applyTooltips();
         } else {
             initFiltering();
         }
@@ -677,6 +709,9 @@ enableDrawing = function() {
 showUploadForm = function() {
   $('#define-modal').modal('hide');
   $('#treatment-upload-modal').modal('show');
+  setTimeout(function() {
+    applyTooltips();
+  }, 100);
 }
 
 showPrescriptionForm = function(features_object) {
