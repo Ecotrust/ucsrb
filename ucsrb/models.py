@@ -430,7 +430,7 @@ class TreatmentArea(models.Model):
             'properties': {
                 'id': self.pk,
                 'prescription': self.prescription_treatment_selection,
-                'rx_label': settings.PRESCRIPTION_TREATMENT_CHOICES_LOOKUP[self.prescription_treatment_selection.label],
+                'rx_label': settings.PRESCRIPTION_TREATMENT_CHOICES_LOOKUP[self.prescription_treatment_selection]['label'],
                 'forested_acres': self.forested_acres
             }
         }
