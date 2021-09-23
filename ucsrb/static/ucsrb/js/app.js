@@ -534,6 +534,7 @@ app.panel = {
             app.panel.show();
             app.state.panel.content = content;
             app.panel.draw.getDrawContentElement.innerHTML = content;
+            $('[data-toggle="tooltip"]').tooltip();
         },
         finishDrawing: function() {
             app.panel.moveRight();
@@ -559,11 +560,31 @@ app.panel = {
                 '<p class="instructions">Select a default treatment prescription:</p>' +
                 '<p class="form-disclaimer">You will be able to assign different treatment prescriptions to each treatment area later</p>' +
                 '<ul id="draw_id_prescription_treatment_selection" class="prescription-choices">' +
-                '<li><label for="draw_id_prescription_treatment_selection_0"><input type="radio" name="draw_prescription_treatment_selection" value="notr" class="prescription-choices" id="draw_id_prescription_treatment_selection_0">No Treatment scenario</label></li>' +
-                '<li><label for="draw_id_prescription_treatment_selection_1"><input type="radio" name="draw_prescription_treatment_selection" value="mb16" class="prescription-choices" id="draw_id_prescription_treatment_selection_1">Maximum Biomass 16 inch scenario</label></li>' +
-                '<li><label for="draw_id_prescription_treatment_selection_2"><input type="radio" name="draw_prescription_treatment_selection" value="mb25" class="prescription-choices" id="draw_id_prescription_treatment_selection_2">Maximum Biomass 25 inch scenario</label></li>' +
-                '<li><label for="draw_id_prescription_treatment_selection_3"><input type="radio" name="draw_prescription_treatment_selection" value="burn" class="prescription-choices" id="draw_id_prescription_treatment_selection_3">Burn Only scenario</label></li>' +
-                '<li><label for="draw_id_prescription_treatment_selection_4"><input type="radio" name="draw_prescription_treatment_selection" value="flow" class="prescription-choices" id="draw_id_prescription_treatment_selection_4">Ideal Water scenario</label></li>' +
+                '<li><label for="draw_id_prescription_treatment_selection_0">' +
+                '   <input type="radio" name="draw_prescription_treatment_selection" value="notr" class="prescription-choices" id="draw_id_prescription_treatment_selection_0">' +
+                '     No Treatment' +
+                '<div class="col-2 text-right"><i class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="Baseline vegetation without fire or mechanical treatment." data-placement="top"></i></div>' +
+                '</label></li>' +
+                '<li><label for="draw_id_prescription_treatment_selection_1">' +
+                '   <input type="radio" name="draw_prescription_treatment_selection" value="mb16" class="prescription-choices" id="draw_id_prescription_treatment_selection_1">' +
+                '     Maximum Biomass 16 Inch Limit' +
+                '     <div class="col-2 text-right"><i class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="Retaining all ponderosa pine and western larch ≥ 16-in at DBH. Wilderness areas are excluded in practice." data-placement="top"></i></div>' +
+                '</label></li>' +
+                '<li><label for="draw_id_prescription_treatment_selection_2">' +
+                '   <input type="radio" name="draw_prescription_treatment_selection" value="mb25" class="prescription-choices" id="draw_id_prescription_treatment_selection_2">' +
+                '     Maximum Biomass 25 Inch Limit' +
+                '     <div class="col-2 text-right"><i class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="Retaining all ponderosa pine and western larch ≥ 25-in at DBH. Wilderness areas are excluded in practice." data-placement="top"></i></div>' +
+                '</label></li>' +
+                '<li><label for="draw_id_prescription_treatment_selection_3">' +
+                '   <input type="radio" name="draw_prescription_treatment_selection" value="burn" class="prescription-choices" id="draw_id_prescription_treatment_selection_3">' +
+                '     Burn Only' +
+                '     <div class="col-2 text-right"><i class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="Broadcast burning treatments across all forested pixels with their existing surface and canopy fuel levels, under moderate fire weather conditions. Wilderness areas are included in practice." data-placement="top"></i></div>' +
+                '</label></li>' +
+                '<li><label for="draw_id_prescription_treatment_selection_4">' +
+                '   <input type="radio" name="draw_prescription_treatment_selection" value="flow" class="prescription-choices" id="draw_id_prescription_treatment_selection_4">' +
+                '     Ideal Water' +
+                '     <div class="col-2 text-right"><i class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="Treatment consists of creating gaps with gap radii are 1.2 * canopy height." data-placement="top"></i></div>' +
+                '</label></li>' +
                 '</ul><br />' +
                 '<div class="btn-toolbar justify-content-between drawing-buttons">' +
                 '<button type="button" class="btn btn-outline-secondary" onclick="app.panel.draw.restart()">Restart</button>' +

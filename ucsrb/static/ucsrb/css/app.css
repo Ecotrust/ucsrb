@@ -959,6 +959,30 @@ Panel
     line-height: 1.5;
 }
 
+#draw_submit_form p.form-disclaimer,
+#draw_submit_form p.instructions {
+  margin: 0 0 0.5rem;
+}
+
+ul#draw_id_prescription_treatment_selection {
+  background: lightgray;
+  border-radius: 0.4rem;
+  padding: 0.5rem 0 0.5rem 0.5rem;
+}
+
+#draw_id_prescription_treatment_selection li {
+  list-style: none;
+  /* margin-left: -20px; */
+}
+
+#draw_id_prescription_treatment_selection li label {
+  width: 100%;
+}
+
+#draw_id_prescription_treatment_selection div.text-right {
+  float: right;
+}
+
 .progress {
     /* background: rgba(230,231,232,0.15); */
     background: rgba(150,151,152,0.45);
