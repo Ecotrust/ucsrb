@@ -375,6 +375,9 @@ main {
     font-size: .875em;
     margin: 0 auto;
     width: 70%;
+    position: absolute;
+    right: 115px;
+    left: 55px;
 }
 
 .map-wrap .overlay.short-overlay h2 {

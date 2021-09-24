@@ -868,8 +868,8 @@ app.nav = {
         define: [''],
         upload: [''],
         draw: [
-            'Zoom in to area of interest or use the geocoder to search for places by name.<br />Click on the map to start drawing the boundary of your management area.',
-            'Add additional points then double-click to finish; Re-select point to edit',
+            'Zoom in to area of interest or use the search (&rarr;) to find places by name.<br />Click on the map to start drawing the boundary of your management area.',
+            'Add additional points then double-click to finish; Re-select point to edit<br/>Click again to add another management area.',
         ],
         prescription: [
           'Select which areas you wish to change treatment prescriptions for.'

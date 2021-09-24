@@ -264,11 +264,7 @@
             <div class="btn-group" role="group" aria-label="steps and save">
                 <a href="#" class="button btn btn-outline-primary" onclick="this.blur(); return false;" id="button_prev"><span>&lt; Previous</span></a>
                 <a href="#" class="button btn btn-outline-primary ml-auto"  onclick="this.blur(); return false;" id="button_next"><span>Next &gt;</span></a>
-                {% if user.is_authenticated %}
-                  <a href="#" class="submit_button button btn btn-primary disabled" onclick="this.blur(); return false;"><span>Evaluate</span></a>
-                {% else %}
-                    <a href="#" class="submit_button button btn btn-primary disabled" onclick="this.blur(); return false;"><span>Save</span></a>
-                {% endif %}
+                <a href="#" class="submit_button button btn btn-primary disabled" onclick="this.blur(); return false;"><span class="field-tooltip" data-toggle="tooltip" data-original-title="Proceed to Treatment Assignment." data-placement="top">Next &gt;</span></a>
             </div>
         </div>
     </div>
