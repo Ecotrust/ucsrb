@@ -992,9 +992,14 @@ form#upload-treatment-form p {
   width: 100%;
 }
 
+div.prescription-selection-row span.rx-tooltip,
 #id_prescription_treatment_selection div.text-right,
 #draw_id_prescription_treatment_selection div.text-right {
   float: right;
+}
+
+div.prescription-selection-row span.rx-tooltip {
+  margin: 1rem;
 }
 
 #step4-inputs {

@@ -733,25 +733,45 @@ showPrescriptionForm = function(features_object) {
 
         '<div id="prescription-selection-container">' +
           '<div class="prescription-selection-row" id="notr-row">' +
-            '<button id="notr-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyNotr()" disabled>Apply</button> <span class="rx-label">No Treatment</span>' +
+            '<button id="notr-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyNotr()" disabled>Apply</button>' +
+                '<span class="rx-label">No Treatment</span>' +
+                '<span class="rx-tooltip text-right"><i class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="' +
+                    'Baseline vegetation without fire or mechanical treatment.'+
+                    '" data-placement="left"></i></span>' +
           '</div>' +
           '<div class="prescription-selection-row" id="mb16-row">' +
-            '<button id="mb16-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyMb16()" disabled>Apply</button> <span class="rx-label">Maximum Biomass 16-inch</span>' +
+            '<button id="mb16-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyMb16()" disabled>Apply</button>' +
+                '<span class="rx-label">Maximum Biomass 16-inch</span>' +
+                '<span class="rx-tooltip text-right"><i class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="' +
+                    'Retaining all ponderosa pine and western larch ≥ 16-in at DBH. Wilderness areas are excluded in practice.'+
+                    '" data-placement="left"></i></span>' +
           '</div>' +
           '<div class="prescription-selection-row" id="mb25-row">' +
-            '<button id="mb25-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyMb25()" disabled>Apply</button> <span class="rx-label">Maximum Biomass 25-inch</span>' +
+            '<button id="mb25-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyMb25()" disabled>Apply</button>' +
+                '<span class="rx-label">Maximum Biomass 25-inch</span>' +
+                '<span class="rx-tooltip text-right"><i class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="' +
+                    'Retaining all ponderosa pine and western larch ≥ 25-in at DBH. Wilderness areas are excluded in practice.'+
+                    '" data-placement="left"></i></span>' +
           '</div>' +
           '<div class="prescription-selection-row" id="burn-row">' +
-            '<button id="burn-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyBurn()" disabled>Apply</button> <span class="rx-label">Burn Only</span>' +
+            '<button id="burn-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyBurn()" disabled>Apply</button>' +
+                '<span class="rx-label">Burn Only</span>' +
+                '<span class="rx-tooltip text-right"><i class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="' +
+                    'Broadcast burning treatments across all forested pixels with their existing surface and canopy fuel levels, under moderate fire weather conditions.'+
+                    '" data-placement="left"></i></span>' +
           '</div>' +
           '<div class="prescription-selection-row" id="ideal-row">' +
-            '<button id="ideal-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyIdeal()" disabled>Apply</button> <span class="rx-label">Ideal Water Flow</span>' +
+            '<button id="ideal-apply-button" class="btn btn-primary rx-button" onclick="app.prescription.applyIdeal()" disabled>Apply</button>' +
+                '<span class="rx-label">Ideal Water Flow</span>' +
+                '<span class="rx-tooltip text-right"><i class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="' +
+                    'Treatment consists of creating gaps with gap radii are 1.2 * canopy height.'+
+                    '" data-placement="left"></i></span>' +
           '</div>' +
         '</div>' +
         '<button class="btn btn-primary" id="rx-submit-button" onclick="app.prescription.submitTreatments()">Save And Report</button>' +
       '</div>';
   app.panel.setContent(html);
-
+  $('[data-toggle="tooltip"]').tooltip();
 }
 
 app.filterDropdownContent = `<div class="dropdown">
