@@ -64,7 +64,9 @@ setInit = function() {
 };
 
 reportInit = function() {
-
+  setTimeout(function(){
+    $('#results-disclaimer').tooltip();
+  }, 50);
 }
 
 app.init = {
@@ -345,7 +347,14 @@ app.panel = {
         },
         expander: function() {
             if (!document.querySelector('#expand')) {
-                app.panel.getPanelContentElement.insertAdjacentHTML('afterbegin', '<a id="expand" href="#" onclick="app.panel.toggleSize()" /><img src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" /></a>');
+                app.panel.getPanelContentElement.insertAdjacentHTML(
+                  'afterbegin',
+                  '<i id="results-disclaimer" class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="' +
+                    'The results from the Snow2Flow tool are a “snapshot in time” and do not include vegetation re-growth. Furthermore, results are based on a wet, average, and dry year. Specific streamflow values should not be taken as absolute or certain results of forest management, but rather as a potential change in streamflow with forest management.' +
+                  '" data-placement="left"></i>' +
+                  '<a id="expand" href="#" onclick="app.panel.toggleSize()" />' +
+                    '<img src="/static/ucsrb/img/icon/i_expand.svg" alt="expand" />' +
+                  '</a>');
             }
         },
         aggPanel: function(results) {

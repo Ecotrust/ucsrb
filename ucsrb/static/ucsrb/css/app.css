@@ -68,6 +68,7 @@ Nav with scenario options (select, filter, draw)
 
 .method-nav {
     transition: 1s all ease-in-out;
+    height: 100%;
 }
 
 .method-nav li {
@@ -1243,6 +1244,14 @@ div.prescription-selection-row span.rx-tooltip {
         transition: 0.1s transform ease;
         transform: rotate(0deg);
         transform-origin: center;
+        line-height: 1em;
+    }
+
+    #panel i#results-disclaimer {
+      position: absolute;
+      right: 6vh;
+      top: 2vh;
+      z-index: 2;
     }
 
     #panel #expand img {
