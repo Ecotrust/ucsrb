@@ -219,9 +219,9 @@ class TreatmentScenario(Scenario):
     @property
     def jobs(self):
         return {
-            'baseline': TaskResult.objects.filter(task_args='"({treatment_id},\'normal\')"'.format(treatment_id=self.id)),
-            'wet': TaskResult.objects.filter(task_args='"({treatment_id},\'wet\')"'.format(treatment_id=self.id)),
-            'dry': TaskResult.objects.filter(task_args='"({treatment_id},\'dry\')"'.format(treatment_id=self.id)),
+            'baseline': TaskResult.objects.filter(task_args='"({treatment_id}, \'baseline\')"'.format(treatment_id=self.id)),
+            'wet': TaskResult.objects.filter(task_args='"({treatment_id}, \'wet\')"'.format(treatment_id=self.id)),
+            'dry': TaskResult.objects.filter(task_args='"({treatment_id}, \'dry\')"'.format(treatment_id=self.id)),
         }
 
     @property
@@ -256,7 +256,7 @@ class TreatmentScenario(Scenario):
         if not active_job == None:
             return active_job
         else:
-            jobs = self.jobs.order_by('date_created')
+            jobs = self.jobs[weather_year].order_by('date_created')
             if jobs.count() > 0:
                 job = jobs[jobs.count()-1]  #get most recently created job
                 return job
@@ -281,7 +281,7 @@ class TreatmentScenario(Scenario):
         active_jobs = self.active_jobs
         for weather_year in active_jobs.keys():
             active_job = active_jobs[weather_year]
-            if active_job.age.total_seconds() > settings.MAX_DHSVM_RUN_DURATION:
+            if active_job and hasattr(active_job, 'age') and active_job.age.total_seconds() > settings.MAX_DHSVM_RUN_DURATION:
                 revoke(active_job.task_id, terminate=True)
                 # active_job = None
                 runTreatment.delay(self.id, weather_year)

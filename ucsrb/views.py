@@ -857,7 +857,7 @@ def get_results_by_scenario_id(request):
     if export:
         print("Export %s" % export)
     else:
-        if treatment.job_status('baseline') == 'None' or treatment.job_status('wet' == 'None' or treatment.job_status('dry') == 'None' or treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
+        if treatment.job_status('baseline') == 'None' or treatment.job_status('wet') == 'None' or treatment.job_status('dry') == 'None' or treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
             treatment.set_report()
             if treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
                 treatment = get_feature_by_uid(scenario_id)
@@ -920,7 +920,7 @@ def get_status_by_scenario_id(request):
             'model_progress': 0,
             'import_progress': 0,
             'task_status': 'Initializing (1/4)',
-            'error': 'None,
+            'error': 'None',
             'last_line': '',
             'age': None
         }

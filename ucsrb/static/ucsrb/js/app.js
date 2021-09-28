@@ -1095,13 +1095,10 @@ app.request = {
               } else {
                 update_hydro = false;
               }
-              job_status[weather_year] = {
-                progress:
-              };
               // var panel_status_notes = '<h3>Flow Results</h3>' +
               panel_status_notes = panel_status_notes +
               '<h3>' + weather_year + ' Year:</h3>' +
-              '<p>' + response[weather_year].status + '</p>' +
+              '<p>Status: ' + response[weather_year].task_status + '</p>' +
               '<div class="hydro-progress progress">' +
               '  <div class="progress-bar progress-bar-striped progress-bar-animated" '+
               'role="progressbar" style="width: ' +

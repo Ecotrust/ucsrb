@@ -12,5 +12,5 @@ def runTreatment(treatment_id, weather_year='baseline'):
     # see if job has been run/Get all jobs for TreatmentScenario
     treatment = TreatmentScenario.objects.get(pk=treatment_id)
 
-    runHarnessConfig(treatment, weather_year)
+    runHarnessConfig(treatment, basin=None, weather_year=weather_year)
     # Thread(target=runHarnessConfig, args=(treatment,)).start()
