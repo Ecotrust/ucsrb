@@ -534,6 +534,9 @@ FORGOT_EMAIL_SUBJECT = 'Snow2Flow Password Reset Request'
 
 LOG_IN_WITH_EMAIL = False
 
+MODEL_PROGRESS_FACTOR = 0.8     # 70-90% of runtime is currently running DHSVM
+IMPORT_PROGRESS_FACTOR = 0.2    # 10-30% of runtime is currently importing model results
+
 try:
     # Local settings should probably be collected to project folder instead.
     from marineplanner.local_settings import *

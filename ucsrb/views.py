@@ -857,7 +857,7 @@ def get_results_by_scenario_id(request):
     if export:
         print("Export %s" % export)
     else:
-        if treatment.job_status == 'None' or treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
+        if treatment.job_status('baseline') == 'None' or treatment.job_status('wet' == 'None' or treatment.job_status('dry') == 'None' or treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
             treatment.set_report()
             if treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
                 treatment = get_feature_by_uid(scenario_id)
@@ -909,70 +909,80 @@ def get_status_by_scenario_id(request):
     except:
         return get_json_error_response('Treatment with given ID (%s) does not exist' % scenario_id, 500, {})
 
-    progress = 0
-    model_progress = 0
-    import_progress = 0
-    task_status = 'Initializing (1/4)'
+    weather_year_results = {
+        'baseline': None,
+        'wet': None,
+        'dry': None
+    }
+    for weather_year in settings.MODEL_YEARS.keys():
+        weather_year_results[weather_year] = {
+            'progress': None,
+            'model_progress': 0,
+            'import_progress': 0,
+            'task_status': 'Initializing (1/4)',
+            'error': 'None,
+            'last_line': '',
+            'age': None
+        }
 
-    error = 'None'
-    last_line = ''
+        if treatment.job_status(weather_year) == 'None':
+            weather_year_results[weather_year]['task_status'] = 'Queued (0/4)'
+        elif treatment.job_status(weather_year) != 'SUCCESS':
+            # Attempt to re-run the job - if job is too new, it won't restart, just continue
+            weather_year_results[weather_year]['progress'] = 0
+            treatment.run_dhsvm()
+            # check out /tmp/runs/run_{id}/output/Streamflow.only
+            flow_outfile = "/tmp/runs/run_{}_{}/output/Streamflow.Only".format(treatment.id, weather_year)
+            if Path(flow_outfile).exists():
 
-    if treatment.job_status == 'None':
-        task_status = 'Queued (0/4)'
-    elif treatment.job_status != 'SUCCESS':
-        # Attempt to re-run the job - if job is too new, it won't restart, just continue
-        treatment.run_dhsvm()
-        # check out /tmp/runs/run_{id}/output/Streamflow.only
-        flow_outfile = "/tmp/runs/run_{}/output/Streamflow.Only".format(treatment.id)
-        if Path(flow_outfile).exists():
+                try:
+                    weather_year_results[weather_year]['last_line'] = get_last_flow_line(flow_outfile)
 
-            try:
-                last_line = get_last_flow_line(flow_outfile)
+                    [month, day, year] = weather_year_results[weather_year]['last_line'].split('-')[0].split('.')[0:3]
+                    model_time = weather_year_results[weather_year]['last_line'].split(' ')[0].split('-')[1]
+                    model_progress_date = datetime.strptime("{}.{}.{}-{}".format(month, day, year, model_time), "%m.%d.%Y-%H:%M:%S")
+                    # model_year_type = settings.MODEL_YEAR_LOOKUP[str(year)]
+                    model_year = settings.MODEL_YEARS[weather_year]
+                    total_time = model_year['end'] - model_year['start']
+                    completed_time = model_progress_date - model_year['start']
+                    weather_year_results[weather_year]['model_progress'] = (completed_time.total_seconds()/total_time.total_seconds())*100*settings.MODEL_PROGRESS_FACTOR   #50% of the progress is modelling, so /2
+                    weather_year_results[weather_year]['task_status'] = 'Modelling (2/4)'
+                except (ValueError, IndexError) as e:
+                    # Streamflow file doesn't have 2 complete entries yet.
+                    weather_year_results[weather_year]['error'] = str(e)
+                    print(e)
+                    pass
+                except OSError as e:
+                    # Streamflow file empty
+                    pass
 
-                [month, day, year] = last_line.split('-')[0].split('.')[0:3]
-                model_time = last_line.split(' ')[0].split('-')[1]
-                model_progress_date = datetime.strptime("{}.{}.{}-{}".format(month, day, year, model_time), "%m.%d.%Y-%H:%M:%S")
-                model_year_type = settings.MODEL_YEAR_LOOKUP[str(year)]
-                model_year = settings.MODEL_YEARS[model_year_type]
-                total_time = model_year['end'] - model_year['start']
-                completed_time = model_progress_date - model_year['start']
-                model_progress = (completed_time.total_seconds()/total_time.total_seconds())*100/2   #50% of the progress is modelling, so /2
-                task_status = 'Modelling (2/4)'
-            except (ValueError, IndexError) as e:
-                # Streamflow file doesn't have 2 complete entries yet.
-                error = str(e)
-                print(e)
-                pass
-            except OSError as e:
-                # Streamflow file empty
-                pass
+                import_status_file = "/tmp/runs/run_{}_{}/output/dhsvm_status.log".format(treatment.id, weather_year)
+                if Path(import_status_file).exists():
+                    weather_year_results[weather_year]['task_status'] = 'Importing (3/4)'
+                    with open(import_status_file, 'r') as f:
+                        inlines=f.readlines()
+                        weather_year_results[weather_year]['import_progress'] = int(inlines[-1])*settings.IMPORT_PROGRESS_FACTOR
 
-            import_status_file = "/tmp/runs/run_{}/output/dhsvm_status.log".format(treatment.id)
-            if Path(import_status_file).exists():
-                task_status = 'Importing (3/4)'
-                with open(import_status_file, 'r') as f:
-                    inlines=f.readlines()
-                    import_progress = int(inlines[-1])/2
+            weather_year_results[weather_year]['progress'] = round(weather_year_results[weather_year]['model_progress']) + round(weather_year_results[weather_year]['import_progress'])
+        else:
+            weather_year_results[weather_year]['task_status'] = 'Complete'
+            weather_year_results[weather_year]['progress'] = 100
 
-        progress = round(model_progress) + round(import_progress)
-    else:
-        task_status = 'Complete'
-        progress = 100
-
-    try:
-        job_age = treatment.job_age.total_seconds()
-    except AttributeError as e:
-        job_age = 0
+        try:
+            weather_year_results[weather_year]['age'] = treatment.job_age(weather_year).total_seconds()
+        except AttributeError as e:
+            weather_year_results[weather_year]['age'] = 0
 
     # MAX_ACTIVE_JOB_AGE
-    return_json = {
-        'status': 'Status: {}'.format(task_status),
-        'progress': progress,
-        'age': job_age,
-        'error': error,
-        'last_line': last_line
-    }
-    return JsonResponse(return_json)
+    # return_json = {
+    #     'status': 'Status: {}'.format(task_status),
+    #     'progress': progress,
+    #     'age': job_age,
+    #     'error': error,
+    #     'last_line': last_line
+    # }
+    # return JsonResponse(return_json)
+    return JsonResponse(weather_year_results)
 
 '''
 '''

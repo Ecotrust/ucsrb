@@ -1037,75 +1037,88 @@ app.request = {
           } else {
             update_hydro = false;
           }
-          if (response.progress == 100) {
+          if (response.baseline.progress == 100 && response.wet.progress == 100 && response.dry.progress == 100) {
             app.panel.results.hydroModelled = true;
             app.panel.results.hydroPanel('<p>Select a gauging station to see hydrologic results.</p>');
           } else {
             app.panel.results.hydroModelled = false;
             // The job needs about 75 seconds before spitting out results for a small job.
-            if (response.age > 75) {
-              response.age = response.age-75;
-            }
-            var seconds_per_percent = response.age/response.progress;
-            var remaining_percent = 100-response.progress;
-            var seconds_remaining = Math.round(seconds_per_percent*remaining_percent);
-            var days_remaining = 0;
-            var seconds_per_day = 60*60*24;
-            if (seconds_remaining > seconds_per_day) {
-              days_remaining = Math.floor(seconds_remaining/seconds_per_day);
-              seconds_remaining = seconds_remaining - (days_remaining*seconds_per_day)
-            }
-            var hours_remaining = 0;
-            var seconds_per_hour = 60*60;
-            if (seconds_remaining > seconds_per_hour) {
-              hours_remaining = Math.floor(seconds_remaining/seconds_per_hour);
-              seconds_remaining = seconds_remaining - (hours_remaining*seconds_per_hour)
-            }
-            var minutes_remaining = 0;
-            var seconds_per_minute = 60;
-            if (seconds_remaining > seconds_per_minute) {
-              minutes_remaining = Math.floor(seconds_remaining/seconds_per_minute);
-              seconds_remaining = seconds_remaining - (minutes_remaining*seconds_per_minute)
-            }
-            var time_remaining_list = [];
-            if (days_remaining) {
-              time_remaining_list.push(days_remaining + ' Days');
-            }
-            if (hours_remaining) {
-              time_remaining_list.push(hours_remaining + ' Hours');
-            }
-            if (minutes_remaining) {
-              time_remaining_list.push(minutes_remaining + ' Minutes');
-            }
-            if (seconds_remaining && !days_remaining) {
-              time_remaining_list.push(seconds_remaining + ' Seconds');
-            }
-            if (response.progress>1) {
-              var time_remaining = time_remaining_list.join(' ');
-            } else {
-              var time_remaining = 'Calculating...';
-            }
-            if ($('#hydro-note').hasClass('show')) {
-              update_hydro = true;
-            } else {
-              update_hydro = false;
-            }
-            var panel_status_notes = '<h3>Flow Results</h3>' +
-              '<p>' + response.status + '</p>' +
+            var weather_years = ['baseline', 'wet', 'dry'];
+            var jobs_status = {};
+            var panel_status_notes = '<h3>Flow Results</h3>';
+            for (var i = 0; i < weather_years.length; i++) {
+              weather_year = weather_years[i];
+              if (response[weather_year].age > 75) {
+                response[weather_year].age = response[weather_year].age-75;
+              }
+              var seconds_per_percent = response[weather_year].age/response[weather_year].progress;
+              var remaining_percent = 100-response[weather_year].progress;
+              var seconds_remaining = Math.round(seconds_per_percent*remaining_percent);
+              var days_remaining = 0;
+              var seconds_per_day = 60*60*24;
+              if (seconds_remaining > seconds_per_day) {
+                days_remaining = Math.floor(seconds_remaining/seconds_per_day);
+                seconds_remaining = seconds_remaining - (days_remaining*seconds_per_day)
+              }
+              var hours_remaining = 0;
+              var seconds_per_hour = 60*60;
+              if (seconds_remaining > seconds_per_hour) {
+                hours_remaining = Math.floor(seconds_remaining/seconds_per_hour);
+                seconds_remaining = seconds_remaining - (hours_remaining*seconds_per_hour)
+              }
+              var minutes_remaining = 0;
+              var seconds_per_minute = 60;
+              if (seconds_remaining > seconds_per_minute) {
+                minutes_remaining = Math.floor(seconds_remaining/seconds_per_minute);
+                seconds_remaining = seconds_remaining - (minutes_remaining*seconds_per_minute)
+              }
+              var time_remaining_list = [];
+              if (days_remaining) {
+                time_remaining_list.push(days_remaining + ' Days');
+              }
+              if (hours_remaining) {
+                time_remaining_list.push(hours_remaining + ' Hours');
+              }
+              if (minutes_remaining) {
+                time_remaining_list.push(minutes_remaining + ' Minutes');
+              }
+              if (seconds_remaining && !days_remaining) {
+                time_remaining_list.push(seconds_remaining + ' Seconds');
+              }
+              if (response[weather_year].progress>1) {
+                var time_remaining = time_remaining_list.join(' ');
+              } else {
+                var time_remaining = 'Calculating...';
+              }
+              if ($('#hydro-note').hasClass('show')) {
+                update_hydro = true;
+              } else {
+                update_hydro = false;
+              }
+              job_status[weather_year] = {
+                progress:
+              };
+              // var panel_status_notes = '<h3>Flow Results</h3>' +
+              panel_status_notes = panel_status_notes +
+              '<h3>' + weather_year + ' Year:</h3>' +
+              '<p>' + response[weather_year].status + '</p>' +
               '<div class="hydro-progress progress">' +
               '  <div class="progress-bar progress-bar-striped progress-bar-animated" '+
               'role="progressbar" style="width: ' +
-              response.progress + '%;" aria-valuenow="' + response.progress +
-              '" aria-valuemin="0" aria-valuemax="100">' + response.progress +
+              response[weather_year].progress + '%;" aria-valuenow="' + response[weather_year].progress +
+              '" aria-valuemin="0" aria-valuemax="100">' + response[weather_year].progress +
               '%</div>' +
               '</div>';
-            if (response.progress > 0) {
-              panel_status_notes = panel_status_notes + '<p>Estimated time ' +
-              'remaining: <br/>' + time_remaining + '</p>';
-            } else {
-              panel_status_notes = panel_status_notes + '<p>There is currently' +
-                ' a backlog of models to be run.<br/>Yours will be processed on a ' +
-                'first-come: first-served basis.<br/>Thank you for your patience.';
+              if (response[weather_year].progress > 0) {
+                panel_status_notes = panel_status_notes + '<p>Estimated time ' +
+                'remaining: <br/>' + time_remaining + '</p>';
+              } else {
+                if (i == 0) {
+                  panel_status_notes = panel_status_notes + '<p>There is currently' +
+                  ' a backlog of models to be run.<br/>Yours will be processed on a ' +
+                  'first-come: first-served basis.<br/>Thank you for your patience.';
+                }
+              }
             }
             app.panel.results.hydroPanel(panel_status_notes);
             window.setTimeout(function(){

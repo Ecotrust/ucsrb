@@ -218,28 +218,41 @@ class TreatmentScenario(Scenario):
 
     @property
     def jobs(self):
-        return TaskResult.objects.filter(task_args='"({treatment_id},)"'.format(treatment_id=self.id))
+        return {
+            'baseline': TaskResult.objects.filter(task_args='"({treatment_id},\'normal\')"'.format(treatment_id=self.id)),
+            'wet': TaskResult.objects.filter(task_args='"({treatment_id},\'wet\')"'.format(treatment_id=self.id)),
+            'dry': TaskResult.objects.filter(task_args='"({treatment_id},\'dry\')"'.format(treatment_id=self.id)),
+        }
 
     @property
-    def active_job(self):
-        incomplete_jobs = self.jobs.filter(status__in=settings.ACTIVE_TASK_STATES)
-        if incomplete_jobs.count() > 1:
-            incomplete_jobs_count = incomplete_jobs.count()
-            for index, job in enumerate(incomplete_jobs.order_by('date_created')):
-                if index < (incomplete_jobs_count - 1):
-                    # Kill Job
-                    revoke(job.task_id, terminate=True)
-                else:
-                    active_job = job
-        elif incomplete_jobs.count() == 1:
-            active_job = incomplete_jobs[0]
-        else: # count == 0
-            active_job = None
-        return active_job
+    def active_jobs(self):
+        active_jobs = {
+            'baseline': None,
+            'wet': None,
+            'dry': None
+        }
+        incomplete_jobs = {
+            'baseline': self.jobs['baseline'].filter(status__in=settings.ACTIVE_TASK_STATES),
+            'wet': self.jobs['wet'].filter(status__in=settings.ACTIVE_TASK_STATES),
+            'dry': self.jobs['dry'].filter(status__in=settings.ACTIVE_TASK_STATES),
+        }
+        for weather_year in incomplete_jobs.keys():
+            if incomplete_jobs[weather_year].count() > 1:
+                incomplete_jobs_count = incomplete_jobs[weather_year].count()
+                for index, job in enumerate(incomplete_jobs[weather_year].order_by('date_created')):
+                    if index < (incomplete_jobs_count - 1):
+                        # Kill Job
+                        revoke(job.task_id, terminate=True)
+                    else:
+                        active_jobs[weather_year] = job
+            elif incomplete_jobs[weather_year].count() == 1:
+                active_jobs[weather_year] = incomplete_jobs[weather_year][0]
+            else: # count == 0
+                active_jobs[weather_year] = None
+        return active_jobs
 
-    @property
-    def job(self):
-        active_job = self.active_job
+    def job(self, weather_year='baseline'):
+        active_job = self.active_jobs[weather_year]
         if not active_job == None:
             return active_job
         else:
@@ -250,32 +263,32 @@ class TreatmentScenario(Scenario):
             else:
                 return None
 
-    @property
-    def job_status(self):
-        job = self.job
+    def job_status(self, weather_year='baseline'):
+        job = self.job(weather_year)
         if not job == None:
             return job.status
         else:
             return "None"
 
-    @property
-    def job_age(self):
-        job = self.job
+    def job_age(self, weather_year='baseline'):
+        job = self.job(weather_year)
         if not job == None:
             return datetime.now() - job.date_created
         else:
             return 0
 
     def run_dhsvm(self):
-        active_job = self.active_job
-        if not active_job == None:
-            if self.job_age.total_seconds() > settings.MAX_DHSVM_RUN_DURATION:
-                revoke(job.task_id, terminate=True)
-                active_job = None
+        active_jobs = self.active_jobs
+        for weather_year in active_jobs.keys():
+            active_job = active_jobs[weather_year]
+            if active_job.age.total_seconds() > settings.MAX_DHSVM_RUN_DURATION:
+                revoke(active_job.task_id, terminate=True)
+                # active_job = None
+                runTreatment.delay(self.id, weather_year)
             # else:
             #     # TODO: give user option to restart task?
-        if active_job == None:
-            runTreatment.delay(self.id)
+            if active_jobs[weather_year] == None:
+                runTreatment.delay(self.id, weather_year)
 
     def aggregate_results(self):
         vpus = self.run_filters(None) # There seems to be no need for passing a query here.
