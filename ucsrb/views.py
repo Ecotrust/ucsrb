@@ -857,7 +857,7 @@ def get_results_by_scenario_id(request):
     if export:
         print("Export %s" % export)
     else:
-        if treatment.job_status('baseline') == 'None' or treatment.job_status('wet') == 'None' or treatment.job_status('dry') == 'None' or treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
+        if (treatment.job_status('baseline') == 'None' and treatment.job_status('wet') == 'None' and treatment.job_status('dry') == 'None') and (treatment.aggregate_report is None or len(treatment.aggregate_report) == 0):
             treatment.set_report()
             if treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
                 treatment = get_feature_by_uid(scenario_id)

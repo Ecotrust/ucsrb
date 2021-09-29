@@ -1,5 +1,5 @@
 from celery.task.control import revoke
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.db import models
 from django.contrib.gis.db import models as gismodels
@@ -231,13 +231,21 @@ class TreatmentScenario(Scenario):
             'wet': None,
             'dry': None
         }
+        cutoff_date = datetime.now() - timedelta(seconds=settings.MAX_DHSVM_RUN_DURATION)
+        complete_jobs = {
+            'baseline': self.jobs['baseline'].filter(status='SUCCESS', date_created__gte=cutoff_date).order_by('-date_created'),
+            'wet': self.jobs['wet'].filter(status='SUCCESS', date_created__gte=cutoff_date).order_by('-date_created'),
+            'dry': self.jobs['dry'].filter(status='SUCCESS', date_created__gte=cutoff_date).order_by('-date_created'),
+        }
         incomplete_jobs = {
             'baseline': self.jobs['baseline'].filter(status__in=settings.ACTIVE_TASK_STATES),
             'wet': self.jobs['wet'].filter(status__in=settings.ACTIVE_TASK_STATES),
             'dry': self.jobs['dry'].filter(status__in=settings.ACTIVE_TASK_STATES),
         }
-        for weather_year in incomplete_jobs.keys():
-            if incomplete_jobs[weather_year].count() > 1:
+        for weather_year in active_jobs.keys():
+            if complete_jobs[weather_year].count() > 0:
+                active_jobs[weather_year] = complete_jobs[weather_year][0]
+            elif incomplete_jobs[weather_year].count() > 1:
                 incomplete_jobs_count = incomplete_jobs[weather_year].count()
                 for index, job in enumerate(incomplete_jobs[weather_year].order_by('date_created')):
                     if index < (incomplete_jobs_count - 1):
