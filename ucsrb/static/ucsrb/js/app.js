@@ -1049,9 +1049,6 @@ app.request = {
             var backlog_message_shown = false;
             for (var i = 0; i < weather_years.length; i++) {
               weather_year = weather_years[i];
-              if (response[weather_year].age > 75) {
-                response[weather_year].age = response[weather_year].age-75;
-              }
               var seconds_per_percent = response[weather_year].age/response[weather_year].progress;
               var remaining_percent = 100-response[weather_year].progress;
               var seconds_remaining = Math.round(seconds_per_percent*remaining_percent);
