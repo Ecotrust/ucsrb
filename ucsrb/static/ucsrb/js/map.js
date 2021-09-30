@@ -520,6 +520,7 @@ pourPointResultSelection = function(feat) {
     app.panel.results.showHydro();
     app.panel.loading.hide();
     alert('Your treatment has not finished modelling yet...');
+    app.map.selection.selectResultsPourPoint.getFeatures().clear();
   }
 
 }

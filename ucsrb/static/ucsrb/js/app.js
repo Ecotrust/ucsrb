@@ -1046,6 +1046,7 @@ app.request = {
             var weather_years = ['baseline', 'wet', 'dry'];
             var jobs_status = {};
             var panel_status_notes = '<h3>Flow Results</h3>';
+            var backlog_message_shown = false;
             for (var i = 0; i < weather_years.length; i++) {
               weather_year = weather_years[i];
               if (response[weather_year].age > 75) {
@@ -1097,25 +1098,33 @@ app.request = {
               }
               // var panel_status_notes = '<h3>Flow Results</h3>' +
               panel_status_notes = panel_status_notes +
-              '<h3>' + weather_year + ' Year:</h3>' +
-              '<p>Status: ' + response[weather_year].task_status + '</p>' +
-              '<div class="hydro-progress progress">' +
-              '  <div class="progress-bar progress-bar-striped progress-bar-animated" '+
-              'role="progressbar" style="width: ' +
-              response[weather_year].progress + '%;" aria-valuenow="' + response[weather_year].progress +
-              '" aria-valuemin="0" aria-valuemax="100">' + response[weather_year].progress +
-              '%</div>' +
-              '</div>';
-              if (response[weather_year].progress > 0) {
-                panel_status_notes = panel_status_notes + '<p>Estimated time ' +
-                'remaining: <br/>' + time_remaining + '</p>';
-              } else {
-                if (i == 0) {
-                  panel_status_notes = panel_status_notes + '<p>There is currently' +
-                  ' a backlog of models to be run.<br/>Yours will be processed on a ' +
-                  'first-come: first-served basis.<br/>Thank you for your patience.';
+              '<h3>' + weather_year.charAt(0).toUpperCase() + weather_year.toLowerCase().slice(1) + ' Year:</h3>' +
+              '<p>Status: ' + response[weather_year].task_status + '</p>';
+              if (response[weather_year].progress < 100 || response[weather_year].progress == null ) {
+                if (response[weather_year].progress != null) {
+                  panel_status_notes = panel_status_notes +
+                  '<div class="hydro-progress progress">' +
+                    '<div class="progress-bar progress-bar-striped progress-bar-animated" '+
+                      'role="progressbar" style="width: ' +
+                      response[weather_year].progress + '%;" aria-valuenow="' + response[weather_year].progress +
+                      '" aria-valuemin="0" aria-valuemax="100">' + response[weather_year].progress +
+                    '%</div>' +
+                  '</div>';
+                }
+
+                if (response[weather_year].progress > 0 ) {
+                  panel_status_notes = panel_status_notes + '<p>Estimated time ' +
+                  'remaining: <br/>' + time_remaining + '</p>';
+                } else {
+                  if (!backlog_message_shown && response[weather_year].progress == null) {
+                    panel_status_notes = panel_status_notes + '<p>There is currently' +
+                    ' a backlog of models to be run.<br/>Yours will be processed on a ' +
+                    'first-come: first-served basis.<br/>Thank you for your patience.';
+                    backlog_message_shown = true;
+                  }
                 }
               }
+              // panel_status_notes = panel_status_notes + '</div>';
             }
             app.panel.results.hydroPanel(panel_status_notes);
             window.setTimeout(function(){
