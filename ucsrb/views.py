@@ -432,6 +432,13 @@ def get_results_delta(flow_output):
         out_dict = json.loads(json.dumps(flow_output))
     else:
         out_dict = deepcopy(flow_output)
+
+    non_delta_years = []
+    for treatment in out_dict.keys():
+        if treatment not in ['baseline', 'treated']:
+            non_delta_years.append(treatment)
+    for treatment in non_delta_years:
+            out_dict.pop(treatment);
     for treatment in out_dict.keys():
         if type(out_dict[treatment]) == dict:
             # flow_results
@@ -456,6 +463,7 @@ def get_results_xd_low(flow_output, sorted_results, days):
     from statistics import median
     out_dict = deepcopy(flow_output)
     sept_median_x_day_low = {}
+
     for rx in sorted_results.keys():
         sept_list = []
         for index, treatment_result in enumerate(sorted_results[rx]):
@@ -471,6 +479,7 @@ def get_results_xd_low(flow_output, sorted_results, days):
             if time_object.month == 9:
                 sept_list.append(low_flow)
         sept_median_x_day_low[rx] = median(sept_list)
+
     return (sort_output(out_dict), sept_median_x_day_low)
 
 def get_results_xd_mean(flow_output, sorted_results, days):
@@ -685,10 +694,11 @@ def get_hydro_results_by_pour_point_id(request):
     # r30_average_flow = str(round(annual_water_volume['reduce to 30']/(365*24*60*60), 2))
     # r0_average_flow = str(round(annual_water_volume['reduce to 0']/(365*24*60*60), 2))
 
+    flow_output['dry'] = flow_results['dry']['flow_output']['treated']
+    flow_output['wet'] = flow_results['wet']['flow_output']['treated']
     absolute_results = sort_output(flow_output)
-
     #   delta flow
-    delta_results = get_results_delta(flow_output)
+    delta_results = get_results_delta(flow_results['baseline']['flow_output'])
 
     #   7-day low-flow (needs sort_by_time)
     (seven_d_low_results, sept_median_7_day_low) = get_results_xd_low(flow_output, absolute_results, 7)
