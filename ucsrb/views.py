@@ -499,12 +499,19 @@ def parse_flow_results(overlap_basin, treatment):
         sept_avg_flow = {}
         flow_results[model_year] = {}
 
-        baseline_readings = StreamFlowReading.objects.filter(
-            segment_id=overlap_basin.unit_id,
-            is_baseline=True,
-            time__gte=settings.MODEL_YEARS[model_year]['start'],
-            time__lte=settings.MODEL_YEARS[model_year]['end'],
-            )
+        flow_data_tuples = []
+
+        if model_year == 'baseline':
+            baseline_readings = StreamFlowReading.objects.filter(
+                segment_id=overlap_basin.unit_id,
+                is_baseline=True,
+                time__gte=settings.MODEL_YEARS[model_year]['start'],
+                time__lte=settings.MODEL_YEARS[model_year]['end'],
+                )
+            flow_data_tuples.append(('baseline', baseline_readings))
+        else:
+            flow_data_tuples.append(('baseline', []))
+
         treated_readings = StreamFlowReading.objects.filter(
             segment_id=overlap_basin.unit_id,
             treatment=treatment,
@@ -512,7 +519,9 @@ def parse_flow_results(overlap_basin, treatment):
             time__lte=settings.MODEL_YEARS[model_year]['end'],
             )
 
-        for (treatment_type, readings_data) in [('baseline', baseline_readings), ('treated', treated_readings)]:
+        flow_data_tuples.append(('treated', treated_readings))
+
+        for (treatment_type, readings_data) in flow_data_tuples:
             record_count = len(readings_data)
             aggregate_volume = 0
             sept_flow = 0
