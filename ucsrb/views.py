@@ -930,7 +930,6 @@ def get_status_by_scenario_id(request):
         elif treatment.job_status(weather_year) != 'SUCCESS':
             # Attempt to re-run the job - if job is too new, it won't restart, just continue
             weather_year_results[weather_year]['progress'] = 0
-            treatment.run_dhsvm()
             # check out /tmp/runs/run_{id}/output/Streamflow.only
             flow_outfile = "/tmp/runs/run_{}_{}/output/Streamflow.Only".format(treatment.id, weather_year)
             if Path(flow_outfile).exists():
