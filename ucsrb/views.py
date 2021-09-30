@@ -504,13 +504,13 @@ def parse_flow_results(overlap_basin, treatment):
             is_baseline=True,
             time__gte=settings.MODEL_YEARS[model_year]['start'],
             time__lte=settings.MODEL_YEARS[model_year]['end'],
-            ).order_by('time')
+            )
         treated_readings = StreamFlowReading.objects.filter(
             segment_id=overlap_basin.unit_id,
             treatment=treatment,
             time__gte=settings.MODEL_YEARS[model_year]['start'],
             time__lte=settings.MODEL_YEARS[model_year]['end'],
-            ).order_by('time')
+            )
 
         for (treatment_type, readings_data) in [('baseline', baseline_readings), ('treated', treated_readings)]:
             record_count = len(readings_data)
@@ -519,18 +519,20 @@ def parse_flow_results(overlap_basin, treatment):
             sept_records = 0
             annual_water_volume[treatment_type] = 0
             output_dict[treatment_type] = OrderedDict({})
-            for index, reading in enumerate(readings_data):
-                time_object = reading.time
-                # Get volume of flow for timestep in Cubic Feet
-                timestep_volume = reading.value * 35.3147 * settings.TIME_STEP_HOURS # readings are in m^3/hr
-                aggregate_volume += timestep_volume
-                annual_water_volume[treatment_type] = annual_water_volume[treatment_type] + timestep_volume
-                if index%steps_to_aggregate == 0:
-                    output_dict[treatment_type][reading.timestamp] = aggregate_volume/settings.TIME_STEP_REPORTING/60/60 #get ft^3/s
-                    aggregate_volume = 0
-                if time_object.month == 9:
-                    sept_flow += timestep_volume/settings.TIME_STEP_HOURS/60/60
-                    sept_records += 1
+            if record_count > 0:
+                readings_data = readings_data.order_by('time')
+                for index, reading in enumerate(readings_data):
+                    time_object = reading.time
+                    # Get volume of flow for timestep in Cubic Feet
+                    timestep_volume = reading.value * 35.3147 * settings.TIME_STEP_HOURS # readings are in m^3/hr
+                    aggregate_volume += timestep_volume
+                    annual_water_volume[treatment_type] = annual_water_volume[treatment_type] + timestep_volume
+                    if index%steps_to_aggregate == 0:
+                        output_dict[treatment_type][reading.timestamp] = aggregate_volume/settings.TIME_STEP_REPORTING/60/60 #get ft^3/s
+                        aggregate_volume = 0
+                    if time_object.month == 9:
+                        sept_flow += timestep_volume/settings.TIME_STEP_HOURS/60/60
+                        sept_records += 1
             if sept_records > 0:
                 sept_avg_flow[treatment_type] = str(round(sept_flow/sept_records, 2))
             else:
