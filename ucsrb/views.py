@@ -435,7 +435,7 @@ def get_results_delta(flow_output):
 
     non_delta_years = []
     for treatment in out_dict.keys():
-        if treatment not in ['baseline', 'treated']:
+        if treatment not in ['baseline', 'normal']:
             non_delta_years.append(treatment)
     for treatment in non_delta_years:
             out_dict.pop(treatment);
@@ -510,6 +510,7 @@ def parse_flow_results(overlap_basin, treatment):
 
         flow_data_tuples = []
 
+        # We only draw the 'untreated baseline' year, not 'untreated wet/dry' years.
         if model_year == 'baseline':
             baseline_readings = StreamFlowReading.objects.filter(
                 segment_id=overlap_basin.unit_id,
@@ -528,29 +529,33 @@ def parse_flow_results(overlap_basin, treatment):
             time__lte=settings.MODEL_YEARS[model_year]['end'],
             )
 
-        flow_data_tuples.append(('treated', treated_readings))
+        flow_data_tuples.append(('normal', treated_readings))
 
         for (treatment_type, readings_data) in flow_data_tuples:
-            record_count = len(readings_data)
             aggregate_volume = 0
             sept_flow = 0
             sept_records = 0
             annual_water_volume[treatment_type] = 0
             output_dict[treatment_type] = OrderedDict({})
-            if record_count > 0:
+            record_count = 0
+            try:
                 readings_data = readings_data.order_by('time')
-                for index, reading in enumerate(readings_data):
-                    time_object = reading.time
-                    # Get volume of flow for timestep in Cubic Feet
-                    timestep_volume = reading.value * 35.3147 * settings.TIME_STEP_HOURS # readings are in m^3/hr
-                    aggregate_volume += timestep_volume
-                    annual_water_volume[treatment_type] = annual_water_volume[treatment_type] + timestep_volume
-                    if index%steps_to_aggregate == 0:
-                        output_dict[treatment_type][reading.timestamp] = aggregate_volume/settings.TIME_STEP_REPORTING/60/60 #get ft^3/s
-                        aggregate_volume = 0
-                    if time_object.month == 9:
-                        sept_flow += timestep_volume/settings.TIME_STEP_HOURS/60/60
-                        sept_records += 1
+            except AttributeError as e:
+                # we use empty lists when no query was made.
+                pass
+            for index, reading in enumerate(list(readings_data)):
+                record_count += 1
+                time_object = reading.time
+                # Get volume of flow for timestep in Cubic Feet
+                timestep_volume = reading.value * 35.3147 * settings.TIME_STEP_HOURS # readings are in m^3/hr
+                aggregate_volume += timestep_volume
+                annual_water_volume[treatment_type] = annual_water_volume[treatment_type] + timestep_volume
+                if index%steps_to_aggregate == 0:
+                    output_dict[treatment_type][reading.timestamp] = aggregate_volume/settings.TIME_STEP_REPORTING/60/60 #get ft^3/s
+                    aggregate_volume = 0
+                if time_object.month == 9:
+                    sept_flow += timestep_volume/settings.TIME_STEP_HOURS/60/60
+                    sept_records += 1
             if sept_records > 0:
                 sept_avg_flow[treatment_type] = str(round(sept_flow/sept_records, 2))
             else:
@@ -694,8 +699,8 @@ def get_hydro_results_by_pour_point_id(request):
     # r30_average_flow = str(round(annual_water_volume['reduce to 30']/(365*24*60*60), 2))
     # r0_average_flow = str(round(annual_water_volume['reduce to 0']/(365*24*60*60), 2))
 
-    flow_output['dry'] = flow_results['dry']['flow_output']['treated']
-    flow_output['wet'] = flow_results['wet']['flow_output']['treated']
+    flow_output['dry'] = flow_results['dry']['flow_output']['normal']
+    flow_output['wet'] = flow_results['wet']['flow_output']['normal']
     absolute_results = sort_output(flow_output)
     #   delta flow
     delta_results = get_results_delta(flow_results['baseline']['flow_output'])

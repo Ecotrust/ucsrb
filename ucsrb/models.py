@@ -524,3 +524,10 @@ class StreamFlowReading(models.Model):
     is_baseline = models.BooleanField(default=False, verbose_name="This is a baseline reading")
     treatment = models.ForeignKey(TreatmentScenario, null=True, blank=True, default=None, on_delete=models.CASCADE, verbose_name="Treatment Scenario")
     value = models.FloatField(verbose_name="Reading in m^3/hr")
+
+    class Meta():
+        indexes = [
+            models.Index(fields=['segment_id']),
+            models.Index(fields=['treatment']),
+            models.Index(fields=['is_baseline'])
+        ]
