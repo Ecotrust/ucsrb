@@ -464,7 +464,7 @@ app.panel = {
                 var data = app.panel.results.charts[chartIndex].data;
                 for (var chart in data) {
                     resultsArray = [];
-                    if (chart !== 'baseline') {
+                    if (chart !== 'untreated') {
                         chartJSON.timestep = [];
                         for (var i = 0; i < data[chart].length; i++) {
                             resultsArray.push(data[chart][i].flow);
@@ -489,10 +489,13 @@ app.panel = {
                         },
                         type: 'line',
                         colors: {
-                            baseline: '#394861',
+                            untreated: '#394861',
                             'reduce to 30': '#FB7302',
                             'reduce to 0': '#680109',
                             'reduce to 50': '#93A35D',
+                            normal: '#00FF00',
+                            wet: '#0000FF',
+                            dry: '#FF9900',
                         }
                     },
                     axis: {
@@ -1037,13 +1040,13 @@ app.request = {
           } else {
             update_hydro = false;
           }
-          if (response.baseline.progress == 100 && response.wet.progress == 100 && response.dry.progress == 100) {
+          if (response.normal.progress == 100 && response.wet.progress == 100 && response.dry.progress == 100) {
             app.panel.results.hydroModelled = true;
             app.panel.results.hydroPanel('<p>Select a gauging station to see hydrologic results.</p>');
           } else {
             app.panel.results.hydroModelled = false;
             // The job needs about 75 seconds before spitting out results for a small job.
-            var weather_years = ['baseline', 'wet', 'dry'];
+            var weather_years = ['normal', 'wet', 'dry'];
             var jobs_status = {};
             var panel_status_notes = '<h3>Flow Results</h3>';
             var backlog_message_shown = false;

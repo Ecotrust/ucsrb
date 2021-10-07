@@ -435,7 +435,7 @@ def get_results_delta(flow_output):
 
     non_delta_years = []
     for treatment in out_dict.keys():
-        if treatment not in ['baseline', 'normal']:
+        if treatment not in [settings.UNTREATED_LABEL, settings.NORMAL_YEAR_LABEL]:
             non_delta_years.append(treatment)
     for treatment in non_delta_years:
             out_dict.pop(treatment);
@@ -453,7 +453,7 @@ def get_results_delta(flow_output):
             # previously-deltaed data
             for index, timestep in enumerate(out_dict[treatment]):
                 # Testing has shown that this logic is sound - chronological order is maintained across treatment.
-                baseflow = flow_output['baseline'][index]['flow']
+                baseflow = flow_output[settings.UNTREATED_LABEL][index]['flow']
                 out_dict[treatment][index]['flow'] -= baseflow
 
     return out_dict
@@ -511,16 +511,16 @@ def parse_flow_results(overlap_basin, treatment):
         flow_data_tuples = []
 
         # We only draw the 'untreated baseline' year, not 'untreated wet/dry' years.
-        if model_year == 'baseline':
+        if model_year == settings.NORMAL_YEAR_LABEL:
             baseline_readings = StreamFlowReading.objects.filter(
                 segment_id=overlap_basin.unit_id,
                 is_baseline=True,
                 time__gte=settings.MODEL_YEARS[model_year]['start'],
                 time__lte=settings.MODEL_YEARS[model_year]['end'],
                 )
-            flow_data_tuples.append(('baseline', baseline_readings))
+            flow_data_tuples.append((settings.UNTREATED_LABEL, baseline_readings))
         else:
-            flow_data_tuples.append(('baseline', []))
+            flow_data_tuples.append((settings.UNTREATED_LABEL, []))
 
         treated_readings = StreamFlowReading.objects.filter(
             segment_id=overlap_basin.unit_id,
@@ -529,7 +529,7 @@ def parse_flow_results(overlap_basin, treatment):
             time__lte=settings.MODEL_YEARS[model_year]['end'],
             )
 
-        flow_data_tuples.append(('normal', treated_readings))
+        flow_data_tuples.append((settings.NORMAL_YEAR_LABEL, treated_readings))
 
         for (treatment_type, readings_data) in flow_data_tuples:
             aggregate_volume = 0
@@ -637,73 +637,46 @@ def get_hydro_results_by_pour_point_id(request):
     basin_acres = round(overlap_geometry.area/4046.86, 2)
     # return geometry to web mercator
     overlap_geometry.transform(3857)
-
-    # if ppt.imputed_ppt:
-    #     imputed_ppt = ppt.imputed_ppt
-    # else:
-    #     imputed_ppt = PourPoint.objects.get(id=settings.DEFAULT_NN_PPT)
-    #
-    # if ppt == imputed_ppt:
     est_type = 'Modeled'
-    # else:
-    #     est_type = 'Imputed'
-    # impute_id = str(imputed_ppt.pk)
     impute_id = ppt.id
-
-    # results_csvs = OrderedDict({})
-    # results_csvs['baseline'] = os.path.join(settings.NN_DATA_DIR,"veg%s" % imputed_ppt.watershed_id,"_base","%s.csv" % imputed_ppt.streammap_id)
-    # (results_csvs['reduce to 50'], rx_50) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 50'])
-    # (results_csvs['reduce to 30'], rx_30) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 30'])
-    # (results_csvs['reduce to 0'], rx_0) = get_flow_csv_match(imputed_ppt, rx_fc_pct_delta['reduce to 0'])
-
-    # (flow_output, annual_water_volume, sept_avg_flow) = parse_flow_results(overlap_basin, treatment)
     flow_results = parse_flow_results(overlap_basin, treatment)
 
-    flow_output = flow_results['baseline']['flow_output']
-    annual_water_volume = flow_results['baseline']['annual_water_volume']
-    sept_avg_flow = flow_results['baseline']['sept_avg_flow']
+    flow_output = flow_results[settings.NORMAL_YEAR_LABEL]['flow_output']
+    annual_water_volume = flow_results[settings.NORMAL_YEAR_LABEL]['annual_water_volume']
+    sept_avg_flow = flow_results[settings.NORMAL_YEAR_LABEL]['sept_avg_flow']
 
     # TUNING: For large basins, this can take over 1 minute to run.
     basin_fractional_coverage = {
-        'baseline': calculate_basin_fc(ppt, basin_acres, upslope_ppts),
-        # 'treated': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, treatment_id)
-
-        # 'reduce to 50': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 50),
-        # 'reduce to 30': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 30),
-        # 'reduce to 0': calculate_basin_fc(ppt, basin_acres, upslope_ppts, treatment, 0)
+        settings.UNTREATED_LABEL: calculate_basin_fc(ppt, basin_acres, upslope_ppts),
     }
 
     rx_fc_pct_delta = {}
     rx_fc_delta = {}
-    # for rx in ['reduce to 50', 'reduce to 30', 'reduce to 0']:
-    for rx in [x for x in basin_fractional_coverage.keys() if not x == 'baseline']:
-        if basin_fractional_coverage['baseline'] == 0:
+    for rx in [x for x in basin_fractional_coverage.keys() if not x == settings.UNTREATED_LABEL]:
+        if basin_fractional_coverage[settings.UNTREATED_LABEL] == 0:
             rx_fc_delta[rx] = 0
             rx_fc_pct_delta[rx] = 0
         else:
-            rx_fc_delta[rx] = basin_fractional_coverage['baseline'] - basin_fractional_coverage[rx]
-            rx_fc_pct_delta[rx] = rx_fc_delta[rx]/basin_fractional_coverage['baseline']*100
+            rx_fc_delta[rx] = basin_fractional_coverage[settings.UNTREATED_LABEL] - basin_fractional_coverage[rx]
+            rx_fc_pct_delta[rx] = rx_fc_delta[rx]/basin_fractional_coverage[settings.UNTREATED_LABEL]*100
 
 
     # Baseline water yield (bas_char)
     # Cubic Feet per year (annual volume) / Square Feet (basin area) * 12 (inches/foot) = x inches/year
-    baseline_water_yield = str(round(annual_water_volume['baseline']/(basin_acres*43560)*12, 2))
+    baseline_water_yield = str(round(annual_water_volume[settings.UNTREATED_LABEL]/(basin_acres*43560)*12, 2))
     # Average Annual Flow: Total flow in cubic feet divided by seconds in year - assume year is not Leap.
     avg_flow_results = {
-        'baseline': str(round(annual_water_volume['baseline']/(365*24*60*60), 2))
+        settings.UNTREATED_LABEL: str(round(annual_water_volume[settings.UNTREATED_LABEL]/(365*24*60*60), 2))
     }
-    for treatment_type in annual_water_volume.keys():
-        if not treatment_type == 'baseline' and flow_output[treatment_type]['records_available']:
-            avg_flow_results[treatment_type] = str(round(annual_water_volume[treatment_type]/(365*24*60*60), 2))
-    # r50_average_flow = str(round(annual_water_volume['reduce to 50']/(365*24*60*60), 2))
-    # r30_average_flow = str(round(annual_water_volume['reduce to 30']/(365*24*60*60), 2))
-    # r0_average_flow = str(round(annual_water_volume['reduce to 0']/(365*24*60*60), 2))
+    for weather_year in annual_water_volume.keys():
+        if not weather_year == settings.UNTREATED_LABEL and flow_output[weather_year]['records_available']:
+            avg_flow_results[weather_year] = str(round(annual_water_volume[weather_year]/(365*24*60*60), 2))
 
-    flow_output['dry'] = flow_results['dry']['flow_output']['normal']
-    flow_output['wet'] = flow_results['wet']['flow_output']['normal']
+    flow_output[settings.DRY_YEAR_LABEL] = flow_results[settings.DRY_YEAR_LABEL]['flow_output'][settings.NORMAL_YEAR_LABEL]
+    flow_output[settings.WET_YEAR_LABEL] = flow_results[settings.WET_YEAR_LABEL]['flow_output'][settings.NORMAL_YEAR_LABEL]
     absolute_results = sort_output(flow_output)
     #   delta flow
-    delta_results = get_results_delta(flow_results['baseline']['flow_output'])
+    delta_results = get_results_delta(flow_results[settings.NORMAL_YEAR_LABEL]['flow_output'])
 
     #   7-day low-flow (needs sort_by_time)
     (seven_d_low_results, sept_median_7_day_low) = get_results_xd_low(flow_output, absolute_results, 7)
@@ -738,100 +711,41 @@ def get_hydro_results_by_pour_point_id(request):
     bas_char_data.append({'key': 'Total forested area upslope', 'value': acres_forested, 'unit': 'acres' })
     # bas_char_data.append({'key': 'Percent Forested', 'value': int(acres_forested/basin_acres*100), 'unit': '%' })
     bas_char_data.append({'key': 'Baseline water yield', 'value': baseline_water_yield, 'unit': 'inches/year' })
-    bas_char_data.append({'key': 'Baseline average annual flow', 'value': avg_flow_results['baseline'], 'unit': 'CFS' })
-    bas_char_data.append({'key': 'Baseline September mean flow', 'value': sept_avg_flow['baseline'], 'unit': 'CFS' })
-    bas_char_data.append({'key': 'Baseline September median 7 day avg low flow', 'value': round(sept_median_7_day_low['baseline'], 2), 'unit': 'CFS' })
+    bas_char_data.append({'key': 'Baseline average annual flow', 'value': avg_flow_results[settings.UNTREATED_LABEL], 'unit': 'CFS' })
+    bas_char_data.append({'key': 'Baseline September mean flow', 'value': sept_avg_flow[settings.UNTREATED_LABEL], 'unit': 'CFS' })
+    bas_char_data.append({'key': 'Baseline September median 7 day avg low flow', 'value': round(sept_median_7_day_low[settings.UNTREATED_LABEL], 2), 'unit': 'CFS' })
 
     hydro_char_data = []
     hydro_char_data.append({'key': '<b>Change in average annual flow from proposed management</b>', 'value': '', 'unit': '' })
-    for treatment_type in avg_flow_results.keys():
-        if not treatment_type == 'baseline':
-            treatment_type_change = get_float_change_as_rounded_string(avg_flow_results[treatment_type],avg_flow_results['baseline'])
-            hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % treatment_type, 'value': treatment_type_change, 'unit': 'CFS' }) #Baseline annl flow - 50 annl flow
-
-    # r50_change = get_float_change_as_rounded_string(r50_average_flow,avg_flow_results['baseline'])
-    # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_change, 'unit': 'CFS' }) #Baseline annl flow - 50 annl flow
-    # r30_change = get_float_change_as_rounded_string(r30_average_flow,avg_flow_results['baseline'])
-    # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_change, 'unit': 'CFS' }) #Baseline annl flow - 30 annl flow
-    # r0_change = get_float_change_as_rounded_string(r0_average_flow,avg_flow_results['baseline'])
-    # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_change, 'unit': 'CFS' }) #Baseline annl flow - 0 annl flow
+    for weather_year in [x for x in avg_flow_results.keys() if not x == settings.UNTREATED_LABEL]:
+        treatment_type_change = get_float_change_as_rounded_string(avg_flow_results[weather_year],avg_flow_results[settings.UNTREATED_LABEL])
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % weather_year, 'value': treatment_type_change, 'unit': 'CFS' }) #Baseline annl flow - 50 annl flow
 
     hydro_char_data.append({'key': '<b>Change in average September flow from proposed management </b>', 'value': '', 'unit': '' })
-    for treatment_type in [x for x in sept_avg_flow.keys() if not x == 'baseline']:
-        if flow_output[treatment_type]['records_available']:
-            treatment_type_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow[treatment_type],sept_avg_flow['baseline'])
+    for weather_year in [x for x in sept_avg_flow.keys() if not x == settings.UNTREATED_LABEL]:
+        if flow_output[weather_year]['records_available']:
+            treatment_type_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow[weather_year],sept_avg_flow[settings.UNTREATED_LABEL])
         else:
             treatment_type_sept_avg_change = 'Data not yet available'
-        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % treatment_type, 'value': treatment_type_sept_avg_change, 'unit': 'CFS' })
-
-        # r50_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow['reduce to 50'],sept_avg_flow['baseline'])
-        # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
-        # r30_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow['reduce to 30'],sept_avg_flow['baseline'])
-        # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
-        # r0_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow['reduce to 0'],sept_avg_flow['baseline'])
-        # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_sept_avg_change, 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % weather_year, 'value': treatment_type_sept_avg_change, 'unit': 'CFS' })
 
     hydro_char_data.append({'key': '<b>Change in Sept. 7-day low flow from proposed management </b>', 'value': '', 'unit': '' })
-    for treatment_type in [x for x in sept_median_7_day_low.keys() if not x == 'baseline']:
-        treatment_type_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low[treatment_type],sept_median_7_day_low['baseline'])
-        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % treatment_type, 'value': treatment_type_sept_7_day_low_diff, 'unit': 'CFS' })
-    # r50_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low['reduce to 50'],sept_median_7_day_low['baseline'])
-    # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': r50_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 50 sept flow
-    # r30_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low['reduce to 30'],sept_median_7_day_low['baseline'])
-    # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': r30_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 30 sept flow
-    # r0_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low['reduce to 0'],sept_median_7_day_low['baseline'])
-    # hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': r0_sept_7_day_low_diff, 'unit': 'CFS' }) #Baseline sept flow - 0 sept flow
+    for weather_year in [x for x in sept_median_7_day_low.keys() if not x == settings.UNTREATED_LABEL]:
+        treatment_type_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low[weather_year],sept_median_7_day_low[settings.UNTREATED_LABEL])
+        hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % weather_year, 'value': treatment_type_sept_7_day_low_diff, 'unit': 'CFS' })
 
     prop_mgmt_data = []
     basin_veg_units = treatment.veg_units.filter(geometry__intersects=overlap_basin.geometry) #within may be more accurate, but slower
     treatment_acres = sum([x.acres for x in basin_veg_units])
     prop_mgmt_data.append({'key': 'Total forested area in proposed treatment', 'value': int(treatment_acres), 'unit': 'acres' })
     prop_mgmt_data.append({'key': '<b>Reduction in avg fractional coverage from proposed management</b>', 'value': '', 'unit': '' })
-    for treatment_type in [x for x in rx_fc_delta.keys() if not x == 'baseline']:
-        prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % treatment_type, 'value': str(round(rx_fc_delta[treatment_type],2)), 'unit': '%' })
-    # prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 50%', 'value': str(round(rx_fc_delta['reduce to 50'],2)), 'unit': '%' }) #Baseline avg fc - 50 avg fc
-    # prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 30%', 'value': str(round(rx_fc_delta['reduce to 30'],2)), 'unit': '%' }) #Baseline avg fc - 30 avg fc
-    # prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- Reducing fractional coverage to 0%', 'value': str(round(rx_fc_delta['reduce to 0'],2)), 'unit': '%' }) #Baseline avg fc - 0 avg fc
-
-    # flow_est_data = []
-    # flow_est_data.append({'key': 'Estimation Type','value': est_type,'unit': ''})
-    # if settings.DEBUG:
-    #     flow_est_data.append({'key': 'Imputed ppt_ID','value': impute_id,'unit': ''})
-    #     flow_est_data.append({'key': 'Imputed veg mgmt scenario (50)','value': rx_50,'unit': ''})
-    #     flow_est_data.append({'key': 'Imputed veg mgmt scenario (30)','value': rx_30,'unit': ''})
-    #     flow_est_data.append({'key': 'Imputed veg mgmt scenario (0)','value': rx_0,'unit': ''})
-    # if ppt.confidence > 9:
-    #     confidence = 'NA'
-    # elif ppt.confidence > 6:
-    #     confidence = 'extremely high'
-    # elif ppt.confidence > 4:
-    #     confidence = 'high'
-    # elif ppt.confidence > 2:
-    #     confidence = 'moderate'
-    # elif ppt.confidence > 1:
-    #     confidence = 'low'
-    # else:
-    #     confidence = 'extremely low'
-    # flow_est_data.append({'key': 'Baseline Confidence', 'value': confidence, 'unit': ''})
-    # flow_est_data.append({'key': 'Change in Flow Confidence', 'value': "TBD", 'unit': '%'})
+    for weather_year in [x for x in rx_fc_delta.keys() if not x == settings.UNTREATED_LABEL]:
+        prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % weather_year, 'value': str(round(rx_fc_delta[weather_year],2)), 'unit': '%' })
 
     summary_reports = []
-    # if settings.DEBUG:
-    #     summary_reports.append(
-    #         {
-    #             'title': 'Debug Data',
-    #             'data': [
-    #                 {'key': 'Gauging station ID', 'value': pourpoint_id, 'unit': ''},
-    #                 # {'key': 'Overlap Basin Area', 'value': basin_acres, 'unit': 'Acres'},
-    #                 # {'key': 'Agg. Ppt Basin Area', 'value': agg_ppt_basin_acres, 'unit': 'Acres'},
-    #                 {'key': 'Agg. Ppt Basin Area', 'value': basin_acres, 'unit': 'Acres'},
-    #             ]
-    #         }
-    #     )
     summary_reports.append({'title': 'Basin Characteristics','data': bas_char_data})
     summary_reports.append({'title': 'Hydrologic Characteristics','data': hydro_char_data})
     summary_reports.append({'title': 'Proposed Management','data': prop_mgmt_data})
-    # summary_reports.append({'title': 'Flow Estimation Confidence','data': flow_est_data})
 
     results = [
         {
@@ -883,10 +797,10 @@ def get_results_by_scenario_id(request):
     if export:
         print("Export %s" % export)
     else:
-        if (treatment.job_status('baseline') == 'None' and treatment.job_status('wet') == 'None' and treatment.job_status('dry') == 'None') and (treatment.aggregate_report is None or len(treatment.aggregate_report) == 0):
+        if treatment.job_can_run(settings.NORMAL_YEAR_LABEL) or treatment.job_can_run(settings.DRY_YEAR_LABEL) or treatment.job_can_run(settings.WET_YEAR_LABEL):
             treatment.set_report()
-            if treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
-                treatment = get_feature_by_uid(scenario_id)
+        if treatment.aggregate_report is None or len(treatment.aggregate_report) == 0:
+            treatment = get_feature_by_uid(scenario_id)
 
         # draw/upload seems to have aggregate_report as a string, while
         # filter wizard sets/gets it as object. This is bad, but for now,
@@ -936,9 +850,9 @@ def get_status_by_scenario_id(request):
         return get_json_error_response('Treatment with given ID (%s) does not exist' % scenario_id, 500, {})
 
     weather_year_results = {
-        'baseline': None,
-        'wet': None,
-        'dry': None
+        settings.NORMAL_YEAR_LABEL: None,
+        settings.WET_YEAR_LABEL: None,
+        settings.DRY_YEAR_LABEL: None
     }
     for weather_year in settings.MODEL_YEARS.keys():
         weather_year_results[weather_year] = {
@@ -953,6 +867,9 @@ def get_status_by_scenario_id(request):
 
         if treatment.job_status(weather_year) == 'None':
             weather_year_results[weather_year]['task_status'] = 'Queued (0/4)'
+        if treatment.job_status(weather_year) == 'FAILURE':
+            weather_year_results[weather_year]['task_status'] = 'Failure. Restarting...'
+            treatment.set_report()
         elif treatment.job_status(weather_year) != 'SUCCESS':
             # Attempt to re-run the job - if job is too new, it won't restart, just continue
             weather_year_results[weather_year]['progress'] = 0
@@ -998,15 +915,6 @@ def get_status_by_scenario_id(request):
         except AttributeError as e:
             weather_year_results[weather_year]['age'] = 0
 
-    # MAX_ACTIVE_JOB_AGE
-    # return_json = {
-    #     'status': 'Status: {}'.format(task_status),
-    #     'progress': progress,
-    #     'age': job_age,
-    #     'error': error,
-    #     'last_line': last_line
-    # }
-    # return JsonResponse(return_json)
     return JsonResponse(weather_year_results)
 
 '''

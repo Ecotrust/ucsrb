@@ -218,85 +218,69 @@ class TreatmentScenario(Scenario):
 
     @property
     def jobs(self):
+        try:
+            normal_job =  ModelRun.objects.get(scenario=self, weather_year=settings.NORMAL_YEAR_LABEL).task
+        except Exception as e:
+            normal_job = None
+        try:
+            wet_job =  ModelRun.objects.get(scenario=self, weather_year=settings.WET_YEAR_LABEL).task
+        except Exception as e:
+            wet_job = None
+        try:
+            dry_job =  ModelRun.objects.get(scenario=self, weather_year=settings.DRY_YEAR_LABEL).task
+        except Exception as e:
+            dry_job = None
         return {
-            'baseline': TaskResult.objects.filter(task_args='"({treatment_id}, \'baseline\')"'.format(treatment_id=self.id)),
-            'wet': TaskResult.objects.filter(task_args='"({treatment_id}, \'wet\')"'.format(treatment_id=self.id)),
-            'dry': TaskResult.objects.filter(task_args='"({treatment_id}, \'dry\')"'.format(treatment_id=self.id)),
+            settings.NORMAL_YEAR_LABEL: normal_job,
+            settings.WET_YEAR_LABEL: wet_job,
+            settings.DRY_YEAR_LABEL: dry_job,
         }
 
-    @property
-    def active_jobs(self):
-        active_jobs = {
-            'baseline': None,
-            'wet': None,
-            'dry': None
-        }
-        cutoff_date = datetime.now() - timedelta(seconds=settings.MAX_DHSVM_RUN_DURATION)
-        complete_jobs = {
-            'baseline': self.jobs['baseline'].filter(status='SUCCESS', date_created__gte=cutoff_date).order_by('-date_created'),
-            'wet': self.jobs['wet'].filter(status='SUCCESS', date_created__gte=cutoff_date).order_by('-date_created'),
-            'dry': self.jobs['dry'].filter(status='SUCCESS', date_created__gte=cutoff_date).order_by('-date_created'),
-        }
-        incomplete_jobs = {
-            'baseline': self.jobs['baseline'].filter(status__in=settings.ACTIVE_TASK_STATES),
-            'wet': self.jobs['wet'].filter(status__in=settings.ACTIVE_TASK_STATES),
-            'dry': self.jobs['dry'].filter(status__in=settings.ACTIVE_TASK_STATES),
-        }
-        for weather_year in active_jobs.keys():
-            if complete_jobs[weather_year].count() > 0:
-                active_jobs[weather_year] = complete_jobs[weather_year][0]
-            elif incomplete_jobs[weather_year].count() > 1:
-                incomplete_jobs_count = incomplete_jobs[weather_year].count()
-                for index, job in enumerate(incomplete_jobs[weather_year].order_by('date_created')):
-                    if index < (incomplete_jobs_count - 1):
-                        # Kill Job
-                        revoke(job.task_id, terminate=True)
-                    else:
-                        active_jobs[weather_year] = job
-            elif incomplete_jobs[weather_year].count() == 1:
-                active_jobs[weather_year] = incomplete_jobs[weather_year][0]
-            else: # count == 0
-                active_jobs[weather_year] = None
-        return active_jobs
+    def job(self, weather_year=settings.NORMAL_YEAR_LABEL):
+        return self.jobs[weather_year]
 
-    def job(self, weather_year='baseline'):
-        active_job = self.active_jobs[weather_year]
-        if not active_job == None:
-            return active_job
-        else:
-            jobs = self.jobs[weather_year].order_by('date_created')
-            if jobs.count() > 0:
-                job = jobs[jobs.count()-1]  #get most recently created job
-                return job
-            else:
-                return None
-
-    def job_status(self, weather_year='baseline'):
+    def job_status(self, weather_year=settings.NORMAL_YEAR_LABEL):
         job = self.job(weather_year)
         if not job == None:
             return job.status
         else:
             return "None"
 
-    def job_age(self, weather_year='baseline'):
+    def job_age(self, weather_year=settings.NORMAL_YEAR_LABEL):
         job = self.job(weather_year)
         if not job == None:
             return datetime.now() - job.date_created
         else:
             return 0
 
-    def run_dhsvm(self):
-        active_jobs = self.active_jobs
-        for weather_year in active_jobs.keys():
-            active_job = active_jobs[weather_year]
-            if active_job and hasattr(active_job, 'age') and active_job.age.total_seconds() > settings.MAX_DHSVM_RUN_DURATION:
-                revoke(active_job.task_id, terminate=True)
-                # active_job = None
-                runTreatment.delay(self.id, weather_year)
-            # else:
-            #     # TODO: give user option to restart task?
-            if active_jobs[weather_year] == None:
-                runTreatment.delay(self.id, weather_year)
+    def job_can_run(self, weather_year):
+        job = self.job(weather_year)
+        if job:
+            if job.status == 'FAILED':
+                return True
+            if hasattr(job, 'age') and job.age.total_seconds() > settings.MAX_DHSVM_RUN_DURATION:
+                return True
+        else:
+            return True
+
+        return False
+
+    def run_dhsvm(self, force_rerun=False):
+        jobs = self.jobs
+        for weather_year in jobs.keys():
+            job = jobs[weather_year]
+            if force_rerun or self.job_can_run(weather_year):
+                if job and job.task_id:
+                    revoke(job.task_id, terminate=True)
+                task = runTreatment.delay(self.id, weather_year)
+                model_runs = ModelRun.objects.filter(scenario = self, weather_year = weather_year)
+                if model_runs.count() > 0:
+                    model_run = model_runs[0]
+                    model_run.task_id = task.task_id
+                    model_run.save()
+                else:
+                    model_run = ModelRun.objects.create(scenario = self, weather_year = weather_year, task_id=task.task_id)
+            # else: viable job may yet run.
 
     def aggregate_results(self):
         vpus = self.run_filters(None) # There seems to be no need for passing a query here.
@@ -419,6 +403,30 @@ class TreatmentScenario(Scenario):
         # form_template = 'scenarios/form.html'
         form_template = 'ucsrb_scenarios/form.html'
         show_template = 'scenarios/show.html'
+
+
+class ModelRun(models.Model):
+    WEATHER_YEAR_CHOICES = [(x, x) for x in settings.MODEL_YEARS.keys()]
+    scenario = models.ForeignKey(TreatmentScenario, on_delete=models.CASCADE)
+    weather_year = models.CharField(max_length=32, choices=WEATHER_YEAR_CHOICES)
+    task_id = models.CharField(max_length=255)
+
+    class Meta:
+        unique_together = [['scenario', 'weather_year']]
+
+    @property
+    def task(self):
+        try:
+            return TaskResult.objects.get(task_id=self.task_id)
+        except Exception as e:
+            return None
+
+    @property
+    def task_status(self):
+        if self.task:
+            return task.status
+        else:
+            return None
 
 class TreatmentArea(models.Model):
     # focus_area = models.ForeignKey(FocusArea, null=True, blank=True, default=None, on_delete=models.SET_NULL)

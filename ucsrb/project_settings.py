@@ -230,25 +230,33 @@ GET_SCENARIOS_URL = '/ucsrb/get_scenarios/'
 SCENARIO_FORM_URL = '/features/treatmentscenario/form/'
 SCENARIO_LINK_BASE = '/features/treatmentscenario/ucsrb_treatmentscenario'
 
+# This is painful, but to clarify 'baseline' year vs. 'baseline' treatment this will help us clean up.
+# NORMAL_YEAR_LABEL = 'baseline'
+NORMAL_YEAR_LABEL = 'normal'
+WET_YEAR_LABEL = 'wet'
+DRY_YEAR_LABEL = 'dry'
+# UNTREATED_LABEL = 'baseline'
+UNTREATED_LABEL = 'untreated'
+
 MODEL_YEAR_LOOKUP = {
-    '2000': 'dry',
-    '2001': 'dry',
-    '2005': 'baseline',
-    '2006': 'baseline',
-    '1998': 'wet',
-    '1999': 'wet',
+    '2000': DRY_YEAR_LABEL,
+    '2001': DRY_YEAR_LABEL,
+    '2005': NORMAL_YEAR_LABEL,
+    '2006': NORMAL_YEAR_LABEL,
+    '1998': WET_YEAR_LABEL,
+    '1999': WET_YEAR_LABEL,
 }
 
 MODEL_YEARS = {
-    'dry': {
+    DRY_YEAR_LABEL: {
         'start': datetime.strptime("10.01.2000-00:00:00", "%m.%d.%Y-%H:%M:%S"),
         'end': datetime.strptime("10.01.2001-00:00:00", "%m.%d.%Y-%H:%M:%S")
     },
-    'baseline': {
+    NORMAL_YEAR_LABEL: {
         'start': datetime.strptime("10.01.2005-00:00:00", "%m.%d.%Y-%H:%M:%S"),
         'end': datetime.strptime("10.01.2006-00:00:00", "%m.%d.%Y-%H:%M:%S")
     },
-    'wet': {
+    WET_YEAR_LABEL: {
         'start': datetime.strptime("10.01.1998-00:00:00", "%m.%d.%Y-%H:%M:%S"),
         'end': datetime.strptime("10.01.1999-00:00:00", "%m.%d.%Y-%H:%M:%S")
     },
