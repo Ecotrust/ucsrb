@@ -1404,7 +1404,7 @@ app.request = {
             },
             error: function(response, status) {
                 console.log(`%cfail @ save drawing: %o`, 'color: red', response);
-                if (response.hasOwnProperty('responseJSON') && response.responseJSON.hasOwnPropety('error_msg')) {
+                if (response.hasOwnProperty('responseJSON') && response.responseJSON.hasOwnProperty('error_msg')) {
                   alert(response.responseJSON.error_msg);
                 } else {
                   alert("Error saving drawing. Please review your form and drawings and try again.");
