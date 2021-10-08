@@ -61,7 +61,7 @@ var main = {
                     }
                 },
                 error: function(response) {
-                    alert("Unknown error while logging in. Please try again.")
+                    main.auth.failure(response);
                 }
             })
         },
