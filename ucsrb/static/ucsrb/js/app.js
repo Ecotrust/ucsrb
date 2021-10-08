@@ -1448,7 +1448,15 @@ app.request = {
             },
             error: function(response, status) {
                 console.log(`%cfail @ upload treatment: %o`, 'color: red', response);
-                alert(response.responseJSON.error_msg);
+                if (response.hasOwnProperty('responseJSON')) {
+                  alert(response.responseJSON.error_msg);
+                } else if (response.hasOwnProperty('statusText') && response.hasOwnProperty('responseText')) {
+                  alert(response.statusText + ": " + response.responseText.slice(0,150));
+                } else if (response.hasOwnProperty('responseText')) {
+                  alert("Error: " + response.responseText.slice(0,150));
+                } else {
+                  alert('Unknown error. Please check that your shapefile is valid.')
+                }
             }
         })
     },

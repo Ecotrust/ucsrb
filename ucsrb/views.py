@@ -2,6 +2,7 @@
 from collections import OrderedDict
 from copy import deepcopy, copy
 from datetime import datetime
+from humanize import intcomma
 import time
 import json
 import os
@@ -203,9 +204,13 @@ def clean_zip_file(tmp_zip_file):
             outzip = zipfile.ZipFile(new_tmp_zip.name, 'w')
             file_parts = [(x.split('/')[-1], zip.read(x)) for x in zip.namelist()]
             for part in file_parts:
-                outzip.writestr(part[0],part[1])
-                if '.shp' in part[0]:
-                    is_clean=True
+                try:
+                    outzip.writestr(part[0],part[1])
+                    if '.shp' in part[0]:
+                        is_clean=True
+                except IndexError as e:
+                    # weird error from zipfile.py line 1792 in writestr
+                    pass
             outzip.close()
             tmp_zip_file.close()
             tmp_zip_file = new_tmp_zip
@@ -291,6 +296,13 @@ def define_scenario(request, featJson, scenario_name, description, prescription_
     layer = 'Drawing'
     focus_area = FocusArea.objects.create(unit_type=layer, geometry=geometry)
     focus_area.save()
+
+    focus_area.geometry.transform(2163)
+    treatment_acres = int(round(focus_area.geometry.area/4046.86, 0))
+    # return geometry to web mercator
+    focus_area.geometry.transform(3857)
+    if treatment_acres > settings.MAX_TREATMENT_ACRES:
+        return get_json_error_response('Treatment is too large ({} acres). Please keep it under {} acres.'.format(intcomma(treatment_acres), intcomma(settings.MAX_TREATMENT_ACRES)))
 
     user = request.user
     if not user.is_authenticated:
