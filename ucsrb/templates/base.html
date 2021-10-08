@@ -70,6 +70,23 @@
                 {% include 'ucsrb/blocks/login_modal.html' %}
             </div>
         {% endblock login_modal %}
+        {% block login_success_modal %}
+          <div id="login-success-modal" class="alert alert-success fade" role="alert">
+            Successfully logged in.<br />
+            Welcome <span id="login-success-username"></span>
+          </div>
+        {% endblock login_success_modal %}
+        {% block login_failure_modal %}
+          <div id="login-failure-modal" class="alert alert-danger fade" role="alert">
+            <button type="button" class="close" onclick="$('.alert').removeClass('show');setTimeout(function(){$('.alert').css('visibility', 'hidden');},150);" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <!-- No account found matching given Username and Password. -->
+            Password does not match username. Please try again.<br />
+            You may also <a href="/account/forgot/" target="_blank">reset your password</a>. <br />
+            Reseting your password will cause your current progress to be lost.
+          </div>
+        {% endblock login_failure_modal %}
         {% block define_modal %}
           <div class="modal fade" id="define-modal" tabindex="-1" role="dialog" aria-labelledby="define-modal" aria-hidden="true">
                 {% include 'ucsrb/blocks/define_modal.html' %}
