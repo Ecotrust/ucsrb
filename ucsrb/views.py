@@ -6,6 +6,7 @@ import time
 import json
 import os
 from pathlib import Path
+import zipfile
 
 from accounts.forms import LogInForm, SignUpForm
 from geodata.geodata import GeoData
@@ -192,6 +193,27 @@ def save_drawing(request):
         return define_scenario(request, featJson, scenario_name, description, prescription_selection)
     return get_json_error_response('Unable to save drawing.', 500, context)
 
+def clean_zip_file(tmp_zip_file):
+    is_clean = False
+    zipname = tmp_zip_file.name
+    if zipfile.is_zipfile(zipname):
+        zip = zipfile.ZipFile(zipname)
+        if len([x for x in zip.namelist() if '/' in x]) > 0:
+            new_tmp_zip = NamedTemporaryFile(mode='w+',delete=True, suffix='.zip')
+            outzip = zipfile.ZipFile(new_tmp_zip.name, 'w')
+            file_parts = [(x.split('/')[-1], zip.read(x)) for x in zip.namelist()]
+            for part in file_parts:
+                outzip.writestr(part[0],part[1])
+                if '.shp' in part[0]:
+                    is_clean=True
+            outzip.close()
+            tmp_zip_file.close()
+            tmp_zip_file = new_tmp_zip
+        else:
+            is_clean = True
+
+    return (tmp_zip_file, is_clean)
+
 def upload_treatment_shapefile(request):
     context = {}
     if request.method == 'POST':
@@ -201,23 +223,32 @@ def upload_treatment_shapefile(request):
             for chunk in request.FILES['zipped_shapefile'].chunks():
                 tmp_zip_file.write(chunk)
             tmp_zip_file.seek(0)
-            projection = request.POST['shp_projection']
-            geodata = GeoData()
-            if projection and len(projection) > 1:
-                geodata.read(tmp_zip_file.name, projection=projection)
+            (tmp_zip_file, is_clean) = clean_zip_file(tmp_zip_file)
+            if is_clean:
+                try:
+                    projection = request.POST['shp_projection']
+                    geodata = GeoData()
+                    if projection and len(projection) > 1:
+                        geodata.read(tmp_zip_file.name, projection=projection)
+                    else:
+                        geodata.read(tmp_zip_file.name)
+
+                    tmp_zip_file.close()
+                    featJson = geodata.getUnion(format='geojson', projection='EPSG:3857')
+                    scenario_name = request.POST['treatment_name']
+                    if len(scenario_name) < 1:
+                        scenario_name = '.'.join(request.FILES['zipped_shapefile'].name.split('.')[:-1])
+                    description = request.POST['treatment_description']
+
+                    prescription_selection = request.POST['prescription_treatment_selection']
+
+                    return define_scenario(request, featJson, scenario_name, description, prescription_selection)
+                except Exception as e:
+                    message = "Error when attempting to read provided shapefile: {}".format(e)
+                    return get_json_error_response(message, 400, context)
             else:
-                geodata.read(tmp_zip_file.name)
-
-            tmp_zip_file.close()
-            featJson = geodata.getUnion(format='geojson', projection='EPSG:3857')
-            scenario_name = request.POST['treatment_name']
-            if len(scenario_name) < 1:
-                scenario_name = '.'.join(request.FILES['zipped_shapefile'].name.split('.')[:-1])
-            description = request.POST['treatment_description']
-
-            prescription_selection = request.POST['prescription_treatment_selection']
-
-            return define_scenario(request, featJson, scenario_name, description, prescription_selection)
+                message = "Error: Unable to read provided file. Be sure you upload a zipfile (.zip) that contains a .shp, .dbf, etc..."
+                return get_json_error_response(message, 400, context)
         else:
             message = "Errors: "
             for key in form.errors.keys():
