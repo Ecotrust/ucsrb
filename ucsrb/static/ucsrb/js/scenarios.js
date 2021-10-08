@@ -1,3 +1,4 @@
+const MIN_TREATMENT_ACRES = 100;
 
 var madrona = {
     onShow: function(callback) { callback(); },
@@ -32,6 +33,10 @@ var madrona = {
             if (!selected_treatment) {
               $("#button_prev").click();
               window.alert("Please select a default treatment prescription - you will be able to set different prescriptions to all areas later.");
+            } else if (app.viewModel.scenarios.scenarioFormModel.gridCellsRemaining() < MIN_TREATMENT_ACRES) {
+              window.alert("Treatments smaller than " + MIN_TREATMENT_ACRES + " acres are unlikely to have a significant impact on downstream flow. Please broaden your filters.");
+            } else if (app.viewModel.scenarios.scenarioFormModel.gridCellsRemaining() >= app.map.draw.maxAcres) {
+              window.alert("Treatments larger than " + app.map.draw.maxAcres + " acres not permitted. Please adjust your filters.");
             } else {
               $("#id_prescription_treatment_selection").val(selected_treatment);
               $('#id_prescription_treatment_selection input:not(:checked)').remove();
@@ -358,7 +363,7 @@ function scenarioFormModel(options) {
                 }
                 self.updatedFilterResultsLayer.setVisibility(true);
                 acres = area_acres;
-                self.gridCellsRemaining(parseInt(acres) + ' acres');
+                self.gridCellsRemaining(parseInt(acres));
 
                 if (parseInt(acres) < parseInt(app.map.draw.maxAcres)) {
                   $('.submit_button').removeClass('disabled');
@@ -367,7 +372,7 @@ function scenarioFormModel(options) {
                   if ($('#scenarios-form .alert').length > 0) {
                     $('#scenarios-form .alert').removeClass('d-none');
                   } else {
-                    $('#scenarios-form').append(`<div class="alert alert-warning" role="alert">Too large of area. Filter to less than ${app.map.draw.maxAcres} acres.`);
+                    $('#scenarios-form').append(`<div class="alert alert-warning" role="alert">Area too large. Filter to less than ${app.map.draw.maxAcres} acres.`);
                   }
                 }
 
