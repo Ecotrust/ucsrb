@@ -748,10 +748,20 @@ def get_hydro_results_by_pour_point_id(request):
     ]
 
     bas_char_data = []
-    bas_char_data.append({'key': 'Total area upslope of this gauging station', 'value': basin_acres, 'unit': 'acres' })
+    bas_char_data.append({
+        'key': 'Total area upslope of this gauging station',
+        'value': basin_acres,
+        'unit': 'acres',
+        'help': '\'Upslope\' means \'all area that drains water to this point.\''
+    })
     vus = VegPlanningUnit.objects.filter(dwnstream_ppt_id__in=upslope_ppts)
     acres_forested = int(sum([x.acres for x in vus]))
-    bas_char_data.append({'key': 'Total forested area upslope', 'value': acres_forested, 'unit': 'acres' })
+    bas_char_data.append({
+        'key': 'Total forested area upslope',
+        'value': acres_forested,
+        'unit': 'acres',
+        'help': '\'Upslope\' means \'all area that drains water to this point.\''
+    })
     # bas_char_data.append({'key': 'Percent Forested', 'value': int(acres_forested/basin_acres*100), 'unit': '%' })
     bas_char_data.append({'key': 'Baseline water yield', 'value': baseline_water_yield, 'unit': 'inches/year' })
     bas_char_data.append({'key': 'Baseline average annual flow', 'value': avg_flow_results[settings.UNTREATED_LABEL], 'unit': 'CFS' })

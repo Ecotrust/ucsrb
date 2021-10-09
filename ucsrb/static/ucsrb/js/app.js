@@ -66,6 +66,7 @@ setInit = function() {
 reportInit = function() {
   setTimeout(function(){
     $('#results-disclaimer').tooltip();
+    $('i.summary-report-tooltip').tooltip();
   }, 50);
 }
 
@@ -451,7 +452,12 @@ app.panel = {
               html += '<div class="table-responsive"><table class="table-light table-borderless table"><tbody>';
               // html += '<tr><th>Field</th><th>Value</th><th>Unit</th></tr>';
               for (var i = 0; i < results[result].data.length; i++) {
-                html += `<tr><td>${results[result].data[i]["key"]}</td><td>${results[result].data[i]["value"]}</td><td>${results[result].data[i]["unit"]}</td></tr>`;
+                if (results[result].data[i].hasOwnProperty('help')) {
+                  help_icon = `<i class="info-icon icon-info-sign field-tooltip summary-report-tooltip" data-toggle="tooltip" data-original-title="${results[result].data[i]['help']}" data-placement="right"></i>`;
+                } else {
+                  help_icon = '';
+                }
+                html += `<tr><td>${results[result].data[i]["key"]} ${help_icon}</td><td>${results[result].data[i]["value"]}</td><td>${results[result].data[i]["unit"]}</td></tr>`;
               }
               html += '</tbody></table></div>'
           }
