@@ -179,6 +179,42 @@ def create_treatment_areas(request):
 
         return get_scenario_treatment_areas_geojson(scenario, final_geometry, split_polys, prescription_selection, context)
 
+def claim_treatment_area(request):
+    json_response = {
+        'status': 'Failed',
+        'code': 500,
+        'message': 'Unknown.',
+    }
+    try:
+        scenario_id = request.GET['scenario']
+        scenario = get_feature_by_uid('ucsrb_treatmentscenario_{}'.format(scenario_id))
+        user = request.user
+        anon_user = User.objects.get(pk=settings.ANONYMOUS_USER_PK)
+        if user.is_authenticated and scenario and scenario.user == anon_user:
+            scenario.user = user
+            scenario.save()
+        elif not user.is_authenticated:
+            json_response['code'] = 300
+            json_response['message'] = 'User is not authenticated.'
+            return JsonResponse(json_response)
+        elif not scenario:
+            json_response['code'] = 400
+            json_response['message'] = 'Treatment Scenario not found.'
+            return JsonResponse(json_response)
+        elif not scenario.user == anon_user:
+            json_response['code'] = 300
+            json_response['message'] = 'Treatment Scenario is owned by another user.'
+            return JsonResponse(json_response)
+
+        json_response['status'] = 'Success'
+        json_response['code'] = 200
+
+    except Exception as e:
+        json_response['message'] = '{}.'.format(e)
+
+    return JsonResponse(json_response)
+
+
 def save_drawing(request):
     context = {}
     if request.method == 'POST':

@@ -128,6 +128,25 @@ var main = {
             $('.username-wrap #sign-in-modal-2').css('display', 'none');
             // hide submenu login
             $('#subnav-sign-in-modal').addClass('d-none');
+            if (app.state.scenarioId) {
+              $.ajax({
+                url: '/ucsrb/claim_treatment_area/',
+                data: {
+                    scenario: app.state.scenarioId,
+                },
+                dataType: 'json',
+                success: function(response) {
+                      if (response.status != 'Success') {
+                        var message = `Error (${response.code}): ${response.message} Unable to reset ownership of current proposed treatment. You will need to start over to save this to your account to view later.`
+                        alert(message);
+                      }
+                },
+                error: function(response) {
+                    var message = `Error (${response.code}): ${response.message}. Unable to reset ownership of current proposed treatment. You will need to start over to save this to your account to view later.`
+                    alert(message);
+                }
+              })
+            }
         },
         failure: function(data) {
           $('#login-failure-modal').css('visibility','visible');
