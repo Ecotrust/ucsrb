@@ -104,6 +104,7 @@ var main = {
                 if (app) {
                     $('#nav-load-save').removeClass('hide');
                     $('#subnav-sign-in-modal').addClass('hide');
+                    $('#upload-treatment-form input[name="csrfmiddlewaretoken"]').val(csrftoken);
                 }
             }
             $('#login-modal').modal('hide');

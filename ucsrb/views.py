@@ -214,6 +214,20 @@ def claim_treatment_area(request):
 
     return JsonResponse(json_response)
 
+def login_check(request):
+    json_response = {
+        'status': 'Failed',
+        'code': 500,
+        'message': 'Unknown.',
+        'is_authenticated': False
+    }
+    user = request.user
+    return JsonResponse({
+        'status': 'Success',
+        'code': 200,
+        'message': None,
+        'is_authenticated': user.is_authenticated,
+    })
 
 def save_drawing(request):
     context = {}

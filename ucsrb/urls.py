@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^upload_treatment_shapefile/', views.upload_treatment_shapefile, name='shp_upload'),
     url(r'^create_treatment_areas/', views.create_treatment_areas),
     url(r'^claim_treatment_area/', views.claim_treatment_area),
+    url(r'^login_check/', views.login_check),
 
     ### Filter/Scenarios Work
     url(r'get_scenarios/(?P<scenario_model_name>[\w_]+)/$', views.get_scenarios),

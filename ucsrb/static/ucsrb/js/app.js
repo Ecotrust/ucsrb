@@ -725,11 +725,28 @@ enableDrawing = function() {
 }
 
 showUploadForm = function() {
-  $('#define-modal').modal('hide');
-  $('#treatment-upload-modal').modal('show');
-  setTimeout(function() {
-    applyTooltips();
-  }, 100);
+  $.ajax({
+      url: `login_check/`,
+      data: {},
+      dataType: 'json',
+      success: function(response) {
+          if (response.is_authenticated) {
+            $('#define-modal').modal('hide');
+            $('#treatment-upload-modal').modal('show');
+            setTimeout(function() {
+              applyTooltips();
+            }, 100);
+          } else {
+            alert('You must log in as a registered user to upload treatments');
+            app.state.method = 'define';
+          }
+      },
+      error: function(response) {
+          alert('Unknown error. Please try again.');
+          app.state.method = 'define';
+      }
+  })
+
 }
 
 showPrescriptionForm = function(features_object) {

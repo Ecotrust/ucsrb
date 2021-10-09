@@ -6,11 +6,7 @@
                 <button class="btn-method-filter" data-method="filter" data-toggle="tooltip" data-placement="bottom" title="Choose a specific forest management unit, identify forest management actions for the chosen forest management unit, then evaluate affect on stream flows."><img src="{% static 'ucsrb/img/icon/filter_forest.svg' %}" alt="filter region" /><h3>Filter forest regions</h3></button>
             </li>
             <li class="nav-item col">
-                {% if not user.is_authenticated %}
-                  <button class="btn-method-draw" data-method="draw" data-toggle="tooltip" data-placement="bottom" title="Draw treatment areas then see the impact on stream flows."><img src="{% static 'ucsrb/img/icon/draw_area.svg' %}" alt="draw area" /><h3>Define treatments</h3></button>
-                {% else %}
-                  <button class="btn-method-define" data-method="define" data-toggle="tooltip" data-placement="bottom" title="Define treatments and stands then see the impact on stream flows."><img src="{% static 'ucsrb/img/icon/draw_area.svg' %}" alt="define treatments" /><h3>Define treatments</h3></button>
-                {% endif %}
+                <button class="btn-method-define" data-method="define" data-toggle="tooltip" data-placement="bottom" title="Define treatments and stands then see the impact on stream flows."><img src="{% static 'ucsrb/img/icon/draw_area.svg' %}" alt="define treatments" /><h3>Define treatments</h3></button>
             </li>
         </ul>
         <ul id="results-nav" class="col-9 nav method-nav justify-content-start align-items-center d-none">
