@@ -256,7 +256,7 @@ class TreatmentScenario(Scenario):
     def job_can_run(self, weather_year):
         job = self.job(weather_year)
         if job:
-            if job.status == 'FAILED':
+            if job.status == 'FAILURE':
                 return True
             if hasattr(job, 'age') and job.age.total_seconds() > settings.MAX_DHSVM_RUN_DURATION:
                 return True
