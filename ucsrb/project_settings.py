@@ -536,7 +536,7 @@ EMAIL_HOST_USER = 'noreply@s2f.ucsrb.org'
 DEFAULT_FROM_EMAIL = 'noreply@s2f.ucsrb.org'
 EMAIL_HOST_ADDRESS = 'https://s2f.ucsrb.org'
 SERVER_EMAIL = 'noreply@s2f.ucsrb.org'
-PROJECT_SITE = 'http://s2f.ucsrb.org'
+PROJECT_SITE = 'https://s2f.ucsrb.org'
 PROJECT_NAME = 'Snow2Flow'
 
 FORGOT_EMAIL_SUBJECT = 'Snow2Flow Password Reset Request'
