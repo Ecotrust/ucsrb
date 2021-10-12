@@ -532,11 +532,11 @@ CMS_ADMIN_BUTTON = False
 MAX_SCENARIO_RESULTS = 10000
 MAPBOX_ACCESS_TOKEN = 'set_in_local_settings'
 
-EMAIL_HOST_USER = 'noreply@s2fdemo.ecotrust.org'
-DEFAULT_FROM_EMAIL = 'noreply@s2fdemo.ecotrust.org'
-EMAIL_HOST_ADDRESS = 'https://s2fdemo.ecotrust.org'
-SERVER_EMAIL = 'noreply@s2fdemo.ecotrust.org'
-PROJECT_SITE = 'http://s2fdemo.ecotrust.org'
+EMAIL_HOST_USER = 'noreply@s2f.ucsrb.org'
+DEFAULT_FROM_EMAIL = 'noreply@s2f.ucsrb.org'
+EMAIL_HOST_ADDRESS = 'https://s2f.ucsrb.org'
+SERVER_EMAIL = 'noreply@s2f.ucsrb.org'
+PROJECT_SITE = 'http://s2f.ucsrb.org'
 PROJECT_NAME = 'Snow2Flow'
 
 FORGOT_EMAIL_SUBJECT = 'Snow2Flow Password Reset Request'
