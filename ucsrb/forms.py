@@ -213,12 +213,12 @@ class TreatmentScenarioForm(ScenarioForm):
         help_text="Uncheck any topo types that you don't want included in your treatment",
     )
 
-    has_burned = HiddenScenarioBooleanField(
-        # initial=False,
-        label="Exclude areas burned in fire 2012-2018",
-        help_text="Vegetation data is from 2012. It is not accurate for planning management impacts in areas that have burned since.",
-        required=False,
-    )
+    # has_burned = HiddenScenarioBooleanField(
+    #     # initial=False,
+    #     label="Exclude areas burned in fire 2012-2018",
+    #     help_text="Vegetation data is from 2012. It is not accurate for planning management impacts in areas that have burned since.",
+    #     required=False,
+    # )
 
     has_wilderness_area = HiddenScenarioBooleanField(
         initial=True,
@@ -252,7 +252,7 @@ class TreatmentScenarioForm(ScenarioForm):
             ('percent_riparian', None, None, None),
             ('percent_wetland', None, None, None),
             ('has_critical_habitat', None, None, None),
-            ('has_burned', None, None, None),
+            # ('has_burned', None, None, None),
         ]
         return self._get_fields(names)
 
