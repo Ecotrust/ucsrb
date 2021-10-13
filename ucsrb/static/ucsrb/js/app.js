@@ -369,7 +369,13 @@ app.panel = {
             </div>`;
             html += `<div class="feature-result"><span class="lead">${results.scenario.acres}</span> acres</div><div class="overflow-gradient"><div class="result-list-wrap align-items-center">`;
             for (var result of results.aggregate_results) {
-                html += `<h5>${Object.keys(result)}</h5>`;
+                var reportSectionTitle = Object.keys(result)[0];
+                if (Object.keys(result[reportSectionTitle][0]).indexOf('help') >= 0) {
+                  var help = ` <i class="info-icon icon-info-sign field-tooltip" data-toggle="tooltip" data-original-title="${result[reportSectionTitle][0]['help']}" data-placement="top"></i>`;
+                } else {
+                  var help = '';
+                }
+                html += `<h5>${reportSectionTitle}${help}</h5>`;
                 html += app.panel.results.styleResultsAsRows(Object.values(result));
             }
             html += '</div></div>';
@@ -433,14 +439,18 @@ app.panel = {
         styleResultsAsRows: function(results) {
             var html = '<div class="table-responsive"><table class="table-light table-borderless table"><tbody>';
             for (var result in results) {
-                html += '<tr>'
                 for (var i = 0; i < results[result].length; i++) {
 
                   for (var j=0; j < Object.keys(results[result][i]).length; j++){
-                    html += `<tr><td>${Object.keys(results[result][i])[j]}</td><td>${Object.values(results[result][i])[j]}</td></tr>`;
+                    if (Object.keys(results[result][i])[j] != 'help') {
+                      html += `<tr><td>${Object.keys(results[result][i])[j]}</td><td>${Object.values(results[result][i])[j]}</td></tr>`;
+                    } else {
+                      setTimeout(function(){
+                        $(".field-tooltip").tooltip();
+                      }, 300)
+                    }
                   }
                 }
-                html += '</tr>'
             }
             html += '</tr></tbody></table></div>'
             return html;

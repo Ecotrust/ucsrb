@@ -347,6 +347,7 @@ class TreatmentScenario(Scenario):
             'total_acres': int(totals['Fractional Coverage']['Total']),
             'results_list': [
                 {'Forest Overstory Fractional Coverage': [
+                    {'help': 'These values may not reflect areas burned or treated since 2012.'},
                     {'0-20% (acres)': int(totals['Fractional Coverage']['0-20%'])},
                     {'20-40% (acres)': int(totals['Fractional Coverage']['20-40%'])},
                     {'40-60% (acres)': int(totals['Fractional Coverage']['40-60%'])},
@@ -355,14 +356,14 @@ class TreatmentScenario(Scenario):
                     # {'Total Acres': int(totals['Fractional Coverage']['Total'])}
                     # {'Total Acres': total_treatment_acres}
                 ]},
-                    {'Landforms': [
+                {'Landforms': [
                     {'Ridgetops (acres)': int(totals['Landforms']['Ridgetops'])},
                     {'Valley Bottoms (acres)': int(totals['Landforms']['Valley Bottoms'])},
                     {'North Facing Slopes (acres)': int(totals['Landforms']['North Facing Slopes'])},
                     {'South Facing Slopes (acres)': int(totals['Landforms']['South Facing Slopes'])},
                     {'East or West Facing Slopes (acres)': int(totals['Landforms']['East or West Facing Slopes'])}
                 ]},
-                    {'Habitat Characteristics': [
+                {'Habitat Characteristics': [
                     {'Riparian Area (acres)': int(totals['Habitat Characteristics']['Riparian Area'])},
                     {'Wetlands (acres)': int(totals['Habitat Characteristics']['Wetlands'])},
                     {'Critical Habitat (acres)': int(totals['Habitat Characteristics']['Critical Habitat'])},
