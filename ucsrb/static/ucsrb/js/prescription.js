@@ -1,6 +1,6 @@
 app.prescription = {
   updateTreatmentSectionCount: function() {
-    var count = app.map.selection.select.getFeatures().getArray().length;
+    var count = app.map.selection.selectTreatmentArea.getFeatures().getArray().length;
     $('#selected-treatments-count').html(count);
     if (count < 1) {
       $('.prescription-selection-row button').prop('disabled', true);
@@ -21,8 +21,8 @@ app.prescription = {
     var all_features = app.map.treatmentLayer.getSource().getFeatures();
     for (var i = 0; i < all_features.length; i++) {
       var feature = all_features[i];
-      if (app.map.selection.select.getFeatures().getArray().indexOf(feature) < 0) {
-        app.map.selection.select.getFeatures().push(feature);
+      if (app.map.selection.selectTreatmentArea.getFeatures().getArray().indexOf(feature) < 0) {
+        app.map.selection.selectTreatmentArea.getFeatures().push(feature);
       }
     }
 
@@ -30,11 +30,11 @@ app.prescription = {
     app.prescription.updateTreatmentSectionCount();
   },
   deselectAllTreatments: function() {
-    app.map.selection.select.getFeatures().clear();
+    app.map.selection.selectTreatmentArea.getFeatures().clear();
     app.prescription.updateTreatmentSectionCount();
   },
   applyRx: function(prescription) {
-    var selected_features = app.map.selection.select.getFeatures().getArray();
+    var selected_features = app.map.selection.selectTreatmentArea.getFeatures().getArray();
     for (var i=0; i < selected_features.length; i++) {
       var feature = selected_features[i];
       feature.set('prescription', prescription);
@@ -47,7 +47,7 @@ app.prescription = {
   applyBurn: function() { app.prescription.applyRx('burn');},
   applyIdeal: function() { app.prescription.applyRx('flow');},
   submitTreatments: function() {
-    var selectedFeatures = app.map.selection.select.getFeatures().getArray();
+    var selectedFeatures = app.map.selection.selectTreatmentArea.getFeatures().getArray();
     if (selectedFeatures.length > 0) {
       alert("You have selected features that you have not updated. Please finish applying prescriptions or clear your selection before proceeding.");
     } else {

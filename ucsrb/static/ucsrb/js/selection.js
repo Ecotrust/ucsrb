@@ -161,14 +161,19 @@ app.map.selection.selectFilterSingleClick = new ol.interaction.Select(
     style: app.map.styles.Polygon
   }
 );
-app.map.selection.selectResultsPourPoint = new ol.interaction.Select(
+// app.map.selection.selectResultsPourPoint = new ol.interaction.Select(
+app.map.selection.selectResultsFeature = new ol.interaction.Select(
   {
     layers: [
-      app.map.layer.resultPoints.layer
+      app.map.layer.resultPoints.layer,
+      app.map.layer.treatmentResultAreas.layer,
     ],
-    style: app.map.styles.PourPointSelected
+    // style: app.map.styles.PourPointSelected
+    // style: app.map.styles.SelectedReportFeature
   }
 );
+
+// For selection of drawings to apply prescriptions
 app.map.selection.selectTreatmentArea = new ol.interaction.Select(
   {
     layers: [
@@ -190,16 +195,45 @@ app.map.selection.selectTreatmentArea = new ol.interaction.Select(
   }
 );
 
-app.map.selection.setSelect = function(selectionInteraction) {
-  //Is this line necessary?
-  app.map.removeInteraction(app.map.selection.select);
-  app.map.selection.select = selectionInteraction;
-  app.map.addInteraction(app.map.selection.select);
-  app.map.selection.select.on('select', function(event) {
-    // var lastSelected = event.target.getFeatures().item(event.target.getFeatures().getLength() - 1);
-    app.map.selection.select.getFeatures().forEach(function(feat) {
-        var layer = app.map.selection.select.getLayer(feat).get('id');
-        app.map.layer[layer].selectAction(feat);
-    });
+app.map.selection.clearSelects = function() {
+  if (app.map.selection.select) {
+    for (var i = 0; i < app.map.selection.select.length; i++) {
+      app.map.removeInteraction(app.map.selection.select[i]);
+    }
+  }
+  app.map.selection.select = [];
+}
+
+app.map.selection.addSelect = function(selectionInteraction) {
+  app.map.selection.select.push(selectionInteraction);
+  app.map.addInteraction(selectionInteraction);
+  selectionInteraction.on('select', function(event) {
+    var selected_features = selectionInteraction.getFeatures().getArray();
+    if (selected_features.length > 0) {
+      selectionInteraction.getFeatures().forEach(function(feat) {
+        var layer = selectionInteraction.getLayer(feat).get('id');
+        app.map.layer[layer].selectAction(feat, event);
+      });
+    } else {
+      event.preventDefault();
+    }
   });
+}
+
+app.map.selection.setSelect = function(selectionInteractions) {
+  app.map.selection.clearSelects();
+  if (selectionInteractions.length == undefined) {
+    selectionInteractions = [selectionInteractions]
+  }
+  for (var i = 0; i < selectionInteractions.length; i++) {
+    var selectionInteraction = selectionInteractions[i];
+    app.map.selection.select.push(selectionInteraction);
+    app.map.addInteraction(selectionInteraction);
+    app.map.selection.select[i].on('select', function(event) {
+      event.target.getFeatures().forEach(function(feat) {
+          var layer = event.target.getLayer(feat).get('id');
+          app.map.layer[layer].selectAction(feat, event);
+      });
+    });
+  }
 };

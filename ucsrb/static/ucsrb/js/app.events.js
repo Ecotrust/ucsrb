@@ -91,8 +91,10 @@ $(document).ready(function() {
                         });
                       }
                     } else {
-                      if (app.map.selection.select) {
-                        app.map.selection.select.getFeatures().clear();
+                      if (app.map.selection.select && app.map.selection.select.length != undefined) {
+                        for (var i = 0; i < app.map.selection.select.length; i++) {
+                          app.map.selection.select[i].getFeatures().clear();
+                        }
                       }
                       $('#load-saved').modal('hide');
                       app.resultsInit(event.target.dataset.id);

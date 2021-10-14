@@ -163,9 +163,11 @@ app.resultsInit = function(id) {
 
               // Hide treated polygons
               app.clearScenarioLayer();
+              app.map.selection.clearSelects();
 
-              app.map.addTreatmentAreasToMap(response.treatment_areas);
               app.map.addDownstreamPptsToMap(response.pourpoints);
+              app.map.addTreatmentResultAreasToMap(response.treatment_areas);
+              app.map.selection.addSelect(app.map.selection.selectResultsFeature);
             }, 500);
         })
         .catch(function(response) {

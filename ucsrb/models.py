@@ -453,6 +453,14 @@ class TreatmentArea(models.Model):
         return acres
 
     @property
+    def total_acres(self):
+        self.geometry.transform(2163)
+        treatment_acres = int(round(self.geometry.area/4046.86, 0))
+        # return geometry to web mercator
+        self.geometry.transform(3857)
+        return treatment_acres
+
+    @property
     def geojson(self):
         out_geojson = {
             'type': "Feature",
@@ -461,7 +469,8 @@ class TreatmentArea(models.Model):
                 'id': self.pk,
                 'prescription': self.prescription_treatment_selection,
                 'rx_label': settings.PRESCRIPTION_TREATMENT_CHOICES_LOOKUP[self.prescription_treatment_selection]['label'],
-                'forested_acres': self.forested_acres
+                'forested_acres': self.forested_acres,
+                'total_acres': self.total_acres
             }
         }
         return json.dumps(out_geojson)

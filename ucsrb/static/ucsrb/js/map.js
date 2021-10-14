@@ -282,7 +282,24 @@ app.map.styles = {
         zIndex: 3
       });
       return selected_style;
-    }
+    },
+    'SelectedReportFeature': function(feature, resolution){
+      console.log(feature);
+
+
+      var rx = feature.get('prescription');
+      var unselected_style = app.map.styles.TreatmentArea(feature, resolution)[0]
+
+      var selected_style = new ol.style.Style({
+        stroke: new ol.style.Stroke({
+          color: 'white',
+          width: 5
+        }),
+        fill: unselected_style.getFill(),
+        zIndex: 3
+      });
+      return selected_style;
+    },
 };
 
 /**
@@ -444,7 +461,10 @@ closeConfirmSelection = function(accepted) {
     app.map.popupLock = false;
     removeFilter();
   }
-  app.map.selection.select.getFeatures().clear();
+  for (var i = 0; i < app.map.selection.select.length; i++) {
+    var interaction = app.map.selection.select[i];
+    interaction.getFeatures().clear();
+  }
 }
 
 generateFilterPopup = function(content) {
@@ -464,7 +484,7 @@ app.scenarioInProgressCheck = function() {
   }
 }
 
-focusAreaSelectAction = function(feat) {
+focusAreaSelectAction = function(feat, event) {
   app.scenarioInProgressCheck();
   if (app.state.step < 1) {
     app.state.setStep = 1; // step forward in state
@@ -479,16 +499,16 @@ focusAreaSelectAction = function(feat) {
   });
 };
 
-treatmentAreaSelectAction = function(feature) {
+treatmentAreaSelectAction = function(feature, event) {
   app.prescription.selectAction(feature);
 };
 
-streamSelectAction = function(feat) {
+streamSelectAction = function(feat, event) {
   app.scenarioInProgressCheck();
-  pourPointSelectAction(feat);
+  pourPointSelectAction(feat, event);
 };
 
-pourPointSelectAction = function(feat, selectEvent) {
+pourPointSelectAction = function(feat, event) {
   app.request.get_basin(feat, function(feat, vector) {
     if (feat) {
       confirmSelection(feat, vector);
@@ -499,9 +519,9 @@ pourPointSelectAction = function(feat, selectEvent) {
   });
 };
 
-pourPointResultSelection = function(feat) {
+pourPointResultSelection = function(feat, event) {
   app.panel.loading.show();
-  var l = app.map.selection.select.getLayer(feat).get('id');
+  var l = app.map.selection.selectResultsFeature.getLayer(feat).get('id');
   app.map.layer[l].layer.getSource().forEachFeature(function(feature) {
     feature.setStyle(app.map.styles.PourPoint)
   });
@@ -520,9 +540,19 @@ pourPointResultSelection = function(feat) {
     app.panel.results.showHydro();
     app.panel.loading.hide();
     alert('Your treatment has not finished modelling yet...');
-    app.map.selection.selectResultsPourPoint.getFeatures().clear();
+    app.map.selection.selectResultsFeature.getFeatures().clear();
   }
 
+}
+
+treatmentResultAreaSelectAction = function(feat, event) {
+  // RDH: I cannot justify the discrepancy between 'forested acres' and 'total acres'.Until the numbers make sense, we can't show them.
+  app.map.report.popupContent.innerHTML = '<table>' +
+    `<tr><td><b>Prescription</b>:</td><td>${feat.get('rx_label')}</td></tr>` +
+    // `<tr><td>Area</td><td>${parseInt(feat.get('total_acres'))} acres</td></tr>` +
+    // `<tr><td>Forested</td><td>${parseInt(feat.get('forested_acres'))} acres</td></tr>` +
+  '</table>';
+  app.map.report.popupOverlay.setPosition(event.mapBrowserEvent.coordinate);
 }
 
 var drawSource = new ol.source.Vector();
@@ -643,6 +673,26 @@ function createMeasureTooltip() {
   });
   app.map.addOverlay(app.map.draw.measureTooltip);
 }
+
+app.map.report = {};
+app.map.report.popupContainer= document.getElementById('report-popup');
+app.map.report.popupContent= document.getElementById('report-popup-content');
+app.map.report.popupCloser= document.getElementById('report-popup-closer');
+
+app.map.report.popupOverlay= new ol.Overlay({
+    element: app.map.report.popupContainer,
+    autoPan: true,
+    autoPanAnimation: {
+      duration: 250,
+    },
+});
+app.map.report.popupCloser.onclick = function() {
+  app.map.report.popupOverlay.setPosition(undefined);
+  app.map.report.popupCloser.blur();
+  return false;
+};
+app.map.addOverlay(app.map.report.popupOverlay);
+
 
 app.map.layer = {
     draw: {
@@ -787,6 +837,25 @@ app.map.layer = {
           return app.map.layer.treatmentAreas.layer.getSource();
         },
         selectAction: treatmentAreaSelectAction
+    },
+    treatmentResultAreas: {
+        layer: new ol.layer.Vector({
+          name: 'Treatment Areas Results Layer',
+          title: 'Treatment Areas Results Layer',
+          id: 'treatmentResultAreas',
+          source: new ol.source.Vector({
+            attributions: 'Ecotrust',
+            format: new ol.format.GeoJSON({
+              dataProjection: 'EPSG:3857',
+              featureProjection: 'EPSG:3857'
+            })
+          }),
+          style: app.map.styles.TreatmentArea
+        }),
+        source: function() {
+          return app.map.layer.treatmentResultAreas.layer.getSource();
+        },
+        selectAction: treatmentResultAreaSelectAction
     },
     planningUnits: {
         layer: mapSettings.getInitFilterResultsLayer('planning units', app.map.styles['Polygon']),
@@ -1013,6 +1082,23 @@ app.map.addTreatmentAreas = function(vectors) {
 
 }
 
+// treatmentResultAreas
+app.map.addTreatmentResultAreas = function(vectors) {
+  if (!app.map.hasOwnProperty('treatmentResultLayer')) {
+    app.map.treatmentResultLayer = app.map.layer.treatmentResultAreas.layer;
+    app.map.addLayer(app.map.treatmentResultLayer);
+    app.map.treatmentResultLayer.removeAllFeatures = function() {
+      app.map.treatmentResultLayer.getSource().clear();
+    }
+  }
+  app.map.treatmentResultLayer.removeAllFeatures();
+
+  app.map.treatmentResultLayer.setVisible(true);
+
+  app.map.treatmentResultLayer.getSource().addFeatures(vectors);
+
+}
+
 app.map.addScenario = function(vectors) {
   // app.map.draw.source.clear(true);
   vectors.forEach(function(vector) {
@@ -1069,7 +1155,8 @@ app.map.addDownstreamPptsToMap = function(pptsArray) {
     feature.setStyle(app.map.styles.PourPoint);
     app.map.layer.resultPoints.layer.getSource().addFeature(feature);
   }
-  app.map.selection.setSelect(app.map.selection.selectResultsPourPoint);
+  // app.map.selection.setSelect(app.map.selection.selectResultsFeature);
+
 };
 
 app.map.addFocusAreaToMap = function(focus_area) {
@@ -1080,14 +1167,15 @@ app.map.addFocusAreaToMap = function(focus_area) {
   // setFilter(app.map.focus_area_feature, app.map.layer.resultPoints.layer);
 }
 
-app.map.addTreatmentAreasToMap = function(treatment_areas) {
+app.map.addTreatmentResultAreasToMap = function(treatment_areas) {
 
   var vectors = (new ol.format.GeoJSON()).readFeatures(treatment_areas, {
       dataProjection: 'EPSG:3857',
       featureProjection: 'EPSG:3857'
   });
-  app.map.addTreatmentAreas(vectors);
-  app.map.zoomToExtent(app.map.treatmentLayer.getSource().getExtent());
+  app.map.addTreatmentResultAreas(vectors);
+  app.map.zoomToExtent(app.map.treatmentResultLayer.getSource().getExtent());
+  // app.map.selection.setSelect(app.map.selection.selectResultsTreatmentArea);
 }
 
 app.map.addDrainageBasinToMap = function(basin_geom) {
