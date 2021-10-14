@@ -445,12 +445,18 @@ class TreatmentArea(models.Model):
 
     @property
     def forested_acres(self):
-        vus = VegPlanningUnit.objects.filter(geometry__intersects=self.geometry)
+        # vus = VegPlanningUnit.objects.filter(geometry__intersects=self.geometry)
+        full_vus = VegPlanningUnit.objects.filter(geometry__coveredby=self.geometry)
+        part_vus = VegPlanningUnit.objects.filter(geometry__overlaps=self.geometry)
         acres = 0
-        for vu in vus:
+        for vu in full_vus:
             acres += vu.acres
+        for vu in part_vus:
+            intersection = vu.geometry.intersection(self.geometry)
+            intersection.transform(2163)
+            acres += intersection.area/4046.86
 
-        return acres
+        return round(acres, 0)
 
     @property
     def total_acres(self):
