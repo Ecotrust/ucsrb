@@ -284,8 +284,7 @@ class TreatmentScenario(Scenario):
 
     def aggregate_results(self):
         vpus = self.run_filters(None) # There seems to be no need for passing a query here.
-        # pu_ids = [int(x) for x in self.planning_units.split(',')]
-        # vpus = VegPlanningUnit.objects.filter(pk__in=pu_ids)
+        full_vpus = vpus.filter(geometry__coveredby=self.focus_area_input.geometry)
         totals = {
             'Fractional Coverage': {
                 '0-20%': 0,
@@ -311,37 +310,43 @@ class TreatmentScenario(Scenario):
             }
         }
         for vpu in vpus:
-            totals['Fractional Coverage']['Total'] += vpu.acres
-            if vpu.percent_fractional_coverage <= 20:
-                totals['Fractional Coverage']['0-20%'] += vpu.acres
-            elif vpu.percent_fractional_coverage <= 40:
-                totals['Fractional Coverage']['20-40%'] += vpu.acres
-            elif vpu.percent_fractional_coverage <= 60:
-                totals['Fractional Coverage']['40-60%'] += vpu.acres
-            elif vpu.percent_fractional_coverage <= 80:
-                totals['Fractional Coverage']['60-80%'] += vpu.acres
+            if vpu in full_vpus:
+                vpu_acres = vpu.acres
             else:
-                totals['Fractional Coverage']['>80%'] += vpu.acres
+                intersection = vpu.geometry.intersection(self.focus_area_input.geometry)
+                intersection.transform(2163)
+                vpu_acres = intersection.area/4046.86
+            totals['Fractional Coverage']['Total'] += vpu_acres
+            if vpu.percent_fractional_coverage <= 20:
+                totals['Fractional Coverage']['0-20%'] += vpu_acres
+            elif vpu.percent_fractional_coverage <= 40:
+                totals['Fractional Coverage']['20-40%'] += vpu_acres
+            elif vpu.percent_fractional_coverage <= 60:
+                totals['Fractional Coverage']['40-60%'] += vpu_acres
+            elif vpu.percent_fractional_coverage <= 80:
+                totals['Fractional Coverage']['60-80%'] += vpu_acres
+            else:
+                totals['Fractional Coverage']['>80%'] += vpu_acres
 
             try:
                 topo_class = int(str(vpu.topo_height_class_majority)[-1])
                 if topo_class == 1:
-                    totals['Landforms']['Ridgetops'] += vpu.acres
+                    totals['Landforms']['Ridgetops'] += vpu_acres
                 if topo_class == 2:
-                    totals['Landforms']['North Facing Slopes'] += vpu.acres
+                    totals['Landforms']['North Facing Slopes'] += vpu_acres
                 if topo_class == 3:
-                    totals['Landforms']['South Facing Slopes'] += vpu.acres
+                    totals['Landforms']['South Facing Slopes'] += vpu_acres
                 if topo_class == 4:
-                    totals['Landforms']['Valley Bottoms'] += vpu.acres
+                    totals['Landforms']['Valley Bottoms'] += vpu_acres
                 if topo_class == 5:
-                    totals['Landforms']['East or West Facing Slopes'] += vpu.acres
+                    totals['Landforms']['East or West Facing Slopes'] += vpu_acres
             except:
                 pass
 
-            totals['Habitat Characteristics']['Riparian Area'] += vpu.acres * vpu.percent_riparian * 0.01
-            totals['Habitat Characteristics']['Wetlands'] += vpu.acres * vpu.percent_wetland * 0.01
-            totals['Habitat Characteristics']['Critical Habitat'] += vpu.acres * vpu.percent_critical_habitat * 0.01
-            # totals['Habitat Characteristics']['Roadless Areas'] += vpu.acres * vpu.percent_roadless * 0.01
+            totals['Habitat Characteristics']['Riparian Area'] += vpu_acres * vpu.percent_riparian * 0.01
+            totals['Habitat Characteristics']['Wetlands'] += vpu_acres * vpu.percent_wetland * 0.01
+            totals['Habitat Characteristics']['Critical Habitat'] += vpu_acres * vpu.percent_critical_habitat * 0.01
+            # totals['Habitat Characteristics']['Roadless Areas'] += vpu_acres * vpu.percent_roadless * 0.01
 
         results = {
             'total_acres': int(totals['Fractional Coverage']['Total']),

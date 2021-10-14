@@ -549,8 +549,8 @@ treatmentResultAreaSelectAction = function(feat, event) {
   // RDH: I cannot justify the discrepancy between 'forested acres' and 'total acres'.Until the numbers make sense, we can't show them.
   app.map.report.popupContent.innerHTML = '<table>' +
     `<tr><td><b>Prescription</b>:</td><td>${feat.get('rx_label')}</td></tr>` +
-    `<tr><td>Area</td><td>${parseInt(feat.get('total_acres'))} acres</td></tr>` +
-    `<tr><td>Forested</td><td>${parseInt(feat.get('forested_acres'))} acres</td></tr>` +
+    `<tr><td><b>Area:</b></td><td>${parseInt(feat.get('total_acres'))} acres</td></tr>` +
+    `<tr><td><b>Forested</b></td><td>${parseInt(feat.get('forested_acres'))} acres</td></tr>` +
   '</table>';
   app.map.report.popupOverlay.setPosition(event.mapBrowserEvent.coordinate);
 }
