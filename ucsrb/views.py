@@ -664,23 +664,6 @@ def parse_flow_results(overlap_basin, treatment):
         }
     return flow_results
 
-def calculate_basin_fc(ppt, basin_area, included_ppts, scenario=None, target_fc=-1):
-    from ucsrb.models import FocusArea, PourPoint, VegPlanningUnit
-
-    if scenario and target_fc >= 0:
-        planning_units = [int(x) for x in scenario.planning_units.split(',')]
-    else:
-        planning_units = False
-
-    veg_units = VegPlanningUnit.objects.filter(dwnstream_ppt_id__in=included_ppts)
-    veg_fc_total = 0
-    for vu in veg_units:
-        if planning_units and vu.id in planning_units and vu.percent_fractional_coverage > target_fc:
-            veg_fc_total += target_fc * vu.acres
-        else:
-            veg_fc_total += vu.percent_fractional_coverage * vu.acres
-    return veg_fc_total/basin_area
-
 def get_float_change_as_rounded_string(rx_val,baseline):
     change_val = float(rx_val) - float(baseline)
     if change_val > 0:
@@ -737,22 +720,6 @@ def get_hydro_results_by_pour_point_id(request):
     flow_output = flow_results[settings.NORMAL_YEAR_LABEL]['flow_output']
     annual_water_volume = flow_results[settings.NORMAL_YEAR_LABEL]['annual_water_volume']
     sept_avg_flow = flow_results[settings.NORMAL_YEAR_LABEL]['sept_avg_flow']
-
-    # TUNING: For large basins, this can take over 1 minute to run.
-    basin_fractional_coverage = {
-        settings.UNTREATED_LABEL: calculate_basin_fc(ppt, basin_acres, upslope_ppts),
-    }
-
-    rx_fc_pct_delta = {}
-    rx_fc_delta = {}
-    for rx in [x for x in basin_fractional_coverage.keys() if not x == settings.UNTREATED_LABEL]:
-        if basin_fractional_coverage[settings.UNTREATED_LABEL] == 0:
-            rx_fc_delta[rx] = 0
-            rx_fc_pct_delta[rx] = 0
-        else:
-            rx_fc_delta[rx] = basin_fractional_coverage[settings.UNTREATED_LABEL] - basin_fractional_coverage[rx]
-            rx_fc_pct_delta[rx] = rx_fc_delta[rx]/basin_fractional_coverage[settings.UNTREATED_LABEL]*100
-
 
     # Baseline water yield (bas_char)
     # Cubic Feet per year (annual volume) / Square Feet (basin area) * 12 (inches/foot) = x inches/year
@@ -832,7 +799,12 @@ def get_hydro_results_by_pour_point_id(request):
             treatment_type_sept_avg_change = 'Data not yet available'
         hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % weather_year, 'value': treatment_type_sept_avg_change, 'unit': 'CFS' })
 
-    hydro_char_data.append({'key': '<b>Change in Sept. 7-day low flow from proposed management </b>', 'value': '', 'unit': '' })
+    hydro_char_data.append({
+        'key': '<b>Change in Sept. 7-day low flow from proposed management </b>',
+        'value': '',
+        'unit': '',
+        'help': 'These values represent the difference between a {}, untreated year and various years that have had the proposed management applied'.format(settings.NORMAL_YEAR_LABEL)
+    })
     for weather_year in [x for x in sept_median_7_day_low.keys() if not x == settings.UNTREATED_LABEL]:
         treatment_type_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low[weather_year],sept_median_7_day_low[settings.UNTREATED_LABEL])
         hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % weather_year, 'value': treatment_type_sept_7_day_low_diff, 'unit': 'CFS' })
@@ -841,9 +813,6 @@ def get_hydro_results_by_pour_point_id(request):
     basin_veg_units = treatment.veg_units.filter(geometry__intersects=overlap_basin.geometry) #within may be more accurate, but slower
     treatment_acres = sum([x.acres for x in basin_veg_units])
     prop_mgmt_data.append({'key': 'Total forested area in proposed treatment', 'value': int(treatment_acres), 'unit': 'acres' })
-    prop_mgmt_data.append({'key': '<b>Reduction in avg fractional coverage from proposed management</b>', 'value': '', 'unit': '' })
-    for weather_year in [x for x in rx_fc_delta.keys() if not x == settings.UNTREATED_LABEL]:
-        prop_mgmt_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % weather_year, 'value': str(round(rx_fc_delta[weather_year],2)), 'unit': '%' })
 
     summary_reports = []
     summary_reports.append({'title': 'Basin Characteristics','data': bas_char_data})
