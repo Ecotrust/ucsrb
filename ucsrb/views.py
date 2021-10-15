@@ -512,9 +512,11 @@ def sort_output(flow_output):
     def get_timestamp_from_string(time_string):
         return datetime.strptime(time_string, "%m.%d.%Y-%H:%M:%S")
     for rx in flow_output.keys():
-        time_keys = sorted([x for x in flow_output[rx].keys() if not x == 'records_available'], key=get_timestamp_from_string)
-        if len(time_keys) > 0:
-            results[rx] = [{'timestep':time_key, 'flow': flow_output[rx][time_key]} for time_key in time_keys]
+        results[rx] = {}
+        for treatment in flow_output[rx].keys():
+            time_keys = sorted([x for x in flow_output[rx][treatment].keys() if not x == 'records_available'], key=get_timestamp_from_string)
+            if len(time_keys) > 0:
+                results[rx][treatment] = [{'timestep':time_key, 'flow': flow_output[rx][treatment][time_key]} for time_key in time_keys]
     return results
 
 def get_results_delta(flow_output):
@@ -526,28 +528,23 @@ def get_results_delta(flow_output):
     else:
         out_dict = deepcopy(flow_output)
 
-    non_delta_years = []
-    for treatment in out_dict.keys():
-        if treatment not in [settings.UNTREATED_LABEL, settings.NORMAL_YEAR_LABEL]:
-            non_delta_years.append(treatment)
-    for treatment in non_delta_years:
-            out_dict.pop(treatment);
-    for treatment in out_dict.keys():
-        if type(out_dict[treatment]) == dict:
-            # flow_results
-            for timestep in out_dict[treatment].keys():
-                baseflow = flow_output[treatment][timestep]
-                for rx in out_dict.keys():
+    if type(out_dict[settings.NORMAL_YEAR_LABEL][settings.TREATED_LABEL]) == dict:
+        # flow_results
+        for weather_year in out_dict.keys():
+            for timestep in out_dict[weather_year][settings.TREATED_LABEL].keys():
+                baseflow = flow_output[settings.TREATED_LABEL][timestep]
+                for rx in out_dict[weather_year].keys():
                     # be sure not to process the 'records_available' key:
-                    if timestep in out_dict[rx].keys():
-                        out_dict[rx][timestep] -= baseflow
-            return sort_output(out_dict)
-        elif type(out_dict[treatment]) == list:
-            # previously-deltaed data
-            for index, timestep in enumerate(out_dict[treatment]):
+                    if timestep in out_dict[weather_year][rx].keys():
+                        out_dict[weather_year][rx][timestep] -= baseflow
+        return sort_output(out_dict)
+    elif type(out_dict[settings.NORMAL_YEAR_LABEL][settings.TREATED_LABEL]) == list:
+        # previously-deltaed data
+        for weather_year in out_dict.keys():
+            for index, timestep in enumerate(out_dict[weather_year][settings.TREATED_LABEL]):
                 # Testing has shown that this logic is sound - chronological order is maintained across treatment.
-                baseflow = flow_output[settings.UNTREATED_LABEL][index]['flow']
-                out_dict[treatment][index]['flow'] -= baseflow
+                baseflow = flow_output[weather_year][settings.UNTREATED_LABEL][index]['flow']
+                out_dict[weather_year][settings.TREATED_LABEL][index]['flow'] -= baseflow
 
     return out_dict
 
@@ -558,20 +555,22 @@ def get_results_xd_low(flow_output, sorted_results, days):
     sept_median_x_day_low = {}
 
     for rx in sorted_results.keys():
-        sept_list = []
-        for index, treatment_result in enumerate(sorted_results[rx]):
-            timestep = treatment_result['timestep']
-            time_object = datetime.strptime(timestep, "%m.%d.%Y-%H:%M:%S")
-            x_day_timestep_count = int(days*(24/settings.TIME_STEP_REPORTING))
-            if index < x_day_timestep_count:
-                flows = [x['flow'] for x in sorted_results[rx][0:x_day_timestep_count]]
-            else:
-                flows = [x['flow'] for x in sorted_results[rx][index-(x_day_timestep_count-1):index+1]]
-            low_flow = min(float(x) for x in flows)
-            out_dict[rx][timestep] = low_flow
-            if time_object.month == 9:
-                sept_list.append(low_flow)
-        sept_median_x_day_low[rx] = median(sept_list)
+        sept_median_x_day_low[rx] = {}
+        for treatment in sorted_results[rx].keys():
+            sept_list = []
+            for index, treatment_result in enumerate(sorted_results[rx][treatment]):
+                timestep = treatment_result['timestep']
+                time_object = datetime.strptime(timestep, "%m.%d.%Y-%H:%M:%S")
+                x_day_timestep_count = int(days*(24/settings.TIME_STEP_REPORTING))
+                if index < x_day_timestep_count:
+                    flows = [x['flow'] for x in sorted_results[rx][treatment][0:x_day_timestep_count]]
+                else:
+                    flows = [x['flow'] for x in sorted_results[rx][treatment][index-(x_day_timestep_count-1):index+1]]
+                low_flow = min(float(x) for x in flows)
+                out_dict[rx][treatment][timestep] = low_flow
+                if time_object.month == 9:
+                    sept_list.append(low_flow)
+            sept_median_x_day_low[rx][treatment] = median(sept_list)
 
     return (sort_output(out_dict), sept_median_x_day_low)
 
@@ -579,15 +578,16 @@ def get_results_xd_mean(flow_output, sorted_results, days):
     from copy import deepcopy
     out_dict = deepcopy(flow_output)
     for rx in sorted_results.keys():
-        for index, treatment_result in enumerate(sorted_results[rx]):
-            timestep = treatment_result['timestep']
-            x_day_timestep_count = int(days*(24/settings.TIME_STEP_REPORTING))
-            if index < x_day_timestep_count:
-                flows = [x['flow'] for x in sorted_results[rx][0:x_day_timestep_count]]
-            else:
-                flows = [x['flow'] for x in sorted_results[rx][index-(x_day_timestep_count-1):index+1]]
-            mean_flow = sum(flows)/float(len(flows))
-            out_dict[rx][timestep] = mean_flow
+        for treatment in sorted_results[rx].keys():
+            for index, treatment_result in enumerate(sorted_results[rx][treatment]):
+                timestep = treatment_result['timestep']
+                x_day_timestep_count = int(days*(24/settings.TIME_STEP_REPORTING))
+                if index < x_day_timestep_count:
+                    flows = [x['flow'] for x in sorted_results[rx][treatment][0:x_day_timestep_count]]
+                else:
+                    flows = [x['flow'] for x in sorted_results[rx][treatment][index-(x_day_timestep_count-1):index+1]]
+                mean_flow = sum(flows)/float(len(flows))
+                out_dict[rx][treatment][timestep] = mean_flow
     return sort_output(out_dict)
 
 def parse_flow_results(overlap_basin, treatment):
@@ -604,16 +604,16 @@ def parse_flow_results(overlap_basin, treatment):
         flow_data_tuples = []
 
         # We only draw the 'untreated baseline' year, not 'untreated wet/dry' years.
-        if model_year == settings.NORMAL_YEAR_LABEL:
-            baseline_readings = StreamFlowReading.objects.filter(
-                segment_id=overlap_basin.unit_id,
-                is_baseline=True,
-                time__gte=settings.MODEL_YEARS[model_year]['start'],
-                time__lte=settings.MODEL_YEARS[model_year]['end'],
-                )
-            flow_data_tuples.append((settings.UNTREATED_LABEL, baseline_readings))
-        else:
-            flow_data_tuples.append((settings.UNTREATED_LABEL, []))
+        # if model_year == settings.NORMAL_YEAR_LABEL:
+        baseline_readings = StreamFlowReading.objects.filter(
+            segment_id=overlap_basin.unit_id,
+            is_baseline=True,
+            time__gte=settings.MODEL_YEARS[model_year]['start'],
+            time__lte=settings.MODEL_YEARS[model_year]['end'],
+            )
+        flow_data_tuples.append((settings.UNTREATED_LABEL, baseline_readings))
+        # else:
+        #     flow_data_tuples.append((settings.UNTREATED_LABEL, []))
 
         treated_readings = StreamFlowReading.objects.filter(
             segment_id=overlap_basin.unit_id,
@@ -622,7 +622,8 @@ def parse_flow_results(overlap_basin, treatment):
             time__lte=settings.MODEL_YEARS[model_year]['end'],
             )
 
-        flow_data_tuples.append((settings.NORMAL_YEAR_LABEL, treated_readings))
+        # flow_data_tuples.append((model_year, treated_readings))
+        flow_data_tuples.append((settings.TREATED_LABEL, treated_readings))
 
         for (treatment_type, readings_data) in flow_data_tuples:
             aggregate_volume = 0
@@ -671,6 +672,26 @@ def get_float_change_as_rounded_string(rx_val,baseline):
     else:
         return str(round(change_val,2))
 
+
+def absolute_chart(chart_data):
+    # out_chart = OrderedDict({})
+    out_chart = {}
+    out_chart[settings.UNTREATED_LABEL] = chart_data[settings.NORMAL_YEAR_LABEL][settings.UNTREATED_LABEL]
+    out_chart[settings.DRY_YEAR_LABEL] = chart_data[settings.DRY_YEAR_LABEL][settings.TREATED_LABEL]
+    out_chart[settings.WET_YEAR_LABEL] = chart_data[settings.WET_YEAR_LABEL][settings.TREATED_LABEL]
+    out_chart[settings.NORMAL_YEAR_LABEL] = chart_data[settings.NORMAL_YEAR_LABEL][settings.TREATED_LABEL]
+
+    return out_chart
+
+def delta_chart(chart_data):
+    # out_chart = OrderedDict({})
+    out_chart = {}
+    out_chart[settings.DRY_YEAR_LABEL] = chart_data[settings.DRY_YEAR_LABEL][settings.TREATED_LABEL]
+    out_chart[settings.WET_YEAR_LABEL] = chart_data[settings.WET_YEAR_LABEL][settings.TREATED_LABEL]
+    out_chart[settings.NORMAL_YEAR_LABEL] = chart_data[settings.NORMAL_YEAR_LABEL][settings.TREATED_LABEL]
+
+    return out_chart
+
 # NEEDS:
 #   pourpoint_id
 #   treatment_id
@@ -717,51 +738,68 @@ def get_hydro_results_by_pour_point_id(request):
     impute_id = ppt.id
     flow_results = parse_flow_results(overlap_basin, treatment)
 
-    flow_output = flow_results[settings.NORMAL_YEAR_LABEL]['flow_output']
-    annual_water_volume = flow_results[settings.NORMAL_YEAR_LABEL]['annual_water_volume']
-    sept_avg_flow = flow_results[settings.NORMAL_YEAR_LABEL]['sept_avg_flow']
+    flow_output = {
+        settings.NORMAL_YEAR_LABEL: flow_results[settings.NORMAL_YEAR_LABEL]['flow_output'],
+        settings.WET_YEAR_LABEL: flow_results[settings.WET_YEAR_LABEL]['flow_output'],
+        settings.DRY_YEAR_LABEL: flow_results[settings.DRY_YEAR_LABEL]['flow_output']
+    }
+
+    avg_flow_results = {}
 
     # Baseline water yield (bas_char)
     # Cubic Feet per year (annual volume) / Square Feet (basin area) * 12 (inches/foot) = x inches/year
-    baseline_water_yield = str(round(annual_water_volume[settings.UNTREATED_LABEL]/(basin_acres*43560)*12, 2))
-    # Average Annual Flow: Total flow in cubic feet divided by seconds in year - assume year is not Leap.
-    avg_flow_results = {
-        settings.UNTREATED_LABEL: str(round(annual_water_volume[settings.UNTREATED_LABEL]/(365*24*60*60), 2))
-    }
-    for weather_year in annual_water_volume.keys():
-        if not weather_year == settings.UNTREATED_LABEL and flow_output[weather_year]['records_available']:
-            avg_flow_results[weather_year] = str(round(annual_water_volume[weather_year]/(365*24*60*60), 2))
-
-    flow_output[settings.DRY_YEAR_LABEL] = flow_results[settings.DRY_YEAR_LABEL]['flow_output'][settings.NORMAL_YEAR_LABEL]
-    flow_output[settings.WET_YEAR_LABEL] = flow_results[settings.WET_YEAR_LABEL]['flow_output'][settings.NORMAL_YEAR_LABEL]
-    absolute_results = sort_output(flow_output)
+    baseline_water_yield = {}
+    absolute_results = {}
     #   delta flow
-    delta_results = get_results_delta(flow_results[settings.NORMAL_YEAR_LABEL]['flow_output'])
-
-    #   7-day low-flow (needs sort_by_time)
-    (seven_d_low_results, sept_median_7_day_low) = get_results_xd_low(flow_output, absolute_results, 7)
+    delta_results = {}
+    seven_d_low_results = {}
+    sept_median_7_day_low = {}
     #   1-day low-flow
-    (one_d_low_results, sept_median_1_day_low) = get_results_xd_low(flow_output, absolute_results, 1)
+    one_d_low_results = {}
+    sept_median_1_day_low = {}
 
+    seven_d_mean_results = {}
+    one_d_mean_results = {}
+    delta_1_d_low_results = {}
+    delta_1_d_mean_results = {}
+    delta_7_d_low_results = {}
+    delta_7_d_mean_results = {}
+
+    for weather_year in flow_results.keys():
+        baseline_water_yield[weather_year] = str(round(flow_results[weather_year]['annual_water_volume'][settings.UNTREATED_LABEL]/(basin_acres*43560)*12, 2))
+
+    absolute_results = sort_output(flow_output)
+    delta_results = get_results_delta(flow_output)
+
+    (seven_d_low_results, sept_median_7_day_low) = get_results_xd_low(flow_output, absolute_results, 7)
+    (one_d_low_results, sept_median_1_day_low) = get_results_xd_low(flow_output, absolute_results, 1)
     seven_d_mean_results = get_results_xd_mean(flow_output, absolute_results, 7)
     one_d_mean_results = get_results_xd_mean(flow_output, absolute_results, 1)
-
     delta_1_d_low_results = get_results_delta(one_d_low_results)
     delta_1_d_mean_results = get_results_delta(one_d_mean_results)
     delta_7_d_low_results = get_results_delta(seven_d_low_results)
     delta_7_d_mean_results = get_results_delta(seven_d_mean_results)
+    for weather_year in flow_results.keys():
+        avg_flow_results[weather_year] = {}
+        for treatment_type in [settings.UNTREATED_LABEL, settings.TREATED_LABEL]:
+            avg_flow_results[weather_year][treatment_type] = str(round(flow_results[weather_year]['annual_water_volume'][treatment_type]/(365*24*60*60), 2))
 
     charts = [
-        {'title': 'Absolute Flow Rate','data': absolute_results},
-        {'title': 'Seven Day Low Flow','data': seven_d_low_results},
-        {'title': 'Seven Day Mean Flow','data': seven_d_mean_results},
-        {'title': 'One Day Low Flow','data': one_d_low_results},
-        {'title': 'One Day Mean Flow','data': one_d_mean_results},
-        {'title': 'Change in Flow Rate','data': delta_results},
-        {'title': 'Change in 7 Day Low Flow Rate','data': delta_7_d_low_results},
-        {'title': 'Change in 7 Day Mean Flow Rate','data': delta_7_d_mean_results},
-        {'title': 'Change in 1 Day Low Flow Rate','data': delta_1_d_low_results},
-        {'title': 'Change in 1 Day Mean Flow Rate','data': delta_1_d_mean_results},
+        {'title': 'Absolute Flow Rate','data': absolute_chart(absolute_results)},
+        {'title': 'Seven Day Low Flow','data': absolute_chart(seven_d_low_results)},
+        {'title': 'Seven Day Mean Flow','data': absolute_chart(seven_d_mean_results)},
+        {'title': 'One Day Low Flow','data': absolute_chart(one_d_low_results)},
+        {'title': 'One Day Mean Flow','data': absolute_chart(one_d_mean_results)},
+        # {'title': 'Change in Flow Rate','data': delta_chart(delta_results)},
+        # {'title': 'Change in 7 Day Low Flow Rate','data': delta_chart(delta_7_d_low_results)},
+        # {'title': 'Change in 7 Day Mean Flow Rate','data': delta_chart(delta_7_d_mean_results)},
+        # {'title': 'Change in 1 Day Low Flow Rate','data': delta_chart(delta_1_d_low_results)},
+        # {'title': 'Change in 1 Day Mean Flow Rate','data': delta_chart(delta_1_d_mean_results)},
+        {'title': 'Change in Flow Rate','data': absolute_chart(delta_results)},
+        {'title': 'Change in 7 Day Low Flow Rate','data': absolute_chart(delta_7_d_low_results)},
+        {'title': 'Change in 7 Day Mean Flow Rate','data': absolute_chart(delta_7_d_mean_results)},
+        {'title': 'Change in 1 Day Low Flow Rate','data': absolute_chart(delta_1_d_low_results)},
+        {'title': 'Change in 1 Day Mean Flow Rate','data': absolute_chart(delta_1_d_mean_results)},
     ]
 
     bas_char_data = []
@@ -780,21 +818,23 @@ def get_hydro_results_by_pour_point_id(request):
         'help': '\'Upslope\' means \'all area that drains water to this point.\''
     })
     # bas_char_data.append({'key': 'Percent Forested', 'value': int(acres_forested/basin_acres*100), 'unit': '%' })
-    bas_char_data.append({'key': 'Baseline water yield', 'value': baseline_water_yield, 'unit': 'inches/year' })
-    bas_char_data.append({'key': 'Baseline average annual flow', 'value': avg_flow_results[settings.UNTREATED_LABEL], 'unit': 'CFS' })
-    bas_char_data.append({'key': 'Baseline September mean flow', 'value': sept_avg_flow[settings.UNTREATED_LABEL], 'unit': 'CFS' })
-    bas_char_data.append({'key': 'Baseline September median 7 day avg low flow', 'value': round(sept_median_7_day_low[settings.UNTREATED_LABEL], 2), 'unit': 'CFS' })
+    bas_char_data.append({'key': 'Baseline water yield', 'value': baseline_water_yield[settings.NORMAL_YEAR_LABEL], 'unit': 'inches/year' })
+    bas_char_data.append({'key': 'Baseline average annual flow', 'value': avg_flow_results[settings.NORMAL_YEAR_LABEL][settings.UNTREATED_LABEL], 'unit': 'CFS' })
+    bas_char_data.append({'key': 'Baseline September mean flow', 'value': flow_results[settings.NORMAL_YEAR_LABEL]['sept_avg_flow'][settings.UNTREATED_LABEL], 'unit': 'CFS' })
+    bas_char_data.append({'key': 'Baseline September median 7 day avg low flow', 'value': round(sept_median_7_day_low[weather_year][settings.UNTREATED_LABEL], 2), 'unit': 'CFS' })
 
     hydro_char_data = []
     hydro_char_data.append({'key': '<b>Change in average annual flow from proposed management</b>', 'value': '', 'unit': '' })
-    for weather_year in [x for x in avg_flow_results.keys() if not x == settings.UNTREATED_LABEL]:
-        treatment_type_change = get_float_change_as_rounded_string(avg_flow_results[weather_year],avg_flow_results[settings.UNTREATED_LABEL])
+    # for weather_year in [x for x in avg_flow_results.keys() if not x == settings.UNTREATED_LABEL]:
+    for weather_year in flow_results.keys():
+        treatment_type_change = get_float_change_as_rounded_string(avg_flow_results[weather_year][settings.TREATED_LABEL],avg_flow_results[weather_year][settings.UNTREATED_LABEL])
         hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % weather_year, 'value': treatment_type_change, 'unit': 'CFS' }) #Baseline annl flow - 50 annl flow
 
     hydro_char_data.append({'key': '<b>Change in average September flow from proposed management </b>', 'value': '', 'unit': '' })
-    for weather_year in [x for x in sept_avg_flow.keys() if not x == settings.UNTREATED_LABEL]:
-        if flow_output[weather_year]['records_available']:
-            treatment_type_sept_avg_change = get_float_change_as_rounded_string(sept_avg_flow[weather_year],sept_avg_flow[settings.UNTREATED_LABEL])
+    # for weather_year in [x for x in sept_avg_flow.keys() if not x == settings.UNTREATED_LABEL]:
+    for weather_year in flow_results.keys():
+        if flow_results[weather_year]['flow_output'][settings.UNTREATED_LABEL]['records_available'] and flow_results[weather_year]['flow_output'][settings.TREATED_LABEL]['records_available']:
+            treatment_type_sept_avg_change = get_float_change_as_rounded_string(flow_results[weather_year]['sept_avg_flow'][settings.TREATED_LABEL],flow_results[weather_year]['sept_avg_flow'][settings.UNTREATED_LABEL])
         else:
             treatment_type_sept_avg_change = 'Data not yet available'
         hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % weather_year, 'value': treatment_type_sept_avg_change, 'unit': 'CFS' })
@@ -803,10 +843,12 @@ def get_hydro_results_by_pour_point_id(request):
         'key': '<b>Change in Sept. 7-day low flow from proposed management </b>',
         'value': '',
         'unit': '',
-        'help': 'These values represent the difference between a {}, untreated year and various years that have had the proposed management applied'.format(settings.NORMAL_YEAR_LABEL)
+        # 'help': 'These values represent the difference between a {}, untreated year and various years that have had the proposed management applied'.format(settings.NORMAL_YEAR_LABEL)
     })
-    for weather_year in [x for x in sept_median_7_day_low.keys() if not x == settings.UNTREATED_LABEL]:
-        treatment_type_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low[weather_year],sept_median_7_day_low[settings.UNTREATED_LABEL])
+    # for weather_year in [x for x in sept_median_7_day_low.keys() if not x == settings.UNTREATED_LABEL]:
+    for weather_year in flow_results.keys():
+        # treatment_type_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low[weather_year],sept_median_7_day_low[settings.UNTREATED_LABEL])
+        treatment_type_sept_7_day_low_diff = get_float_change_as_rounded_string(sept_median_7_day_low[weather_year][settings.TREATED_LABEL],sept_median_7_day_low[weather_year][settings.UNTREATED_LABEL])
         hydro_char_data.append({'key': '&nbsp;&nbsp;&nbsp;&nbsp;- %s' % weather_year, 'value': treatment_type_sept_7_day_low_diff, 'unit': 'CFS' })
 
     prop_mgmt_data = []

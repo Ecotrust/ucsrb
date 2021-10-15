@@ -237,6 +237,7 @@ WET_YEAR_LABEL = 'wet'
 DRY_YEAR_LABEL = 'dry'
 # UNTREATED_LABEL = 'baseline'
 UNTREATED_LABEL = 'untreated'
+TREATED_LABEL = 'treated'
 
 MODEL_YEAR_LOOKUP = {
     '2000': DRY_YEAR_LABEL,
