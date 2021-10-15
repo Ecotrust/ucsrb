@@ -374,7 +374,7 @@ app.map.setBoundaryLayer = function(layer) {
     layer.removeFilter(app.map.boundary);
   }
   app.map.boundary = new ol.filter.Mask({
-    feature: layer.getSource().getFeatureById('bound'),
+    feature: layer.getSource().getFeatures()[0],
     inner: false,
     fill: new ol.style.Fill({color:[58,86,117,0.45]})
   });
