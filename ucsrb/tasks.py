@@ -14,3 +14,8 @@ def runTreatment(treatment_id, weather_year='baseline'):
 
     runHarnessConfig(treatment, basin=None, weather_year=weather_year)
     # Thread(target=runHarnessConfig, args=(treatment,)).start()
+
+@shared_task
+def runBaseline(basin, weather_year):
+    from dhsvm_harness.utils import runHarnessConfig
+    runHarnessConfig(treatment_scenario=None, basin=basin, weather_year=weather_year)

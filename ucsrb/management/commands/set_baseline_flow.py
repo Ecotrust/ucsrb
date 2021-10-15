@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.contrib.auth.models import User
 from ucsrb.models import FocusArea, TreatmentScenario
-from dhsvm_harness.utils import runHarnessConfig
+from ucsrb.tasks import runBaseline
 from time import sleep
 
 class Command(BaseCommand):
@@ -27,4 +27,6 @@ class Command(BaseCommand):
             )
             sys.exit()
 
-        runHarnessConfig(None, basin=basin_name)
+        runBaseline.delay(self.id, settings.NORMAL_YEAR_LABEL)
+        runBaseline.delay(basin_name, settings.WET_YEAR_LABEL)
+        runBaseline.delay(basin_name, settings.DRY_YEAR_LABEL)
