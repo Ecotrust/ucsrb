@@ -541,10 +541,11 @@ def get_results_delta(flow_output):
     elif type(out_dict[settings.NORMAL_YEAR_LABEL][settings.TREATED_LABEL]) == list:
         # previously-deltaed data
         for weather_year in out_dict.keys():
-            for index, timestep in enumerate(out_dict[weather_year][settings.TREATED_LABEL]):
-                # Testing has shown that this logic is sound - chronological order is maintained across treatment.
-                baseflow = flow_output[weather_year][settings.UNTREATED_LABEL][index]['flow']
-                out_dict[weather_year][settings.TREATED_LABEL][index]['flow'] -= baseflow
+            for treatment in out_dict[weather_year].keys():
+                for index, timestep in enumerate(out_dict[weather_year][treatment]):
+                    # Testing has shown that this logic is sound - chronological order is maintained across treatment.
+                    baseflow = flow_output[weather_year][settings.UNTREATED_LABEL][index]['flow']
+                    out_dict[weather_year][treatment][index]['flow'] -= baseflow
 
     return out_dict
 
