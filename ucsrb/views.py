@@ -528,11 +528,11 @@ def get_results_delta(flow_output):
     else:
         out_dict = deepcopy(flow_output)
 
-    if type(out_dict[settings.NORMAL_YEAR_LABEL][settings.TREATED_LABEL]) == dict:
+    if type(out_dict[settings.NORMAL_YEAR_LABEL][settings.TREATED_LABEL]) in [dict, OrderedDict]:
         # flow_results
         for weather_year in out_dict.keys():
             for timestep in out_dict[weather_year][settings.TREATED_LABEL].keys():
-                baseflow = flow_output[settings.TREATED_LABEL][timestep]
+                baseflow = flow_output[weather_year][settings.UNTREATED_LABEL][timestep]
                 for rx in out_dict[weather_year].keys():
                     # be sure not to process the 'records_available' key:
                     if timestep in out_dict[weather_year][rx].keys():
