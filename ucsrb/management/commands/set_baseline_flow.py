@@ -27,6 +27,6 @@ class Command(BaseCommand):
             )
             sys.exit()
 
-        runBaseline.delay(self.id, settings.NORMAL_YEAR_LABEL)
+        runBaseline.delay(basin_name, settings.NORMAL_YEAR_LABEL)
         runBaseline.delay(basin_name, settings.WET_YEAR_LABEL)
         runBaseline.delay(basin_name, settings.DRY_YEAR_LABEL)
