@@ -738,7 +738,7 @@ enableDrawing = function() {
 
 showUploadForm = function() {
   $.ajax({
-      url: `login_check/`,
+      url: `/login_check/`,
       data: {},
       dataType: 'json',
       success: function(response) {
