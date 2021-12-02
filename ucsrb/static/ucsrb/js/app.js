@@ -338,6 +338,9 @@ app.panel = {
         showAggregate: function() {
             $('.result-section').removeClass('show');
             $('#aggregate-results').addClass('show');
+            setTimeout(function() {
+              $('[data-toggle="tooltip"]').tooltip();
+            }, 100);
         },
         showHydro: function() {
             if (!document.getElementById('hydro-results')) {
