@@ -858,8 +858,8 @@ def get_hydro_results_by_pour_point_id(request):
     prop_mgmt_data.append({'key': 'Total forested area in proposed treatment', 'value': int(treatment_acres), 'unit': 'acres' })
 
     summary_reports = []
-    summary_reports.append({'title': 'Basin Characteristics','data': bas_char_data})
-    summary_reports.append({'title': 'Hydrologic Characteristics','data': hydro_char_data})
+    summary_reports.append({'title': 'Basin Characteristics','data': bas_char_data,'help': "These results are from a DHSVM run with climate data from a normal or average hydrologic year."})
+    summary_reports.append({'title': 'Hydrologic Characteristics','data': hydro_char_data,'help': "Each of these results is for a DHSVM run with climate data from a representative dry, normal (average), and wet hydrologic year."})
     summary_reports.append({'title': 'Proposed Management','data': prop_mgmt_data})
 
     results = [

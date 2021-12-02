@@ -460,7 +460,11 @@ app.panel = {
         styleSummaryResultsAsRows: function(results) {
           var html = '<h2>Summary Report</h2>';
           for (var result in results) {
-              html += `<h3>${results[result].title}</h3>`
+              html += `<h3>${results[result].title}`;
+              if (results[result].hasOwnProperty('help') && results[result].help.length > 0) {
+                html += `&nbsp;&nbsp;&nbsp;<i class="info-icon icon-info-sign field-tooltip summary-report-tooltip" data-toggle="tooltip" data-original-title="${results[result].help}" data-placement="right"></i>`;
+              }
+              html += `</h3>`;
               html += '<div class="table-responsive"><table class="table-light table-borderless table"><tbody>';
               // html += '<tr><th>Field</th><th>Value</th><th>Unit</th></tr>';
               for (var i = 0; i < results[result].data.length; i++) {
