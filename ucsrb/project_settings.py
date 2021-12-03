@@ -236,7 +236,11 @@ NORMAL_YEAR_LABEL = 'normal'
 WET_YEAR_LABEL = 'wet'
 DRY_YEAR_LABEL = 'dry'
 # UNTREATED_LABEL = 'baseline'
+# Do not change the UNTREATED_LABEL -- instead use OVERRIDE below
 UNTREATED_LABEL = 'untreated'
+# If you change this, be sure to enforce it's chart style in 
+#   static/ucsrb/js/app.js under 'app.panel.results.chart.obj'
+OVERRIDE_UNTREATED_CHART_LABEL = 'untreated-normal'
 TREATED_LABEL = 'treated'
 
 MODEL_YEAR_LOOKUP = {

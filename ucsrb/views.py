@@ -676,8 +676,12 @@ def get_float_change_as_rounded_string(rx_val,baseline):
 
 def absolute_chart(chart_data):
     # out_chart = OrderedDict({})
+    if settings.OVERRIDE_UNTREATED_CHART_LABEL:
+        chart_untreated_label = settings.OVERRIDE_UNTREATED_CHART_LABEL
+    else:
+        chart_untreated_label = settings.UNTREATED_LABEL
     out_chart = {}
-    out_chart[settings.UNTREATED_LABEL] = chart_data[settings.NORMAL_YEAR_LABEL][settings.UNTREATED_LABEL]
+    out_chart[chart_untreated_label] = chart_data[settings.NORMAL_YEAR_LABEL][settings.UNTREATED_LABEL]
     out_chart[settings.DRY_YEAR_LABEL] = chart_data[settings.DRY_YEAR_LABEL][settings.TREATED_LABEL]
     out_chart[settings.WET_YEAR_LABEL] = chart_data[settings.WET_YEAR_LABEL][settings.TREATED_LABEL]
     out_chart[settings.NORMAL_YEAR_LABEL] = chart_data[settings.NORMAL_YEAR_LABEL][settings.TREATED_LABEL]

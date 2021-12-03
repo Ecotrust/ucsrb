@@ -517,6 +517,7 @@ app.panel = {
                         type: 'line',
                         colors: {
                             untreated: '#394861',
+                            'untreated-normal': '#394861',
                             'reduce to 30': '#FB7302',
                             'reduce to 0': '#680109',
                             'reduce to 50': '#93A35D',
