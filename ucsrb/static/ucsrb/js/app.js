@@ -319,7 +319,9 @@ app.panel = {
             app.panel.results.showHydro();
         },
         addResults: function(content, callback) {
+            $('[data-toggle="tooltip"]').trigger('mouseout');
             app.panel.results.getPanelResultsElement.innerHTML += content;
+            $('[data-toggle="tooltip"]').tooltip();
             app.panel.results.expander();
             if (callback) {
                 callback();

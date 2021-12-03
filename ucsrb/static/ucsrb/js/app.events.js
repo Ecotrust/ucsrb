@@ -42,6 +42,9 @@ $(document).ready(function() {
             steps_element: '#stepTwoPageGuide',
         });
 
+        // Why aren't tooltips dying during model runs?
+        $('[data-toggle="tooltip"]').tooltip('dispose');
+
         // Hide more method details collapsable
         $('#collapsable-help-wrap').addClass('d-none');
     });
