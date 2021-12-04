@@ -371,9 +371,9 @@ def define_scenario(request, featJson, scenario_name, description, prescription_
             focus_area_input=focus_area,
             prescription_treatment_selection=prescription_selection
         )
-    except:
+    except Exception as e:
         # Technically we're testing for psycopg2's InternalError GEOSIntersects TopologyException
-        return get_json_error_response('Treatment Areas overlap. Please review your data and start over.', 500, context)
+        return get_json_error_response('Unexpected error: "{}". This could be the result of trying to treat an area in a designated Wilderness, please review your data and start over.'.format(e), 500, context)
 
     if not scenario.geometry_dissolved:
         return get_json_error_response('Drawing does not cover any forested land in the Upper Columbia', 500, context)
