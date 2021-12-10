@@ -546,9 +546,11 @@ class VegPlanningUnit(models.Model):
 
 # class Report(models.Model):
 class StreamFlowReading(models.Model):
+    # Timestamp should be removed in favor of just using 'time' field.
     timestamp = models.CharField(max_length=30, verbose_name="Reading Timestamp")
     time = models.DateTimeField(verbose_name="Reading DateTime")
     segment_id = models.CharField(max_length=30, blank=True, null=True, default=None, verbose_name="Streat Segment ID")
+    # Metric field is not useful - we only store Abs flow
     metric = models.CharField(max_length=30, choices=settings.FLOW_METRIC_CHOICES, verbose_name="Measurement Metric")
     is_baseline = models.BooleanField(default=False, verbose_name="This is a baseline reading")
     treatment = models.ForeignKey(TreatmentScenario, null=True, blank=True, default=None, on_delete=models.CASCADE, verbose_name="Treatment Scenario")
